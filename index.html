@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pixel Quest Echoes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <header><h1>Pixel Quest Echoes</h1></header>
+
+  <main id="game">
+    <section id="screen" class="card">
+      <div id="location-name" class="title">Oakhaven</div>
+      <button id="floatingMenuBtn" class="floating-menu-btn">☰</button>
+      <div id="enemy-panel" class="hidden">
+        <p><strong id="enemy-name"></strong></p>
+        <p>HP: <span id="enemy-hp"></span></p>
+      </div>
+      <div id="story" class="story"></div>
+    </section>
+
+    <aside id="sidebar">
+      <div class="card collapsible">
+        <h2 class="collapsible-header" data-target="stats-content">📊 Stats</h2>
+        <div id="stats-content" class="collapsible-content">
+          <div class="stat-bar">
+            <p>HP:</p>
+            <div class="bar-container">
+              <div id="hp-bar" class="bar hp-bar"></div>
+              <span id="hp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <p>MP:</p>
+            <div class="bar-container">
+              <div id="mp-bar" class="bar mp-bar"></div>
+              <span id="mp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <p>XP:</p>
+            <div class="bar-container">
+              <div id="xp-bar" class="bar xp-bar"></div>
+              <span id="xp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <div class="stat-display">
+            <div>ATK: <strong id="derived-attack">0</strong></div>
+            <div>DEF: <strong id="derived-defense">0</strong></div>
+            <div>MAG: <strong id="derived-magic">0</strong></div>
+          </div>
+          <p>Gold: <span id="gold"></span></p>
+          <p>Level: <span id="level"></span></p>
+          <p>STR: <span id="strength"></span></p>
+          <p>AGI: <span id="agility"></span></p>
+          <p>INT: <span id="intelligence"></span></p>
+          <p>Stat Points: <span id="stat-points"></span></p>
+        </div>
+      </div>
+
+      <div class="card collapsible">
+        <h2 class="collapsible-header" data-target="quickactions-content">⚡ Quick Actions</h2>
+        <div id="quickactions-content" class="collapsible-content">
+          <button class="btn" id="inventoryBtn">🎒 Inventory</button>
+          <button class="btn" id="statsBtn">📈 Stats</button>
+          <button class="btn" id="restBtn">🛏️ Rest</button>
+          <button class="btn" id="shopBtn">🛒 Shop</button>
+          <button class="btn" id="craftBtn">🧪 Crafting</button>
+        </div>
+      </div>
+
+      <div id="combat-menu" class="card collapsible hidden">
+        <h2 class="collapsible-header" data-target="combat-content">⚔️ Combat</h2>
+        <div id="combat-content" class="collapsible-content">
+          <div class="action-buttons-grid">
+            <button class="btn" id="attackBtn">⚔️ Attack</button>
+            <button class="btn" id="magicBtn">✨ Magic</button>
+            <button class="btn" id="itemBtn">🧪 Item</button>
+            <button class="btn" id="fleeBtn">🏃 Flee</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="navigation-menu" class="card collapsible">
+        <h2 class="collapsible-header" data-target="navigation-content">🧭 Navigation</h2>
+        <div id="navigation-content" class="collapsible-content">
+          <div class="direction-buttons">
+            <button class="btn" data-direction="up">🔼 Up</button>
+            <button class="btn" data-direction="north">⬆️ North</button>
+            <button class="btn" data-direction="down">🔽 Down</button>
+            <button class="btn" data-direction="west">⬅️ West</button>
+            <button class="btn" data-direction="enter">🚪 Enter</button>
+            <button class="btn" data-direction="east">➡️ East</button>
+            <button class="btn" data-direction="out">🚪 Exit</button>
+            <button class="btn" data-direction="south">⬇️ South</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modales -->
+  <div id="inventoryModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>🎒 Inventory</h2>
+      <p>Gold: <span id="inventoryGold">0</span> 🪙</p>
+      <div class="inventory-grid">
+        <div class="inventory-list-col">
+          <h3>Items</h3>
+          <ul id="inventoryList"></ul>
+        </div>
+        <div class="inventory-detail-col" id="inventoryDetail">
+          <h3>Item Details</h3>
+          <div class="item-detail-empty">Select an item and click <strong>Info</strong> to view details.</div>
+          <div class="item-detail" id="itemDetailCard" style="display:none;">
+            <button id="detailCloseBtn" class="btn small" style="float:right; margin-top:-6px;">Cerrar</button>
+            <div class="item-detail-header">
+              <div class="item-detail-icon" id="detailIcon">🧪</div>
+              <div>
+                <div id="detailName" class="detail-name">Health Potion</div>
+                <div id="detailMeta" class="detail-meta">Common • Consumable</div>
+              </div>
+            </div>
+            <div class="item-detail-body">
+              <p id="detailDesc"></p>
+              <ul id="detailAttrs"></ul>
+            </div>
+            <div class="item-detail-actions">
+              <button id="detailUseBtn" class="btn small">Use</button>
+              <button id="detailEquipBtn" class="btn small">Equip</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>Equipment</h3>
+        <ul id="equipmentList">
+          <li>Right Hand: <span id="equip-rightHand">Empty</span></li>
+          <li>Armor: <span id="equip-armor">Empty</span></li>
+          <li>Accessory: <span id="equip-accessory">Empty</span></li>
+        </ul>
+      </div>
+      <button class="btn" id="closeInventoryBtn">❌ Close</button>
+    </div>
+  </div>
+
+  <div id="statsModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>📈 Improve Stats</h2>
+      <p>Stat Points: <strong id="modal-stat-points">0</strong></p>
+      <div class="stat-increase-grid">
+        <div class="stat-row">STR: <span id="modal-strength">0</span> <button id="inc-str" class="btn small">+</button></div>
+        <div class="stat-row">AGI: <span id="modal-agility">0</span> <button id="inc-agi" class="btn small">+</button></div>
+        <div class="stat-row">INT: <span id="modal-intelligence">0</span> <button id="inc-int" class="btn small">+</button></div>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn" id="closeStatsBtn">❌ Close</button>
+      </div>
+      <p class="muted">You gain 5 stat points each level. Spend them here.</p>
+    </div>
+  </div>
+
+  <div id="shopModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>General Store</h2>
+      <p>Your gold: <span id="shopGold">0</span> 🪙</p>
+      <div>
+        <h3>Buy</h3>
+        <ul id="shopBuyList"></ul>
+      </div>
+      <div>
+        <h3>Sell</h3>
+        <ul id="shopSellList"></ul>
+      </div>
+      <button class="btn" id="closeShopBtn">❌ Close</button>
+    </div>
+  </div>
+
+  <div id="craftingModal" class="modal hidden">
+    <div class="crafting-container">
+      <h2>Crafting</h2>
+      <div class="crafting-tabs">
+        <button class="crafting-tab active" data-tab="forge">Forge</button>
+        <button class="crafting-tab" data-tab="alchemy">Alchemy</button>
+        <button class="crafting-tab" data-tab="arcane">Arcane</button>
+      </div>
+      <div class="recipes-list" id="recipesList"></div>
+      <div class="recipe-details hidden" id="recipeDetails">
+        <h3 id="recipeName"></h3>
+        <p id="recipeRarity"></p>
+        <h4>Required Materials:</h4>
+        <ul id="materialsList"></ul>
+        <button id="craftButton" class="btn">Craft</button>
+      </div>
+      <button id="closeCraftingBtn" class="btn close-btn">Close</button>
+    </div>
+  </div>
+
+  <div id="mainMenuModal" class="modal hidden">
+    <div class="modal-content main-menu">
+      <h1>🏰 Pixel Quest Echoes 🏰</h1>
+      <div class="menu-options">
+        <button id="newGameBtn" class="menu-btn">🆕 New Game</button>
+        <button id="continueBtn" class="menu-btn">▶️ Continue</button>
+        <button id="saveGameBtn" class="menu-btn">💾 Save Game</button>
+        <button id="loadGameBtn" class="menu-btn">📂 Load Game</button>
+        <button id="deleteSaveBtn" class="menu-btn">🗑️ Delete Save</button>
+        <button id="closeMenuBtn" class="menu-btn">❌ Close</button>
+      </div>
+      <div class="save-info" id="saveInfo"></div>
+    </div>
+  </div>
+
+  <div id="gameOverModal" class="modal hidden">
+    <div class="modal-content game-over-content">
+      <h1>💀 GAME OVER 💀</h1>
+      <p>You have been defeated in your quest.</p>
+      <button id="restartBtn" class="btn menu-btn">🔄 Try Again</button>
+    </div>
+  </div>
+
+  <div id="endingModal" class="modal hidden">
+    <div class="modal-content ending-modal">
+      <h1>🏆 ¡Misión Completada! 🏆</h1>
+      <p id="endingMessage">Has derrotado al Dragon King y completado la misión principal.</p>
+      <div class="ending-stats">
+        <p>Level: <span id="ending-level">0</span></p>
+        <p>Gold: <span id="ending-gold">0</span></p>
+        <p>Experience: <span id="ending-xp">0</span></p>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; justify-content:center;">
+        <button id="endingRestartBtn" class="btn">🔄 Reiniciar</button>
+        <button id="endingCloseBtn" class="btn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer><p>© 2025 Pixel Quest Echoes</p></footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

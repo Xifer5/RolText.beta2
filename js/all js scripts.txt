@@ -1,0 +1,3778 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header, footer {
+  background: #222;
+  padding: 10px;
+  text-align: center;
+}
+
+main#game {
+  display: flex;
+  flex-direction: row; /* Asegura que la barra lateral y la pantalla estén una al lado de la otra */
+  flex: 1;
+}
+
+#screen {
+  flex: 1; /* Ocupa el espacio restante */
+  padding: 15px;
+  overflow-y: auto;
+  background: #111;
+}
+
+#sidebar {
+  width: 250px; /* Ancho fijo para el menú delgado */
+  padding: 10px;
+  background: #1a1a1a;
+  display: flex; /* Utiliza flexbox para los elementos internos */
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto; /* ¡Añade esto para el scroll vertical! */
+}
+
+.card {
+  background: #2a2a2a;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.story {
+  max-height: 300px; /* Aumenta la altura */
+  min-height: 200px; /* Altura mínima */
+  overflow-y: auto;
+  padding: 10px; /* Más padding */
+  border: 1px solid #444; /* Borde más visible */
+  border-radius: 5px;
+  margin-top: 15px;
+  background-color: #1a1a1a; /* Fondo diferenciado */
+  flex: 1;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  margin: 5px 0;
+  padding: 8px;
+  background: #444;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+.btn:hover {
+  background: #666;
+}
+
+.direction-buttons {
+  display: grid;
+  grid-template-areas:
+        ". up ."
+        "left . right"
+        ". down .";
+  gap: 5px; /* Espacio entre los botones */
+  margin-top: 10px;
+  width: 150px; /* Ancho fijo para centrar */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.direction-buttons .north-btn { grid-area: up; }
+.direction-buttons .west-btn { grid-area: left; }
+.direction-buttons .east-btn { grid-area: right; }
+.direction-buttons .south-btn { grid-area: down; }
+
+.direction-buttons div {
+  display: flex;
+  gap: 4px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Mensajes narrativos */
+.msg-combat { color: #ff5555; }
+.msg-loot { color: #ffaa00; }
+.msg-stat { color: #55ff55; }
+.msg-shop { color: #00aaff; }
+
+/* Modal tienda */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+/* Estilo de las barras de progreso */
+.stat-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.stat-bar p {
+  margin: 0;
+  width: 40px; /* Ancho fijo para alinear el texto */
+}
+
+.bar-container {
+  flex: 1;
+  background: #444;
+  border: 1px solid #666;
+  border-radius: 4px;
+  height: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  border-radius: 3px;
+}
+
+.bar-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.hp-bar { background-color: #e74c3c; } /* Rojo para HP */
+.mp-bar { background-color: #3498db; } /* Azul para MP */
+.xp-bar { background-color: #f1c40f; } /* Amarillo para XP */
+
+.actions-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.action-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas de igual ancho */
+    gap: 10px; /* Espacio entre los botones */
+    margin-bottom: 10px;
+}
+
+/* Reducimos el padding de los botones en esta sección para que sean más compactos */
+.action-buttons-grid .btn {
+    padding: 10px;
+}
+
+.msg-system { color: #888; font-style: italic; }
+
+.msg-narrative { 
+  color: #dddddd; 
+  margin: 5px 0;
+}
+
+.stat-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  padding: 8px;
+  background: #2a2a2a;
+  border-radius: 5px;
+}
+
+.stat-btn {
+  width: auto;
+  padding: 5px 10px;
+  margin: 0;
+}
+
+.modal-content h3 {
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+  margin-top: 15px;
+}
+
+#inventoryList li, #equipmentList li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  padding: 5px;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.equip-btn {
+  padding: 3px 8px;
+  font-size: 0.8em;
+}
+
+/* Mejora para los botones de dirección */
+.direction-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+}
+
+.direction-buttons .btn {
+  padding: 8px 5px;
+  font-size: 0.9em;
+}
+
+/* Estilos para el modal de estadísticas */
+.stat-bonus {
+  font-size: 0.9em;
+  color: #55ff55;
+  margin-left: 10px;
+}
+
+/* Estilos para menús colapsables - CORREGIDO */
+.collapsible {
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.collapsible-header {
+  cursor: pointer;
+  padding: 10px;
+  background: #333;
+  border-radius: 5px;
+  margin: -10px -10px 0 -10px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  position: relative;
+  z-index: 2;
+}
+
+.collapsible-header::after {
+  content: '▼';
+  margin-left: auto;
+  font-size: 0.8em;
+  transition: transform 0.3s ease;
+}
+
+.collapsible-header.collapsed::after {
+  transform: rotate(-90deg);
+}
+
+.collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 500px;
+  opacity: 1;
+}
+
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+/* NUNCA usar display: none en el contenido colapsable */
+.collapsible-content {
+  display: block !important;
+}
+
+/* Estado inicial - colapsar algunos menús por defecto */
+#stats-content.collapsed,
+#quickactions-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+#stats-content:not(.collapsed),
+#quickactions-content:not(.collapsed) {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* Asegurar que el contenido colapsable tenga padding cuando está expandido */
+.collapsible-content:not(.collapsed) {
+  padding: 10px 0;
+}
+
+/* Estilos específicos para el contenido de stats */
+#stats-content {
+  padding: 10px 0;
+}
+
+#stats-content .stat-bar {
+  margin: 8px 0;
+}
+
+#stats-content p {
+  margin: 5px 0;
+  color: #eee;
+}
+
+/* Estilos específicos para quick actions */
+#quickactions-content {
+  padding: 10px 0;
+}
+
+#quickactions-content .btn {
+  margin: 5px 0;
+  width: 100%;
+}
+
+/* ========= CRAFTING MODAL ========= */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.crafting-container {
+  background: #222;
+  color: #fff;
+  padding: 20px;
+  width: 420px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.crafting-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.crafting-tab {
+  flex: 1;
+  padding: 6px;
+  background: #444;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.crafting-tab.active {
+  background: #66aaff;
+  color: #012;
+}
+
+.recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #555;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.recipe-button {
+  background: linear-gradient(#2b2b2b,#262626);
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #3b3b3b;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recipe-button:hover {
+  background: #444;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+}
+
+.recipe-details {
+  margin-top: 10px;
+  padding: 10px;
+  background: #333;
+  border-radius: 8px;
+  border: 1px solid #555;
+}
+
+.close-btn {
+  margin-top: 12px;
+  width: 100%;
+  background: #aa4444;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#craftButton {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  background: #44aa44;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Estilos para el menú principal */
+.main-menu {
+  max-width: 500px;
+  text-align: center;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 2px solid #0f3460;
+  box-shadow: 0 0 20px rgba(15, 52, 96, 0.5);
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.menu-btn {
+  padding: 12px 20px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #2d3561, #0f3460);
+  border: 1px solid #533483;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.menu-btn:hover {
+  background: linear-gradient(135deg, #3a4270, #1a3a6a);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(83, 52, 131, 0.3);
+}
+
+.save-info {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+  color: #ccc;
+  font-size: 14px;
+}
+
+/* Estilos para los botones de guardado/carga rápidos */
+.save-load-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.quick-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  background: linear-gradient(135deg, #2d3561, #0f3460);
+  border: 1px solid #533483;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+  background: linear-gradient(135deg, #3a4270, #1a3a6a);
+  transform: translateY(-1px);
+}
+/* Estilos para el modal de Game Over */
+.game-over-content {
+  text-align: center;
+  background: linear-gradient(135deg, #3a0b0b, #1a0000);
+  border: 2px solid #8b0000;
+  color: #ffcccc;
+}
+
+.game-over-content h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px #ff0000;
+}
+
+.game-over-content p {
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
+/* ================= TOOLTIP ================= */
+.tooltip {
+  position: relative;
+  display: inline-block;          /* se adapta al ancho del texto */
+  cursor: help;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: max-content;
+  max-width: 220px;
+  background-color: #222;
+  color: #fff;
+  text-align: left;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 6px 8px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;                  /* arriba del elemento */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85em;
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.tooltip:hover .tooltiptext,
+.tooltip:active .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.floating-menu-btn {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: #444; color: #fff;
+  border: none; font-size: 1.4em;
+  cursor: pointer; z-index: 999;
+}
+.floating-menu-btn:hover { background: #666; }
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pixel Quest Echoes</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Pixel Quest Echoes</h1>
+  </header>
+
+  <main id="game">
+    <!-- Pantalla principal -->
+    <section id="screen" class="card">
+      <div id="location-name" class="title">Town Square</div>
+          <!-- Botón flotante ☰  -->
+    <button id="floatingMenuBtn" class="floating-menu-btn">☰</button>
+
+      <div id="enemy-panel" class="hidden">
+        <p><strong id="enemy-name"></strong></p>
+        <p>HP: <span id="enemy-hp"></span></p>
+      </div>
+      <div id="story" class="story"></div>
+    </section>
+
+    <!-- Panel lateral -->
+    <aside id="sidebar">
+      <!-- Menú Colapsable - Stats -->
+      <div class="card collapsible">
+        <h2 class="collapsible-header" data-target="stats-content">📊 Stats</h2>
+        <div id="stats-content" class="collapsible-content">
+          <div class="stat-bar">
+            <p>HP:</p>
+            <div class="bar-container">
+              <div id="hp-bar" class="bar hp-bar"></div>
+              <span id="hp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <p>MP:</p>
+            <div class="bar-container">
+              <div id="mp-bar" class="bar mp-bar"></div>
+              <span id="mp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <div class="stat-bar">
+            <p>XP:</p>
+            <div class="bar-container">
+              <div id="xp-bar" class="bar xp-bar"></div>
+              <span id="xp-text" class="bar-text"></span>
+            </div>
+          </div>
+          <p>Gold: <span id="gold"></span></p>
+          <p>Level: <span id="level"></span></p>
+          <p>STR: <span id="strength"></span></p>
+          <p>AGI: <span id="agility"></span></p>
+          <p>INT: <span id="intelligence"></span></p>
+          <p>Stat Points: <span id="stat-points"></span></p>
+        </div>
+      </div>
+
+      <!-- Menú Colapsable - Quick Actions -->
+      <div class="card collapsible">
+        <h2 class="collapsible-header" data-target="quickactions-content">⚡ Quick Actions</h2>
+        <div id="quickactions-content" class="collapsible-content">
+          <button class="btn" id="inventoryBtn">🎒 Inventory</button>
+          <button class="btn" id="statsBtn">📊 Stats</button>
+          <button class="btn" id="restBtn">🛏️ Rest</button>
+          <button class="btn" id="shopBtn">🛒 Shop</button>
+          <button class="btn" id="craftBtn" onclick="openCrafting()">🧪 Crafting</button>
+        </div>
+      </div>
+
+      <!-- Menú Combat (solo visible en combate) -->
+      <div id="combat-menu" class="card collapsible hidden">
+        <h2 class="collapsible-header" data-target="combat-content">⚔️ Combat</h2>
+        <div id="combat-content" class="collapsible-content">
+          <div class="action-buttons-grid">
+            <button class="btn" id="attackBtn">⚔️ Attack</button>
+            <button class="btn" id="magicBtn">✨ Magic</button>
+            <button class="btn" id="itemBtn">🧪 Item</button>
+            <button class="btn" id="fleeBtn">🏃 Flee</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menú Navigation (solo visible fuera de combate) -->
+      <div id="navigation-menu" class="card collapsible">
+        <h2 class="collapsible-header" data-target="navigation-content">🧭 Navigation</h2>
+        <div id="navigation-content" class="collapsible-content">
+          <div class="direction-buttons">
+            <button class="btn north-btn" data-direction="north">⬆️ North</button>
+            <button class="btn west-btn" data-direction="west">⬅️ West</button>
+            <button class="btn east-btn" data-direction="east">➡️ East</button>
+            <button class="btn south-btn" data-direction="south">⬇️ South</button>
+            <button class="btn up-btn" data-direction="up">🔼 Up</button>
+            <button class="btn down-btn" data-direction="down">🔽 Down</button>
+            <button class="btn enter-btn" data-direction="enter">🚪 Enter</button>
+            <button class="btn out-btn" data-direction="out">🚪 Exit</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Modales -->
+    <!-- Modal de Inventario -->
+    <div id="inventoryModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>🎒 Inventory</h2>
+        <p>Gold: <span id="inventoryGold">0</span> 🪙</p>
+        <div>
+          <h3>Items</h3>
+          <ul id="inventoryList"></ul>
+        </div>
+        <div>
+          <h3>Equipment</h3>
+          <ul id="equipmentList">
+            <li>Right Hand: <span id="equip-rightHand">Empty</span></li>
+            <li>Armor: <span id="equip-armor">Empty</span></li>
+            <li>Accessory: <span id="equip-accessory">Empty</span></li>
+          </ul>
+        </div>
+        <button class="btn" id="closeInventoryBtn">❌ Close</button>
+      </div>
+    </div>
+
+    <!-- Modal de Estadísticas -->
+    <div id="statsModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>📊 Character Stats</h2>
+        <p>Level: <span id="modalLevel"></span></p>
+        <p>Stat Points: <span id="modalStatPoints"></span></p>
+        
+        <div class="stat-display">
+          <p>Strength: <span id="modalStrength"></span> (+<span id="strBonus">0</span> ATK, +<span id="strHpBonus">0</span> HP)</p>
+          <button class="btn stat-btn" data-stat="strength" id="addStrBtn">+ STR</button>
+        </div>
+        
+        <div class="stat-display">
+          <p>Agility: <span id="modalAgility"></span> (+<span id="agiDefBonus">0</span> DEF)</p>
+          <button class="btn stat-btn" data-stat="agility" id="addAgiBtn">+ AGI</button>
+        </div>
+        
+        <div class="stat-display">
+          <p>Intelligence: <span id="modalIntelligence"></span> (+<span id="intMpBonus">0</span> MP, +<span id="intMagicBonus">0</span> MAG)</p>
+          <button class="btn stat-btn" data-stat="intelligence" id="addIntBtn">+ INT</button>
+        </div>
+        
+        <button class="btn" id="closeStatsBtn">❌ Close</button>
+      </div>
+    </div>
+
+    <!-- Modal Tienda -->
+    <div id="shopModal" class="modal hidden">
+      <div class="modal-content">
+        <h2>General Store</h2>
+        <p>Your gold: <span id="shopGold">0</span> 🪙</p>
+        <div>
+          <h3>Buy</h3>
+          <ul id="shopBuyList"></ul>
+        </div>
+        <div>
+          <h3>Sell</h3>
+          <ul id="shopSellList"></ul>
+        </div>
+        <button class="btn" id="closeShopBtn">❌ Close</button>
+      </div>
+    </div>
+
+    <!-- CRAFTING MODAL -->
+    <div id="craftingModal" class="modal hidden">
+      <div class="crafting-container">
+        <h2>Crafting</h2>
+
+        <!-- Tabs -->
+        <div class="crafting-tabs">
+          <button class="crafting-tab active" data-tab="forge">Forge</button>
+          <button class="crafting-tab" data-tab="alchemy">Alchemy</button>
+          <button class="crafting-tab" data-tab="arcane">Arcane</button>
+        </div>
+
+        <!-- Recipe list -->
+        <div class="recipes-list" id="recipesList"></div>
+
+        <!-- Selected recipe details -->
+        <div class="recipe-details hidden" id="recipeDetails">
+          <h3 id="recipeName"></h3>
+          <p id="recipeRarity"></p>
+
+          <h4>Required Materials:</h4>
+          <ul id="materialsList"></ul>
+
+          <button id="craftButton" class="btn">Craft</button>
+        </div>
+
+        <button id="closeCraftingBtn" class="btn close-btn">Close</button>
+      </div>
+    </div>
+
+
+    <!-- MAIN MENU MODAL (moved outside main) -->
+    <div id="mainMenuModal" class="modal hidden">
+      <div class="modal-content main-menu">
+        <h1>🏰 Pixel Quest Echoes 🏰</h1>
+        <div class="menu-options">
+          <button id="newGameBtn" class="menu-btn">🆕 New Game</button>
+          <button id="continueBtn" class="menu-btn">▶️ Continue</button>
+          <button id="saveGameBtn" class="menu-btn">💾 Save Game</button>
+          <button id="loadGameBtn" class="menu-btn">📂 Load Game</button>
+          <button id="deleteSaveBtn" class="menu-btn">🗑️ Delete Save</button>
+          <button id="closeMenuBtn" class="menu-btn">❌ Close</button>
+        </div>
+        <div class="save-info" id="saveInfo"></div>
+      </div>
+    </div>
+        <!-- Modal de Game Over -->
+    <div id="gameOverModal" class="modal hidden">
+      <div class="modal-content game-over-content">
+        <h1>💀 GAME OVER 💀</h1>
+        <p>You have been defeated in your quest.</p>
+        <button id="restartBtn" class="btn menu-btn">🔄 Try Again</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Pixel Quest Echoes</p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
+
+// biomeBosses.js
+// Define los jefes (bosses) y mini-jefes de cada bioma
+// Compatible con biomes.js y el sistema de combate
+
+export const biomeBosses = {
+  forest: {
+    boss: "forest_titan",
+    miniBosses: ["alpha_wolf", "shaman_goblin"],
+    spawnChance: 0.10, // probabilidad de aparición por encuentro
+  },
+
+  cave: {
+    boss: "cave_devourer",
+    miniBosses: ["crystal_golem", "shadow_bat"],
+    spawnChance: 0.12,
+  },
+
+  mountain: {
+    boss: "mountain_colossus",
+    miniBosses: ["wyvern_elder", "stone_charger"],
+    spawnChance: 0.08,
+  },
+
+  ruins: {
+    boss: "ancient_construct",
+    miniBosses: ["arcane_beholder", "golem_guardian"],
+    spawnChance: 0.15,
+  },
+
+  swamp: {
+    boss: "swamp_abomination",
+    miniBosses: ["toxic_hydra", "zombie_lord"],
+    spawnChance: 0.14,
+  },
+
+  volcano: {
+    boss: "inferno_dragon",
+    miniBosses: ["lava_golem", "pyro_elemental"],
+    spawnChance: 0.18,
+  },
+
+  tundra: {
+    boss: "frost_wyrm",
+    miniBosses: ["ice_giant", "frozen_spirit"],
+    spawnChance: 0.09,
+  }
+};
+
+
+// -----------------------------------------------------
+// Función para seleccionar un jefe o mini-jefe
+// Se integra con tu sistema de combate actual
+// -----------------------------------------------------
+
+export function trySpawnBoss(biomeId) {
+  const biome = biomeBosses[biomeId];
+  if (!biome) return null;
+
+  // Probabilidad base del bioma
+  if (Math.random() > biome.spawnChance) return null;
+
+  // Seleccionar boss o mini-boss
+  const isBoss = Math.random() < 0.3; // 30% de probabilidad de ser el boss principal
+
+  if (isBoss) {
+    return biome.boss;
+  } else {
+    const mini = biome.miniBosses;
+    return mini[Math.floor(Math.random() * mini.length)];
+  }
+}
+
+
+// -----------------------------------------------------
+// Función principal usada desde tu sistema de combate
+// -----------------------------------------------------
+// Uso sugerido:
+// const bossId = getBossForBiome(location.biome);
+// if (bossId) startCombat(bossId);
+
+export function getBossForBiome(biomeId) {
+  const biome = biomeBosses[biomeId];
+  if (!biome) return null;
+
+  // Probabilidad dinámica (puede ajustarse según progreso del jugador)
+  if (Math.random() <= biome.spawnChance) {
+    return trySpawnBoss(biomeId);
+  }
+
+  return null;
+}
+
+
+// biomes.js
+// Sistema de biomas para Pixel Quest Echoes
+// Cada bioma define:
+// - Nivel mínimo sugerido
+// - Enemigos disponibles
+// - Probabilidad de encuentro
+// - Frases para descripciones dinámicas
+// - Modificadores opcionales (clima, visión, penalidades)
+
+export const biomes = {
+  forest: {
+    id: "forest",
+    name: "Forest",
+    minLevel: 1,
+    encounterRate: 0.35,
+    enemies: ["slime", "wolf", "goblin", "fungedBeast"],
+    description: [
+      "The trees loom tall above you.",
+      "You hear rustling in the bushes.",
+      "Birds scatter as you pass between the trees.",
+      "Faint sunlight breaks through the forest canopy."
+    ],
+    modifiers: {
+      visibility: 1.0,
+      magicBonus: 0,
+      defenseBonus: 0,
+    }
+  },
+
+  desert: {
+    name: "Desert",
+    minLevel: 5,
+    encounterRate: 0.35,
+    enemies: ["beholder", "warlock", "linchorn", "chimera"],
+    description: [
+      "A vast, endless expanse of blood-red sand. The heat here is oppressive, a tangible force that seems to drain the will to move. The defining feature is the wind—it constantly shifts the dunes, creating high, sculpted crests, and carries a sound like a thousand mournful voices. This is the Sea of Whispering Sands, where ancient travelers are said to be buried just beneath the surface, their final words carried on the breeze.",
+      "This desert is composed not of sand, but of millions of tiny, weathered shards of obsidian and jade. It is the remnants of a cataclysmic magical explosion. The ground glints with a painful brilliance under the relentless sun. In the center, a sunken crater holds a pool of water that shimmers with an unnatural, oily sheen, surrounded by bizarre, thorny cacti that pulse with faint, purple light.",
+      "The soil here is a rust-colored powder, so rich in iron that the entire area gives off a faint magnetic pull. Thunderstorms are frequent, and the flashes of lightning often strike the ground, fusing the dust into sharp, glassy ribbons. The air tastes of ozone and metallic decay. Strange, heavy-bodied creatures with thick, scaled hides are the only life that thrive in this mineral-rich wasteland.",
+      "A landscape dominated by the ghostly remains of a forest turned to stone. Hundreds of fossilized trees, gray and skeletal, jut from the cracked, dry earth. They offer no shade, only eerie, fixed shadows that stretch and warp as the sun crosses the sky. The silence is profound and heavy, a testament to the sudden, terrible event that once froze life in this desolate place.",
+      "This long, winding valley is perpetually shrouded in a thick, dust-laden haze. The sun never seems to fully rise or set, leaving the land in a state of dim, orange-tinged twilight. Navigation is difficult as landmarks are obscured. The only sign of life is the occasional, deep track of something massive and slow-moving that passes through the gloom, heading toward a destination you cannot see.",
+      "An expanse of cracked, parched earth that stretches to the horizon. The ground is a mosaic of deep fissures and jagged plates, with occasional geysers of steam venting from the depths below. The air is dry and hot, carrying the scent of sulfur and minerals. In the distance, mirages create illusions of water and greenery that vanish as you approach."
+    ],
+    modifiers: {
+      visibility: 1.0,
+      magicBonus: -1.0,
+      defenseBonus: -1.0,
+    }
+  },
+
+  cave: {
+    id: "cave",
+    name: "Cave",
+    minLevel: 3,
+    encounterRate: 0.45,
+    enemies: ["cave_bat", "cave_bear", "goblin_shaman"],
+    description: [
+      "The cave walls feel cold and damp.",
+      "Water dripping echoes endlessly.",
+      "Shadows dance along the rocky surfaces.",
+      "A distant growl makes you tense up."
+    ],
+    modifiers: {
+      visibility: 0.7,
+      magicBonus: +2,
+      defenseBonus: +1,
+    }
+  },
+
+  mountain: {
+    id: "mountain",
+    name: "Mountain",
+    minLevel: 6,
+    encounterRate: 0.40,
+    enemies: ["wyvern", "mountain_giant","drider"],
+    description: [
+      "Freezing winds whip across your face.",
+      "The air is thin and heavy.",
+      "Loose gravel slides under your boots.",
+      "You see massive figures moving in the distance."
+    ],
+    modifiers: {
+      visibility: 1.2,
+      magicBonus: -2,
+      defenseBonus: +3,
+    }
+  },
+
+  ruins: {
+    id: "ruins",
+    name: "Ancient Ruins",
+    minLevel: 5,
+    encounterRate: 0.50,
+    enemies: ["stone_golem", "ancient_guardian", "hydra"],
+    description: [
+      "Ancient pillars crumble upon your touch.",
+      "Blue runes glow faintly on broken walls.",
+      "The air feels charged with forgotten magic.",
+      "Whispers echo from nowhere."
+    ],
+    modifiers: {
+      visibility: 0.9,
+      magicBonus: +4,
+      defenseBonus: 0,
+    }
+  },
+
+  swamp: {
+    id: "swamp",
+    name: "Poison Swamp",
+    minLevel: 4,
+    encounterRate: 0.55,
+    enemies: ["zombie", "squeletor", "imp"],
+    description: [
+      "Thick fog makes it hard to see ahead.",
+      "Your boots sink into the muddy ground.",
+      "A foul smell fills the humid air.",
+      "Something splashes nearby… too large to be a frog."
+    ],
+    modifiers: {
+      visibility: 0.6,
+      magicBonus: +1,
+      defenseBonus: -1,
+      poisonChance: 0.1
+    }
+  },
+
+  volcano: {
+    id: "volcano",
+    name: "Volcanic Region",
+    minLevel: 10,
+    encounterRate: 0.50,
+    enemies: ["hydra", "chimera", "dragon", "Diablo", "infernal_elemental"],
+    description: [
+      "Heat waves distort the air.",
+      "Streams of lava crackle nearby.",
+      "Ash falls like snow around you.",
+      "The ground trembles with volcanic activity."
+    ],
+    modifiers: {
+      visibility: 1.0,
+      magicBonus: +3,
+      defenseBonus: -2,
+      fireDamage: 1
+    }
+  },
+
+  tundra: {
+    id: "tundra",
+    name: "Frozen Tundra",
+    minLevel: 7,
+    encounterRate: 0.30,
+    enemies: ["wolf", "mountain_giant", "wyvern"],
+    description: [
+      "The cold bites at your skin.",
+      "Snow crunches with every step.",
+      "Your breath freezes on the air.",
+      "Icy winds carry distant howls."
+    ],
+    modifiers: {
+      visibility: 1.1,
+      magicBonus: -1,
+      defenseBonus: +2,
+      coldDamage: 1
+    }
+  },
+
+  
+  beach: {
+    id: "beach",
+    name: "Sunny Beach",
+    minLevel: 7,
+    encounterRate: 0.30,
+    enemies: ["centaurus", "kraken", "sea_serpent", "mermaid", "medusa", "pirate", "pirate_captain"],
+    description: [
+      "The sand here is replaced by millions of smooth, dark, volcanic shingle stones. When the tide recedes, they create a cacophony of sound—the deep, rattling, withdrawing clatter of stone on stone. The water itself is a chilling, deep sapphire, and the sea stacks rising offshore are crowned with the crumbling ruins of ancient, forgotten shrines. The air is crisp and carries the potent scent of salt and iodine.",
+      "A secluded stretch of ivory-white sand fringed by tall, swaying palms. The water is turquoise and warm, shallow for hundreds of feet before it drops off. What makes this beach unique are the sea caves carved into the limestone cliffs. When the wind blows into them, it creates a melodic, mournful sound, like a choir singing softly across the water.",
+      "This beach is strewn with the skeletal remains of massive sea creatures: colossal ribs, cracked skulls the size of carriages, and pieces of polished driftwood that look like petrified bone. The sand is a dark, gritty brown, stained by years of tidal decomposition. The tide line is marked by a layer of strange, phosphorescent algae that glows faintly at night. The atmosphere is one of brooding, lonely majesty.",
+      "An idyllic beach where the sand is mixed with tiny, perfectly rounded amber stones. When the sun hits them, the entire shoreline glitters with a warm, golden fire. The waves are gentle, but the water tastes curiously sweet. A single, enormous, moss-covered archway of coral stands at the edge of the water, a natural gateway to the restless sea.",
+      "This is a rugged, wild beach where the land ends in sheer, jagged cliffs. The beach below is narrow and dangerous, littered with the wreckage of a hundred ships—splintered masts, barnacled figureheads, and rotted chests. The waves crash against the rocks with a violence that shakes the ground, and the cry of gulls is harsh and incessant. It is a place of scavengers and dark secrets.",
+
+    ],
+    modifiers: {
+      visibility: 1.1,
+      magicBonus: -1,
+      defenseBonus: +2,
+      WaterDamage: 2,
+    }
+  },
+
+    jungle: {
+    id: "jungle",
+    name: "The Canopy of Eternal Rain Jungle",
+    minLevel: 8,
+    encounterRate: 0.30,
+    enemies: ["gorilla_warrior", "jungle_tiger", "vine_serpent", "jungle_spirit"],
+    description: [
+      "The air is a thick, hot soup, saturated with the smell of wet earth and decaying wood. The foliage is so dense that true darkness reigns even at noon. A constant, gentle rain falls, not from the sky, but from the condensed water dripping from the leaves of the towering, emerald trees. The ground is a treacherous swamp of tangled roots and slick, moss-covered logs, and the sounds of unseen, chittering life are deafening.",
+      "An unsettling, quiet jungle. The trees are draped in thick, gray-green, sentient-looking vines that hang like the beards of ancient giants. These vines seem to shift slightly when you look away, and the wind passing through them creates a low, sibilant sound, like hundreds of voices exchanging secrets. Flowers here are rare, but when found, they are unnaturally large and vibrant, attracting huge, iridescent insects.",
+      "This jungle is constantly enveloped in a cool, white mist that rolls in from the mountain peaks. The ground is rocky and uneven, dotted with strange, luminous fungi that glow with a cool blue light. Every few hours, the mist clears dramatically, revealing a vast, open valley that disappears again moments later. Navigating here is a challenge of memory and trust.",
+      "A low-lying, humid jungle near a great river. The banks are mud-choked and lined with massive, bulbous trees whose lower branches dip into the slow-moving, brown water. This place is defined by the incredible density of its undergrowth and the constant, subtle movement of reptiles. The sounds are dominated by the croaking of frogs and the unsettling, dry rasp of scales dragging across the wet ground.",
+      "This jungle sits atop a massive, flat mesa, accessible only by a crumbling, ancient stone staircase. The trees are shorter and gnarled, adapted to the high winds. The ground is surprisingly clear, a carpet of short, wiry grass. From the edge of the plateau, you can look down over the clouds, and the silence is broken only by the shriek of the giant, colorful birds that make their nests in the sheer cliff face.",
+
+    ],
+    modifiers: {
+      visibility: -2,
+      magicBonus: +3,
+      defenseBonus: +2,
+      WaterDamage: 2,
+    }
+  },
+
+};
+
+// Función utilitaria usada por el generador de zonas
+export function getBiome(id) {
+  return biomes[id] || null;
+}
+
+// js/combat.js
+import { gameState } from "./state.js";
+import { enemyData } from "./enemies.js"; // Si no tienes este archivo, crea uno simple con enemyData exportado.
+import { calculateTotalStats, calculateMagicAttack } from "./stats.js";
+import { addMessage } from "./story.js";
+import { updateUI } from "./ui.js";
+
+/**
+ * Exporta funciones para iniciar/gestionar combate.
+ * También expone getRandomEncounter() que usa worldMap (ubicación) para decidir
+ * si hay un encuentro aleatorio.
+ */
+
+export function setupCombat() {
+  window.addEventListener("pixel:attack", playerAttack);
+  window.addEventListener("pixel:magic", playerMagic);
+  window.addEventListener("pixel:flee", tryFlee);
+  window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId));
+}
+
+/**
+ * Decide si ocurre un encuentro en una localización (retorna enemyId o null).
+ * movement.js llama a esto.
+ */
+export function getRandomEncounter(locationId) {
+  const loc = window.worldMap?.[locationId];
+  if (!loc) return null;
+  const list = loc.enemies || [];
+  const rate = typeof loc.encounterRate === "number" ? loc.encounterRate : 0.25;
+  if (list.length === 0) return null;
+  if (Math.random() < rate) return list[Math.floor(Math.random() * list.length)];
+  return null;
+}
+
+export function startCombat(enemyType) {
+  const base = enemyData?.[enemyType];
+  if (!base) {
+    addMessage(`No enemy definition for ${enemyType}`, "system");
+    return;
+  }
+  // Copia para que no modifiquemos la definición base
+  gameState.currentEnemy = { ...base, hp: base.hp ?? base.maxHp ?? 1, maxHp: base.maxHp ?? base.hp ?? 1 };
+  gameState.isInCombat = true;
+  addMessage(`A wild ${gameState.currentEnemy.type} appears!`, "combat");
+  updateUI();
+}
+
+function playerAttack() {
+  if (!gameState.isInCombat || !gameState.currentEnemy) { addMessage("There's no enemy to attack!", "system"); return; }
+  const stats = calculateTotalStats(gameState.player, gameState.equipment);
+  const dmg = Math.max(1, stats.attack - (gameState.currentEnemy.defense || 0));
+  gameState.currentEnemy.hp -= dmg;
+  addMessage(`You strike the ${gameState.currentEnemy.type} for ${dmg} damage!`, "combat");
+  if (gameState.currentEnemy.hp <= 0) return endCombat(true);
+  setTimeout(enemyTurn, 600);
+  updateUI();
+}
+
+function playerMagic() {
+  if (!gameState.isInCombat || !gameState.currentEnemy) { addMessage("No enemy in sight.", "system"); return; }
+  const stats = calculateTotalStats(gameState.player, gameState.equipment);
+  if (stats.mp < 10) { addMessage("Not enough mana.", "system"); return; }
+  const dmg = calculateMagicAttack(stats);
+  gameState.player.mp -= 10;
+  gameState.currentEnemy.hp -= dmg;
+  addMessage(`You cast a spell dealing ${dmg} damage!`, "combat");
+  if (gameState.currentEnemy.hp <= 0) return endCombat(true);
+  setTimeout(enemyTurn, 600);
+  updateUI();
+}
+
+function enemyTurn() {
+  if (!gameState.currentEnemy) return;
+  const enemyAtk = gameState.currentEnemy.magicAttack && Math.random() < 0.3 ? gameState.currentEnemy.magicAttack : gameState.currentEnemy.attack;
+  const stats = calculateTotalStats(gameState.player, gameState.equipment);
+  const final = Math.max(1, (enemyAtk || 1) - stats.defense);
+  gameState.player.hp -= final;
+  const atkType = enemyAtk === gameState.currentEnemy.magicAttack ? "magic attack" : "physical attack";
+  addMessage(`The ${gameState.currentEnemy.type} hits you with a ${atkType} for ${final} damage.`, "combat");
+  if (gameState.player.hp <= 0) return endCombat(false);
+  updateUI();
+}
+
+function tryFlee() {
+  if (!gameState.currentEnemy) return;
+  if (Math.random() < 0.6) {
+    addMessage("You successfully fled!", "combat");
+    gameState.isInCombat = false;
+    gameState.currentEnemy = null;
+    updateUI();
+    return;
+  }
+  addMessage("You failed to flee!", "combat");
+  setTimeout(enemyTurn, 600);
+}
+
+function endCombat(victory) {
+  if (victory) {
+    const enemy = gameState.currentEnemy;
+    addMessage(`You defeated the ${enemy.type}!`, "combat");
+    gameState.player.gold += enemy.gold || 0;
+    gameState.player.experience += enemy.experience || 0;
+
+    // Loot: si quieres integrar getLoot, importa y úsalo aquí
+    gameState.currentEnemy = null;
+    gameState.isInCombat = false;
+
+    // Nivel
+    if (gameState.player.experience >= (gameState.player.nextLevelXp || 100)) {
+      // No importamos levelUp aquí para evitar circular imports; puedes disparar un event
+      window.dispatchEvent(new Event("pixel:levelUp"));
+    }
+
+    updateUI();
+    return;
+  }
+
+  // derrota
+  addMessage("You have been defeated. GAME OVER", "system");
+  gameState.isGameOver = true;
+  updateUI();
+}
+
+// crafting.js
+// Sistema de crafting avanzado para Pixel Quest
+
+import { allItems } from "./items.js";
+
+// =============================
+// ⭐ DEFINICIÓN DE RECETAS
+// =============================
+
+export const craftingRecipes = {
+
+  // ---- FORJA ----
+  forge: {
+    iron_sword: {
+      name: "Iron Sword",
+      levelReq: 2,
+      rarity: "uncommon",
+      ingredients: {
+        iron_ore: 3,
+        wolf_pelt: 1
+      },
+      result: { id: "iron_sword", 
+        type: "weapon", 
+        slot: "rightHand", 
+        attack: 5 },
+    },
+
+    crystal_blade: {
+      name: "Crystal Blade",
+      levelReq: 5,
+      rarity: "rare",
+      ingredients: {
+        crystal_shard: 2,
+        golem_fragment: 1
+      },
+      result: { id: "crystal_blade", 
+        type: "weapon", 
+        slot: "rightHand", 
+        attack: 10 },
+    }
+    },
+
+  // ---- ALQUIMIA ----
+    alchemy: {
+      healing_elixir: {
+      name: "Healing Elixir",
+      levelReq: 1,
+      rarity: "rare",
+      ingredients: {
+        herb: 3,
+        fungus_core: 1
+      },
+      result: { id: "healing_elixir", 
+        type: "consumable", 
+        effect: "restore_hp", 
+        potency: 50},
+    },
+    
+
+    mana_elixir: {
+      name: "Mana Elixir",
+      levelReq: 4,
+      rarity: "uncommon",
+      ingredients: {
+        bat_wing: 2,
+        ice_essence: 1,
+      },
+      result: { id: "mana_elixir", 
+        type: "consumable", 
+        effect: "restore_mp", 
+        potency: 50},
+    },
+
+  },
+
+  // ---- TALLER ARCANO ----
+  arcane: {
+    forest_emblem_upgraded: {
+      name: "Forest Emblem (Upgraded)",
+      levelReq: 7,
+      rarity: "epic",
+      ingredients: {
+        forest_emblem: 1,
+        ancient_core: 1,
+        enchanted_dust: 2
+      },
+      result: { id: "forest_emblem_upgraded", 
+        type: "accessory", 
+        slot: "accessory",
+        rarity: "legendary",
+        attack: 10,
+        magic: 10,
+        price: 300
+    },
+
+    inferno_emblem_upgraded: {
+      name: "Inferno Emblem (Upgraded)",
+      result: "inferno_emblem_upgraded",
+      levelReq: 10,
+      rarity: "legendary",
+      ingredients: {
+        inferno_emblem: 1,
+        dragon_scale: 1,
+        heart_of_inferno: 1
+      },
+      result: { id: "inferno_emblem_upgraded", 
+        type: "accessory", 
+        slot: "accessory",
+        rarity: "legendary",
+        attack: 30,
+        magic: 30,
+        price: 600
+      },
+    },
+    }
+  }
+};
+
+
+/// ---------------------------
+//  nuevo canCraft (inventario objeto)
+// ---------------------------
+export function canCraft(recipe, inventory, playerLevel) {
+  if (playerLevel < recipe.levelReq) {
+    return { ok: false, reason: "Level too low" };
+  }
+  for (const mat in recipe.ingredients) {
+    const required = recipe.ingredients[mat];
+    const have   = inventory[mat] || 0;
+    if (have < required) {
+      const itemName = allItems[mat]?.name || mat;
+      return { ok: false, reason: `Missing ${itemName} (${have}/${required})` };
+    }
+  }
+  return { ok: true };
+}
+
+// ---------------------------
+//  nuevo craftItem (inventario objeto)
+// ---------------------------
+export function craftItem(recipe, inventory) {
+  // 1) consumir materiales
+  for (const mat in recipe.ingredients) {
+    const required = recipe.ingredients[mat];
+    inventory[mat] = (inventory[mat] || 0) - required;
+    if (inventory[mat] <= 0) delete inventory[mat];
+  }
+  // 2) crear resultado
+  const resultId = recipe.result.id || recipe.result; // soportar ambos formatos
+  const itemData = allItems[resultId];
+  if (!itemData) {
+    console.error("Craft result not found in allItems:", resultId);
+    return null;
+  }
+  // 3) añadir al inventario (stack)
+  if (inventory[itemData.id]) inventory[itemData.id]++;
+  else inventory[itemData.id] = 1;
+  return itemData;
+}
+
+// enemies.js
+import { allItems } from "./items.js";
+
+export const enemyData = {
+  slime: {
+    type: "Slime",
+    levelRequirement: 1,
+    hp: 20,
+    maxHp: 20,
+    attack: 3,
+    defense: 1,
+    experience: 10,
+    gold: 5,
+    drops: ["mana_potion"],
+  },
+  fungedBeast: {
+    type: "Funged Beast",
+    levelRequirement: 1,
+    hp: 25,
+    maxHp: 25,
+    attack: 5,
+    defense: 1,
+    experience: 15,
+    gold: 5,
+    drops: ["health_potion"],
+  },
+  goblin: {
+    type: "Goblin",
+    levelRequirement: 2,
+    hp: 30,
+    maxHp: 30,
+    attack: 6,
+    defense: 1,
+    experience: 20,
+    gold: 8,
+    drops: ["sword"],
+  },
+  wolf: {
+    type: "Wolf",
+    levelRequirement: 2,
+    hp: 40,
+    maxHp: 40,
+    attack: 8,
+    defense: 2,
+    experience: 25,
+    gold: 10,
+    drops: ["health_potion"],
+  },
+  thief: {
+    type: "Thief",
+    levelRequirement: 2,
+    hp: 35,
+    maxHp: 35,
+    attack: 7,
+    defense: 1,
+    experience: 22,
+    gold: 12,
+    drops: ["ring_agility"],
+  },
+  guard: {
+    type: "Royal Guard",
+    levelRequirement: 3,
+    hp: 50,
+    maxHp: 50,
+    attack: 10,
+    defense: 4,
+    experience: 35,
+    gold: 15,
+    drops: ["armor"],
+  },
+  orc: {
+    type: "Orc",
+    levelRequirement: 3,
+    hp: 60,
+    maxHp: 60,
+    attack: 12,
+    defense: 4,
+    experience: 40,
+    gold: 20,
+    drops: ["axe"],
+  },
+  goblin_shaman: {
+    type: "Goblin Shaman",
+    levelRequirement: 3,
+    hp: 45,
+    maxHp: 45,
+    attack: 8,
+    defense: 2,
+    magicAttack: 12,
+    experience: 38,
+    gold: 18,
+    drops: ["staff"],
+  },
+  cave_bat: {
+    type: "Cave Bat",
+    levelRequirement: 1,
+    hp: 25,
+    maxHp: 25,
+    attack: 5,
+    defense: 0,
+    experience: 15,
+    gold: 5,
+    drops: ["mana_potion"],
+  },
+  cave_bear: {
+    type: "Cave Bear",
+    levelRequirement: 3,
+    hp: 70,
+    maxHp: 70,
+    attack: 15,
+    defense: 5,
+    experience: 50,
+    gold: 25,
+    drops: ["health_potion"],
+  },
+  giant_spider: {
+    type: "Giant Spider",
+    levelRequirement: 3,
+    hp: 55,
+    maxHp: 55,
+    attack: 11,
+    defense: 3,
+    experience: 42,
+    gold: 22,
+    drops: ["ring_strength"],
+  },
+  cave_troll: {
+    type: "Cave Troll",
+    levelRequirement: 4,
+    hp: 80,
+    maxHp: 80,
+    attack: 18,
+    defense: 6,
+    experience: 60,
+    gold: 30,
+    drops: ["chainmail"],
+  },
+  stone_golem: {
+    type: "Stone Golem",
+    levelRequirement: 5,
+    hp: 100,
+    maxHp: 100,
+    attack: 20,
+    defense: 10,
+    experience: 75,
+    gold: 40,
+    drops: ["ring_strength"],
+  },
+  ancient_guardian: {
+    type: "Ancient Guardian",
+    levelRequirement: 4,
+    hp: 90,
+    maxHp: 90,
+    attack: 16,
+    defense: 8,
+    magicAttack: 14,
+    experience: 70,
+    gold: 35,
+    drops: ["ring_intelligence"],
+  },
+  mountain_giant: {
+    type: "Mountain Giant",
+    levelRequirement: 5,
+    hp: 120,
+    maxHp: 120,
+    attack: 22,
+    defense: 7,
+    experience: 85,
+    gold: 45,
+    drops: ["axe"],
+  },
+  wyvern: {
+    type: "Wyvern",
+    levelRequirement: 5,
+    hp: 95,
+    maxHp: 95,
+    attack: 18,
+    defense: 5,
+    experience: 80,
+    gold: 40,
+    drops: ["robe"],
+  },
+  treasure_guardian: {
+    type: "Treasure Guardian",
+    levelRequirement: 5,
+    hp: 110,
+    maxHp: 110,
+    attack: 19,
+    defense: 9,
+    magicAttack: 16,
+    experience: 90,
+    gold: 50,
+    drops: ["chainmail"],
+  },
+  beholder: {
+    type: "Beholder",
+    levelRequirement: 5,
+    hp: 100,
+    maxHp: 100,
+    attack: 20,
+    defense: 7,
+    experience: 80,
+    gold: 40,
+    drops: ["big_mana_potion"],
+  },
+
+  zombie: {
+    type: "Zombie",
+    levelRequirement: 2,
+    hp: 50,
+    maxHp: 50,
+    attack: 10,
+    defense: 3,
+    experience: 40,
+    gold: 20,
+    drops: ["big_health_potion"],
+  },
+  vampire: {
+    type: "Vampire",
+    levelRequirement: 3,
+    hp: 80,
+    maxHp: 80,
+    attack: 15,
+    defense: 5,
+    experience: 60,
+    gold: 30,
+    drops: ["elixir_potion"],
+  },
+  squeletor: {
+    type: "Squeletor",
+    levelRequirement: 2,
+    hp: 70,
+    maxHp: 70,
+    attack: 12,
+    defense: 4,
+    experience: 55,
+    gold: 25,
+    drops: ["hammer"],
+  },
+  warlock: {
+    type: "Warlock",
+    levelRequirement: 3,
+    hp: 90,
+    maxHp: 90,
+    attack: 14,
+    defense: 6,
+    magicAttack: 18,
+    experience: 70,
+    gold: 35,
+    drops: ["wand"],
+  },
+  imp: {
+    type: "Imp",
+    levelRequirement: 2,
+    hp: 40,
+    maxHp: 40,
+    attack: 8,
+    defense: 2,
+    experience: 30,
+    gold: 15,
+    drops: ["gown"],
+  },
+  linchorn: {
+    type: "Linchorn",
+    levelRequirement: 5,
+    hp: 110,
+    maxHp: 110,
+    attack: 20,
+    defense: 8,
+    experience: 85,
+    gold: 45,
+    drops: ["katana"],
+  },
+  hydra: {
+    type: "Hydra",
+    levelRequirement: 6,
+    hp: 150,
+    maxHp: 150,
+    attack: 22,
+    defense: 9,
+    experience: 120,
+    gold: 60,
+    drops: ["plate_armor"],
+  },
+  centaurus: {
+    type: "Centaurus",
+    levelRequirement: 5,
+    hp: 130,
+    maxHp: 130,
+    attack: 18,
+    defense: 7,
+    experience: 100,
+    gold: 55,
+    drops: ["elemental_wand"],
+  },
+  chimera: {
+    type: "Chimera",
+    levelRequirement: 6,
+    hp: 140,
+    maxHp: 140,
+    attack: 20,
+    defense: 8,
+    experience: 110,
+    gold: 58,
+    drops: ["divine_sword"],
+  },
+  cultist: {
+    type: "Cultist",
+    levelRequirement: 4,
+    hp: 85,
+    maxHp: 85,
+    attack: 13,
+    defense: 5,
+    magicAttack: 15,
+    experience: 75,
+    gold: 38,
+    drops: ["bless_staff"],
+  },
+  drider: {
+    type: "Drider",
+    levelRequirement: 5,
+    hp: 120,
+    maxHp: 120,
+    attack: 17,
+    defense: 6,
+    experience: 90,
+    gold: 42,
+    drops: ["arcane_robe"],
+  },
+  kraken: {
+    type: "Kraken",
+    levelRequirement: 10,
+    hp: 320,
+    maxHp: 320,
+    attack: 30,
+    defense: 12,
+    magicAttack: 20,
+    experience: 350,
+    gold: 220,
+    drops: ["trident", "sea_armor"],
+  },
+  sea_serpent: {
+    type: "Sea Serpent",
+    levelRequirement: 9,
+    hp: 290,
+    maxHp: 290,
+    attack: 27,
+    defense: 10,
+    magicAttack: 18,
+    experience: 310,
+    gold: 200,
+    drops: ["water_staff", "aqua_robe"],
+  },
+  medusa: {
+    type: "Medusa",
+    levelRequirement: 8,
+    hp: 260,
+    maxHp: 260,
+    attack: 25,
+    defense: 9,
+    magicAttack: 22,
+    experience: 280,
+    gold: 180,
+    drops: ["serpent_sword", "stone_armor"],
+  },
+  mermaid: {
+    type: "Mermaid",
+    levelRequirement: 7,
+    hp: 240,
+    maxHp: 240,
+    attack: 22,
+    defense: 8,
+    magicAttack: 24,
+    experience: 260,
+    gold: 170,
+    drops: ["ocean_staff", "coral_robe"],
+  },
+  pirate: {
+    type: "Pirate",
+    levelRequirement: 6,
+    hp: 200,
+    maxHp: 200,
+    attack: 21,
+    defense: 7,
+    experience: 220,
+    gold: 150,
+    drops: ["cutlass", "leather_armor"],
+  },
+  pirate_captain: {
+    type: "Pirate Captain",
+    levelRequirement: 8,
+    hp: 270,
+    maxHp: 270,
+    attack: 26,
+    defense: 9,
+    experience: 300,
+    gold: 190,
+    drops: ["captain_sword", "captain_coat"],
+  },
+  Inferno_elemental: {
+    type: "Inferno Elemental",
+    levelRequirement: 9,
+    hp: 280,
+    maxHp: 280,
+    attack: 28,
+    defense: 11,
+    magicAttack: 25,
+    experience: 320,
+    gold: 210,
+    drops: ["flame_staff", "fire_robe"],
+  },
+  gorilla_warrior: {
+    type: "Gorilla Warrior",
+    levelRequirement: 7,
+    hp: 220,
+    maxHp: 220,
+    attack: 23,
+    defense: 8,
+    experience: 240,
+    gold: 160,
+    drops: ["giant_club", "jungle_armor"],
+  },
+  jungle_tiger: {
+    type: "Jungle Tiger",
+    levelRequirement: 6,
+    hp: 210,
+    maxHp: 210,
+    attack: 20,
+    defense: 7,
+    experience: 230,
+    gold: 155,
+    drops: ["tiger_blade", "leather_armor"],
+  },
+  vine_serpent: {
+    type: "Vine Serpent",
+    levelRequirement: 8,
+    hp: 250,
+    maxHp: 250,
+    attack: 24,
+    defense: 9,
+    magicAttack: 20,
+    experience: 270,
+    gold: 175,
+    drops: ["vine_whip", "nature_robe"],
+  },
+  jungle_spirit: {
+    type: "Jungle Spirit",
+    levelRequirement: 9,
+    hp: 300,
+    maxHp: 300,
+    attack: 29,
+    defense: 10,
+    magicAttack: 28,
+    experience: 330,
+    gold: 215,
+    drops: ["spirit_staff", "ethereal_robe"],
+  },
+  Diablo: {
+    type: "Diablo",
+    levelRequirement: 10,
+    hp: 350,
+    maxHp: 350,
+    attack: 32,
+    defense: 13,
+    magicAttack: 30,
+    experience: 400,
+    gold: 250,
+    drops: ["demon_blade", "dark_armor"],
+  },
+  dragon: {
+    type: "Dragon",
+    levelRequirement: 10,
+    hp: 300,
+    maxHp: 300,
+    attack: 35,
+    defense: 10,
+    magicAttack: 22,
+    experience: 300,
+    gold: 200,
+    drops: ["ring_intelligence", "staff", "robe"],
+  },
+};
+
+import { initializeGame, resetState } from "./state.js";
+import { saveGame, loadGame, deleteSave, hasSavedGame } from "./saveSystem.js";
+import { toggleMainMenu, updateSaveInfo, updateUI } from "./ui.js";
+import { addMessage, clearStory } from "./story.js";
+
+
+export function setupMainMenuListeners() {
+const mapping = {
+newGameBtn: () => {
+if (hasSavedGame() && !confirm("Start a new game? Unsaved progress will be lost.")) return;
+deleteSave(); // clean previous
+initializeGame();
+toggleMainMenu(false);
+addMessage("New game started.", "system");
+updateUI();
+},
+continueBtn: () => { if (loadGame()) toggleMainMenu(false); },
+saveGameBtn: () => { if (saveGame()) updateSaveInfo(); },
+loadGameBtn: () => { if (loadGame()) toggleMainMenu(false); },
+deleteSaveBtn: () => { if (confirm('Delete saved game?')) { deleteSave(); updateSaveInfo(); } },
+closeMenuBtn: () => toggleMainMenu(false)
+};
+
+
+Object.entries(mapping).forEach(([id, fn]) => {
+const el = document.getElementById(id);
+if (!el) return console.warn(`Missing button: ${id}`);
+el.addEventListener("click", fn);
+});
+}
+
+
+export function setupGlobalListeners() {
+// Direction buttons
+document.querySelectorAll('.direction-buttons .btn').forEach(btn => {
+btn.addEventListener('click', (e) => {
+const dir = e.currentTarget.getAttribute('data-direction');
+// Dispatch a custom event for movement module
+window.dispatchEvent(new CustomEvent('pixel:move', { detail: { direction: dir } }));
+});
+});
+
+
+// Combat buttons (attack / magic / item / flee)
+document.getElementById('attackBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:attack')));
+document.getElementById('magicBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:magic')));
+document.getElementById('itemBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:openInventory')));
+document.getElementById('fleeBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:flee')));
+
+
+// Inventory / Stats / Shop
+document.getElementById('inventoryBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:openInventory')));
+document.getElementById('statsBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:openStats')));
+document.getElementById('restBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:rest')));
+document.getElementById('shopBtn')?.addEventListener('click', () => window.dispatchEvent(new Event('pixel:openShop')));
+
+// items.js
+export const allItems = {
+  // Pociones
+  health_potion: {
+    id: "health_potion",
+    name: "Health Potion",
+    description: "Restores 25 HP.",
+    type: "consumable",
+    price: 10,
+  },
+  mana_potion: {
+    id: "mana_potion",
+    name: "Mana Potion",
+    description: "Restores 10 MP.",
+    type: "consumable",
+    price: 12,
+  },
+  elixir_potion: {
+    id: "elixir_potion",
+    name: "Elixir Potion",
+    description: "Restores 50 HP. and 30 MP.",
+    type: "consumable",
+    price: 30,
+  },
+  big_health_potion: {
+    id: "big_health_potion",
+    name: "Big Health Potion",
+    description: "Restores 75 HP.",
+    type: "consumable",
+    price: 35,
+  },
+
+  big_mana_potion: {
+    id: "big_mana_potion",
+    name: "Big Mana Potion",
+    description: "Restores 50 MP.",
+    type: "consumable",
+    price: 25,
+  },
+
+  // Armas
+  sword: {
+    id: "sword",
+    name: "Sword",
+    description: "A sturdy blade. +5 ATK",
+    slot: "rightHand",
+    attack: 5,
+    price: 30,
+  },
+  axe: {
+    id: "axe",
+    name: "Battle Axe",
+    description: "A heavy axe. +8 ATK",
+    slot: "rightHand",
+    attack: 8,
+    price: 50,
+  },
+  hammer: {
+    id: "hammer",
+    name: "Battle Hammer",
+    description: "A heavy hammer. +10 ATK",
+    slot: "rightHand",
+    attack: 10,
+    price: 70,
+  },
+  katana: {
+    id: "katana",
+    name: "Katana",
+    description: "A ceremonial katana. +15 ATK",
+    slot: "rightHand",
+    attack: 15,
+    price: 100,
+  },
+  divine_sword: {
+    id: "divine_sword",
+    name: "Divine Sword",
+    description: "A divine weapon. +20 ATK",
+    slot: "rightHand",
+    attack: 20,
+    price: 150,
+  },
+  staff: {
+    id: "staff",
+    name: "Magic Staff",
+    description: "A staff imbued with magic. +3 INT, +2 MAG",
+    slot: "rightHand",
+    intelligence: 3,
+    magic: 2,
+    price: 45,
+  },
+  wand: {
+    id: "wand",
+    name: "Magic Wand",
+    description: "A wand imbued with magic. +5 INT, +3 MAG",
+    slot: "rightHand",
+    intelligence: 5,
+    magic: 3,
+    price: 65,
+  },
+  elemental_wand: {
+    id: "elemental_wand",
+    name: "Elemental Wand",
+    description: "A elemental wand imbued with magic of elemnts. +7 INT, +5 MAG",
+    slot: "rightHand",
+    intelligence: 7,
+    magic: 5,
+    price: 85,
+  },
+  bless_staff: {
+    id: "bless_staff",
+    name: "Bless Staff",
+    description: "A blessed staff imbued with magic. +10 INT, +7 MAG",
+    slot: "rightHand",
+    intelligence: 10,
+    magic: 7,
+    price: 120,
+  },
+
+  // Armaduras
+  armor: {
+    id: "armor",
+    name: "Leather Armor",
+    description: "Simple armor. +3 DEF",
+    slot: "armor",
+    defense: 3,
+    price: 40,
+  },
+  chainmail: {
+    id: "chainmail",
+    name: "Chainmail Armor",
+    description: "Strong armor. +6 DEF",
+    slot: "armor",
+    defense: 6,
+    price: 80,
+  },
+  plate_armor: {
+    id: "plate_armor",
+    name: "Plate Armor",
+    description: "Strong armor. +10 DEF",
+    slot: "armor",
+    defense: 10,
+    price: 120,
+  },
+  robe: {
+    id: "robe",
+    name: "Mage Robe",
+    description: "Enchanted robe. +2 INT, +1 DEF",
+    slot: "armor",
+    intelligence: 2,
+    defense: 1,
+    price: 35,
+  },
+  gown: {
+    id: "gown",
+    name: "Mage Gown",
+    description: "Enchanted gown. +5 INT, +3 DEF",
+    slot: "armor",
+    intelligence: 5,
+    defense: 3,
+    price: 50,
+  },
+  arcane_robe: {
+    id: "arcane_robe",
+    name: "Arcane Mage Robe",
+    description: "Enchanted arcane robe. +8 INT, +5 DEF",
+    slot: "armor",
+    intelligence: 8,
+    defense: 5,
+    price: 80,
+  },
+
+  // Accesorios
+  ring_strength: {
+    id: "ring_strength",
+    name: "Ring of Strength",
+    description: "Increases physical power. +2 STR",
+    slot: "accessory",
+    strength: 2,
+    price: 60,
+  },
+  ring_agility: {
+    id: "ring_agility",
+    name: "Ring of Agility",
+    description: "Enhances movement. +2 AGI",
+    slot: "accessory",
+    agility: 2,
+    price: 60,
+  },
+  ring_intelligence: {
+    id: "ring_intelligence",
+    name: "Ring of Intelligence",
+    description: "Boosts magical power. +2 INT",
+    slot: "accessory",
+    intelligence: 2,
+    price: 60,
+  },
+  saint_grial: {
+    id: "saint_grial",
+    name: "Saint Grial",
+    description: "This is the Quest object. Boosts attack and magical power. +30 STR +20 AGI +20 INT",
+    slot: "accessory",
+    intelligence: 20,
+    agility: 20,
+    strength: 30,
+    price: 60,
+
+  },
+  
+  // =====================
+  // ⭐ Loot común por bioma
+  // =====================
+
+  herb: {
+    id: "herb",
+    name: "Healing Herb",
+    type: "material",
+    rarity: "common",
+    price: 5
+  },
+
+  wolf_pelt: {
+    id: "wolf_pelt",
+    name: "Wolf Pelt",
+    type: "material",
+    rarity: "uncommon",
+    price: 8
+  },
+
+  goblin_dagger: {
+    id: "goblin_dagger",
+    name: "Goblin Dagger",
+    type: "weapon",
+    rarity: "uncommon",
+    slot: "rightHand",
+    attack: 3,
+    price: 20
+  },
+
+  fungus_core: {
+    id: "fungus_core",
+    name: "Fungus Core",
+    type: "material",
+    rarity: "rare",
+    price: 18
+  },
+
+  iron_ore: {
+    id: "iron_ore",
+    name: "Iron Ore",
+    type: "material",
+    rarity: "common",
+    price: 5
+  },
+
+  bat_wing: {
+    id: "bat_wing",
+    name: "Bat Wing",
+    type: "material",
+    rarity: "uncommon",
+    price: 8
+  },
+
+  crystal_shard: {
+    id: "crystal_shard",
+    name: "Crystal Shard",
+    type: "material",
+    rarity: "rare",
+    price: 20
+  },
+
+  golem_fragment: {
+    id: "golem_fragment",
+    name: "Golem Fragment",
+    type: "material",
+    rarity: "epic",
+    price: 35
+  },
+
+  ice_crystal: {
+    id: "ice_crystal",
+    name: "Ice Crystal",
+    type: "material",
+    rarity: "uncommon",
+    price: 15
+  },
+
+  wyvern_scale: {
+    id: "wyvern_scale",
+    name: "Wyvern Scale",
+    type: "material",
+    rarity: "rare",
+    price: 35
+  },
+
+  giant_bone: {
+    id: "giant_bone",
+    name: "Giant Bone",
+    type: "material",
+    rarity: "rare",
+    price: 25
+  },
+
+  ancient_relic: {
+    id: "ancient_relic",
+    name: "Ancient Relic",
+    type: "material",
+    rarity: "epic",
+    price: 50
+  },
+
+  enchanted_dust: {
+    id: "enchanted_dust",
+    name: "Enchanted Dust",
+    type: "material",
+    rarity: "uncommon",
+    price: 12
+  },
+
+  runestone: {
+    id: "runestone",
+    name: "Runestone",
+    type: "material",
+    rarity: "rare",
+    price: 30
+  },
+
+  ancient_core: {
+    id: "ancient_core",
+    name: "Ancient Core",
+    type: "material",
+    rarity: "epic",
+    price: 40
+  },
+
+  arcane_relic: {
+    id: "arcane_relic",
+    name: "Arcane Relic",
+    type: "material",
+    rarity: "legendary",
+    price: 100
+  },
+
+  poison_gland: {
+    id: "poison_gland",
+    name: "Poison Gland",
+    type: "material",
+    rarity: "common",
+    price: 6
+  },
+
+  acid_sac: {
+    id: "acid_sac",
+    name: "Acid Sac",
+    type: "material",
+    rarity: "uncommon",
+    price: 10
+  },
+
+  necrotic_bone: {
+    id: "necrotic_bone",
+    name: "Necrotic Bone",
+    type: "material",
+    rarity: "rare",
+    price: 22
+  },
+
+  toxic_heart: {
+    id: "toxic_heart",
+    name: "Toxic Heart",
+    type: "material",
+    rarity: "epic",
+    price: 45
+  },
+
+  magma_fragment: {
+    id: "magma_fragment",
+    name: "Magma Fragment",
+    type: "material",
+    rarity: "uncommon",
+    price: 18
+  },
+
+  pyro_core: {
+    id: "pyro_core",
+    name: "Pyro Core",
+    type: "material",
+    rarity: "rare",
+    price: 28
+  },
+
+  dragon_scale: {
+    id: "dragon_scale",
+    name: "Dragon Scale",
+    type: "material",
+    rarity: "epic",
+    price: 75
+  },
+
+  heart_of_inferno: {
+    id: "heart_of_inferno",
+    name: "Heart of the Inferno",
+    type: "material",
+    rarity: "legendary",
+    price: 150
+  },
+
+  frost_shard: {
+    id: "frost_shard",
+    name: "Frost Shard",
+    type: "material",
+    rarity: "uncommon",
+    price: 14
+  },
+
+  ice_essence: {
+    id: "ice_essence",
+    name: "Ice Essence",
+    type: "material",
+    rarity: "rare",
+    price: 24
+  },
+
+  glacial_core: {
+    id: "glacial_core",
+    name: "Glacial Core",
+    type: "material",
+    rarity: "epic",
+    price: 60
+  },
+
+
+  // =====================
+  // ⭐ Loot de Jefes
+  // =====================
+
+  titan_branch: {
+    id: "titan_branch",
+    name: "Titan Branch",
+    type: "material",
+    rarity: "rare",
+    price: 40
+  },
+
+  forest_emblem: {
+    id: "forest_emblem",
+    name: "Forest Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "epic",
+    magic: 5,
+    defense: 2,
+    price: 90
+  },
+
+  devourer_fang: {
+    id: "devourer_fang",
+    name: "Devourer Fang",
+    type: "material",
+    rarity: "rare",
+    price: 45
+  },
+
+  earthbreaker_core: {
+    id: "earthbreaker_core",
+    name: "Earthbreaker Core",
+    type: "material",
+    rarity: "epic",
+    price: 100
+  },
+
+  colossus_heart: {
+    id: "colossus_heart",
+    name: "Colossus Heart",
+    type: "material",
+    rarity: "rare",
+    price: 55
+  },
+
+  mountain_emblem: {
+    id: "mountain_emblem",
+    name: "Mountain Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "epic",
+    defense: 4,
+    price: 120
+  },
+
+  construct_eye: {
+    id: "construct_eye",
+    name: "Construct Eye",
+    type: "material",
+    rarity: "rare",
+    price: 50
+  },
+
+  arcane_emblem: {
+    id: "arcane_emblem",
+    name: "Arcane Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "legendary",
+    magic: 8,
+    defense: 3,
+    price: 150
+  },
+
+  abomination_core: {
+    id: "abomination_core",
+    name: "Abomination Core",
+    type: "material",
+    rarity: "rare",
+    price: 48
+  },
+
+  plague_emblem: {
+    id: "plague_emblem",
+    name: "Plague Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "epic",
+    strength: 3,
+    magic: 3,
+    price: 120
+  },
+
+  inferno_eye: {
+    id: "inferno_eye",
+    name: "Inferno Eye",
+    type: "material",
+    rarity: "epic",
+    price: 85
+  },
+
+  inferno_emblem: {
+    id: "inferno_emblem",
+    name: "Inferno Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "legendary",
+    attack: 5,
+    magic: 5,
+    price: 200
+  },
+
+  wyrm_tail: {
+    id: "wyrm_tail",
+    name: "Frost Wyrm Tail",
+    type: "material",
+    rarity: "epic",
+    price: 70
+  },
+
+  tundra_emblem: {
+    id: "tundra_emblem",
+    name: "Tundra Emblem",
+    type: "accessory",
+    slot: "accessory",
+    rarity: "legendary",
+    defense: 5,
+    magic: 4,
+    price: 180
+  },
+  // Crafting Results
+iron_sword: {
+  id: "iron_sword",
+  name: "Iron Sword",
+  type: "weapon",
+  rarity: "uncommon",
+  slot: "rightHand",
+  attack: 6,
+  price: 40
+},
+
+crystal_blade: {
+  id: "crystal_blade",
+  name: "Crystal Blade",
+  type: "weapon",
+  rarity: "rare",
+  slot: "rightHand",
+  attack: 10,
+  magic: 3,
+  price: 90
+},
+
+healing_elixir: {
+  id: "healing_elixir",
+  name: "Healing Elixir",
+  type: "consumable",
+  rarity: "rare",
+  restoreHp: 60,
+  price: 45
+},
+
+mana_elixir: {
+  id: "mana_elixir",
+  name: "Mana Elixir",
+  type: "consumable",
+  rarity: "uncommon",
+  restoreMp: 40,
+  price: 40
+},
+
+forest_emblem_upgraded: {
+  id: "forest_emblem_upgraded",
+  name: "Forest Emblem+",
+  type: "accessory",
+  slot: "accessory",
+  rarity: "epic",
+  magic: 8,
+  defense: 5,
+  price: 180
+},
+
+inferno_emblem_upgraded: {
+  id: "inferno_emblem_upgraded",
+  name: "Inferno Emblem+",
+  type: "accessory",
+  slot: "accessory",
+  rarity: "legendary",
+  attack: 10,
+  magic: 10,
+  price: 300
+},
+
+rusty_coin: {
+  id: "rusty_coin",
+  name: "Rusty Coin",
+  type: "material",
+  rarity: "common",
+  price: 5
+},
+
+trident: {
+  id: "trident",
+  name: "Trident",
+  type: "weapon",
+  rarity: "rare",
+  slot: "rightHand",
+  attack: 12,
+  price: 100
+},
+
+sea_armor: {
+  id: "sea_armor",
+  name: "Sea Armor",
+  type: "armor",
+  rarity: "epic",
+  slot: "armor",
+  defense: 12,
+  price: 150
+},
+water_staff: {
+  id: "water_staff",
+  name: "Water Staff",
+  type: "weapon",
+  rarity: "rare",
+  slot: "rightHand",
+  intelligence: 10,
+  magic: 8,
+  price: 90
+},
+aqua_robe: {
+  id: "aqua_robe",
+  name: "Aqua Robe",
+  type: "armor",
+  rarity: "epic",
+  slot: "armor",
+  intelligence: 12,
+  defense: 6,
+  price: 130
+},
+serpent_sword: {
+  id: "serpent_sword",
+  name: "Serpent Sword",
+  type: "weapon",
+  rarity: "epic",
+  slot: "rightHand",
+  attack: 15,
+  price: 120
+},
+stone_armor: {
+  id: "stone_armor",
+  name: "Stone Armor",
+  type: "armor",
+  rarity: "epic",
+  slot: "armor",
+  defense: 14,
+  price: 160
+},
+ocean_staff: {
+  id: "ocean_staff",
+  name: "Ocean Staff",
+  type: "weapon",
+  rarity: "epic",
+  slot: "rightHand",
+  intelligence: 15,
+  magic: 10,
+  price: 140
+},
+coral_robe: {
+  id: "coral_robe",
+  name: "Coral Robe",
+  type: "armor",
+  rarity: "epic",
+  slot: "armor",
+  intelligence: 10,
+  defense: 8,
+  price: 150
+},
+cutlass: {
+  id: "cutlass",
+  name: "Cutlass",
+  type: "weapon",
+  rarity: "rare",
+  slot: "rightHand",
+  attack: 11,
+  price: 95
+},
+leather_armor: {
+  id: "leather_armor",
+  name: "Leather Armor",
+  type: "armor",
+  rarity: "uncommon",
+  slot: "armor",
+  defense: 7,
+  price: 70
+  },
+captain_sword: {
+    id: "captain_sword",
+    name: "Captain Sword",
+    type: "weapon",
+    rarity: "epic",
+    slot: "rightHand",
+    attack: 16,
+    price: 130
+  },
+  captain_coat: {
+    id: "captain_coat",
+    name: "Captain Coat",
+    type: "armor",
+    rarity: "epic",
+    slot: "armor",
+    defense: 13,
+    price: 140
+  },
+  flame_staff: {
+    id: "flame_staff",
+    name: "Flame Staff",
+    type: "weapon",
+    rarity: "epic",
+    slot: "rightHand",
+    intelligence: 18,
+    magic: 12,
+    price: 160
+  },
+  fire_robe: {
+    id: "fire_robe",
+    name: "Fire Robe",
+    type: "armor",
+    rarity: "epic",
+    slot: "armor",
+    intelligence: 14,
+    defense: 9,
+    price: 170
+  },
+  giant_club: {
+    id: "giant_club",
+    name: "Giant Club",
+    type: "weapon",
+    rarity: "epic",
+    slot: "rightHand",
+    attack: 14,
+    price: 125
+  },
+  jungle_armor: {
+    id: "jungle_armor",
+    name: "Jungle Armor",
+    type: "armor",
+    rarity: "epic",
+    slot: "armor",
+    defense: 12,
+    price: 135
+  },
+  tiger_blade: {
+    id: "tiger_blade",
+    name: "Tiger Blade",
+    type: "weapon",
+    rarity: "rare",
+    slot: "rightHand",
+    attack: 10,
+    price: 90
+  },
+  leather_armor: {
+    id: "leather_armor",
+    name: "Leather Armor",
+    type: "armor",
+    rarity: "uncommon",
+    slot: "armor",
+    defense: 7,
+    price: 70
+  },
+  vine_whip: {
+    id: "vine_whip",
+    name: "Vine Whip",
+    type: "weapon",
+    rarity: "rare",
+    slot: "rightHand",
+    attack: 11,
+    price: 95
+  },
+  nature_robe: {
+    id: "nature_robe",
+    name: "Nature Robe",
+    type: "armor",
+    rarity: "epic",
+    slot: "armor",
+    intelligence: 12,
+    defense: 6,
+    price: 130
+  },
+  spirit_staff: {
+    id: "spirit_staff",
+    name: "Spirit Staff",
+    type: "weapon",
+    rarity: "epic",
+    slot: "rightHand",
+    intelligence: 15,
+    magic: 10,
+    price: 140
+  },
+  ethereal_robe: {
+    id: "ethereal_robe",
+    name: "Ethereal Robe",
+    type: "armor",
+    rarity: "epic",
+    slot: "armor",
+    intelligence: 14,
+    defense: 8,
+    price: 150
+  },
+  demon_blade: {
+    id: "demon_blade",
+    name: "Demon Blade",
+    type: "weapon",
+    rarity: "legendary",
+    slot: "rightHand",
+    attack: 20,
+    price: 200
+  },
+  dark_armor: {
+    id: "dark_armor",
+    name: "Dark Armor",
+    type: "armor",
+    rarity: "legendary",
+    slot: "armor",
+    defense: 15,
+    price: 220
+  },
+  slime_gel: {
+    id: "slime_gel",
+    name: "Slime Gel",
+    type: "material",
+    rarity: "common",
+    price: 4
+  },
+
+
+
+};
+
+// Inventario de la tienda
+export const shopInventory = [
+  "health_potion", 
+  "mana_potion", 
+  "sword", 
+  "armor",
+  "staff",
+  "robe",
+  "ring_strength",
+  "ring_agility",
+  "ring_intelligence"
+];
+
+export function addItemToInventory(inventory, itemId, qty = 1) {
+  if (!inventory) return;
+  inventory[itemId] = (inventory[itemId] || 0) + qty;
+  return inventory[itemId];
+}
+
+export function removeItemFromInventory(inventory, itemId, qty = 1) {
+  if (!inventory || !inventory[itemId]) return false;
+  inventory[itemId] -= qty;
+  if (inventory[itemId] <= 0) delete inventory[itemId];
+  return true;
+}
+
+// locations.js
+export const worldMap = {
+  town: {
+    id: "town",
+    name: "Town Square",
+    description: "You are in the town square. Villagers bustle around. The air smells of fresh bread and adventure.",
+    exits: { east: "shop", north: "forest", west: "tavern", south: "training_grounds" },
+    canRest: true,
+  },
+  shop: {
+    id: "shop",
+    name: "General Store",
+    description: "A small shop filled with goods. Shelves are packed with potions, weapons, and curious artifacts.",
+    exits: { west: "town" },
+  },
+  tavern: {
+    id: "tavern",
+    name: "The Drunken Dragon",
+    description: "A cozy tavern filled with adventurers. The smell of ale and roasted meat fills the air.",
+    exits: { east: "town", north: "alley" },
+    canRest: true,
+  },
+  alley: {
+    id: "alley",
+    name: "Dark Alley",
+    description: "A narrow, shadowy alley. You feel like you're being watched...",
+    exits: { south: "tavern" },
+    enemies: ["thief"],
+  },
+  training_grounds: {
+    id: "training_grounds",
+    name: "Training Grounds",
+    description: "Where warriors hone their skills. Dummies and practice weapons are scattered around.",
+    exits: { north: "town", east: "barracks" },
+  },
+  barracks: {
+    id: "barracks",
+    name: "Royal Barracks",
+    description: "The king's soldiers train here. The air is filled with the sound of clashing steel.",
+    exits: { west: "training_grounds" },
+    enemies: ["guard"],
+  },
+  forest: {
+    id: "forest",
+    name: "Dark Forest",
+    description: "The forest is dense and filled with danger. Ancient trees block most of the sunlight.",
+    exits: { south: "town", east: "cave", north: "deep_forest", west: "river" },
+    enemies: ["goblin", "wolf", "slime"],
+  },
+  deep_forest: {
+    id: "deep_forest",
+    name: "Deep Forest",
+    description: "The heart of the forest. The trees are enormous and the air is thick with magic.",
+    exits: { south: "forest", east: "ancient_ruins" },
+    enemies: ["wolf", "orc", "fungedBeast"],
+  },
+  ancient_ruins: {
+    id: "ancient_ruins",
+    name: "Ancient Ruins",
+    description: "Crumbling stone structures covered in vines. Something powerful sleeps here...",
+    exits: { west: "deep_forest", down: "underground_temple" },
+    enemies: ["orc", "goblin_shaman"],
+  },
+  underground_temple: {
+    id: "underground_temple",
+    name: "Underground Temple",
+    description: "A mysterious temple buried deep underground. Strange runes glow on the walls.",
+    exits: { up: "ancient_ruins", east: "sacred_chamber" },
+    enemies: ["stone_golem", "ancient_guardian"],
+  },
+  sacred_chamber: {
+    id: "sacred_chamber",
+    name: "Sacred Chamber",
+    description: "The innermost chamber of the temple. A powerful energy emanates from the center.",
+    exits: { west: "underground_temple" },
+    enemies: ["dragon"],
+  },
+  river: {
+    id: "river",
+    name: "Crystal River",
+    description: "A sparkling river that cuts through the forest. The water looks clean and refreshing.",
+    exits: { east: "forest", north: "waterfall" },
+  },
+  waterfall: {
+    id: "waterfall",
+    name: "Hidden Waterfall",
+    description: "A majestic waterfall hides a secret cave behind its curtain of water.",
+    exits: { south: "river", enter: "hidden_cave" },
+  },
+  hidden_cave: {
+    id: "hidden_cave",
+    name: "Hidden Cave",
+    description: "A secret cave behind the waterfall. Treasure might be hidden here!",
+    exits: { out: "waterfall" },
+    enemies: ["cave_bear", "treasure_guardian"],
+  },
+  cave: {
+    id: "cave",
+    name: "Shadow Cave",
+    description: "A dark cave where orcs dwell. The sound of dripping water echoes through the tunnels.",
+    exits: { west: "forest", north: "mountain", south: "cave_depths" },
+    enemies: ["orc", "cave_bat"],
+  },
+  cave_depths: {
+    id: "cave_depths",
+    name: "Cave Depths",
+    description: "The deepest part of the cave. It's pitch black and smells of damp earth.",
+    exits: { north: "cave" },
+    enemies: ["giant_spider", "cave_troll"],
+  },
+  mountain: {
+    id: "mountain",
+    name: "Dragon's Peak",
+    description: "The treacherous path to the dragon's lair. The air is thin and cold.",
+    exits: { south: "cave", summit: "dragon_lair" },
+    enemies: ["mountain_giant", "wyvern"],
+  },
+  dragon_lair: {
+    id: "dragon_lair",
+    name: "Dragon's Lair",
+    description: "The final challenge. The dragon's hoard glitters in the dim light.",
+    exits: { down: "mountain" },
+    enemies: ["dragon"],
+  },
+};
+
+// lootTables.js
+// Sistema de loot escalable para Pixel Quest Echoes
+
+// -----------------------------------------------------
+// Rarezas
+// -----------------------------------------------------
+export const RARITY = {
+  COMMON: "common",
+  UNCOMMON: "uncommon",
+  RARE: "rare",
+  EPIC: "epic",
+  LEGENDARY: "legendary",
+};
+
+
+// -----------------------------------------------------
+// Tablas de loot por bioma
+// -----------------------------------------------------
+export const biomeLoot = {
+  forest: [
+    { item: "herb", chance: 0.40, rarity: RARITY.COMMON },
+    { item: "wolf_pelt", chance: 0.25, rarity: RARITY.UNCOMMON },
+    { item: "goblin_dagger", chance: 0.10, rarity: RARITY.UNCOMMON },
+    { item: "fungus_core", chance: 0.05, rarity: RARITY.RARE },
+  ],
+
+  cave: [
+    { item: "iron_ore", chance: 0.45, rarity: RARITY.COMMON },
+    { item: "bat_wing", chance: 0.35, rarity: RARITY.UNCOMMON },
+    { item: "crystal_shard", chance: 0.12, rarity: RARITY.RARE },
+    { item: "golem_fragment", chance: 0.05, rarity: RARITY.EPIC },
+  ],
+
+  mountain: [
+    { item: "ice_crystal", chance: 0.30, rarity: RARITY.UNCOMMON },
+    { item: "wyvern_scale", chance: 0.15, rarity: RARITY.RARE },
+    { item: "giant_bone", chance: 0.10, rarity: RARITY.RARE },
+    { item: "ancient_relic", chance: 0.03, rarity: RARITY.EPIC },
+  ],
+
+  ruins: [
+    { item: "enchanted_dust", chance: 0.35, rarity: RARITY.UNCOMMON },
+    { item: "runestone", chance: 0.20, rarity: RARITY.RARE },
+    { item: "ancient_core", chance: 0.08, rarity: RARITY.EPIC },
+    { item: "arcane_relic", chance: 0.02, rarity: RARITY.LEGENDARY },
+  ],
+
+  swamp: [
+    { item: "poison_gland", chance: 0.40, rarity: RARITY.COMMON },
+    { item: "acid_sac", chance: 0.30, rarity: RARITY.UNCOMMON },
+    { item: "necrotic_bone", chance: 0.12, rarity: RARITY.RARE },
+    { item: "toxic_heart", chance: 0.04, rarity: RARITY.EPIC },
+  ],
+
+  volcano: [
+    { item: "magma_fragment", chance: 0.35, rarity: RARITY.UNCOMMON },
+    { item: "pyro_core", chance: 0.15, rarity: RARITY.RARE },
+    { item: "dragon_scale", chance: 0.07, rarity: RARITY.EPIC },
+    { item: "heart_of_inferno", chance: 0.02, rarity: RARITY.LEGENDARY },
+  ],
+
+  tundra: [
+    { item: "frost_shard", chance: 0.30, rarity: RARITY.UNCOMMON },
+    { item: "ice_essence", chance: 0.18, rarity: RARITY.RARE },
+    { item: "glacial_core", chance: 0.06, rarity: RARITY.EPIC },
+  ],
+};
+
+
+// -----------------------------------------------------
+// Loot específico de bosses y mini-bosses
+// -----------------------------------------------------
+export const bossLoot = {
+  forest_titan: [
+    { item: "titan_branch", chance: 1.00, rarity: RARITY.RARE },
+    { item: "forest_emblem", chance: 0.25, rarity: RARITY.EPIC },
+  ],
+
+  cave_devourer: [
+    { item: "devourer_fang", chance: 1.00, rarity: RARITY.RARE },
+    { item: "earthbreaker_core", chance: 0.15, rarity: RARITY.EPIC },
+  ],
+
+  mountain_colossus: [
+    { item: "colossus_heart", chance: 1.00, rarity: RARITY.RARE },
+    { item: "mountain_emblem", chance: 0.25, rarity: RARITY.EPIC },
+  ],
+
+  ancient_construct: [
+    { item: "construct_eye", chance: 1.00, rarity: RARITY.RARE },
+    { item: "arcane_emblem", chance: 0.20, rarity: RARITY.LEGENDARY },
+  ],
+
+  swamp_abomination: [
+    { item: "abomination_core", chance: 1.00, rarity: RARITY.RARE },
+    { item: "plague_emblem", chance: 0.20, rarity: RARITY.EPIC },
+  ],
+
+  inferno_dragon: [
+    { item: "inferno_eye", chance: 1.00, rarity: RARITY.EPIC },
+    { item: "inferno_emblem", chance: 0.15, rarity: RARITY.LEGENDARY },
+  ],
+
+  frost_wyrm: [
+    { item: "wyrm_tail", chance: 1.00, rarity: RARITY.EPIC },
+    { item: "tundra_emblem", chance: 0.20, rarity: RARITY.LEGENDARY },
+  ],
+};
+
+
+// -----------------------------------------------------
+// Loot por enemigo específico (opcional)
+// -----------------------------------------------------
+export const enemyLoot = {
+  wolf: [
+    { item: "wolf_pelt", chance: 0.30, rarity: RARITY.COMMON }
+  ],
+  goblin: [
+    { item: "rusty_coin", chance: 0.50, rarity: RARITY.COMMON },
+    { item: "goblin_dagger", chance: 0.10, rarity: RARITY.UNCOMMON }
+  ],
+  slime: [
+    { item: "slime_gel", chance: 0.50, rarity: RARITY.COMMON }
+  ]
+};
+
+
+// -----------------------------------------------------
+// Función principal: obtener loot según contexto
+// -----------------------------------------------------
+export function getLoot(enemyId, biomeId) {
+  const drops = [];
+
+  // 1. Loot específico del enemigo
+  if (enemyLoot[enemyId]) {
+    drops.push(...enemyLoot[enemyId]);
+  }
+
+  // 2. Loot del bioma
+  if (biomeLoot[biomeId]) {
+    drops.push(...biomeLoot[biomeId]);
+  }
+
+  // 3. Loot especial si es un boss
+  if (bossLoot[enemyId]) {
+    drops.push(...bossLoot[enemyId]);
+  }
+
+  // 4. Filtrar por probabilidad
+  const awarded = drops.filter(drop => Math.random() <= drop.chance);
+
+  // 5. Devolver lista de items ganados
+  return awarded.map(d => d.item);
+}
+
+
+import { initializeGame, gameState } from "./state.js";
+import { setupMainMenuListeners, updateSaveInfo } from "./events.js";
+import { toggleMainMenu } from "./ui.js";
+
+window.addEventListener("DOMContentLoaded", () => {
+    setupMainMenuListeners();
+    updateSaveInfo();
+    toggleMainMenu(true); // Mostrar menú al iniciar
+});
+
+
+// js/movement.js
+import { gameState } from "./state.js";
+import { worldMap } from "./world.js";
+import { addMessage } from "./story.js";
+import { getRandomEncounter } from "./combat.js";
+import { updateUI } from "./ui.js";
+
+/**
+ * Inicializa escuchas para eventos de movimiento.
+ * El event 'pixel:move' debe contener detail.direction
+ */
+export function setupMovement() {
+  window.addEventListener("pixel:move", (e) => {
+    const dir = e.detail?.direction;
+    if (!dir) return;
+    handleMove(dir);
+  });
+}
+
+export function handleMove(direction) {
+  if (gameState.isGameOver) return;
+  if (gameState.isInCombat) {
+    addMessage("You can't move during combat!", "system");
+    return;
+  }
+
+  const cur = worldMap[gameState.currentLocationId] || {};
+  const nextId = cur.exits?.[direction];
+  if (!nextId || !worldMap[nextId]) {
+    addMessage("You can't go that way.", "system");
+    return;
+  }
+
+  gameState.currentLocationId = nextId;
+  const newLoc = worldMap[nextId];
+  addMessage(`You travel ${direction} to ${newLoc.name}.`, "narrative");
+  if (Array.isArray(newLoc.description)) {
+    addMessage(newLoc.description[Math.floor(Math.random() * newLoc.description.length)], "narrative");
+  } else if (newLoc.description) {
+    addMessage(newLoc.description, "narrative");
+  }
+
+  // probabilidad de encuentro
+  const encounterId = getRandomEncounter(nextId);
+  if (encounterId) {
+    window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: encounterId } }));
+  }
+
+  updateUI();
+}
+
+import { gameState } from "./state.js";
+import { updateUI } from "./ui.js";
+import { addMessage } from "./story.js";
+
+
+const SAVE_KEY = "pixelQuestSave";
+
+
+export function hasSavedGame() {
+return localStorage.getItem(SAVE_KEY) !== null;
+}
+
+
+export function saveGame() {
+try {
+const payload = { gameState, timestamp: new Date().toISOString() };
+localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+addMessage("💾 Game saved!", "system");
+return true;
+} catch (e) {
+console.error(e);
+addMessage("❌ Failed to save game.", "system");
+return false;
+}
+}
+
+
+export function loadGame() {
+const raw = localStorage.getItem(SAVE_KEY);
+if (!raw) { addMessage("❌ No save found.", "system"); return false; }
+try {
+const parsed = JSON.parse(raw);
+if (!parsed.gameState) throw new Error("Bad save format");
+// copy fields onto current gameState reference if needed
+// simplistic: replace global object by import consumer (we re-exported reference in state.js)
+// For safety we reload the page with a full assign in main.js after load
+window.__PIXEL_QUEST_LOADED = parsed;
+updateUI();
+addMessage("📂 Game loaded!", "system");
+return true;
+} catch (e) {
+console.error(e);
+addMessage("❌ Corrupted save.", "system");
+return false;
+}
+}
+
+
+export function deleteSave() {
+localStorage.removeItem(SAVE_KEY);
+addMessage("🗑️ Save deleted.", "system");
+}
+
+
+// js/shop.js
+import { allItems, shopInventory, addItemToInventory, removeItemFromInventory } from "./items.js";
+import { gameState } from "./state.js";
+import { addMessage } from "./story.js";
+import { updateUI } from "./ui.js";
+
+/**
+ * Renderiza el contenido de la tienda en el DOM
+ */
+export function renderShop() {
+  const buyList = document.getElementById("shopBuyList");
+  const sellList = document.getElementById("shopSellList");
+  const goldEl = document.getElementById("shopGold");
+  if (!buyList || !sellList || !goldEl) return;
+
+  buyList.innerHTML = "";
+  sellList.innerHTML = "";
+  goldEl.textContent = gameState.player.gold;
+
+  // Lista de compra
+  shopInventory.forEach(id => {
+    const item = allItems[id];
+    if (!item) return;
+    const li = document.createElement("li");
+    li.className = "tooltip";
+    li.innerHTML = `${item.name} - ${item.price}g `;
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = "Buy";
+    btn.addEventListener("click", () => buyItem(item));
+    li.appendChild(btn);
+    buyList.appendChild(li);
+  });
+
+  // Lista de venta (inventario del jugador)
+  for (const [itemId, qty] of Object.entries(gameState.inventory)) {
+    const item = allItems[itemId];
+    if (!item || !item.price) continue;
+    const sellPrice = Math.floor(item.price / 2);
+    const li = document.createElement("li");
+    li.className = "tooltip";
+    li.innerHTML = `${item.name} x${qty} - ${sellPrice}g `;
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = "Sell";
+    btn.addEventListener("click", () => sellItem(itemId, sellPrice));
+    li.appendChild(btn);
+    sellList.appendChild(li);
+  }
+}
+
+export function buyItem(item) {
+  if (gameState.player.gold < item.price) {
+    addMessage("Not enough gold!", "system");
+    return false;
+  }
+  gameState.player.gold -= item.price;
+  addItemToInventory(gameState.inventory, item.id, 1);
+  addMessage(`Bought ${item.name} for ${item.price}g.`, "shop");
+  renderShop();
+  updateUI();
+  return true;
+}
+
+export function sellItem(itemId, price) {
+  if (!removeItemFromInventory(gameState.inventory, itemId)) {
+    addMessage("You don't have that item.", "system");
+    return false;
+  }
+  const item = allItems[itemId] || { name: itemId };
+  gameState.player.gold += price;
+  addMessage(`Sold ${item.name} for ${price}g.`, "shop");
+  renderShop();
+  updateUI();
+  return true;
+}
+
+
+import { deepClone } from "./utils.js";
+import { calculateTotalStats } from "./stats.js";
+
+
+export const initialGameState = {
+player: {
+level: 1,
+hp: 100,
+maxHp: 100,
+mp: 30,
+maxMp: 30,
+strength: 10,
+agility: 8,
+intelligence: 7,
+gold: 50,
+experience: 0,
+nextLevelXp: 100,
+statPoints: 0
+},
+currentLocationId: "town",
+currentEnemy: null,
+isInCombat: false,
+inventory: {},
+equipment: { rightHand: null, armor: null, accessory: null },
+messages: [],
+isGameOver: false,
+timeOfDay: "day"
+};
+
+
+export let gameState = deepClone(initialGameState);
+
+
+export function resetState() {
+gameState = deepClone(initialGameState);
+// recalcular stats
+const s = calculateTotalStats(gameState.player, gameState.equipment);
+gameState.player.maxHp = s.maxHp;
+gameState.player.maxMp = s.maxMp;
+gameState.player.hp = s.maxHp;
+gameState.player.mp = s.maxMp;
+}
+
+
+export function initializeGame() {
+resetState();
+}
+
+
+// js/stats.js
+import { gameState } from "./state.js";
+import { addMessage } from "./story.js";
+
+/**
+ * Calcula estadísticas derivadas a partir de los atributos base y equipo.
+ * No modifica gameState (salvo que el caller lo quiera aplicar).
+ */
+export function calculateTotalStats(player, equipment = {}) {
+  const stats = { ...player };
+
+  // Base
+  stats.attack = player.strength ?? 0;
+  stats.defense = Math.floor((player.agility ?? 0) / 2);
+  stats.magic = player.intelligence ?? 0;
+  stats.maxHp = 80 + ((player.strength ?? 0) * 2);
+  stats.maxMp = 20 + ((player.intelligence ?? 0) * 2);
+
+  // Aplicar equipo si tiene bonificaciones
+  for (const slot in equipment) {
+    const it = equipment[slot];
+    if (!it) continue;
+    stats.attack += it.attack || 0;
+    stats.defense += it.defense || 0;
+    stats.magic += it.magic || 0;
+    stats.strength += it.strength || 0;
+    stats.agility += it.agility || 0;
+    stats.intelligence += it.intelligence || 0;
+  }
+
+  // Asegurar integridad
+  stats.hp = Math.min(player.hp ?? stats.maxHp, stats.maxHp);
+  stats.mp = Math.min(player.mp ?? stats.maxMp, stats.maxMp);
+
+  return stats;
+}
+
+export function calculateMagicAttack(stats) {
+  return Math.round((stats.magic ?? 0) * 1.5);
+}
+
+export function increaseStat(statName) {
+  if (!gameState.player) return false;
+  if ((gameState.player.statPoints ?? 0) <= 0) {
+    addMessage("Not enough stat points!", "system");
+    return false;
+  }
+  if (!["strength", "agility", "intelligence"].includes(statName)) return false;
+
+  gameState.player.statPoints -= 1;
+  gameState.player[statName] = (gameState.player[statName] || 0) + 1;
+
+  // Recalculate maxes and clamp current hp/mp
+  const s = calculateTotalStats(gameState.player, gameState.equipment);
+  gameState.player.maxHp = s.maxHp;
+  gameState.player.maxMp = s.maxMp;
+  gameState.player.hp = Math.min(gameState.player.hp ?? s.maxHp, s.maxHp);
+  gameState.player.mp = Math.min(gameState.player.mp ?? s.maxMp, s.maxMp);
+
+  addMessage(`Increased ${statName.toUpperCase()} to ${gameState.player[statName]}!`, "stat");
+  return true;
+}
+
+export function levelUp() {
+  const p = gameState.player;
+  p.level = (p.level || 1) + 1;
+  p.experience = 0;
+  p.nextLevelXp = Math.floor((p.nextLevelXp || 100) * 1.5);
+  p.statPoints = (p.statPoints || 0) + 5;
+  p.maxHp = (p.maxHp || 0) + 10;
+  p.maxMp = (p.maxMp || 0) + 5;
+  p.hp = p.maxHp;
+  p.mp = p.maxMp;
+  addMessage(`LEVEL UP! You reached level ${p.level}! Gained 5 stat points.`, "stat");
+}
+
+
+import { gameState } from "./state.js";
+
+
+export function addMessage(text, type = "narrative") {
+const storyEl = document.getElementById("story");
+if (!storyEl) return console.error("#story missing in DOM");
+const p = document.createElement("p");
+p.textContent = text;
+p.className = `msg msg-${type}`;
+storyEl.appendChild(p);
+storyEl.scrollTop = storyEl.scrollHeight;
+// also store in state for save-preview if desired
+try { gameState.messages = gameState.messages || []; gameState.messages.push({ text, type, t: Date.now() }); } catch (e) {}
+}
+
+
+export function clearStory() {
+const storyEl = document.getElementById("story");
+if (storyEl) storyEl.innerHTML = "";
+}
+
+
+// /tooltip.js
+export function buildTooltip(item) {
+  if (!item) return "";
+  let t = [];
+
+  t.push(item.name);
+  if (item.description) t.push(item.description);
+
+  if (item.attack)        t.push(`⚔️ ATK  +${item.attack}`);
+  if (item.defense)       t.push(`🛡️ DEF  +${item.defense}`);
+  if (item.magic)         t.push(`✨ MAG  +${item.magic}`);
+  if (item.strength)      t.push(`💪 STR  +${item.strength}`);
+  if (item.agility)       t.push(`🏃 AGI  +${item.agility}`);
+  if (item.intelligence)  t.push(`🧠 INT  +${item.intelligence}`);
+
+  if (item.type === "consumable") {
+    if (item.effect === "restore_hp") t.push(`❤️ Restores ${item.potency} HP`);
+    if (item.effect === "restore_mp") t.push(`💧 Restores ${item.potency} MP`);
+  }
+
+  if (item.price) t.push(`🪙 ${item.price} g`);
+
+  return t.join("\n");
+}
+
+
+import { gameState } from "./state.js";
+
+
+export function updateUI() {
+const stats = gameState.player;
+const hpBar = document.getElementById("hp-bar");
+const hpText = document.getElementById("hp-text");
+if (hpBar && hpText) {
+const pct = Math.round((stats.hp / stats.maxHp) * 100);
+hpBar.style.width = pct + "%";
+hpText.textContent = `${stats.hp}/${stats.maxHp}`;
+}
+
+
+const mpBar = document.getElementById("mp-bar");
+const mpText = document.getElementById("mp-text");
+if (mpBar && mpText) {
+const pct = Math.round((stats.mp / stats.maxMp) * 100);
+mpBar.style.width = pct + "%";
+mpText.textContent = `${stats.mp}/${stats.maxMp}`;
+}
+
+
+const xpBar = document.getElementById("xp-bar");
+const xpText = document.getElementById("xp-text");
+if (xpBar && xpText) {
+const xpPct = Math.round((gameState.player.experience / gameState.player.nextLevelXp) * 100);
+xpBar.style.width = xpPct + "%";
+xpText.textContent = `${gameState.player.experience}/${gameState.player.nextLevelXp}`;
+}
+
+
+document.getElementById("gold")?.textContent = stats.gold;
+document.getElementById("level")?.textContent = stats.level;
+document.getElementById("strength")?.textContent = stats.strength;
+document.getElementById("agility")?.textContent = stats.agility;
+document.getElementById("intelligence")?.textContent = stats.intelligence;
+document.getElementById("stat-points")?.textContent = stats.statPoints;
+
+
+document.getElementById("location-name")?.textContent = (window.worldMap && window.worldMap[gameState.currentLocationId]?.name) || gameState.currentLocationId;
+
+
+// enemy panel
+if (gameState.currentEnemy) {
+document.getElementById("enemy-panel")?.classList.remove("hidden");
+document.getElementById("enemy-name")?.textContent = gameState.currentEnemy.type;
+document.getElementById("enemy-hp")?.textContent = `${gameState.currentEnemy.hp}/${gameState.currentEnemy.maxHp}`;
+} else {
+document.getElementById("enemy-panel")?.classList.add("hidden");
+}
+}
+
+
+export function toggleMainMenu(show) {
+const modal = document.getElementById("mainMenuModal");
+if (!modal) return;
+modal.classList.toggle("hidden", !show);
+if (show) updateSaveInfo();
+}
+
+
+export function updateSaveInfo() {
+const saveInfo = document.getElementById("saveInfo");
+if (!saveInfo) return;
+try {
+const raw = localStorage.getItem("pixelQuestSave");
+if (!raw) { saveInfo.innerHTML = "<p>No saved game</p>"; return; }
+const parsed = JSON.parse(raw);
+const date = new Date(parsed.timestamp);
+const lvl = parsed.gameState.player.level;
+const gold = parsed.gameState.player.gold;
+saveInfo.innerHTML = `<p>Last save: ${date.toLocaleString()}</p><p>Level ${lvl} | Gold ${gold}</p>`;
+} catch (e) {
+saveInfo.innerHTML = "<p>Corrupted save</p>";
+}
+}
+
+
+export function showGameOver() {
+const modal = document.getElementById("gameOverModal");
+if (modal) modal.classList.remove("hidden");
+
+
+// Funciones utilitarias pequeñas
+export function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+export function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+export function deepClone(obj) { return structuredClone ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)); }
+
+
+
+
+// Funciones utilitarias pequeñas
+export function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+export function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+export function deepClone(obj) { return structuredClone ? structuredClone(obj) : JSON.parse(JSON.stringify(obj)); }
+
+
+// worldMap.nonLinear.js
+// Mapa ESTÁTICO pero NO-LINEAL para Pixel Quest Echoes
+// (usa tu generateZone y connectZones existentes)
+
+import { generateZone, connectZones } from "./mapgen.js";
+
+// ======================================================
+// 1) PUNTOS DE INTERÉS MANUALES (ciudades, zonas seguras)
+// ======================================================
+export const worldMap = {
+  // ----------- CAPITAL INICIAL -----------
+  town: {
+    id: "town",
+    name: "Oakhaven",
+    biome: "town",
+    safeZone: true,
+    canRest: true,
+    level: 1,
+    description: "A lively trade-hub surrounded by gentle hills.",
+    exits: { north: "forest_cross", south: "swamp_dock", east: "shop", west: "tavern" }
+  },
+  shop: {
+    id: "shop",
+    name: "Adventurer's Supply",
+    biome: "none",
+    level: 1,
+    description: "Gear, potions and gossip.",
+    exits: { west: "town" }
+  },
+  tavern: {
+    id: "tavern",
+    name: "The Drunken Dragon",
+    biome: "none",
+    canRest: true,
+    level: 1,
+    description: "Warm fire, cold ale, loud bards.",
+    exits: { east: "town", down: "cellar" }
+  },
+  cellar: {
+    id: "cellar",
+    name: "Old Cellar",
+    biome: "none",
+    level: 1,
+    description: "Barrels and rats... and a hidden passage?",
+    exits: { up: "tavern", west: "catacombs_1" }
+  },
+
+  // ----------- CASTILLO DEL NORTE -----------
+  castle: {
+    id: "castle",
+    name: "Griffon Keep",
+    biome: "town",
+    safeZone: true,
+    canRest: true,
+    level: 3,
+    description: "Cold stone, fluttering banners, clanking armour.",
+    exits: { south: "mountain_pass", east: "castle_shop", down: "dungeon_1" }
+  },
+  castle_shop: {
+    id: "castle_shop",
+    name: "Keep Quartermaster",
+    biome: "none",
+    level: 3,
+    description: "Military-grade gear.",
+    exits: { west: "castle" }
+  },
+
+  // ----------- PUEBLO COSTERO -----------
+  port: {
+    id: "port",
+    name: "Saltwind Port",
+    biome: "town",
+    safeZone: true,
+    canRest: true,
+    level: 2,
+    description: "Smell of salt, gulls overhead, ships creak in the bay.",
+    exits: { north: "beach_1", south: "jungle_1", west: "desert_1" }
+  }
+};
+
+// ======================================================
+// 2) BIOMAS GENERADOS (no-lineales)
+// ======================================================
+const zones = [
+  { id: "forest", rooms: 6 },
+  { id: "cave", rooms: 5 },
+  { id: "mountain", rooms: 5 },
+  { id: "swamp", rooms: 5 },
+  { id: "desert", rooms: 5 },
+  { id: "beach", rooms: 4 },
+  { id: "jungle", rooms: 5 },
+  { id: "ruins", rooms: 4 },
+  { id: "volcano", rooms: 4 },
+  { id: "tundra", rooms: 4 },
+  { id: "catacombs", rooms: 3 },
+  { id: "dungeon", rooms: 3 }
+];
+
+// generamos cada zona
+zones.forEach(z => {
+  Object.assign(worldMap, generateZone({
+    biome: z.id,
+    idPrefix: z.id,
+    rooms: z.rooms
+  }));
+});
+
+// ======================================================
+// 3) CONEXIONES NO-LINEALES
+// ======================================================
+
+// ----------- BOSQUE (múltiples entradas) -----------
+connectZones(worldMap, "town", "forest_1", "north");
+connectZones(worldMap, "forest_2", "cave_1", "down");
+connectZones(worldMap, "forest_4", "ruins_1", "east");
+connectZones(worldMap, "forest_6", "mountain_1", "north-east");
+
+// ----------- PANTANO -----------
+connectZones(worldMap, "town", "swamp_1", "south");
+connectZones(worldMap, "swamp_3", "catacombs_1", "down");
+connectZones(worldMap, "swamp_5", "castle", "north");   // camino alternativo al castillo
+
+// ----------- MONTAÑA -----------
+connectZones(worldMap, "mountain_2", "cave_5", "west");
+connectZones(worldMap, "mountain_4", "tundra_1", "north");
+connectZones(worldMap, "mountain_5", "volcano_1", "up");
+
+// ----------- DESIERTO -----------
+connectZones(worldMap, "port", "desert_1", "west");
+connectZones(worldMap, "desert_3", "ruins_4", "portal");
+connectZones(worldMap, "desert_5", "beach_3", "south");
+
+// ----------- PLAYA / COSTA -----------
+connectZones(worldMap, "port", "beach_1", "north");
+connectZones(worldMap, "beach_4", "jungle_2", "south-east");
+
+// ----------- SELVA -----------
+connectZones(worldMap, "port", "jungle_1", "south");
+connectZones(worldMap, "jungle_4", "volcano_2", "west");
+
+// ----------- RUINAS (hub central) -----------
+connectZones(worldMap, "ruins_3", "forest_4", "west");
+connectZones(worldMap, "ruins_5", "dungeon_1", "down");
+
+// ----------- CATACOMBAS (desde sótano) -----------
+connectZones(worldMap, "catacombs_3", "dungeon_2", "east");
+
+// ----------- DUNGEON FINAL -----------
+connectZones(worldMap, "dungeon_3", "volcano_4", "portal");
+
+// ----------- TUNDRA (remoto norte) -----------
+connectZones(worldMap, "tundra_4", "volcano_5", "portal");
+
+// ======================================================
+// 4) EXPORT
+// ======================================================
+export default worldMap;
+
+
+
+
