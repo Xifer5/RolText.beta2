@@ -1,0 +1,113 @@
+// ══════════════════════════════════════════════════════
+//  JOURNAL — Diario del aventurero
+// ══════════════════════════════════════════════════════
+import { gameState } from "./state.js";
+
+// Entradas predefinidas por progresión
+const JOURNAL_ENTRIES = [
+  {
+    id: "start",
+    title: "El comienzo de la aventura",
+    icon: "📖",
+    alwaysVisible: true,
+    text: "He decidido abandonar mi pueblo natal y embarcarme en una aventura. Las historias del Dragon King que amenaza estas tierras me persiguen. Quizás yo pueda marcar la diferencia. El camino está lleno de peligros, pero también de oportunidades."
+  },
+  {
+    id: "first_kill",
+    title: "Primera batalla",
+    icon: "⚔️",
+    requirement: (gs) => gs.stats?.kills >= 1,
+    text: "Hoy luché contra mi primer enemigo. La adrenalina del combate es algo que nunca olvidaré. Debo seguir entrenando si quiero sobrevivir a lo que viene."
+  },
+  {
+    id: "level_5",
+    title: "El camino se forja",
+    icon: "⭐",
+    requirement: (gs) => gs.player.level >= 5,
+    text: "Nivel 5. Estoy empezando a entender mi propio camino. Mis habilidades crecen, pero los enemigos también son más fuertes. Debo seguir adelante."
+  },
+  {
+    id: "level_10",
+    title: "Mitad del camino",
+    icon: "🌟",
+    requirement: (gs) => gs.player.level >= 10,
+    text: "Nivel 10. He recorrido muchas tierras y derrotado a criaturas que antes me habrían aterrorizado. El Dragon King sigue ahí, esperando. Debo prepararme."
+  },
+  {
+    id: "first_boss",
+    title: "El primer gran reto",
+    icon: "🐉",
+    requirement: (gs) => gs.stats?.bossKills >= 1,
+    text: "Derroté a mi primer jefe de área. La batalla fue épica. Sus caídas resuenan en mis oídos. Cada victoria me acerca más a mi destino final."
+  },
+  {
+    id: "discovered_magic",
+    title: "Los misterios arcanos",
+    icon: "✨",
+    requirement: (gs) => gs.player.intelligence >= 15,
+    text: "La magia fluye a través de mí con más facilidad. Siento el poder arcano cuando cierro los ojos. La inteligencia es la llave de este poder oculto."
+  },
+  {
+    id: "warrior_path",
+    title: "El camino del guerrero",
+    icon: "⚔️",
+    requirement: (gs) => gs.player.class === "warrior" && gs.player.strength >= 20,
+    text: "Mi fuerza es legendaria. Los enemigos tiemblan ante mi presencia. El camino del guerrero exige sacrificio, pero la recompensa en poder físico no tiene igual."
+  },
+  {
+    id: "mage_path",
+    title: "El sendero arcano",
+    icon: "🔮",
+    requirement: (gs) => gs.player.class === "mage" && gs.player.intelligence >= 20,
+    text: "He desbloqueado secretos mágicos que pocos mortales comprenden. Mi mente es más poderosa que cualquier espada. El conocimiento es el verdadero poder."
+  },
+  {
+    id: "rogue_path",
+    title: "Las sombras me guían",
+    icon: "🗡️",
+    requirement: (gs) => gs.player.class === "rogue" && gs.player.agility >= 20,
+    text: "Me muevo como el viento, golpeo como el rayo. Ningún enemigo puede atraparme. La agilidad no es huir: es elegir cuándo y cómo atacar."
+  }
+];
+
+export function getAvailableEntries() {
+  return JOURNAL_ENTRIES.filter(e => e.alwaysVisible || (e.requirement && e.requirement(gameState)));
+}
+
+export function renderJournal() {
+  const entries = getAvailableEntries();
+  const cls = gameState.player.class;
+  const clsName = gameState.player.className || "Aventurero";
+  const clsEmoji = gameState.player.classEmoji || "⚔️";
+
+  return `
+    <div class="journal-container">
+      <div class="journal-header">
+        <div class="journal-hero">
+          <span style="font-size:2.5rem">${clsEmoji}</span>
+          <div>
+            <div class="journal-name">${gameState.player.name || "Aventurero"}</div>
+            <div class="journal-class">${clsName} · Nivel ${gameState.player.level}</div>
+          </div>
+        </div>
+        <div class="journal-stats-row">
+          <div class="jstat"><span>🏆</span><span>${gameState.stats?.kills || 0}</span><label>Victorias</label></div>
+          <div class="jstat"><span>💀</span><span>${gameState.stats?.bossKills || 0}</span><label>Jefes</label></div>
+          <div class="jstat"><span>🪙</span><span>${gameState.player.gold}</span><label>Oro</label></div>
+          <div class="jstat"><span>📍</span><span>${gameState.stats?.locationsVisited || 0}</span><label>Lugares</label></div>
+        </div>
+      </div>
+      <div class="journal-entries">
+        ${entries.map(e => `
+          <div class="journal-entry">
+            <div class="journal-entry-header">
+              <span class="journal-icon">${e.icon}</span>
+              <strong>${e.title}</strong>
+            </div>
+            <p class="journal-text">${e.text}</p>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}

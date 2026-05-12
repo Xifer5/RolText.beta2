@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Pixel Quest Echoes — RPG de texto con Material Design 3"/>
+  <title>Pixel Quest Echoes</title>
+  <link rel="stylesheet" href="styles-m3.css"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body role="application">
+
+<!-- ══ TOPBAR ══════════════════════════════════════════════════ -->
+<header id="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-brand">
+      <span class="brand-icon">⚔</span>
+      <div>
+        <div class="brand-title">Pixel Quest Echoes</div>
+        <div class="brand-sub" data-i18n="brandSubtitle">Explora · Combate · Forja tu destino</div>
+      </div>
+    </div>
+    <nav class="topbar-nav">
+      <button class="nav-tab active" data-panel="attributes"><span data-i18n="navAttributes">Atributos</span></button>
+      <button class="nav-tab" data-panel="equipment"><span data-i18n="navEquipment">Equipo</span></button>
+      <button class="nav-tab" data-panel="spellbook"><span data-i18n="navSpellbook">Grimorio</span></button>
+      <button class="nav-tab" data-panel="journal"><span data-i18n="navJournal">Diario</span></button>
+      <button class="nav-tab" data-panel="bestiary"><span data-i18n="navBestiary">Bestiario</span></button>
+      <button class="nav-tab" data-panel="minimap">🗺️ <span data-i18n="navMap">Mapa</span></button>
+      <button class="nav-tab" data-panel="achievements">🏆 <span data-i18n="navAchievements">Logros</span></button>
+      <button class="nav-tab" data-panel="crafting">⚒️ <span data-i18n="navCrafting">Forja</span></button>
+    </nav>
+    <div class="topbar-actions">
+      <div class="m3-input-container">
+        <label class="lang-label" for="localeSelect" data-i18n="languageLabel">Idioma</label>
+        <div class="select-wrapper">
+          <select id="localeSelect" class="m3-select">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+          <span class="m3-select-icon">▼</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="themeToggleBtn" aria-label="Cambiar tema" data-i18n-attr="aria-label" data-i18n="themeToggleLabel">🌙</button>
+      <button class="icon-btn" id="floatingMenuBtn" aria-label="Menú principal" data-i18n-attr="aria-label" data-i18n="mainMenuLabel">☰</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ LAYOUT ══════════════════════════════════════════════════ -->
+<main id="game">
+
+  <!-- ── LEFT SIDEBAR ──────────────────────────────────────── -->
+  <aside id="left-panel">
+
+    <!-- Character portrait -->
+    <div class="char-card">
+      <div class="char-portrait" id="char-portrait">
+        <span id="char-portrait-emoji">⚔️</span>
+      </div>
+      <div class="char-info">
+        <div class="char-name" id="profile-name">Aventurero</div>
+        <div class="char-class">
+          <span class="profile-role">Nv.1 Guerrero</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vitals -->
+    <div class="sidebar-block vitals-block">
+      <div class="block-label">Vitalidad</div>
+      <div class="vital-row">
+        <span class="vital-label">HP</span>
+        <div class="vital-bar-wrap">
+          <div class="vital-bar hp-bar" id="hp-bar"></div>
+        </div>
+        <span class="vital-num" id="hp-text">0/0</span>
+      </div>
+      <div class="vital-row">
+        <span class="vital-label">MP</span>
+        <div class="vital-bar-wrap">
+          <div class="vital-bar mp-bar" id="mp-bar"></div>
+        </div>
+        <span class="vital-num" id="mp-text">0/0</span>
+      </div>
+      <div class="vital-row">
+        <span class="vital-label xp-label">XP</span>
+        <div class="vital-bar-wrap">
+          <div class="vital-bar xp-bar" id="xp-bar"></div>
+        </div>
+        <span class="vital-num" id="xp-text">0/0</span>
+      </div>
+    </div>
+
+    <!-- Core Stats -->
+    <div class="sidebar-block stats-grid-block">
+      <div class="block-label">Estadísticas</div>
+      <div class="stats-trio">
+        <div class="stat-cell">
+          <span class="stat-val" id="derived-attack">0</span>
+          <span class="stat-key">ATK</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-val" id="derived-defense">0</span>
+          <span class="stat-key">DEF</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-val" id="derived-magic">0</span>
+          <span class="stat-key">MAG</span>
+        </div>
+      </div>
+      <div class="attrs-row">
+        <span class="attr-chip">STR <b id="strength">0</b></span>
+        <span class="attr-chip">AGI <b id="agility">0</b></span>
+        <span class="attr-chip">INT <b id="intelligence">0</b></span>
+      </div>
+      <div class="gold-level-row">
+        <span class="gold-val">🪙 <b id="gold">0</b></span>
+        <span class="level-val">⭐ Lv.<b id="level">1</b></span>
+        <span class="pts-val" id="stat-points-row" style="display:none">✨ <b id="stat-points">0</b> pts</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="sidebar-block">
+      <div class="block-label" data-i18n="actionsLabel">Acciones</div>
+      <div class="quick-actions">
+        <button class="qa-btn" id="inventoryBtn">🎒<span data-i18n="quickInventory">Inventory</span></button>
+        <button class="qa-btn" id="statsBtn">📈<span data-i18n="quickStats">Stats</span></button>
+        <button class="qa-btn" id="restBtn">🛏️<span data-i18n="quickRest">Rest</span></button>
+        <button class="qa-btn" id="shopBtn">🛒<span data-i18n="quickShop">Tienda</span></button>
+        <button class="qa-btn wide" id="questLogBtn">📋<span data-i18n="quickQuests">Misiones</span></button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── CENTER: WORLD SCREEN ───────────────────────────────── -->
+  <section id="screen">
+
+    <!-- Location hero -->
+    <div id="location-hero">
+      <img id="location-img" class="location-img" src="" alt=""
+           style="display:none" onerror="this.style.display='none'">
+      <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
+      <div id="location-subtitle" class="location-subtitle"></div>
+      <button id="npc-talk-btn" type="button" class="npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel">
+        💬 <span data-i18n="npcTalkText">Hablar</span>
+      </button>
+    </div>
+
+    <!-- Enemy panel -->
+    <div id="enemy-panel" class="hidden" role="region" aria-labelledby="enemy-name" aria-live="assertive">
+      <img id="enemy-portrait" class="enemy-portrait" src="" alt="" style="display:none"
+           onerror="this.style.display='none'">
+      <div class="enemy-left">
+        <div class="enemy-title-row">
+          <strong id="enemy-name">Enemy</strong>
+          <div id="enemy-debuffs" class="enemy-debuffs"></div>
+        </div>
+        <div class="enemy-hp-row">
+          <div class="enemy-hp-bar-wrap">
+            <div class="enemy-hp-bar-fill" id="enemy-hp-bar" style="width:100%"></div>
+          </div>
+          <span id="enemy-hp" class="enemy-hp-num"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buff bar -->
+    <div id="buff-bar" class="buff-bar" aria-live="polite"></div>
+
+    <!-- Skill panel -->
+    <div id="skill-panel" class="skill-panel" aria-label="Habilidades" data-i18n-attr="aria-label" data-i18n="skillsPanelLabel"></div>
+
+    <!-- Story log -->
+    <div id="story-wrap" class="story-wrap">
+      <div class="story-filters" role="toolbar" aria-label="Filtrar mensajes" data-i18n-attr="aria-label" data-i18n="storyFilterLabel">
+        <button class="sf-btn active" data-filter="" data-i18n="storyFilterAll">Todos</button>
+        <button class="sf-btn" data-filter="combat" data-i18n="storyFilterCombat">⚔ Combate</button>
+        <button class="sf-btn" data-filter="narrative" data-i18n="storyFilterNarrative">📖 Historia</button>
+        <button class="sf-btn" data-filter="loot" data-i18n="storyFilterLoot">🎁 Loot</button>
+        <button class="sf-btn" data-filter="system" data-i18n="storyFilterSystem">⚙ Sistema</button>
+      </div>
+      <div id="story" class="story" role="log" aria-label="Registro de eventos" aria-live="polite"></div>
+    </div>
+
+  </section>
+
+  <!-- ── RIGHT SIDEBAR ──────────────────────────────────────── -->
+  <aside id="right-panel">
+
+    <!-- COMBAT panel (shown in combat) -->
+    <div id="combat-menu" class="sidebar-block combat-block hidden">
+      <div class="block-label combat-label" data-i18n="combatLabel">⚔ En Combate</div>
+      <div id="combat-content" class="combat-grid">
+        <button class="combat-btn attack" id="attackBtn" aria-keyshortcuts="1" data-i18n-attr="aria-label" data-i18n="combatAttackAria">⚔️<span data-i18n="combatAttack">Atacar</span><kbd class="key-hint">1</kbd></button>
+        <button class="combat-btn magic"  id="magicBtn"  aria-keyshortcuts="2" data-i18n-attr="aria-label" data-i18n="combatMagicAria">✨<span data-i18n="combatMagic">Magia</span><kbd class="key-hint">2</kbd></button>
+        <button class="combat-btn item"   id="itemBtn"   aria-keyshortcuts="3" data-i18n-attr="aria-label" data-i18n="combatItemAria">🧪<span data-i18n="combatItem">Ítem</span><kbd class="key-hint">3</kbd></button>
+        <button class="combat-btn flee"   id="fleeBtn"   aria-keyshortcuts="4" data-i18n-attr="aria-label" data-i18n="combatFleeAria">🏃<span data-i18n="combatFlee">Huir</span><kbd class="key-hint">4</kbd></button>
+      </div>
+    </div>
+
+    <!-- NAVIGATION panel (shown outside combat) -->
+    <div id="navigation-menu" class="sidebar-block nav-block">
+      <div class="block-label" data-i18n="navigationLabel">🧭 Navegación</div>
+      <div id="navigation-content" class="compass-pad" aria-label="Compás de movimiento">
+        <!-- Middle row - Main compass -->
+      </div>
+      <div class="compass-directionals" aria-label="Direcciones cardinales">
+        <div class="compass-dir-row">
+          <button class="compass-dir-label" data-direction="north">N</button>
+        </div>
+        <div class="compass-dir-row compass-ew">
+          <button class="compass-dir-label" data-direction="west">O</button>
+          <span class="compass-spacer"></span>
+          <button class="compass-dir-label" data-direction="east">E</button>
+        </div>
+        <div class="compass-dir-row">
+          <button class="compass-dir-label" data-direction="south">S</button>
+        </div>
+      </div>
+      <div class="compass-actions" aria-label="Acciones especiales">
+        <button class="compass-action-btn" data-direction="enter" aria-label="Entrar" data-i18n-attr="aria-label" data-i18n="enterButton">⏎ <span data-i18n="enterButton">Enter</span></button>
+        <button class="compass-action-btn compass-exit" data-direction="out" aria-label="Salir" data-i18n-attr="aria-label" data-i18n="exitButton">⟲ <span data-i18n="exitButton">Exit</span></button>
+        <button class="compass-action-btn" data-direction="up" aria-label="Subir" data-i18n-attr="aria-label" data-i18n="climbUp">⬆ <span data-i18n="climbUp">Subir</span></button>
+        <button class="compass-action-btn" data-direction="down" aria-label="Bajar" data-i18n-attr="aria-label" data-i18n="climbDown">⬇ <span data-i18n="climbDown">Bajar</span></button>
+      </div>
+    </div>
+
+      <!-- LOCAL MINIMAP (siempre visible) -->
+    <div id="local-minimap" class="sidebar-block minimap-block">
+      <div class="block-label">
+        🗺️ <span data-i18n="localMapLabel">Mapa local</span>
+        <span class="minimap-coords" id="minimap-coords"></span>
+      </div>
+      <div id="local-minimap-grid" class="local-mm-grid"></div>
+    </div>
+
+  </aside>
+</main>
+
+<!-- ══ MOBILE BOTTOM NAV ════════════════════════════════════════
+     Visible ≤960px cuando el panel derecho está oculto.
+     Se sincroniza con el estado de combate igual que el right-panel.
+     ═══════════════════════════════════════════════════════════════ -->
+<nav id="mobile-bottom-nav" aria-label="Controles de juego" data-i18n-attr="aria-label" data-i18n="mobileNavLabel">
+
+  <!-- Modo combate -->
+  <div id="mob-combat" class="mob-bar hidden">
+    <button class="mob-btn mob-attack" id="mob-attackBtn" aria-keyshortcuts="1" aria-label="Atacar (tecla 1)">
+      <span class="mob-icon">⚔️</span><span>Atacar</span>
+    </button>
+    <button class="mob-btn mob-magic"  id="mob-magicBtn"  aria-keyshortcuts="2" aria-label="Magia (tecla 2)">
+      <span class="mob-icon">✨</span><span>Magia</span>
+    </button>
+    <button class="mob-btn"            id="mob-itemBtn"   aria-keyshortcuts="3" aria-label="Ítem (tecla 3)">
+      <span class="mob-icon">🧪</span><span>Ítem</span>
+    </button>
+    <button class="mob-btn mob-flee"   id="mob-fleeBtn"   aria-keyshortcuts="4" aria-label="Huir (tecla 4)">
+      <span class="mob-icon">🏃</span><span>Huir</span>
+    </button>
+  </div>
+
+  <!-- Modo navegación -->
+  <div id="mob-nav" class="mob-bar">
+    <button class="mob-btn mob-dir" data-direction="west"  aria-label="Oeste  (A/←)">◀</button>
+    <div style="display:flex;flex-direction:column;flex:1;gap:4px">
+      <button class="mob-btn mob-dir" data-direction="north" aria-label="Norte (W/↑)" style="min-height:40px">▲</button>
+      <button class="mob-btn mob-dir" data-direction="south" aria-label="Sur   (S/↓)" style="min-height:40px">▼</button>
+    </div>
+    <button class="mob-btn mob-dir" data-direction="east"  aria-label="Este   (D/→)">▶</button>
+    <div class="mob-sep"></div>
+    <button class="mob-btn" data-direction="enter" aria-label="Entrar" style="flex:.8" data-i18n-attr="aria-label" data-i18n="enterButton">
+      <span class="mob-icon">⏎</span><span data-i18n="enterButton">Enter</span>
+    </button>
+    <button class="mob-btn" id="mob-inventoryBtn"  aria-label="Inventario" data-i18n-attr="aria-label" data-i18n="mobInventoryAria">
+      <span class="mob-icon">🎒</span><span data-i18n="mobInventory">Inv.</span>
+    </button>
+  </div>
+
+</nav>
+
+<!-- ══ MODALES ══════════════════════════════════════════════════ -->
+
+<!-- PANEL MODAL (Attributes / Equipment / Spellbook / Journal / Bestiary) -->
+<div id="panelModal" class="modal hidden" role="dialog" aria-labelledby="panelModalTitle">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="panelModalTitle"></h2>
+      <button class="modal-close" id="closePanelBtn" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="panelModalBody"></div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div id="inventoryModal" class="modal hidden" role="dialog" aria-labelledby="inventory-title">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="inventory-title" data-i18n="inventoryTitle">🎒 Inventario</h2>
+      <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="modal-gold"><span data-i18n="inventoryGold">Oro</span>: <span id="inventoryGold" class="gold-accent">0</span> 🪙</p>
+    <div class="inventory-grid">
+      <div class="inventory-list-col">
+        <h3 data-i18n="itemsSectionTitle">Objetos</h3>
+        <ul id="inventoryList" role="listbox"></ul>
+      </div>
+      <div class="inventory-detail-col" id="inventoryDetail">
+        <h3 data-i18n="itemDetailTitle">Detalles</h3>
+        <div class="item-detail-empty" data-i18n="itemDetailEmpty">Selecciona un objeto para ver sus detalles.</div>
+        <div class="item-detail" id="itemDetailCard" style="display:none">
+          <button id="detailCloseBtn" class="btn-ghost small" data-i18n="detailClose">✕ Cerrar</button>
+          <div class="item-detail-header" style="margin-top:12px">
+            <div class="item-detail-icon" id="detailIcon">🧪</div>
+            <div>
+              <div id="detailName" class="detail-name">Item</div>
+              <div id="detailMeta" class="detail-meta">Común · Consumible</div>
+            </div>
+          </div>
+          <div class="item-detail-body">
+            <p id="detailDesc"></p>
+            <ul id="detailAttrs" role="list"></ul>
+          </div>
+          <div class="item-detail-actions">
+            <button id="detailUseBtn" class="btn-action">Usar</button>
+            <button id="detailEquipBtn" class="btn-action secondary">Equipar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <h3>Equipamiento</h3>
+      <ul id="equipmentList" role="list" class="equipment-slots-list">
+        <li>🪖 <span id="equip-head" class="equip-val">Vacío</span></li>
+        <li>⚔️ <span id="equip-rightHand" class="equip-val">Vacío</span></li>
+        <li>🛡️ <span id="equip-leftHand" class="equip-val">Vacío</span></li>
+        <li>🥋 <span id="equip-armor" class="equip-val">Vacío</span></li>
+        <li>🦾 <span id="equip-arms" class="equip-val">Vacío</span></li>
+        <li>👢 <span id="equip-boots" class="equip-val">Vacío</span></li>
+        <li>💍 <span id="equip-ring" class="equip-val">Vacío</span></li>
+        <li>✨ <span id="equip-accessory" class="equip-val">Vacío</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div id="statsModal" class="modal hidden" role="dialog" aria-labelledby="stats-modal-title">
+  <div class="modal-content" style="max-width:440px">
+    <div class="modal-header">
+        <h2 id="stats-modal-title" data-i18n="statsModalTitle">📈 Mejorar Atributos</h2>
+        <button class="modal-close" id="closeStatsBtn">✕</button>
+      </div>
+      <p class="modal-points-label"><span data-i18n="statPointsText">Puntos disponibles</span>: <strong id="modal-stat-points" class="gold-accent" style="font-size:1.3em">0</strong></p>
+      <p id="stat-class-hint" class="hint-text" data-i18n="statClassHint"></p>
+      <div class="stat-increase-grid">
+        <div class="stat-row">💪 STR — <span id="modal-strength">0</span>
+          <button id="inc-str" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        </div>
+        <div class="stat-row">🏃 AGI — <span id="modal-agility">0</span>
+          <button id="inc-agi" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        </div>
+        <div class="stat-row">🔮 INT — <span id="modal-intelligence">0</span>
+          <button id="inc-int" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        </div>
+      </div>
+      <p class="hint-text" style="margin-top:16px" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div id="shopModal" class="modal hidden" role="dialog" aria-labelledby="shop-modal-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="shop-modal-title" data-i18n="shopModalTitle">🛒 Tienda</h2>
+        <button class="modal-close" id="closeShopBtn">✕</button>
+      </div>
+      <p class="modal-gold"><span data-i18n="shopGoldLabel">Tu oro</span>: <span id="shopGold" class="gold-accent">0</span> 🪙</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div><h3 data-i18n="shopBuyTitle">Comprar</h3><ul id="shopBuyList" role="listbox"></ul></div>
+        <div><h3 data-i18n="shopSellTitle">Vender</h3><ul id="shopSellList" role="listbox"></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MAIN MENU -->
+<div id="mainMenuModal" class="modal hidden" role="dialog" aria-labelledby="main-menu-title">
+  <div class="modal-content main-menu-content">
+    <div class="main-menu-brand">⚔ Pixel Quest Echoes ⚔</div>
+    <div class="menu-options">
+      <button id="newGameBtn" class="menu-option primary" data-i18n="newGameBtn">🆕 Nuevo Juego</button>
+      <button id="continueBtn" class="menu-option" data-i18n="continueButton">▶️ Continuar</button>
+      <button id="saveGameBtn" class="menu-option" data-i18n="saveGameButton">💾 Guardar</button>
+      <button id="loadGameBtn" class="menu-option" data-i18n="loadGameButton">📂 Cargar</button>
+      <button id="deleteSaveBtn" class="menu-option danger" data-i18n="deleteSaveButton">🗑️ Borrar partida</button>
+      <button id="closeMenuBtn" class="menu-option ghost" data-i18n="closeButton">✕ Cerrar</button>
+    </div>
+    <div class="audio-controls">
+      <div class="audio-section-title" data-i18n="audioSectionTitle">🎧 Audio</div>
+      <div class="audio-row">
+        <label for="sfx-volume" data-i18n="sfxLabel">🔊 Efectos</label>
+        <input type="range" id="sfx-volume" min="0" max="100" value="50" class="vol-slider">
+        <button id="sfx-mute-btn" class="mute-btn" data-i18n-attr="title" data-i18n="muteSfxTooltip">🔊</button>
+      </div>
+      <div class="audio-row">
+        <label for="music-volume" data-i18n="musicLabel">🎵 Música</label>
+        <input type="range" id="music-volume" min="0" max="100" value="40" class="vol-slider">
+        <button id="music-mute-btn" class="mute-btn" data-i18n-attr="title" data-i18n="muteMusicTooltip">🎵</button>
+      </div>
+    </div>
+    <div class="save-info" id="saveInfo"></div>
+  </div>
+</div>
+
+<!-- NPC DIALOG -->
+<div id="npcModal" class="modal hidden" role="dialog" aria-labelledby="npc-modal-title" aria-modal="true">
+  <div class="modal-content npc-modal-content">
+    <div class="modal-header">
+      <h2 id="npc-modal-title">NPC</h2>
+      <button class="modal-close" id="closeNpcBtn" aria-label="Cerrar diálogo" data-i18n-attr="aria-label" data-i18n="closeDialogue">✕</button>
+    </div>
+
+    <!-- Portrait + info -->
+    <div class="npc-header">
+      <div class="npc-portrait" id="npcEmoji">🔮</div>
+      <div>
+        <div class="npc-name" id="npcName">Nombre</div>
+        <div class="npc-role" id="npcRole">Rol</div>
+      </div>
+    </div>
+
+    <!-- Lore -->
+    <div class="npc-lore" id="npcLore"></div>
+
+    <!-- Quest section -->
+    <div class="npc-quest-section">
+      <div class="npc-quest-meta">
+        <span class="npc-quest-badge" id="npcQuestBadge"></span>
+        <span class="npc-quest-title" id="npcQuestTitle"></span>
+      </div>
+      <div class="npc-dialogue" id="npcDialogue"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="npc-actions">
+      <button id="npcActionBtn" class="btn-action hidden"></button>
+      <button id="closeNpcActionBtn" class="btn-action secondary" data-i18n="npcFarewell">Despedirse</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUEST LOG -->
+<div id="questLogModal" class="modal hidden" role="dialog" aria-labelledby="ql-title" aria-modal="true">
+  <div class="modal-content ql-modal-content">
+    <div class="modal-header">
+      <h2 id="ql-title" data-i18n="questLogTitle">📋 Diario de Misiones</h2>
+      <button class="modal-close" id="closeQuestLogBtn">✕</button>
+    </div>
+    <div class="ql-tabs">
+      <button class="ql-tab active" data-tab="active" data-i18n="qlTabActive">En progreso</button>
+      <button class="ql-tab" data-tab="available" data-i18n="qlTabAvailable">Disponibles</button>
+      <button class="ql-tab" data-tab="completed" data-i18n="qlTabCompleted">Completadas</button>
+    </div>
+    <div id="ql-body" class="ql-body"></div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameOverModal" class="modal hidden" role="dialog" aria-labelledby="game-over-title">
+  <div class="modal-content" style="max-width:380px;text-align:center">
+    <h2 id="game-over-title" class="gameover-title" data-i18n="gameOverTitle">💀 GAME OVER 💀</h2>
+    <p style="margin:16px 0;color:var(--c-muted)" data-i18n="gameOverText">Has caído en tu aventura.</p>
+    <button id="restartBtn" class="btn-action" data-i18n="retryButton">🔄 Intentar de nuevo</button>
+  </div>
+</div>
+
+<!-- ENDING -->
+<!-- ══ TRAVEL EVENT MODAL ══════════════════════════════════════════ -->
+<div id="travelEventModal" class="modal hidden" role="dialog" aria-labelledby="teTitle" aria-modal="true">
+  <div class="modal-content te-modal">
+    <div class="te-icon" id="teIcon"></div>
+    <h2 class="te-title" id="teTitle"></h2>
+    <p class="te-text" id="teText"></p>
+    <div class="te-choices" id="teChoices"></div>
+    <div class="te-result hidden" id="teResult"></div>
+    <button class="btn te-continue hidden" id="teContinueBtn">Continuar →</button>
+  </div>
+</div>
+
+<div id="endingModal" class="modal hidden" role="dialog" aria-labelledby="ending-title">
+  <div class="modal-content" style="max-width:440px;text-align:center">
+    <h2 id="ending-title" data-i18n="endingTitle">🏆 ¡Victoria! 🏆</h2>
+    <p id="endingMessage" style="margin:12px 0;color:var(--c-muted)" data-i18n="endingMessage">Has derrotado al Dragon King.</p>
+    <div class="ending-stats-grid">
+      <div><div class="es-label" data-i18n="endingLevelLabel">Nivel</div><div class="es-val" id="ending-level">0</div></div>
+      <div><div class="es-label" data-i18n="endingGoldLabel">Oro</div><div class="es-val gold-accent" id="ending-gold">0</div></div>
+      <div><div class="es-label" data-i18n="endingXpLabel">XP</div><div class="es-val" id="ending-xp">0</div></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
+      <button id="endingRestartBtn" class="btn-action" data-i18n="endingRestartButton">🔄 Reiniciar</button>
+      <button id="endingCloseBtn" class="btn-action secondary" data-i18n="endingCloseButton">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const btn = document.getElementById('themeToggleBtn');
+  const stored = localStorage.getItem('pqe-theme') || 'dark';
+  document.documentElement.dataset.theme = stored;
+  btn.textContent = stored === 'light' ? '☀️' : '🌙';
+  btn.addEventListener('click', () => {
+    const cur = document.documentElement.dataset.theme;
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next;
+    btn.textContent = next === 'light' ? '☀️' : '🌙';
+    localStorage.setItem('pqe-theme', next);
+  });
+})();
+</script>
+<script type="module" src="js/main.js" defer></script>
+</body>
+</html>
