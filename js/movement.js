@@ -49,11 +49,17 @@ export function handleMove(direction) {
   if (!direction) return;
   if (gameState.isGameOver) return;
   if (gameState.isInCombat) { addMessage("¡No puedes moverte en combate!", "system"); return; }
+  if (gameState.isProcessingMove) { addMessage("Procesando tu movimiento... espera un momento.", "system"); return; }
+
+  gameState.isProcessingMove = true;
+  updateUI();
 
   const cur = window.worldMap?.[gameState.currentLocationId];
   const nextId = cur?.exits?.[direction];
   if (!nextId || !window.worldMap[nextId]) {
     addMessage("No puedes ir en esa dirección.", "system");
+    gameState.isProcessingMove = false;
+    updateUI();
     return;
   }
 
@@ -65,6 +71,8 @@ export function handleMove(direction) {
     const hasKey = (gameState.inventory?.[gate.item] ?? 0) > 0;
     if (!hasKey) {
       addMessage(gate.msg, "system");
+      gameState.isProcessingMove = false;
+      updateUI();
       return;
     }
     // Consumir la llave al cruzar por primera vez
@@ -122,12 +130,26 @@ export function handleMove(direction) {
   if (!combatTarget) combatTarget = getRandomEncounter(nextId);
 
   if (combatTarget) {
-    setTimeout(() => window.dispatchEvent(new CustomEvent("pixel:startCombat", {
-      detail: { enemyId: combatTarget, isBoss: asBoss }
-    })), 400);
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("pixel:startCombat", {
+        detail: { enemyId: combatTarget, isBoss: asBoss }
+      }));
+      gameState.isProcessingMove = false;
+      updateUI();
+    }, 400);
   } else {
     const tevt = getTravelEvent(biome);
-    if (tevt) setTimeout(() => showTravelEvent(tevt), 700);
+    if (tevt) {
+      setTimeout(() => {
+        showTravelEvent(tevt);
+        updateUI();
+      }, 700);
+    } else {
+      setTimeout(() => {
+        gameState.isProcessingMove = false;
+        updateUI();
+      }, 250);
+    }
   }
 
   updateUI();

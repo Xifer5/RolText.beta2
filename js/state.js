@@ -29,6 +29,7 @@ export const initialGameState = {
   currentLocationId: "town",
   currentEnemy: null,
   isInCombat: false,
+  isProcessingMove: false,
   inventory: {},
   equipment: {
     head: null, rightHand: null, leftHand: null,

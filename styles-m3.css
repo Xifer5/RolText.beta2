@@ -905,20 +905,19 @@ button:focus-visible,
   background: var(--md-surface-c-low);
   border-left: 1px solid var(--md-outline-variant);
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-auto-rows: min-content;
   padding: 12px;
   gap: 10px;
   overflow: hidden;
   height: 100%;
   min-height: 0;
 }
-/* Cuando hay panel de combate Y nav, ambos se muestran 50/50.
-   El JS de tu app oculta uno con .hidden, así que el restante toma 100%. */
-#right-panel:has(.combat-block:not(.hidden)) {
-  grid-template-rows: 1fr;
-}
+/* El panel de la derecha ahora incluye acciones, navegación/combate y minimapa.
+   El bloque principal debe ocupar el espacio central mientras las cabeceras y el minimapa quedan fijas. */
+#right-panel:has(.combat-block:not(.hidden)),
 #right-panel:has(.nav-block:not(.hidden)):has(.combat-block.hidden) {
-  grid-template-rows: 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 #right-panel .sidebar-block {
   background: var(--md-surface-c);
@@ -1086,15 +1085,97 @@ button:focus-visible,
   #game { grid-template-columns: 1fr; height: auto; }
   #right-panel { display: none; }
   #left-panel { display: none; }
+  .topbar-inner { flex-wrap: wrap; justify-content: space-between; padding: 10px 14px; }
+  .topbar-nav { display: none; }
+  .topbar-actions { width: 100%; justify-content: flex-end; margin-top: 8px; }
   #mobile-bottom-nav {
     display: block;
     position: sticky;
     bottom: 0;
     background: var(--md-surface-c);
     border-top: 1px solid var(--md-outline-variant);
-    padding: 8px;
+    padding: 8px 8px 10px;
     z-index: 50;
   }
+  .mob-btn.mob-menu {
+    min-width: 64px;
+  }
+  .mob-sheet-btn {
+    width: 100%;
+    border: 1px solid var(--md-outline-variant);
+    background: var(--md-surface-c-high);
+    color: var(--md-on-surface);
+    border-radius: var(--r-md);
+    padding: 12px 14px;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    transition: background .2s var(--ease), transform .2s var(--ease);
+  }
+  .mob-sheet-btn:hover { background: var(--md-surface-c); transform: translateY(-1px); }
+  .mobile-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: grid;
+    place-items: end center;
+    background: rgba(0,0,0,.38);
+    padding: 0 12px 12px;
+  }
+  .mobile-sheet.hidden { display: none; }
+  .mobile-sheet-content {
+    width: min(100%, 540px);
+    max-height: 82vh;
+    background: var(--md-surface-c);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0,0,0,.25);
+    position: relative;
+    padding: 18px;
+  }
+  .mobile-sheet-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: none;
+    background: var(--md-surface-c-high);
+    color: var(--md-on-surface);
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .mobile-sheet-panels {
+    display: grid;
+    gap: 16px;
+    padding-top: 8px;
+  }
+  .mobile-sheet-panel h3 {
+    margin: 0 0 10px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--md-on-surface);
+  }
+  .mobile-sheet-grid {
+    display: grid;
+    gap: 10px;
+  }
+  .mobile-sheet-panel.hidden { display: none; }
+  .mobile-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+  }
+  .story-filters { display: none !important; }
+  #screen { padding-bottom: 124px; }
   .mob-bar {
     display: flex;
     gap: 6px;
@@ -2434,7 +2515,7 @@ button:focus-visible,
   border-radius: var(--r-lg);
   padding: 12px;
   display: grid;
-  grid-template-columns: 96px 1fr;
+  grid-template-columns: 218px 1fr;
   gap: 14px;
   align-items: start;
   margin-bottom: 8px;
@@ -2444,8 +2525,8 @@ button:focus-visible,
 
 /* Contenedor fijo — garantiza tamaño uniforme con o sin imagen */
 .bestiary-portrait-wrap {
-  width: 96px;
-  height: 96px;
+  width: 218px;
+  height: 150px;
   border-radius: var(--r-md);
   background: var(--md-surface-c);
   overflow: hidden;

@@ -685,12 +685,23 @@ export function showTravelEvent(event) {
   });
 
   modal.classList.remove("hidden");
+  gameState.isProcessingMove = true;
 }
 
 export function setupTravelEventModal() {
   const modal       = document.getElementById("travelEventModal");
   const continueBtn = document.getElementById("teContinueBtn");
   if (!modal || !continueBtn) return;
-  continueBtn.addEventListener("click", () => modal.classList.add("hidden"));
-  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.add("hidden"); });
+  continueBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    gameState.isProcessingMove = false;
+    updateUI();
+  });
+  modal.addEventListener("click", e => {
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+      gameState.isProcessingMove = false;
+      updateUI();
+    }
+  });
 }

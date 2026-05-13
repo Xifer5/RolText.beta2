@@ -24,10 +24,38 @@ import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, acti
 const LOCATION_IMAGES = {
   // "tower":      "img/locations/castle_tower.png",
   // "inferno_1":  "img/locations/dragon_throne.png",
-   "town":       "img/locations/town.jpg",
+   "town":       "img/locations/town.png",
    "shop":       "img/locations/shop1.png",
    "tavern":      "img/locations/The Drunken Dragon.png",
    "cellar":      "img/locations/old cellar.png",
+   "castle":     "img/locations/castle.png",
+   "castle_shop": "img/locations/castle_shop.png",
+   "port":       "img/locations/port.png",
+   "beach":      "img/locations/beach.png",
+   "forest":     "img/locations/forest.png",
+   "cave":       "img/locations/cave.png",
+    "swamp":      "img/locations/swamp.png",
+    "mountain":   "img/locations/mountain.png",
+    "sea":        "img/locations/sea.png",
+    "desert":     "img/locations/desert.png",
+    "dungeon":    "img/locations/dungeon.png",
+    "none":       "img/locations/none.png",
+    "jungle":     "img/locations/jungle.png",
+    "tundra":     "img/locations/tundra.png",
+    "volcano":    "img/locations/volcano.png",
+    "garden":     "img/locations/garden.png",
+    "default":    "img/locations/default.png",
+    "tower":      "img/locations/tower.png",
+    "armory":     "img/locations/armory.png",
+    "swamp":      "img/locations/swamp.png",
+    "ruins":      "img/locations/ruins.png",
+    "catacomb":   "img/locations/catacomb.png",
+    "treasure_keep": "img/locations/treasure_keep.png",
+
+
+
+
+
 
 };
 const LOCATION_IMG_PATH = "img/locations/";
@@ -88,6 +116,23 @@ function _setupRipple() {
   });
 }
 
+function _openMobileSheet(panelId) {
+  const sheet = document.getElementById("mobileSheet");
+  if (!sheet) return;
+  sheet.classList.remove("hidden");
+  sheet.setAttribute("aria-hidden", "false");
+  document.querySelectorAll(".mobile-sheet-panel").forEach(panel => {
+    panel.classList.toggle("hidden", panel.id !== panelId);
+  });
+}
+
+function _closeMobileSheet() {
+  const sheet = document.getElementById("mobileSheet");
+  if (!sheet) return;
+  sheet.classList.add("hidden");
+  sheet.setAttribute("aria-hidden", "true");
+}
+
 /* ── Mobile nav — conectar botones ──────────────────────────── */
 function _setupMobileNav() {
   const map = [
@@ -95,14 +140,19 @@ function _setupMobileNav() {
     ["mob-magicBtn",  () => window.dispatchEvent(new Event("pixel:magic"))],
     ["mob-itemBtn",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
     ["mob-fleeBtn",   () => window.dispatchEvent(new Event("pixel:flee"))],
-    ["mob-inventoryBtn", () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
+    ["mob-inventoryBtn", () => _openMobileSheet("mobileActionMenu")],
   ];
   map.forEach(([id, fn]) => document.getElementById(id)?.addEventListener("click", fn));
+  document.getElementById("mob-moveMenuBtn")?.addEventListener("click", () => _openMobileSheet("mobileMoveMenu"));
+  document.getElementById("mob-panelMenuBtn")?.addEventListener("click", () => _openMobileSheet("mobilePanelMenu"));
 
-  document.querySelectorAll("#mob-nav [data-direction]").forEach(btn => {
+  document.querySelectorAll("#mob-nav [data-direction], #mobileSheet [data-direction]").forEach(btn => {
     btn.addEventListener("click", () => {
       const dir = btn.getAttribute("data-direction");
-      if (dir) window.dispatchEvent(new CustomEvent("pixel:move", { detail: { direction: dir } }));
+      if (dir) {
+        window.dispatchEvent(new CustomEvent("pixel:move", { detail: { direction: dir } }));
+        _closeMobileSheet();
+      }
     });
   });
 }
@@ -269,6 +319,21 @@ export function updateUI() {
   if (ui.magicBtn)  ui.magicBtn.disabled  = disabled;
   if (ui.itemBtn)   ui.itemBtn.disabled   = disabled;
   if (ui.fleeBtn)   ui.fleeBtn.disabled   = disabled;
+
+  const navLocked = gameState.isProcessingMove || gameState.isInCombat;
+  document.querySelectorAll("#navigation-menu [data-direction], #mob-nav [data-direction], #navigation-menu .compass-action-btn").forEach(btn => {
+    btn.disabled = navLocked;
+  });
+
+  if (gameState.isProcessingMove) {
+    document.querySelectorAll("#navigation-menu button, #mob-nav button").forEach(btn => {
+      btn.classList.add("disabled");
+    });
+  } else {
+    document.querySelectorAll("#navigation-menu button, #mob-nav button").forEach(btn => {
+      btn.classList.remove("disabled");
+    });
+  }
 
   if (ui["derived-attack"])  ui["derived-attack"].textContent  = derived.attack ?? 0;
   if (ui["derived-defense"]) ui["derived-defense"].textContent = derived.defense ?? 0;
@@ -680,6 +745,57 @@ export function setupUIListeners() {
     ui["npc-talk-btn"] = npcTalkButton;
     npcTalkButton.addEventListener("click", handleNpcTalk);
   }
+
+  document.getElementById("mobileSheetClose")?.addEventListener("click", _closeMobileSheet);
+  const mobileSheet = document.getElementById("mobileSheet");
+  mobileSheet?.addEventListener("click", (e) => {
+    if (e.target === mobileSheet || e.target.classList.contains("mobile-sheet-backdrop")) {
+      _closeMobileSheet();
+    }
+  });
+
+  document.getElementById("mobActionInventoryBtn")?.addEventListener("click", () => {
+    _closeMobileSheet();
+    renderInventory();
+    document.getElementById("inventoryModal")?.classList.remove("hidden");
+  });
+  document.getElementById("mobActionStatsBtn")?.addEventListener("click", () => {
+    _closeMobileSheet();
+    renderStatsModal();
+    document.getElementById("statsModal")?.classList.remove("hidden");
+  });
+  document.getElementById("mobActionRestBtn")?.addEventListener("click", () => {
+    _closeMobileSheet();
+    const loc = window.worldMap?.[gameState.currentLocationId];
+    if (loc?.canRest) {
+      playSound("rest");
+      const hpGain = gameState.player.maxHp - gameState.player.hp;
+      const mpGain = gameState.player.maxMp - gameState.player.mp;
+      gameState.player.hp = gameState.player.maxHp;
+      gameState.player.mp = gameState.player.maxMp;
+      addMessage(`Descansas y recuperas ${hpGain} HP y ${mpGain} MP.`, "stat");
+      showFloatingText("¡Restaurado!", window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
+      updateUI();
+    } else addMessage("No puedes descansar aquí.", "system");
+  });
+  document.getElementById("mobActionShopBtn")?.addEventListener("click", () => {
+    _closeMobileSheet();
+    const loc = window.worldMap?.[gameState.currentLocationId];
+    if (loc && ["shop","castle_shop","port"].includes(loc.id)) {
+      renderShop();
+      document.getElementById("shopModal")?.classList.remove("hidden");
+    } else addMessage("Necesitas estar en una tienda.", "system");
+  });
+  document.getElementById("mobActionQuestLogBtn")?.addEventListener("click", () => {
+    _closeMobileSheet();
+    renderQuestLog("active");
+    document.querySelectorAll(".ql-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "active"));
+    document.getElementById("questLogModal")?.classList.remove("hidden");
+  });
+
+  document.querySelectorAll("#mobileSheet [data-panel]").forEach(btn => {
+    btn.addEventListener("click", _closeMobileSheet);
+  });
 
   const closeNpc = () => document.getElementById("npcModal")?.classList.add("hidden");
   document.getElementById("closeNpcBtn")?.addEventListener("click", closeNpc);

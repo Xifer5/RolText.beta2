@@ -125,18 +125,6 @@
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="sidebar-block">
-      <div class="block-label" data-i18n="actionsLabel">Acciones</div>
-      <div class="quick-actions">
-        <button class="qa-btn" id="inventoryBtn">🎒<span data-i18n="quickInventory">Inventory</span></button>
-        <button class="qa-btn" id="statsBtn">📈<span data-i18n="quickStats">Stats</span></button>
-        <button class="qa-btn" id="restBtn">🛏️<span data-i18n="quickRest">Rest</span></button>
-        <button class="qa-btn" id="shopBtn">🛒<span data-i18n="quickShop">Tienda</span></button>
-        <button class="qa-btn wide" id="questLogBtn">📋<span data-i18n="quickQuests">Misiones</span></button>
-      </div>
-    </div>
-
   </aside>
 
   <!-- ── CENTER: WORLD SCREEN ───────────────────────────────── -->
@@ -194,6 +182,18 @@
   <!-- ── RIGHT SIDEBAR ──────────────────────────────────────── -->
   <aside id="right-panel">
 
+    <!-- Quick Actions -->
+    <div id="actionsPanel" class="sidebar-block action-panel">
+      <div class="block-label" data-i18n="actionsLabel">Acciones</div>
+      <div class="quick-actions">
+        <button class="qa-btn" id="inventoryBtn">🎒<span data-i18n="quickInventory">Inventory</span></button>
+        <button class="qa-btn" id="statsBtn">📈<span data-i18n="quickStats">Stats</span></button>
+        <button class="qa-btn" id="restBtn">🛏️<span data-i18n="quickRest">Rest</span></button>
+        <button class="qa-btn" id="shopBtn">🛒<span data-i18n="quickShop">Tienda</span></button>
+        <button class="qa-btn wide" id="questLogBtn">📋<span data-i18n="quickQuests">Misiones</span></button>
+      </div>
+    </div>
+
     <!-- COMBAT panel (shown in combat) -->
     <div id="combat-menu" class="sidebar-block combat-block hidden">
       <div class="block-label combat-label" data-i18n="combatLabel">⚔ En Combate</div>
@@ -232,7 +232,7 @@
       </div>
     </div>
 
-      <!-- LOCAL MINIMAP (siempre visible) -->
+    <!-- LOCAL MINIMAP (siempre visible) -->
     <div id="local-minimap" class="sidebar-block minimap-block">
       <div class="block-label">
         🗺️ <span data-i18n="localMapLabel">Mapa local</span>
@@ -275,15 +275,59 @@
     </div>
     <button class="mob-btn mob-dir" data-direction="east"  aria-label="Este   (D/→)">▶</button>
     <div class="mob-sep"></div>
-    <button class="mob-btn" data-direction="enter" aria-label="Entrar" style="flex:.8" data-i18n-attr="aria-label" data-i18n="enterButton">
-      <span class="mob-icon">⏎</span><span data-i18n="enterButton">Enter</span>
+    <button class="mob-btn mob-menu" id="mob-moveMenuBtn" aria-label="Movimientos">
+      <span class="mob-icon">⏎</span><span>Mov.</span>
     </button>
-    <button class="mob-btn" id="mob-inventoryBtn"  aria-label="Inventario" data-i18n-attr="aria-label" data-i18n="mobInventoryAria">
-      <span class="mob-icon">🎒</span><span data-i18n="mobInventory">Inv.</span>
+    <button class="mob-btn mob-menu" id="mob-inventoryBtn" aria-label="Acciones">
+      <span class="mob-icon">🎒</span><span>Acc.</span>
+    </button>
+    <button class="mob-btn mob-menu" id="mob-panelMenuBtn" aria-label="Menú">
+      <span class="mob-icon">☰</span><span>Menu</span>
     </button>
   </div>
 
 </nav>
+
+<div id="mobileSheet" class="mobile-sheet hidden" aria-hidden="true">
+  <div class="mobile-sheet-backdrop"></div>
+  <div class="mobile-sheet-content" role="dialog" aria-modal="true" aria-label="Menú móvil">
+    <button class="mobile-sheet-close" id="mobileSheetClose" aria-label="Cerrar">✕</button>
+    <div class="mobile-sheet-panels">
+      <div class="mobile-sheet-panel" id="mobileMoveMenu">
+        <h3>Movimientos</h3>
+        <div class="mobile-sheet-grid">
+          <button class="mob-sheet-btn" data-direction="enter">⏎ Enter</button>
+          <button class="mob-sheet-btn" data-direction="out">⟲ Exit</button>
+          <button class="mob-sheet-btn" data-direction="up">⬆ Subir</button>
+          <button class="mob-sheet-btn" data-direction="down">⬇ Bajar</button>
+        </div>
+      </div>
+      <div class="mobile-sheet-panel hidden" id="mobileActionMenu">
+        <h3>Acciones</h3>
+        <div class="mobile-sheet-grid">
+          <button class="mob-sheet-btn" id="mobActionInventoryBtn">🎒 Inventario</button>
+          <button class="mob-sheet-btn" id="mobActionStatsBtn">📈 Stats</button>
+          <button class="mob-sheet-btn" id="mobActionRestBtn">🛏️ Descansar</button>
+          <button class="mob-sheet-btn" id="mobActionShopBtn">🛒 Tienda</button>
+          <button class="mob-sheet-btn" id="mobActionQuestLogBtn">📋 Misiones</button>
+        </div>
+      </div>
+      <div class="mobile-sheet-panel hidden" id="mobilePanelMenu">
+        <h3>Paneles</h3>
+        <div class="mobile-sheet-grid">
+          <button class="mob-sheet-btn" data-panel="attributes">Atributos</button>
+          <button class="mob-sheet-btn" data-panel="equipment">Equipo</button>
+          <button class="mob-sheet-btn" data-panel="spellbook">Grimorio</button>
+          <button class="mob-sheet-btn" data-panel="journal">Diario</button>
+          <button class="mob-sheet-btn" data-panel="bestiary">Bestiario</button>
+          <button class="mob-sheet-btn" data-panel="minimap">🗺️ Mapa</button>
+          <button class="mob-sheet-btn" data-panel="achievements">🏆 Logros</button>
+          <button class="mob-sheet-btn" data-panel="crafting">⚒️ Forja</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ MODALES ══════════════════════════════════════════════════ -->
 
