@@ -207,7 +207,7 @@ export const enemyData = {
     experience: 220,
     gold: 100,
     drops: ["robe"],
-    img: "img/enemies/wyver.png",
+    img: "img/enemies/wyvern.png",
   },
   treasure_guardian: {
     type: "Treasure Guardian",

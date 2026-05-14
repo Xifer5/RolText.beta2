@@ -141,6 +141,33 @@
       </button>
     </div>
 
+    <!-- Mobile Player Header (only visible on mobile) -->
+    <div id="mobile-player-header" class="mobile-player-header">
+      <div class="mobile-player-card">
+        <div class="mobile-avatar">
+          <span id="mobile-avatar-emoji">⚔️</span>
+          <img id="mobile-avatar-img" class="mobile-avatar-img" src="" alt="" style="display:none">
+        </div>
+        <div class="mobile-player-info">
+          <div class="mobile-player-name" id="mobile-player-name">Aventurero</div>
+          <div class="mobile-vitals-compact">
+            <div class="compact-vital">
+              <div class="compact-vital-bar hp-bar" id="mobile-hp-bar"></div>
+              <span class="compact-vital-text" id="mobile-hp-text">0/0</span>
+            </div>
+            <div class="compact-vital">
+              <div class="compact-vital-bar mp-bar" id="mobile-mp-bar"></div>
+              <span class="compact-vital-text" id="mobile-mp-text">0/0</span>
+            </div>
+            <div class="compact-vital">
+              <div class="compact-vital-bar xp-bar" id="mobile-xp-bar"></div>
+              <span class="compact-vital-text" id="mobile-xp-text">0/0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Enemy panel -->
     <div id="enemy-panel" class="hidden" role="region" aria-labelledby="enemy-name" aria-live="assertive">
       <img id="enemy-portrait" class="enemy-portrait" src="" alt="" style="display:none"
@@ -426,7 +453,7 @@
         <button class="modal-close" id="closeShopBtn">✕</button>
       </div>
       <p class="modal-gold"><span data-i18n="shopGoldLabel">Tu oro</span>: <span id="shopGold" class="gold-accent">0</span> 🪙</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="shop-grid">
         <div><h3 data-i18n="shopBuyTitle">Comprar</h3><ul id="shopBuyList" role="listbox"></ul></div>
         <div><h3 data-i18n="shopSellTitle">Vender</h3><ul id="shopSellList" role="listbox"></ul></div>
       </div>

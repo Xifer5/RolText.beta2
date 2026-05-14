@@ -205,6 +205,45 @@ export function updateUI() {
   if (ui["xp-bar"]) ui["xp-bar"].style.width = `${xpPct}%`;
   if (ui["xp-text"]) ui["xp-text"].textContent = `${p.experience||0}/${p.nextLevelXp||100}`;
 
+  // Mobile player header — compact vitals
+  const mobileHpBar = document.getElementById("mobile-hp-bar");
+  const mobileMpBar = document.getElementById("mobile-mp-bar");
+  const mobileXpBar = document.getElementById("mobile-xp-bar");
+  const mobileHpText = document.getElementById("mobile-hp-text");
+  const mobileMpText = document.getElementById("mobile-mp-text");
+  const mobileXpText = document.getElementById("mobile-xp-text");
+  const mobilePlayerName = document.getElementById("mobile-player-name");
+  const mobileAvatarEmoji = document.getElementById("mobile-avatar-emoji");
+  const mobileAvatarImg = document.getElementById("mobile-avatar-img");
+
+  if (mobileHpBar) mobileHpBar.style.setProperty("--fill-width", `${hpPct}%`);
+  if (mobileMpBar) mobileMpBar.style.setProperty("--fill-width", `${mpPct}%`);
+  if (mobileXpBar) mobileXpBar.style.setProperty("--fill-width", `${xpPct}%`);
+  if (mobileHpText) mobileHpText.textContent = `${p.hp}/${hpMax}`;
+  if (mobileMpText) mobileMpText.textContent = `${p.mp}/${mpMax}`;
+  if (mobileXpText) mobileXpText.textContent = `${p.experience||0}/${p.nextLevelXp||100}`;
+  if (mobilePlayerName) mobilePlayerName.textContent = p.name || "Aventurero";
+  if (mobileAvatarEmoji && p.class) {
+    const cls = CLASS_DEFINITIONS[p.class];
+    mobileAvatarEmoji.textContent = cls?.emoji || "⚔️";
+  }
+
+  // Update mobile avatar image
+  if (mobileAvatarImg && p.class) {
+    const src = CLASS_AVATARS[p.class];
+    if (src && mobileAvatarImg.src !== src) {
+      mobileAvatarImg.src = src;
+      mobileAvatarImg.onerror = () => {
+        mobileAvatarImg.style.display = "none";
+        if (mobileAvatarEmoji) mobileAvatarEmoji.style.display = "inline";
+      };
+      mobileAvatarImg.onload = () => {
+        mobileAvatarImg.style.display = "block";
+        if (mobileAvatarEmoji) mobileAvatarEmoji.style.display = "none";
+      };
+    }
+  }
+
   if (ui.gold)  ui.gold.textContent  = p.gold;
   if (ui.level) ui.level.textContent = p.level;
 

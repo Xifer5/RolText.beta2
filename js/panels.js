@@ -8,6 +8,12 @@ import { calculateTotalStats } from "./stats.js";
 import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, getAvailableSkills } from "./classes.js";
 import { renderJournal } from "./journal.js";
 import { renderBestiary } from "./bestiary.js";
+
+const CLASS_AVATARS = {
+  warrior: "img/avatar_warrior.png",
+  mage:    "img/avatar_mage.png",
+  rogue:   "img/avatar_rogue.png",
+};
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { renderMinimap } from "./minimap.js";
@@ -75,6 +81,16 @@ function renderAttributes() {
 
   openPanel("📜 Atributos del Personaje", `
     <div class="attr-panel">
+      <div class="player-avatar-section">
+        <div class="player-avatar" style="background: radial-gradient(circle at 30% 30%, ${classColor}40, ${classColor}20); border-color: ${classColor};">
+          ${cls && CLASS_AVATARS[p.class] ? `<img src="${CLASS_AVATARS[p.class]}" alt="${cls.name}" class="player-avatar-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline'">` : ''}
+          <span class="avatar-emoji" ${cls && CLASS_AVATARS[p.class] ? 'style="display:none"' : ''}>${cls ? cls.emoji : '⚔️'}</span>
+        </div>
+        <div class="player-info">
+          <div class="player-name">${p.name || 'Aventurero'}</div>
+          <div class="player-level">Nv. ${p.level} ${cls ? cls.name : 'Sin Clase'}</div>
+        </div>
+      </div>
       ${cls ? `
         <div class="class-badge" style="border-color:${classColor};background:${classColor}18">
           <span style="font-size:2rem">${cls.emoji}</span>
