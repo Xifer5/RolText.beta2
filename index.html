@@ -377,6 +377,23 @@
       <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar">✕</button>
     </div>
     <p class="modal-gold"><span data-i18n="inventoryGold">Oro</span>: <span id="inventoryGold" class="gold-accent">0</span> 🪙</p>
+    <div class="inventory-filter-row">
+      <div class="m3-input-container inventory-search-group">
+        <input id="inventorySearchInput" type="search" placeholder="Buscar objetos..." autocomplete="off" aria-label="Buscar inventario">
+        <select id="inventoryTypeFilter" aria-label="Filtrar por tipo">
+          <option value="all">Todos</option>
+          <option value="consumable">Consumibles</option>
+          <option value="weapon">Armas</option>
+          <option value="armor">Armaduras</option>
+          <option value="shield">Escudos</option>
+          <option value="helmet">Casco</option>
+          <option value="boots">Botas</option>
+          <option value="ring">Anillos</option>
+          <option value="accessory">Accesorios</option>
+          <option value="quest">Misiones</option>
+        </select>
+      </div>
+    </div>
     <div class="inventory-grid">
       <div class="inventory-list-col">
         <h3 data-i18n="itemsSectionTitle">Objetos</h3>

@@ -32,8 +32,8 @@ export const SOUND_MAP = {
   quest_done:   "sounds/quest_done.mp3",
   // Exploración / UI
   move:         "sounds/move.mp3",
-  rest:         "sounds/rest.ogg",
-  npc_talk:     "sounds/npc_talk.ogg",
+  /*rest:         "sounds/rest.ogg",
+  npc_talk:     "sounds/npc_talk.ogg",*/
 };
 
 // ── MAPA DE MÚSICA — EDITABLE ─────────────────────────────────────────
@@ -54,7 +54,7 @@ export const MUSIC_MAP = {
   tundra:   "music/inferno.mp3",
   volcano:  "music/forest.mp3",
   garden:   "music/inferno.mp3",
-  combat:   "music/combat.mp3",
+  /*combat:   "music/combat.mp3",*/
   inferno:   "music/inferno.mp3",
   castle:   "music/forest.mp3",
   port:     "music/forest.mp3",

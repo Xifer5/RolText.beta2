@@ -3,6 +3,7 @@ import { addMessage } from "./story.js";
 import { QUEST_DATA } from "./quests.js";
 import { enemyData } from "./enemies.js";
 import { showAchievementToast } from "./toast.js";
+import { t, formatText } from "./i18n.js";
 
 export const ACHIEVEMENTS = [
   { id:"first_kill",    icon:"⚔️",  rarity:"common",    title:"Primer Golpe",         desc:"Derrota tu primer enemigo.",              check:()=>(gameState.stats?.kills??0)>=1 },
@@ -30,7 +31,7 @@ export function checkAchievements() {
     try {
       if (ach.check()) {
         gameState.achievements[ach.id] = true;
-        addMessage(`🏆 ¡Logro desbloqueado: "${ach.title}"!`, "stat");
+        addMessage(formatText(t('achievementUnlocked'), { title: ach.title }), "stat");
         showAchievementToast(ach);
       }
     } catch(e) {}
@@ -50,8 +51,8 @@ export function renderAchievements() {
     return `<div class="ach-card ${is?"unlocked":"locked"} ach-rarity-${a.rarity}">
       <div class="ach-icon">${is ? a.icon : "🔒"}</div>
       <div class="ach-body">
-        <div class="ach-title">${is ? a.title : "???"}</div>
-        <div class="ach-desc">${is ? a.desc : "Condición oculta"}</div>
+        <div class="ach-title">${is ? a.title : t('achievementHiddenTitle')}</div>
+        <div class="ach-desc">${is ? a.desc : t('achievementHiddenCondition')}</div>
       </div>
       ${is ? `<span class="ach-badge ach-rarity-${a.rarity}">${RARITY_LABEL[a.rarity]}</span>` : ""}
     </div>`;
@@ -59,7 +60,7 @@ export function renderAchievements() {
 
   return `<div class="ach-container">
     <div class="ach-header">
-      <span>${done}/${total} logros desbloqueados</span>
+      <span>${done}/${total} ${t('achievementsUnlocked')}</span>
       <div class="ach-progress-bar"><div class="ach-progress-fill" style="width:${pct}%"></div></div>
     </div>
     <div class="ach-grid">${cards}</div>

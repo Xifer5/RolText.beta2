@@ -11,6 +11,7 @@ import { checkAchievements } from "./achievements.js";
 import { saveGame } from "./saveSystem.js";
 import { playSound, playMusic } from "./sounds.js";
 import { showToast } from "./toast.js";
+import { t, formatText } from "./i18n.js";
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -46,7 +47,7 @@ async function handleAction(fn) {
   if (gameState.playerDebuffs?.stun?.turns > 0) {
     gameState.playerDebuffs.stun.turns--;
     if (gameState.playerDebuffs.stun.turns <= 0) delete gameState.playerDebuffs.stun;
-    addMessage("💫 Estás aturdido y no puedes actuar.", "combat");
+    addMessage(t('combatStunned'), "combat");
     updateUI();
     await delay(600);
     await enemyTurn();
@@ -69,7 +70,7 @@ export function getRandomEncounter(locationId) {
 
 export function startCombat(enemyType, isBoss = false) {
   const base = enemyData?.[enemyType];
-  if (!base) { addMessage(`Error: enemigo desconocido: ${enemyType}`, "system"); return; }
+  if (!base) { addMessage(formatText(t('enemyUnknownError'), { type: enemyType }), "system"); return; }
 
   const lvl = gameState.player.level - 1;
   const lvlMult = isBoss
@@ -91,11 +92,10 @@ export function startCombat(enemyType, isBoss = false) {
   gameState.playerDebuffs  = {};
 
   if (isBoss) {
-    addMessage(`💀 ¡¡${gameState.currentEnemy.type} APARECE!! ¡Un enemigo formidable!`, "combat");
-    // Comentado: efecto visual que mueve la pantalla
-    // showFloatingText("⚠ JEFE", window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
+    addMessage(formatText(t('bossAppears'), { enemy: gameState.currentEnemy.type }), "combat");
+    showFloatingText("⚠ JEFE", window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
   } else {
-    addMessage(`⚔️ ¡${gameState.currentEnemy.type} aparece!`, "combat");
+    addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");
   }
   playSound("combat_start");
   playMusic("combat");
@@ -134,12 +134,16 @@ async function playerAttack() {
   playSound("hit");
 
   const critLabel = isCrit ? " 💥 ¡CRÍTICO!" : "";
-  addMessage(`Atacas a ${enemy.type} por ${dmg}${extraHit ? ` + ${extraHit} (doble golpe!)` : ""}${critLabel}`, "combat");
-  // Comentado: efectos visuales que mueven la pantalla
-  // showFloatingText(`-${total}${isCrit ? "!" : ""}`,
-  //   window.innerWidth/2+50, window.innerHeight/2-50,
-  //   "#ef4444", "2em", isCrit ? "critical" : "");
-  // shakeScreen();
+  addMessage(formatText(t('attackEnemy'), {
+    enemy: enemy.type,
+    damage: dmg,
+    extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
+    crit: critLabel
+  }), "combat");
+  showFloatingText(`-${total}${isCrit ? "!" : ""}`,
+    window.innerWidth/2+50, window.innerHeight/2-50,
+    "#ef4444", "2em", isCrit ? "critical" : "");
+  shakeScreen();
 
   tickBuffs();
   updateUI();
@@ -152,9 +156,8 @@ async function playerMagic() {
   const cost = gameState.player.class === "mage" && gameState.player.level >= 10 ? 7 : 10;
 
   if ((gameState.player.mp || 0) < cost) {
-    addMessage("Sin maná suficiente.", "system");
-    // Comentado: efecto visual que mueve la pantalla
-    // showFloatingText("Sin Maná", window.innerWidth/2, window.innerHeight/2, "#818cf8");
+    addMessage(t('notEnoughMana'), "system");
+    showFloatingText("Sin Maná", window.innerWidth/2, window.innerHeight/2, "#818cf8");
     return;
   }
 
@@ -165,10 +168,9 @@ async function playerMagic() {
   playSound("magic");
   applyDamageToEnemy(dmg);
   playSound("hit");
-  addMessage(`Lanzas un hechizo por ${dmg} daño mágico.`, "combat");
-  // Comentado: efectos visuales que mueven la pantalla
-  // showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.5em");
-  // shakeScreen();
+  addMessage(formatText(t('castMagic'), { damage: dmg }), "combat");
+  showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em");
+  shakeScreen();
 
   tickBuffs();
   updateUI();
@@ -180,9 +182,9 @@ async function useSkill(skillId) {
   const p = gameState.player;
   const skills = SKILLS_BY_CLASS[p.class] || [];
   const skill = skills.find(s => s.id === skillId);
-  if (!skill) { addMessage("Habilidad no encontrada.", "system"); return; }
-  if (p.level < skill.levelReq) { addMessage(`Necesitas nivel ${skill.levelReq}.`, "system"); return; }
-  if ((p.mp || 0) < skill.mpCost) { addMessage("Sin maná.", "system"); return; }
+  if (!skill) { addMessage(t('skillNotFound'), "system"); return; }
+  if (p.level < skill.levelReq) { addMessage(formatText(t('skillLevelRequired'), { level: skill.levelReq }), "system"); return; }
+  if ((p.mp || 0) < skill.mpCost) { addMessage(t('noMana'), "system"); return; }
 
   const stats = calculateTotalStats(p, gameState.equipment);
   const result = skill.effect(stats, gameState.currentEnemy, p);
@@ -196,16 +198,14 @@ async function useSkill(skillId) {
     const dmg = result.ignoresDef ? result.damage : Math.max(1, result.damage - (gameState.currentEnemy?.defense || 0));
     applyDamageToEnemy(dmg);
     playSound("hit");
-    // Comentado: efectos visuales que mueven la pantalla
-    // showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em");
-    // shakeScreen();
+    showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em");
+    shakeScreen();
   }
 
   // Apply heal
   if (result.heal) {
     p.hp = Math.min(p.maxHp, (p.hp || 0) + result.heal);
-    // Comentado: efectos visuales que mueven la pantalla
-    // showFloatingText(`+${result.heal}`, window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.8em", "heal");
+    showFloatingText(`+${result.heal}`, window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.8em", "heal");
   }
 
   // Apply buffs
@@ -242,10 +242,10 @@ async function tryFlee() {
   const chance = 0.4 + agiMod + (gameState.player.class === "rogue" ? 0.15 : 0);
   if (Math.random() < chance) {
     playSound("flee");
-    addMessage("¡Escapas del combate!", "system");
+    addMessage(t('fleeSuccess'), "system");
     endCombat(false, true);
   } else {
-    addMessage("No consigues escapar...", "system");
+    addMessage(t('fleeFail'), "system");
     await delay(500); await enemyTurn();
   }
 }
@@ -265,9 +265,9 @@ async function enemyTurn() {
     const poisonInfo = gameState.activeDebuffs.poison;
     const poisonDmg = poisonInfo.damage || 3;
     applyDamageToEnemy(poisonDmg);
-    addMessage(`☠️ Veneno: ${enemy.type} sufre ${poisonDmg} daño.`, "combat");
+    addMessage(formatText(t('enemyPoisonDamage'), { enemy: enemy.type, damage: poisonDmg }), "combat");
     poisonInfo.turns--;
-    if (poisonInfo.turns <= 0) { delete gameState.activeDebuffs.poison; addMessage("El veneno se disipa.", "system"); }
+    if (poisonInfo.turns <= 0) { delete gameState.activeDebuffs.poison; addMessage(t('poisonWearsOff'), "system"); }
     if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
   }
 
@@ -276,9 +276,9 @@ async function enemyTurn() {
     const burnInfo = gameState.activeDebuffs.burn;
     const burnDmg = burnInfo.damage || 3;
     applyDamageToEnemy(burnDmg);
-    addMessage(`🔥 Quemadura: ${enemy.type} sufre ${burnDmg} daño.`, "combat");
+    addMessage(formatText(t('enemyBurnDamage'), { enemy: enemy.type, damage: burnDmg }), "combat");
     burnInfo.turns--;
-    if (burnInfo.turns <= 0) { delete gameState.activeDebuffs.burn; addMessage("Las llamas se extinguen.", "system"); }
+    if (burnInfo.turns <= 0) { delete gameState.activeDebuffs.burn; addMessage(t('burnWearsOff'), "system"); }
     if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
   }
 
@@ -287,7 +287,7 @@ async function enemyTurn() {
   const frozenMult = frozenDebuff ? 0.75 : 1.0;
   if (frozenDebuff) {
     frozenDebuff.turns--;
-    if (frozenDebuff.turns <= 0) { delete gameState.activeDebuffs.frozen; addMessage("El enemigo se descongela.", "system"); }
+    if (frozenDebuff.turns <= 0) { delete gameState.activeDebuffs.frozen; addMessage(t('frozenWearsOff'), "system"); }
   }
 
   // Enemy AI: magic or physical
@@ -306,13 +306,13 @@ async function enemyTurn() {
   const shieldMult = gameState.activeBuffs?.arcane_shield > 0 ? 0.6 : 1.0;
   if (gameState.activeBuffs?.arcane_shield > 0) {
     delete gameState.activeBuffs.arcane_shield;
-    addMessage("💠 Escudo Arcano absorbe parte del daño.", "system");
+    addMessage(t('arcaneShieldAbsorbs'), "system");
   }
 
   // Rogue evasion
   const evasionChance = (stats.agility || 0) * 0.01 + (p.class === "rogue" ? 0.1 : 0) + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0);
   if (Math.random() < evasionChance) {
-    addMessage(`⚡ Esquivas el ataque de ${enemy.type}!`, "combat");
+    addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
     updateUI(); return;
   }
 
@@ -324,10 +324,10 @@ async function enemyTurn() {
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
 
-  const attackLabel = useMagic ? "hechizo" : "ataque";
-  addMessage(`${enemy.type} usa ${attackLabel} y te causa ${finalDmg} de daño.`, "combat");
-  // Comentado: efectos visuales que mueven la pantalla
-  // showFloatingText(`-${finalDmg}`, window.innerWidth/2-80, window.innerHeight/2, "#fca5a5", "1.8em");
+  const attackLabel = useMagic ? t('magicAttackLabel') : t('physicalAttackLabel');
+  addMessage(formatText(t('enemyUsedAttack'), { enemy: enemy.type, attack: attackLabel, damage: finalDmg }), "combat");
+  showFloatingText(`-${finalDmg}`, window.innerWidth/2-80, window.innerHeight/2, "#fca5a5", "1.8em");
+  shakeScreen();
 
   updateUI();
 
@@ -336,7 +336,7 @@ async function enemyTurn() {
     gameState.isGameOver = true;
     gameState.isInCombat = false;
     playSound("player_die");
-    addMessage("Has sido derrotado... Game Over.", "combat");
+    addMessage(t('combatGameOverDefeated'), "combat");
     updateUI();
     setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
     return;
@@ -349,13 +349,13 @@ async function enemyTurn() {
     if (!gameState.playerDebuffs[se.type]) {
       if (se.type === "stun") {
         gameState.playerDebuffs.stun = { turns: se.turns };
-        addMessage(`💫 ${enemy.type} te aturde. ¡Perderás tu próximo turno!`, "combat");
+        addMessage(formatText(t('enemyStunEffect'), { enemy: enemy.type }), "combat");
       } else if (se.type === "poison") {
         gameState.playerDebuffs.poison = { turns: se.turns, damage: se.damage };
-        addMessage(`☠️ ${enemy.type} te envenena. (${se.damage} daño/turno × ${se.turns})`, "combat");
+        addMessage(formatText(t('enemyPoisonEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
       } else if (se.type === "burn") {
         gameState.playerDebuffs.burn = { turns: se.turns, damage: se.damage };
-        addMessage(`🔥 ${enemy.type} te quema. (${se.damage} daño/turno × ${se.turns})`, "combat");
+        addMessage(formatText(t('enemyBurnEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
       }
       updateUI();
     }
@@ -377,16 +377,15 @@ function processPlayerDebuffs() {
     p.hp = Math.max(0, p.hp - data.damage);
     const icon  = key === "poison" ? "☠️" : "🔥";
     const label = key === "poison" ? "Veneno" : "Quemadura";
-    addMessage(`${icon} ${label}: recibes ${data.damage} daño.`, "combat");
-    // Comentado: efecto visual que mueve la pantalla
-    // showFloatingText(`-${data.damage}`,
-    //   window.innerWidth/2 - 80, window.innerHeight/2 - 20,
-    //   key === "poison" ? "#4ade80" : "#fb923c", "1.6em");
+    addMessage(formatText(t('playerDebuffDamage'), { icon, label, damage: data.damage }), "combat");
+    showFloatingText(`-${data.damage}`,
+      window.innerWidth/2 - 80, window.innerHeight/2 - 20,
+      key === "poison" ? "#4ade80" : "#fb923c", "1.6em");
 
     data.turns--;
     if (data.turns <= 0) {
       delete debuffs[key];
-      addMessage(`✨ El ${label.toLowerCase()} se disipa.`, "system");
+      addMessage(formatText(t('statusEffectEnds'), { label: label.toLowerCase() }), "system");
     }
     if (p.hp <= 0) break;
   }
@@ -398,7 +397,7 @@ function processPlayerDebuffs() {
     gameState.isInCombat  = false;
     gameState.playerDebuffs = {};
     playSound("player_die");
-    addMessage("Los efectos de estado te han derrotado... Game Over.", "combat");
+    addMessage(t('combatStatusEffectsDefeat'), "combat");
     updateUI();
     setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
     return true;
@@ -433,13 +432,13 @@ function endCombat(victory, fled = false) {
     gameState.player.experience = (gameState.player.experience || 0) + xp;
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
-    addMessage(`¡Victoria! +${xp} XP, +${gold} oro.`, "stat");
+    addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
 
     // Record kill for bestiary
     recordEnemyKill(enemy.id);
     if (enemy.isBoss) {
       recordBossKill();
-      setTimeout(() => { saveGame(); showToast("💾 Victoria guardada"); }, 800);
+      setTimeout(() => { saveGame(); showToast(t('victorySaved')); }, 800);
     }
 
     // Loot
@@ -451,7 +450,7 @@ function endCombat(victory, fled = false) {
           gameState.inventory[item] = (gameState.inventory[item] || 0) + 1;
         });
         playSound("loot");
-        addMessage(`🎁 Obtienes: ${loot.map(i => allItems[i]?.name ?? i.replace(/_/g, " ")).join(", ")}`, "loot");
+        addMessage(formatText(t('lootObtained'), { items: loot.map(i => allItems[i]?.name ?? i.replace(/_/g, " ")).join(", ") }), "loot");
       }
     } catch(e) {}
 
@@ -460,7 +459,7 @@ function endCombat(victory, fled = false) {
       levelUp();
     }
   } else if (fled) {
-    addMessage("Huyes del combate.", "system");
+    addMessage(t('fleeSuccess'), "system");
   }
 
   checkAchievements();
@@ -488,16 +487,15 @@ function levelUp() {
 
   // Update profile card
   const profileRole = document.querySelector(".profile-role");
-  if (profileRole) profileRole.textContent = `NIVEL ${p.level} ${(p.className || "").toUpperCase()}`;
+  if (profileRole) profileRole.textContent = `${t('levelBadgePrefix')} ${p.level} ${(p.className || "").toUpperCase()}`;
 
   playSound("level_up");
-  addMessage(`⭐ ¡SUBISTE DE NIVEL! Ahora eres nivel ${p.level}. +5 puntos de estadística.`, "stat");
+  addMessage(formatText(t('levelUp'), { level: p.level }), "stat");
   checkAchievements();
   // Autoguardar en cada level up
   setTimeout(() => {
     saveGame();
-    showToast("💾 Partida guardada automáticamente");
+    showToast(t('autoSaveToast'));
   }, 1200);
-  // Comentado: efecto visual que mueve la pantalla
-  // showFloatingText("¡LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em");
+  showFloatingText("¡LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em");
 }

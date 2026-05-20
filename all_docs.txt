@@ -1,0 +1,1435 @@
+===== README.md =====
+# RolText.beta2
+
+Notes — Icons & Responsive UX
+---------------------------------
+
+- To use PNG/JPG/SVG images as item icons, set each item's `icon` property to just the filename (e.g. `"sword.png"`) or to an object `{ type: 'img', src: 'sword.png' }`.
+- Don't hard-code full paths like `pruebas/6.1/img/sword.png` — instead, set a global `window.ASSET_BASE` before the game loads (for example inside `index.html` or your server templates):
+
+```html
+<script>window.ASSET_BASE = '/img/items/';</script>
+<script type="module" src="js/main.js"></script>
+```
+
+The code will resolve `"sword.png"` to `window.ASSET_BASE + 'sword.png'` (default base is `./img/items/`).
+
+- UI/UX improvements in this release:
+	- Smooth modal open/close transitions for better polish
+	- Inventory detail pane animates when opening/closing
+	- Responsive styles & layout for small screens
+	- Item icons render as images (if available) or fall back to emoji — broken image URLs no longer leak as raw path text
+
+If you want, I can add more UX polish (keyboard navigation, animated equip feedback, shop confirmations, buy/sell filters, restock logic, etc.).
+
+===== PROJECT-OVERVIEW.md =====
+# RolText Project Overview
+
+## Project name
+Pixel Quest Echoes (RolText)
+
+## Purpose
+A browser-based text RPG with a Material Design 3 visual shell and a responsive dashboard-style interface.
+
+## Core structure
+- `index.html` - main UI shell with topbar, left sidebar, center game screen, and mobile-friendly layout.
+- `styles-m3.css` - Material Design 3 skin for the existing app. Contains color tokens, typography, shape radius, elevation, and responsive visual system.
+- `styles.css` - original app styling (kept separate from the M3 skin).
+- `js/` - game logic modules: combat, inventory, crafting, map, dialogue, save system, UI management, audio, and story.
+- `img/`, `music/`, `sounds/` - asset folders.
+
+## Design principles
+- M3 color system with warm amber/fantasy palette.
+- Dark and light theme support via `data-theme` attribute.
+- Elevated cards, soft surfaces, and clear visual hierarchy.
+- Consistent typography using display/fantasy fonts for brand and serif fonts for body text.
+- Focus on readability, accessible contrast, and mobile-first usability.
+
+## Key UI patterns
+- Top navigation bar with action buttons and language/theme toggles.
+- Left sidebar for character stats, vitals, and quick navigation.
+- Central game panel for location, story log, combat, and interactive buttons.
+- Mobile player header and compact vitals for smaller screens.
+- Persistent floating menu and panel switching.
+
+## Material Design 3 specifics
+- Uses M3 semantic tokens: `--md-primary`, `--md-surface`, `--md-on-surface`, `--md-outline`, etc.
+- Adapts existing CSS variables for the current project: `--bg`, `--border`, `--c-text`, `--c-hp`, etc.
+- Defines M3 shape radii: `--r-sm`, `--r-md`, `--r-lg`, `--r-xl`.
+- Includes motion timings and state layer opacities.
+- Keeps HTML and JS untouched while mapping visual roles in CSS.
+
+## Workflow guidance
+- Always prefer non-destructive design improvements.
+- Keep new UI changes consistent with current IDs and class names when possible.
+- Use `PROJECT-OVERVIEW.md` as your first reference when planning tasks.
+- Propose minimal, modular layout or style changes that improve readability and immersion.
+- Document design decisions in markdown when adding new UI patterns.
+
+===== DESIGN-GUIDELINES.md =====
+# RolText Design Guidelines
+
+## Purpose
+This document captures the design and workflow principles for Pixel Quest Echoes, with a focus on the Material Design 3 skin and responsive game UI.
+
+## Design goals
+- Preserve the existing HTML/JS structure while improving visual hierarchy.
+- Use Material Design 3 semantic tokens and surface roles.
+- Keep the interface readable and immersive for both desktop and mobile players.
+- Maintain clear contrast, accessible typography, and consistent spacing.
+
+## Material Design 3 guidance
+- Use `--md-primary`, `--md-secondary`, `--md-tertiary`, `--md-surface`, `--md-on-surface`, `--md-outline` for color roles.
+- Apply `--r-sm`, `--r-md`, `--r-lg`, `--r-xl` for consistent rounded corners.
+- Use elevation shadows with `--elev-1`, `--elev-2`, `--elev-3` to separate layers.
+- Use state opacity variables for hover/pressed/focus states: `--md-state-hover`, `--md-state-pressed`, `--md-state-focused`.
+- Give grouped controls like `story-filters`, `skill-panel`, `buff-bar`, `enemy-panel`, and `mobile-player-header` clear surface containers.
+- Prefer surface-driven palettes over ad-hoc color values.
+
+## Typography
+- Brand display: `--font-display` for titles and strong UI identity.
+- Section/title font: `--font-title` for panel headings and location names.
+- Body: `--font-body` for content, story text, and labels.
+- UI/system: `--font-ui` for small controls, selects, and button text.
+
+## Layout and spacing
+- Use consistent padding and margin values in multiples of `8px` or `12px`.
+- Keep the topbar and sidebar visually distinct with surface and outline contrast.
+- Ensure responsive scaling by using fluid widths and hidden mobile-only sections.
+- Avoid overcrowding the center game area; keep story panels and buttons separated.
+
+## UI components to prioritize
+- Topbar navigation: ensure active tab states are visible and accessible.
+- Sidebar vitals: make HP, MP, XP bars clear and meaningful at a glance.
+- Location hero: blend image, title, and action button with M3 surface styling.
+- Mobile header: preserve compact vitals and avoid hidden content.
+- Story log and filters: keep filters visible and maintain readable text flow.
+
+## Workflow recommendations
+1. Start by reviewing `PROJECT-OVERVIEW.md` for the overall scope.
+2. Inspect `index.html` and `styles-m3.css` before touching JavaScript.
+3. When making visual changes:
+   - update CSS variables first,
+   - add new utility classes only when necessary,
+   - document the intention in markdown.
+4. When proposing new features or patterns, include examples of the expected HTML/CSS structure.
+5. Always test both dark and light themes using `data-theme` toggling.
+
+## Suggested next tasks
+- Review the topbar buttons and add subtle M3 hover/pressed styling.
+- Improve the `enemy-panel` and `buff-bar` surfaces with distinct elevation.
+- Polish the mobile player header for better spacing and visual separation.
+- Add clear focus ring styling for keyboard navigation.
+- Document any UI components or new patterns in markdown.
+
+===== UI-TASKS.md =====
+# RolText UI Tasks
+
+## Priority 1 — Core M3 polish
+- [ ] Add hover/pressed state layers to topbar buttons and navigation tabs.
+- [ ] Improve `enemy-panel` surface contrast and elevation.
+- [ ] Refine the mobile player header spacing and visual separation.
+- [ ] Ensure story filters and log text remain readable in both dark and light themes.
+- [ ] Add consistent focus ring styling for keyboard navigation.
+
+## Priority 2 — Visual system consistency
+- [ ] Use M3 semantic colors for badges, chips, and status indicators.
+- [ ] Apply `--r-md` and `--r-lg` consistently on panels and cards.
+- [ ] Add subtle background surfaces behind `skill-panel` and `buff-bar`.
+- [ ] Confirm `location-hero` works with image and text overlay spacing.
+
+## Priority 3 — Documentation and workflow
+- [ ] Document component patterns in `DESIGN-GUIDELINES.md`.
+- [ ] Update `PROJECT-OVERVIEW.md` when new UI modules or patterns are introduced.
+- [ ] Review JS panel toggles and identify opportunities for smaller UI improvements.
+- [ ] Capture design decisions in markdown before making larger style changes.
+
+## Notes
+- Prefer small, modular CSS updates that don’t require structural HTML changes.
+- Validate both theme modes using the `data-theme` attribute.
+- Keep the agent prompt and docs synced with any new workflow changes.
+
+===== M3-AUDIT.md =====
+# M3 Audit for RolText
+
+## What is already strong
+- Uses Material Design 3 semantic tokens in `styles-m3.css` (`--md-primary`, `--md-surface`, `--md-outline`, etc.).
+- Supports light/dark theme with `data-theme` variables.
+- Applies M3 typography tokens via `--font-display`, `--font-ui`, `--font-body`.
+- Has accessible focus-ring support for many interactive controls.
+- Uses elevated modal surfaces and good border radius for dialogs.
+- Includes M3-like button states for hover and active interactions.
+
+## Improvements available
+
+### 1. Surface consistency
+- Apply a shared surface/background style to `sidebar-block` sections to make all panels look like unified cards.
+- Add subtle elevation to `sidebar-block` containers so content sections feel layered.
+- Use `--md-surface-c` or `--md-surface-c-high` more consistently for the right-sidebar and left-sidebar cards.
+
+### 2. Topbar and nav controls
+- Strengthen `nav-tab` surface states with an M3 tonal container and a clearer active state.
+- Add pressed/hover surface layers using `rgba(236,197,111,...)` on buttons and tabs.
+- Make icon buttons (`icon-btn`) feel more tactile with a tonal surface.
+
+### 3. Layout and responsiveness
+- Convert the main layout grid into `minmax()` columns to preserve responsive behavior across window sizes.
+- Add consistent gaps between panels instead of fixed zero spacing.
+- Improve mobile section transitions and ensure the bottom nav uses safe-area padding.
+
+### 4. Buttons and controls
+- Ensure `qa-btn`, `combat-btn`, `mob-btn`, `menu-option`, `mob-sheet-btn` all share consistent M3 motion and hover treatment.
+- Add state-layer or surface feedback for segmented story filters (`.sf-btn`).
+- Use M3-style pill shapes and balanced spacing for button groups.
+
+### 5. Patterns and token use
+- Prefer `--md-surface-c-high`, `--md-surface-c-low`, and `--md-outline-variant` for borders and backgrounds.
+- Reserve accent colors for primary actions and danger states, while keeping text on-surface contrast high.
+- Use `--r-md` / `--r-lg` in horizontal groups and cards, and `--r-sm` on smaller chips/controls.
+
+## Changes made in this pass
+- Added surface, border, radius, and elevation to `.sidebar-block`.
+- Updated `#game` layout to use responsive `minmax()` column sizes with a `gap`.
+- Polished topbar nav tabs with hover, active, and focus-visible states.
+- Refined segmented story filter button hover/active states.
+- Added icon button pressed and keyboard focus visual feedback.
+
+## Next recommended M3 improvements
+- Review `#location-hero` cards and buff bar surfaces to improve hero layering.
+- Polish `mobile-sheet` dialog surfaces and background blur for an M3 modal experience.
+- Make `story-filters` segmented buttons look more like an M3 segmented control.
+- Add subtle state layers for `.menu-option` and `.btn-action` pressed states.
+- Validate the new styles in both `dark` and `light` themes.
+
+===== AGENTS.md =====
+# Custom Agents for RolText
+
+This repository includes a custom Copilot agent for design-driven work and Material Design 3 refinement.
+
+## Available Agents
+
+- `roltext-m3-agent.agent.md`
+  - Title: RolText M3 Design Assistant
+  - Purpose: scaffold workflows, analyze UX/UI, and propose M3-consistent improvements for HTML/CSS/JS/MD.
+  - Best use: review `PROJECT-OVERVIEW.md` first, then work from `index.html`, `styles-m3.css`, and the `js/` source files.
+
+## Notes
+
+- Use `PROJECT-OVERVIEW.md` as the project knowledge base before making edits.
+- The agent is optimized for design and workflow tasks, not just code fixes.
+- Keep changes aligned to the existing Material Design 3 styling and responsive game UI layout.
+
+===== roltext-m3-agent.instructions.md =====
+As the RolText M3 Design Assistant, follow these rules:
+
+- Treat `PROJECT-OVERVIEW.md` as the master summary of the repository and design goals.
+- Use markdown files to capture decisions, workflows, and rationale.
+- Advise with a focus on Material Design 3: token use, contrast, motion, spacing, and component hierarchy.
+- Keep existing UI classes and IDs stable unless a clear improvement is needed.
+- Propose feature or UI changes in small, scaffolded steps with clear before/after reasoning.
+- When updating code, include comments or markdown notes explaining the design intent.
+
+===== roltext-m3-agent.agent.md =====
+---
+id: roltext-m3-design-assistant
+title: RolText M3 Design Assistant
+description: A custom agent tailored to RolText for Material Design 3 styling, UX workflow scaffolding, and markdown-based project understanding.
+applyTo:
+  - '**/*.{html,css,js,md}'
+tags:
+  - design
+  - m3
+  - workflow
+  - documentation
+---
+
+# RolText M3 Design Assistant
+
+This agent is built to support design-focused development in the RolText project.
+
+## Primary goals
+- Analyze and improve the user interface using Material Design 3 principles.
+- Help scaffold workflows, tasks, and documentation that reflect the current project structure.
+- Use markdown files as knowledge sources for project context and design decisions.
+- Keep enhancements compatible with the existing HTML and JavaScript architecture.
+
+## When using this agent
+1. Read `PROJECT-OVERVIEW.md` to understand the repo scope and design intent.
+2. Inspect `index.html`, `styles-m3.css`, and relevant `js/` modules for the current UI flow.
+3. Propose or implement changes that preserve the theme, readability, and game UX.
+4. Document any new patterns or design systems in markdown.
+
+===== roltext-m3-agent.prompt.md =====
+You are a senior frontend designer and workflow engineer with strong expertise in Material Design 3. The project is a browser RPG called Pixel Quest Echoes, rendered with an HTML/CSS/JavaScript architecture and a custom M3 skin in `styles-m3.css`.
+
+Your task is to act as a design-aware scaffold for the RolText workflow. Focus on:
+- Material Design 3 semantics: color roles, elevation, shape, typography, motion, and state layers.
+- Responsive game UI patterns: topbar, sidebar, game screen, combat UI, story log, and mobile layout.
+- Non-destructive improvements: prefer CSS and layout refinements over rewrites of HTML/JS.
+- Documentation: create clear markdown summaries, design notes, and workflow instructions.
+
+Start by using `PROJECT-OVERVIEW.md` as the project knowledge base, then read the existing source files to inform your recommendations. Suggest actionable tasks, design upgrades, and implementation steps that align with the current repo structure.
+
+===== spec\SPEC-001-Arquitectura-General.md =====
+# SPEC-001: Arquitectura General de Pixel Quest Echoes
+
+## 1. Visión del Sistema
+
+Pixel Quest Echoes es un RPG de texto basado en navegador con las siguientes características técnicas:
+- **Frontend**: Vanilla JavaScript ES6+ modular, sin framework
+- **UI/UX**: Material Design 3 (MD3) con theming dinámico (dark/light)
+- **Estado**: Patrón Singleton centralizado (`gameState`)
+- **Comunicación**: Event-driven architecture via `CustomEvent`
+- **Persistencia**: localStorage con versionado de save files
+- **Responsive**: Mobile-first con navegación adaptativa
+
+## 2. Diagrama de Arquitectura
+
+```
++-------------------------------------------------------------+
+¦                        PRESENTATION LAYER                      ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
+¦  ¦  index.html ¦ ¦  styles-m3   ¦ ¦  MD3 Components     ¦   ¦
+¦  ¦  (Estructura)¦ ¦  (Tokens CSS)¦ ¦  (Modales, Sheets)  ¦   ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
++-------------------------------------------------------------¦
+¦                      INTERACTION LAYER                       ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
+¦  ¦  keyboard.js¦ ¦  events.js  ¦ ¦  ui.js              ¦   ¦
+¦  ¦  (Input)     ¦ ¦  (Handlers)  ¦ ¦  (Render/Update)    ¦   ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
++-------------------------------------------------------------¦
+¦                       CORE LAYER                               ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
+¦  ¦  state.js   ¦ ¦  main.js    ¦ ¦  i18n.js            ¦   ¦
+¦  ¦  (Store)     ¦ ¦  (Bootstrap) ¦ ¦  (Localization)     ¦   ¦
+¦  +-------------+ +-------------+ +---------------------+   ¦
++-------------------------------------------------------------¦
+¦                      GAME SYSTEMS LAYER                        ¦
+¦  +----------+ +----------+ +----------+ +----------+       ¦
+¦  ¦ combat.js¦ ¦movement.js¦ ¦crafting.js¦ ¦quests.js ¦       ¦
+¦  ¦inventory.js¦ ¦shop.js  ¦ ¦journal.js¦ ¦bestiary.js¦       ¦
+¦  ¦panels.js ¦ ¦mapgen.js ¦ ¦npcs.js   ¦ ¦achievements¦       ¦
+¦  +----------+ +----------+ +----------+ +----------+       ¦
++-------------------------------------------------------------¦
+¦                      DATA LAYER                                ¦
+¦  +----------+ +----------+ +----------+ +----------+         ¦
+¦  ¦items.js  ¦ ¦enemies.js¦ ¦biomes.js ¦ ¦locations.js¦       ¦
+¦  ¦lootTables¦ ¦classes.js¦ ¦worldMap  ¦ ¦craftingRecipes¦    ¦
+¦  +----------+ +----------+ +----------+ +----------+         ¦
++-------------------------------------------------------------¦
+¦                    INFRASTRUCTURE LAYER                        ¦
+¦  +----------+ +----------+ +----------+ +----------+         ¦
+¦  ¦saveSystem¦ ¦sounds.js ¦ ¦scrollMgr ¦ ¦localMinimap¦       ¦
+¦  ¦utils.js  ¦ ¦toast.js  ¦ ¦travelEvts¦ ¦minimap.js ¦       ¦
+¦  +----------+ +----------+ +----------+ +----------+         ¦
++-------------------------------------------------------------+
+```
+
+## 3. Patrones de Diseño Implementados
+
+| Patrón | Implementación | Uso |
+|--------|---------------|-----|
+| **Singleton** | `gameState` exportado desde `state.js` | Estado global único |
+| **Observer** | `CustomEvent` con namespace `pixel:*` | Desacoplamiento entre sistemas |
+| **Module** | ES6 `import/export` | Encapsulamiento por feature |
+| **Factory** | `generateZone()` en `mapgen.js` | Generación procedural de contenido |
+| **Strategy** | `SKILLS_BY_CLASS` en `classes.js` | Habilidades por clase |
+| **State Machine** | `isInCombat`, `isGameOver`, `isProcessingMove` | Estados del juego |
+| **Component** | Modales reutilizables en HTML | UI dinámica |
+
+## 4. Flujo de Datos
+
+```
+Usuario Input ? keyboard.js/events.js ? Action Handler ? gameState Mutation ? 
+CustomEvent Dispatch ? UI Update (ui.js/panels.js) ? DOM Render ? localStorage (opcional)
+```
+
+## 5. Convenciones de Código
+
+### 5.1 Estructura de Módulos
+```javascript
+// 1. Imports externos
+import { gameState } from "./state.js";
+
+// 2. Imports internos
+import { addMessage } from "./story.js";
+
+// 3. Constantes del módulo
+const MODULE_CONSTANT = value;
+
+// 4. Funciones exportadas
+export function mainFunction() { }
+
+// 5. Funciones privadas
+function _helper() { }
+```
+
+### 5.2 Naming Conventions
+- **PascalCase**: Clases/Constructores (no hay en este proyecto)
+- **camelCase**: Variables, funciones, métodos
+- **SCREAMING_SNAKE_CASE**: Constantes globales
+- **Prefijo `_`**: Funciones privadas del módulo
+
+### 5.3 Event Namespace
+Todos los eventos custom usan el prefijo `pixel:`:
+- `pixel:move` — Movimiento del jugador
+- `pixel:attack`, `pixel:magic`, `pixel:flee` — Acciones de combate
+- `pixel:startCombat` — Inicio de combate
+- `pixel:useSkill` — Uso de habilidad
+- `pixel:openMenu` — Abrir menú principal
+- `pixel:newGame` — Nueva partida
+- `pixel:localeChanged` — Cambio de idioma
+- `pixel:locationChanged` — Cambio de ubicación
+- `pixel:saveChanged`, `pixel:stateUpdated` — Persistencia
+
+## 6. Dependencias entre Módulos
+
+### 6.1 Grafo de Dependencias Críticas
+```
+state.js (raíz)
+  +-- combat.js ? enemies.js, stats.js, lootTables.js, classes.js
+  +-- movement.js ? combat.js, biomes.js, travelEvents.js
+  +-- inventory.js ? items.js, stats.js, i18n.js
+  +-- panels.js ? journal.js, bestiary.js, minimap.js, crafting.js
+  +-- questlog.js ? quests.js, npcs.js
+  +-- main.js ? TODOS los módulos (bootstrap)
+```
+
+### 6.2 Reglas de Dependencia
+1. **Nunca** importar ciclicamente (A ? B ? A)
+2. **Nunca** importar `main.js` desde otros módulos
+3. **Siempre** usar `gameState` como única fuente de verdad
+4. **Preferir** eventos sobre imports directos para desacoplamiento
+
+## 7. Gestión de Estado
+
+### 7.1 Estructura de gameState
+```javascript
+{
+  player: {
+    name, class, className, classEmoji,
+    level, experience, nextLevelXp, statPoints,
+    hp, maxHp, mp, maxMp,
+    strength, agility, intelligence,
+    gold
+  },
+  currentLocationId: string,
+  currentEnemy: Enemy | null,
+  isInCombat: boolean,
+  isGameOver: boolean,
+  isProcessingMove: boolean,
+  inventory: { [itemId]: quantity },
+  equipment: { [slot]: Item | null },
+  equipmentStats: { attack, defense, magic, maxHp, maxMp },
+  activeBuffs: { [buffId]: turnsRemaining },
+  activeDebuffs: { [debuffId]: { turns, damage } },
+  playerDebuffs: { [debuffId]: { turns, damage } },
+  visitedLocations: { [locationId]: boolean },
+  quests: { [questId]: "inactive" | "active" | "completed" },
+  achievements: { [achievementId]: boolean },
+  stats: {
+    kills, bossKills, enemiesDefeated: { [enemyId]: count },
+    locationsVisited: number
+  }
+}
+```
+
+### 7.2 Inmutabilidad
+- **NO mutar** objetos anidados directamente
+- **USAR** `calculateTotalStats()` para derivados
+- **CLONAR** con `deepClone()` para saves
+
+## 8. Rendimiento
+
+### 8.1 Optimizaciones Actuales
+- Lazy loading de imágenes (`onerror="this.style.display='none'"`)
+- Event delegation para listas dinámicas
+- CSS containment en modales (`contain: layout style paint`)
+
+### 8.2 Cuellos de Botella Identificados
+- Re-render completo de inventario en cada cambio
+- Cálculo de stats en cada frame de combate
+- Generación de HTML string en memoria para modales grandes
+
+## 9. Seguridad
+
+### 9.1 Vectores de Ataque
+- **XSS**: HTML injection via nombres de jugador (mitigado: `textContent` en mayoría)
+- **Save Tampering**: localStorage editable por usuario (aceptable para SP)
+- **Cheat Engine**: Valores en memoria modificables (aceptable para SP)
+
+## 10. Versionado
+
+Formato de save actual: `version: "3.0"`
+Estrategia de migración: Merge con defaults (`Object.assign(initial, saved)`)
+
+===== spec\SPEC-002-Sistema-Combate.md =====
+# SPEC-002: Sistema de Combate por Turnos
+
+## 1. Resumen Ejecutivo
+
+Sistema de combate por turnos basado en estadísticas derivadas, con soporte para:
+- 3 clases con 6 habilidades cada una (18 skills total)
+- Buffs/debuffs con duración por turnos
+- Evasión y críticos basados en agilidad
+- Daño elemental (fuego, veneno, hielo)
+- Fuga con probabilidad modificada por AGI
+
+## 2. Flujo de Combate
+
+```
++-------------+     +-------------+     +-------------+
+¦   INICIO    ¦----?¦  JUGADOR    ¦----?¦   ENEMIGO   ¦
+¦  startCombat¦     ¦   TURNO     ¦     ¦   TURNO     ¦
++-------------+     +-------------+     +-------------+
+       ?                                    ¦
+       +------------------------------------+
+                    (loop hasta victoria/derrota/fuga)
+```
+
+### 2.1 Estados del Combate
+```javascript
+const COMBAT_STATES = {
+  IDLE: 'idle',           // Fuera de combate
+  PLAYER_TURN: 'player',  // Esperando input del jugador
+  ENEMY_TURN: 'enemy',    // Ejecutando IA del enemigo
+  RESOLVING: 'resolving', // Animación/efecto en progreso
+  ENDED: 'ended'          // Combate terminado
+};
+```
+
+## 3. Fórmulas de Daño
+
+### 3.1 Daño Físico del Jugador
+```
+damage = max(1, floor((attack * atkMult * variance * critMult) - enemyDefense))
+
+Donde:
+- attack = derived.attack (base + equipo + STR)
+- atkMult = 1.3 si warcry activo, 1.0 base
+- variance = random(0.9, 1.1)  // ±10%
+- critMult = 1.75 si crítico, 1.0 base
+- critChance = 0.10 + (AGI * 0.005) + (rogue ? 0.10 : 0)
+```
+
+### 3.2 Daño Mágico del Jugador
+```
+damage = max(1, floor(magicAttack * mult * variance))
+
+Donde:
+- magicAttack = derived.magic * 1.5 (calculateMagicAttack)
+- mult = 2.0 si mage nivel 20+, 1.0 base
+- cost = 7 MP si mage nivel 10+, 10 MP base
+```
+
+### 3.3 Daño del Enemigo
+```
+damage = max(1, floor((enemyAttack * frozenMult * variance * defenseMult * shieldMult) - playerDefense))
+
+Donde:
+- frozenMult = 0.75 si enemigo congelado, 1.0 base
+- defenseMult = 0.5 si defend_stance activo, 1.0 base
+- shieldMult = 0.6 si arcane_shield activo, 1.0 base
+- variance = random(0.85, 1.15)  // ±15%
+```
+
+### 3.4 Evasión
+```
+evasionChance = (AGI * 0.01) + (rogue ? 0.10 : 0) + (rogue nivel 5+ ? 0.25 : 0)
+// Cap implícito: ~50% máximo para rogue nivel 20
+```
+
+## 4. Sistema de Buffs/Debuffs
+
+### 4.1 Buffs del Jugador (activeBuffs)
+| Buff | Efecto | Duración | Origen |
+|------|--------|----------|--------|
+| `warcry` | ATK +30% | 3-4 turnos | Skill Warrior |
+| `defend_stance` | Daño recibido ×0.5 | 1 turno | Skill Warrior |
+| `arcane_shield` | Absorbe 40% daño | 1 golpe | Skill Mage |
+
+### 4.2 Debuffs del Enemigo (activeDebuffs)
+| Debuff | Efecto | Duración | Origen |
+|--------|--------|----------|--------|
+| `poison` | Daño/turno | 2-4 turnos | Skill Rogue, enemigos |
+| `burn` | Daño/turno | 2-3 turnos | Skill Mage, enemigos de fuego |
+| `frozen` | ATK enemigo ×0.75 | 2 turnos | Skill Mage |
+
+### 4.3 Debuffs del Jugador (playerDebuffs)
+| Debuff | Efecto | Duración | Aplicado por |
+|--------|--------|----------|--------------|
+| `poison` | 3-15 daño/turno | 2-3 turnos | Slime, Funged Beast, etc. |
+| `burn` | 5-15 daño/turno | 2-3 turnos | Goblin Shaman, Warlock, etc. |
+| `stun` | Pierde 1 turno | 1 turno | Vampire, Medusa |
+
+### 4.4 Tick de Efectos
+```javascript
+function tickBuffs() {
+  // Decrementar contadores
+  // Eliminar si turns <= 0
+  // Aplicar daño DOT antes del turno del enemigo
+}
+```
+
+## 5. Habilidades por Clase
+
+### 5.1 Warrior (??)
+| ID | Nombre | MP | Nivel | Efecto |
+|----|--------|-----|-------|--------|
+| `bash` | Golpe Brutal | 8 | 1 | Daño ×1.4, ignora 30% DEF |
+| `defend` | Postura Defensiva | 5 | 3 | Cura 15% HP, mitiga 50% daño |
+| `warcry` | Grito de Guerra | 12 | 6 | ATK +30% por 3 turnos |
+| `whirlwind` | Torbellino | 20 | 10 | 2-3 ataques aleatorios |
+| `berserker_rage` | Frenesí Bersérker | 15 | 15 | Pierde 15% HP, daño ×3 |
+| `avatar_of_war` | Avatar de la Guerra | 30 | 20 | Cura 30% HP + warcry 4 turnos |
+
+### 5.2 Mage (??)
+| ID | Nombre | MP | Nivel | Efecto |
+|----|--------|-----|-------|--------|
+| `fireball` | Bola de Fuego | 12 | 1 | Daño + quemadura 2 turnos |
+| `icebolt` | Rayo de Hielo | 10 | 3 | Daño + congelación (ATK -25%) |
+| `arcane_shield` | Escudo Arcano | 15 | 6 | Absorbe 40% próximo daño |
+| `meteor` | Meteoro | 35 | 10 | Daño ×3, ignora DEF |
+| `arcane_storm` | Tormenta Arcana | 28 | 15 | 3 rayos, ignora DEF |
+| `singularity` | Singularidad | 50 | 20 | Daño ×4.5 + drena 25% HP enemigo |
+
+### 5.3 Rogue (???)
+| ID | Nombre | MP | Nivel | Efecto |
+|----|--------|-----|-------|--------|
+| `backstab` | Golpe Furtivo | 8 | 1 | Crítico garantizado ×2.5 |
+| `poison` | Veneno | 6 | 3 | Veneno 4 turnos |
+| `smoke_bomb` | Bomba de Humo | 10 | 6 | 70% escape inmediato |
+| `double_strike` | Golpe Doble | 15 | 10 | 2 ataques con chance de crítico |
+| `shadow_strike` | Golpe de Sombra | 18 | 15 | Crítico ×4, ignora DEF |
+| `death_dance` | Danza de la Muerte | 28 | 20 | 5 ataques con 40% crítico |
+
+## 6. Escala de Enemigos
+
+### 6.1 Fórmula de Escalado
+```javascript
+// Enemigo normal
+lvlMult = 1 + (playerLevel - 1) * 0.05
+scaledHp  = base.maxHp * lvlMult
+scaledAtk = base.attack * lvlMult
+
+// Boss
+bossMult = 1.6 + (playerLevel - 1) * 0.08
+bossAtkMult = 1.4 + (playerLevel - 1) * 0.04
+```
+
+### 6.2 Tabla de Enemigos Base
+Ver `enemies.js` para datos completos. Estructura:
+```javascript
+{
+  id: string,
+  type: string,           // Nombre visible
+  levelRequirement: number,
+  hp: number,             // Vida base
+  maxHp: number,          // Vida máxima (redundante con hp)
+  attack: number,         // ATK físico
+  defense: number,
+  magicAttack: number,    // ATK mágico (opcional)
+  experience: number,
+  gold: number,
+  drops: string[],        // IDs de items
+  img: string,            // Ruta de imagen
+  isBoss: boolean         // Si es jefe de área
+}
+```
+
+## 7. IA del Enemigo
+
+### 7.1 Comportamiento
+```javascript
+function enemyTurn() {
+  // 1. Aplicar DOTs al enemigo (veneno/quemadura)
+  // 2. Reducir duración de debuffs
+  // 3. Decidir ataque: 30% mágico si tiene magicAttack
+  // 4. Aplicar daño al jugador
+  // 5. Chance de aplicar status effect (definido en ENEMY_STATUS_EFFECTS)
+}
+```
+
+### 7.2 Tabla de Status Effects de Enemigos
+Ver `ENEMY_STATUS_EFFECTS` en `combat.js`:
+- `slime`: 30% poison, 3 daño, 2 turnos
+- `vampire`: 25% stun, 1 turno
+- `dragon_king`: 45% burn, 15 daño, 3 turnos
+
+## 8. Interfaz de Combate
+
+### 8.1 Estados Visuales
+- **Fuera de combate**: Panel de navegación visible, combate oculto
+- **En combate**: Panel de combate visible, navegación oculta
+- **Sincronización**: Desktop (`combat-menu`/`navigation-menu`) y Mobile (`mob-combat`/`mob-nav`)
+
+### 8.2 Atajos de Teclado
+| Tecla | Acción | Condición |
+|-------|--------|-----------|
+| `1` | Atacar | En combate |
+| `2` | Magia | En combate |
+| `3` | Ítems | En combate (abre inventario) |
+| `4` | Huir | En combate |
+
+### 8.3 Accesibilidad
+- `aria-live="assertive"` en panel de enemigo
+- `aria-keyshortcuts` en botones de combate
+- Indicadores visuales de debuffs en barra del enemigo
+
+## 9. Balance y Curva de Dificultad
+
+### 9.1 Progresión Esperada
+| Nivel | Zona Sugerida | Enemigos | Boss |
+|-------|--------------|----------|------|
+| 1-3 | Forest, Garden | Slime, Goblin, Wolf | — |
+| 4-6 | Cave, Swamp | Cave Bat, Zombie, Orc | — |
+| 7-9 | Mountain, Beach | Wyvern, Pirate, Giant | Forest Titan |
+| 10-12 | Ruins, Dungeon | Stone Golem, Warlock | Cave Devourer |
+| 13-15 | Volcano, Jungle | Inferno Elemental, Diablo | Inferno Dragon |
+| 16-20 | Tundra, Inferno | Frost Wyrm, Dragon King | Dragon King |
+
+### 9.2 Problemas de Balance Actuales
+1. **Excalibur**: Requiere 10 de cada material (imposible sin grind excesivo)
+2. **Dragon King**: 3000 HP vs ~200 HP jugador nivel 15 (desequilibrado)
+3. **Mage nivel 20**: Daño ×2 hace que el juego sea trivial
+4. **Rogue evasión**: 50% evasión a nivel 20 rompe el combate
+
+## 10. Mejoras Propuestas
+
+### 10.1 Mecánicas
+- [ ] **Sistema de combos**: Bonus por alternar tipos de ataque
+- [ ] **Contrataques**: Chance de contraatacar al bloquear
+- [ ] **Morale**: El enemigo puede huir si HP < 20%
+- [ ] **Cover system**: Posicionamiento táctico (front/back row)
+
+### 10.2 UX
+- [ ] **Timeline visual**: Mostrar orden de turnos
+- [ ] **Damage numbers**: Animación de daño flotante (descomentar)
+- [ ] **Screen shake**: Feedback de impacto (descomentar)
+- [ ] **Battle log**: Historial de acciones del combate actual
+
+### 10.3 Técnicas
+- [ ] **State machine formal**: Reemplar flags booleanos con máquina de estados
+- [ ] **Action queue**: Cola de acciones para evitar race conditions
+- [ ] **Combat snapshot**: Guardar estado del combate para reconexión
+
+===== spec\SPEC-003-Progresion-Economia.md =====
+# SPEC-003: Sistema de Progresión y Economía
+
+## 1. Progresión del Jugador
+
+### 1.1 Curva de Experiencia
+```javascript
+nextLevelXp = floor(previousXp * 1.5)
+// Nivel 1: 100 XP
+// Nivel 2: 150 XP
+// Nivel 3: 225 XP
+// Nivel 5: 506 XP
+// Nivel 10: 3,844 XP
+// Nivel 20: 221,684 XP
+```
+
+### 1.2 Ganancia de Atributos por Nivel
+| Clase | HP/level | MP/level | Stat Points |
+|-------|----------|----------|-------------|
+| Warrior | +15 | +3 | +5 |
+| Mage | +6 | +12 | +5 |
+| Rogue | +10 | +5 | +5 |
+
+### 1.3 Bonificaciones de Clase por Nivel
+Ver `CLASS_DEFINITIONS` en `classes.js`. Desbloqueos cada 5 niveles:
+- **Nivel 5**: Bonificación pasiva permanente
+- **Nivel 10**: Mecánica nueva (coste reducido, ignore DEF)
+- **Nivel 15**: Proc chance (doble golpe, evasión aumentada)
+- **Nivel 20**: Multiplicador de daño ×2 o evasión 50%
+
+## 2. Sistema de Atributos
+
+### 2.1 Derivación de Stats
+```javascript
+attack      = strength + equipment.attack + buffs
+ defense     = floor(agility / 2) + equipment.defense + buffs
+magic       = intelligence + equipment.magic + buffs
+maxHp       = 80 + (strength * 2) + equipment.hpBonus + classBonusHp
+maxMp       = 20 + (intelligence * 4) + classBonusMp
+```
+
+### 2.2 Eficiencia de Atributos
+| Stat | Efecto por punto | Clase óptima |
+|------|-----------------|--------------|
+| STR | +1 ATK, +2 HP | Warrior |
+| AGI | +0.5 DEF, +0.5% evasión, +0.5% crit | Rogue |
+| INT | +1 MAG, +4 MP, +0.5% magic pen | Mage |
+
+### 2.3 Soft Caps y Diminishing Returns
+- **Evasión**: Cap suave al 50% (rogue nivel 20 alcanza ~55%)
+- **Crítico**: Cap suave al 40% (base 10% + AGI*0.5% + rogue 10%)
+- **Magic Pen**: No implementado actualmente
+
+## 3. Economía
+
+### 3.1 Fuentes de Oro
+| Fuente | Cantidad | Frecuencia |
+|--------|----------|------------|
+| Enemigos normales | 5-35g | Por combate |
+| Jefes | 100-800g | Por derrota |
+| Venta de items | 50% precio | Bajo demanda |
+| Misiones | 30-200g | Por entrega |
+| Logros | — | One-time |
+
+### 3.2 Sumideros de Oro
+| Uso | Precio típico |
+|-----|--------------|
+| Poción HP | 10g |
+| Poción MP | 12g |
+| Arma básica | 30-65g |
+| Armadura | 40-300g |
+| Recetas craft | Materiales |
+
+### 3.3 Inflación Control
+- **Problema**: Jugador nivel 10+ acumula miles de oro sin gasto
+- **Solución propuesta**: 
+  - Reparación de equipo (durabilidad)
+  - Servicios de entrenamiento (pagar por XP)
+  - Apuestas/Gambling en taverna
+  - Banco con interés negativo (storage fee)
+
+## 4. Sistema de Crafting
+
+### 4.1 Categorías
+| Tab | Tipo | Recetas | Focus |
+|-----|------|---------|-------|
+| Forja | Armas, Armaduras, Accesorios | 25+ | STR/DEF |
+| Alquimia | Pociones, Elixires, Antídotos | 8+ | Restauración |
+| Arcano | Anillos, Emblemas, Encantamientos | 12+ | MAG/INT |
+
+### 4.2 Fórmula de Éxito
+```javascript
+// Actual: 100% éxito si tienes materiales
+// Propuesto:
+successChance = baseChance + (playerLevel - recipeLevel) * 0.05
+qualityBonus = random(1, 3) si successChance > 1.2
+```
+
+### 4.3 Materiales por Bioma
+Ver `lootTables.js` para distribución completa. Key materials:
+- **Forest**: herb, wolf_pelt, fungus_core
+- **Cave**: iron_ore, bat_wing, crystal_shard
+- **Mountain**: ice_crystal, wyvern_scale, giant_bone
+- **Ruins**: enchanted_dust, runestone, ancient_core
+- **Volcano**: magma_fragment, dragon_scale, heart_of_inferno
+
+## 5. Tiendas
+
+### 5.1 Tipos de Tienda
+| ID | Ubicación | Especialización | Nivel |
+|----|-----------|----------------|-------|
+| `shop` | Town | General | 1+ |
+| `castle_shop` | Castle | Equipo avanzado | 5+ |
+| `port` | Port | Marítimo/exploración | 7+ |
+
+### 5.2 Stock Dinámico
+```javascript
+// Actual: Inventario fijo
+// Propuesto:
+shopStock = baseInventory + (playerLevel * 2) items random
+restockTimer = 10 minutos real o 1 descanso
+```
+
+## 6. Recompensas de Misiones
+
+### 6.1 Tabla de Recompensas
+| Misión | XP | Oro | Item especial |
+|--------|-----|-----|--------------|
+| explore_forest | 50 | 30 | world_map |
+| collect_crystal | 120 | 80 | arcane_key |
+| kill_pirates | 100 | 120 | navigation_chart |
+| collect_fairy_dust | 80 | 50 | garden_key |
+| collect_ice_crystal | 150 | 100 | mountain_pass |
+| defeat_dark_lord | 300 | 200 | dragon_key |
+
+### 6.2 Progresión de Misiones (Questline)
+```
+Elara (Town) ? Valdris (Tower) ? Brennan (Port) ? Eryndel (Garden) ? Theron (Mountain) ? Pyrax (Volcano)
+     ?              ?                ?                  ?                  ?                ?
+ world_map      arcane_key      navigation_chart    garden_key        mountain_pass      dragon_key
+     ?              ?                ?                  ?                  ?                ?
+ Forest 3      Ruins 4          Catacombs 1        Treasure Keep 1   Tundra 1          Inferno 1
+```
+
+## 7. Sistema de Logros
+
+### 7.1 Categorías
+| Categoría | Cantidad | Ejemplos |
+|-----------|----------|----------|
+| Combate | 5 | first_kill, hunter_50, veteran_200, first_boss, boss_slayer |
+| Exploración | 4 | explorer_10, explorer_30, cartographer |
+| Progresión | 3 | level_5, level_15, level_25 |
+| Economía | 1 | rich (500g) |
+| Misiones | 2 | first_quest, all_quests |
+| Bestiario | 2 | bestiary_5, bestiary_all |
+
+### 7.2 Rareza de Logros
+| Rarity | Color | Cantidad |
+|--------|-------|----------|
+| Common | Gris | 5 |
+| Uncommon | Verde | 5 |
+| Rare | Azul | 3 |
+| Epic | Púrpura | 2 |
+| Legendary | Dorado | 1 |
+
+## 8. Problemas de Balance
+
+### 8.1 Identificados
+1. **Excalibur**: Requiere 10 de cada material (grind excesivo)
+2. **Economía estancada**: Sin gastos recurrentes, oro pierde valor
+3. **Progresión lineal**: Sin ramificaciones de build
+4. **Respec ausente**: No se pueden redistribuir puntos
+
+### 8.2 Soluciones Propuestas
+- [ ] **Transmutación**: Convertir materiales comunes en raros (ratio 5:1)
+- [ ] **Enchanting**: Mejorar equipo existente con materiales
+- [ ] **Durabilidad**: Equipo se desgasta, requiere reparación
+- [ ] **Respec**: Poción de olvido (costosa) para redistribuir stats
+- [ ] **Prestige**: Reset a nivel 1 con bonus permanente al completar juego
+
+## 9. Persistencia
+
+### 9.1 Formato de Guardado
+```javascript
+{
+  version: "3.0",
+  timestamp: ISOString,
+  gameState: { /* estado completo */ }
+}
+```
+
+### 9.2 Estrategia de Merge
+```javascript
+// Al cargar:
+loaded = JSON.parse(localStorage.getItem(SAVE_KEY));
+merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
+// Garantiza que campos nuevos tengan valores por defecto
+```
+
+### 9.3 Auto-save Triggers
+- Subir de nivel
+- Derrotar jefe
+- Completar misión
+- Manual (botón Save)
+
+===== spec\SPEC-004-UX-UI-Responsive.md =====
+# SPEC-004: UX/UI y Responsive Design (Material Design 3)
+
+## 1. Sistema de Diseño
+
+### 1.1 Tokens MD3 Implementados
+```css
+/* Estructura de tokens (inferida de index.html y clases CSS) */
+:root {
+  /* Colores primarios */
+  --md-primary: #d0bcff;
+  --md-on-primary: #381e72;
+  --md-primary-container: #4f378b;
+  --md-on-primary-container: #eaddff;
+
+  /* Superficies */
+  --md-surface: #1c1b1f;
+  --md-surface-variant: #49454f;
+  --md-on-surface: #e6e1e5;
+  --md-on-surface-variant: #cac4d0;
+
+  /* Estados */
+  --md-outline: #938f99;
+  --md-outline-variant: #49454f;
+
+  /* Semánticos de juego */
+  --c-heal: #4ade80;
+  --c-damage: #ef4444;
+  --c-magic: #818cf8;
+  --c-gold: #fbbf24;
+  --c-xp: #fbbf24;
+  --c-poison: #4ade80;
+  --c-burn: #fb923c;
+}
+```
+
+### 1.2 Tipografía
+| Uso | Fuente | Tamaño | Peso |
+|-----|--------|--------|------|
+| Títulos | Cinzel Decorative | 1.5-2rem | 700 |
+| Subtítulos | Cinzel | 1.1-1.3rem | 600 |
+| Body | EB Garamond | 0.9-1rem | 400/500 |
+| UI/Stats | Press Start 2P | 0.75-0.85rem | 400 |
+| Pixel art | Press Start 2P | Variable | 400 |
+
+## 2. Layout Principal
+
+### 2.1 Grid System (Desktop > 960px)
+```
++-------------------------------------------------------------+
+¦                      TOPBAR (header)                         ¦
+¦  [Brand] [Nav Tabs]                    [Lang] [Theme] [Menu]¦
++-------------------------------------------------------------¦
+¦          ¦                              ¦                   ¦
+¦  LEFT    ¦         CENTER               ¦     RIGHT         ¦
+¦  SIDEBAR ¦         SCREEN               ¦     SIDEBAR       ¦
+¦          ¦                              ¦                   ¦
+¦  Portrait¦  Location Hero               ¦  Quick Actions    ¦
+¦  Vitals  ¦  Enemy Panel                 ¦  Combat/Nav       ¦
+¦  Stats   ¦  Buff Bar                    ¦  Local Minimap    ¦
+¦          ¦  Story Log (scroll inverted) ¦                   ¦
+¦          ¦                              ¦                   ¦
++-------------------------------------------------------------¦
+¦              MOBILE BOTTOM NAV (=960px)                      ¦
++-------------------------------------------------------------+
+```
+
+### 2.2 Breakpoints
+| Breakpoint | Layout | Sidebar |
+|------------|--------|---------|
+| > 1200px | 3-column | Left + Right visibles |
+| 960-1200px | 3-column compact | Left + Right visibles |
+| 768-960px | 2-column | Right colapsado ? Bottom nav |
+| < 768px | 1-column | Left colapsado ? Mobile header |
+| < 480px | 1-column minimal | Todo en modales/sheets |
+
+## 3. Componentes UI
+
+### 3.1 Modales (Modal System)
+| Modal | ID | Contenido | Max Width |
+|-------|-----|-----------|-----------|
+| Panel genérico | `panelModal` | Atributos/Equip/Spellbook/Journal/Bestiary/Map/Craft | 640px |
+| Inventario | `inventoryModal` | Grid de items + detalle | 720px |
+| Stats | `statsModal` | Distribución de puntos | 440px |
+| Tienda | `shopModal` | Compra/Venta | 600px |
+| Menú principal | `mainMenuModal` | Save/Load/Audio | 480px |
+| NPC | `npcModal` | Diálogo + Quest | 520px |
+| Quest Log | `questLogModal` | Tabs de misiones | 560px |
+| Game Over | `gameOverModal` | Restart | 380px |
+| Ending | `endingModal` | Stats finales | 440px |
+| Travel Event | `travelEventModal` | Eventos aleatorios | 480px |
+
+### 3.2 Mobile Sheets
+```
++-------------------------+
+¦    ??? (drag handle)    ¦
+¦  [Close]  Título        ¦
+¦  +-----------------+    ¦
+¦  ¦ Grid de botones ¦    ¦
+¦  ¦ (movimientos/   ¦    ¦
+¦  ¦  paneles)        ¦    ¦
+¦  +-----------------+    ¦
++-------------------------+
+```
+- **Trigger**: Swipe up desde bottom nav
+- **Backdrop**: Cierre al tocar fuera
+- **Panels**: Movimientos, Acciones, Paneles (tabs internos)
+
+### 3.3 Barras de Vitalidad
+```html
+<!-- Desktop -->
+<div class="vital-row">
+  <span class="vital-label">HP</span>
+  <div class="vital-bar-wrap">
+    <div class="vital-bar hp-bar" id="hp-bar"></div>
+  </div>
+  <span class="vital-num" id="hp-text">0/0</span>
+</div>
+
+<!-- Mobile (compacto) -->
+<div class="compact-vital">
+  <div class="compact-vital-bar hp-bar" id="mobile-hp-bar"></div>
+  <span class="compact-vital-text" id="mobile-hp-text">0/0</span>
+</div>
+```
+
+## 4. Sistema de Navegación
+
+### 4.1 Desktop
+- **Topbar tabs**: Attributes, Equipment, Spellbook, Journal, Bestiary, Map, Achievements, Crafting
+- **Right sidebar**: Quick Actions + Combat/Nav toggle + Minimap
+- **Keyboard**: WASD movimiento, 1234 combate, ESC cerrar modal, M menú
+
+### 4.2 Mobile
+- **Bottom nav**: 
+  - Modo combate: Atacar, Magia, Ítem, Huir
+  - Modo navegación: Direcciones + Menús
+- **Swipe gestures**: 
+  - Swipe up: Abrir mobile sheet
+  - Swipe left/right: Cambiar tab en modales
+- **Tap hold**: Tooltips en items
+
+### 4.3 Accesibilidad
+```html
+<!-- Atributos ARIA implementados -->
+<header id="topbar" role="banner">
+<main id="game" role="application">
+<aside id="left-panel"> <!-- Vitals -->
+<section id="screen" role="main">
+  <div id="story" role="log" aria-live="polite">
+  <div id="enemy-panel" role="region" aria-live="assertive">
+  <div id="buff-bar" aria-live="polite">
+<aside id="right-panel"> <!-- Actions -->
+<nav id="mobile-bottom-nav" aria-label="Controles de juego">
+```
+
+## 5. Feedback Visual
+
+### 5.1 Estados de Carga
+| Estado | Indicador | Ubicación |
+|--------|-----------|-----------|
+| `isProcessingMove` | Spinner sutil | Centro de pantalla |
+| Guardando | Toast "?? Partida guardada" | Bottom-right |
+| Cargando | Fade in de modal | Centro |
+
+### 5.2 Notificaciones (Toast System)
+```javascript
+// Tipos de toast
+showToast(msg)           // Info general
+showAchievementToast(ach) // Logro desbloqueado (con icono y rareza)
+showFloatingText(text, x, y, color, size, anim) // Daño/curación flotante
+```
+
+### 5.3 Efectos Comentados (Pendientes de Activar)
+```javascript
+// En combat.js, múltiples efectos están comentados:
+// - showFloatingText(): Números flotantes de daño
+// - shakeScreen(): Vibración de pantalla al impacto
+// - Animaciones de crítico (scale + color)
+```
+
+## 6. Internacionalización (i18n)
+
+### 6.1 Arquitectura
+```javascript
+// Diccionarios por locale
+const dictionaries = {
+  en: { /* ~200 strings */ },
+  es: { /* ~200 strings */ }
+};
+
+// Funciones
+setLocale(locale)      // Cambia idioma y persiste en localStorage
+t(key)                 // Traducción simple
+formatText(key, vars)  // Traducción con interpolación {{var}}
+localizeText(source)   // Soporte para objetos {en, es}
+translatePage(root)    // Traduce DOM por data-i18n
+```
+
+### 6.2 Strings Hardcodeados (Deuda Técnica)
+- `journal.js`: Textos en español sin traducción
+- `bestiary.js`: "Criaturas descubiertas", lore en español
+- `crafting.js`: "Materiales necesarios", "Fabricar"
+- `ENEMY_LORE` en `bestiary.js`: Todo en español
+
+## 7. Temas
+
+### 7.1 Implementación Actual
+```javascript
+// Toggle dark/light
+const stored = localStorage.getItem('pqe-theme') || 'dark';
+document.documentElement.dataset.theme = stored;
+// CSS responde a [data-theme="light"]
+```
+
+### 7.2 Tokens por Tema
+| Token | Dark | Light |
+|-------|------|-------|
+| --md-surface | #1c1b1f | #fffbfe |
+| --md-on-surface | #e6e1e5 | #1c1b1f |
+| --md-primary | #d0bcff | #6750a4 |
+
+## 8. Problemas UX/UI Identificados
+
+### 8.1 Críticos
+1. **Scroll invertido**: Confuso para usuarios nuevos (nuevos mensajes arriba)
+2. **Modales apilados**: Sin z-index management, pueden superponerse mal
+3. **Falta de tutorial**: No hay onboarding para nuevos jugadores
+4. **Tooltips ausentes**: Enemigos, buffs, y stats sin explicación hover
+
+### 8.2 Mayores
+1. **Inventario**: Sin categorización ni búsqueda (300+ items)
+2. **Crafting**: Sin preview de resultado ni comparativa con equipo actual
+3. **Mapa**: Sin pathfinding ni indicación de zonas peligrosas
+4. **Diálogo NPC**: Sin historial de conversación
+
+### 8.3 Menores
+1. **Animaciones**: CSS transitions mínimas, sin micro-interacciones
+2. **Sonido**: Sin indicador visual de volumen actual
+3. **Font loading**: FOUT potencial con Google Fonts
+4. **Focus states**: Inconsistentes en botones MD3
+
+## 9. Mejoras Propuestas
+
+### 9.1 UX Inmediatas
+- [ ] **Tutorial interactivo**: Primeros 5 minutos guiados
+- [ ] **Tooltips everywhere**: Hover/long-press en todos los elementos interactivos
+- [ ] **Quick actions**: Atajos de teclado visibles (badges en botones)
+- [ ] **Undo**: Deshacer última acción de combate (1 vez/encuentro)
+
+### 9.2 UI de Alto Impacto
+- [ ] **Character sheet redesign**: Vista unificada de stats + equipo + skills
+- [ ] **Combat log**: Panel dedicado con timeline de turnos
+- [ ] **Inventory grid**: Vista de iconos + filtros por tipo/rareza
+- [ ] **World map interactivo**: Zoom, pan, marcadores de objetivo
+
+### 9.3 Responsive Avanzado
+- [ ] **PWA**: Service worker para offline play
+- [ ] **Touch gestures**: Pinch para zoom en mapa, swipe para navegación
+- [ ] **Vibration API**: Haptic feedback en combate (móvil)
+- [ ] **Orientation**: Layout alternativo en landscape móvil
+
+===== spec\SPEC-005-Mundo-Contenido.md =====
+# SPEC-005: Mundo y Contenido Procedural
+
+## 1. Arquitectura del Mundo
+
+### 1.1 Grafo de Localizaciones
+```javascript
+// worldMap es un grafo dirigido con pesos implícitos
+worldMap = {
+  [locationId]: {
+    id, name, description, biome,
+    exits: { [direction]: targetId },
+    enemies: string[],      // IDs de enemigos posibles
+    encounterRate: number,  // 0.0 - 1.0
+    canRest: boolean,
+    safeZone: boolean,
+    level: number          // Nivel sugerido
+  }
+}
+```
+
+### 1.2 Direcciones Soportadas
+```javascript
+const DIRECTIONS = {
+  cardinal: ['north', 'south', 'east', 'west'],
+  vertical: ['up', 'down'],
+  portal:   ['enter', 'out'],
+  special:  ['summit']  // Caso especial: mountain ? dragon_lair
+};
+```
+
+## 2. Biomas
+
+### 2.1 Definición
+```javascript
+biomes = {
+  [biomeId]: {
+    name, minLevel, encounterRate,
+    enemies: string[],        // Pool de enemigos
+    description: string[],     // Array de descripciones random
+    modifiers: {
+      visibility: number,     // Modificador de encounterRate
+      magicBonus: number,     // Bonus a daño mágico
+      defenseBonus: number,   // Bonus a DEF
+      poisonChance?: number,  // Chance de veneno ambiental
+      fireDamage?: number,    // Daño de fuego por turno
+      coldDamage?: number     // Daño de frío por turno
+    }
+  }
+}
+```
+
+### 2.2 Biomas Implementados (14)
+| ID | Nombre | Nivel | Encounter | Enemigos | Modificadores |
+|----|--------|-------|-----------|----------|---------------|
+| forest | Forest | 1 | 0.35 | Slime, Wolf, Goblin, Funged Beast | vis:-1.5, mag:+1, def:+1 |
+| garden | Garden | 1 | 0.40 | Thief, Orc, Imp, Elf, Pegasus | vis:-1.0, mag:+2, def:-1 |
+| cave | Cave | 3 | 0.45 | Cave Bat, Cave Bear, Goblin Shaman | vis:0.7, mag:+2, def:+1 |
+| mountain | Mountain | 6 | 0.40 | Wyvern, Mountain Giant, Drider | vis:1.2, mag:-2, def:+3 |
+| ruin | Ancient Ruins | 5 | 0.50 | Stone Golem, Ancient Guardian, Hydra | vis:0.9, mag:+4, def:0 |
+| swamp | Poison Swamp | 4 | 0.55 | Zombie, Skeleton, Imp | vis:0.6, mag:+1, def:-1, poison:0.1 |
+| volcano | Volcanic Region | 10 | 0.50 | Diablo, Dragon, Inferno Elemental | vis:1.0, mag:+3, def:-2, fire:1 |
+| tundra | Frozen Tundra | 7 | 0.30 | Wolf, Mountain Giant, Wyvern, Beholder | vis:1.1, mag:-1, def:+2, cold:1 |
+| beach | Sunny Beach | 7 | 0.30 | Centaurus, Kraken, Sea Serpent, Mermaid | vis:1.1, mag:-1, def:+2, water:2 |
+| jungle | The Canopy | 8 | 0.30 | Gorilla Warrior, Jungle Tiger, Vine Serpent | vis:-2, mag:+3, def:+2, water:2 |
+| dungeon | Dungeon | 5 | 0.50 | Stone Golem, Warlock, Linchorn | vis:0.5, mag:+4, def:-2 |
+| catacomb | Catacomb | 5 | 0.50 | Stone Golem, Warlock, Linchorn | vis:0.5, mag:+4, def:-2 |
+| treasure_keep | Treasure Keep | 5 | 0.40 | Ancient Guardian, Treasure Guardian | vis:-1.0, mag:+3, def:-2 |
+| inferno | Inferno | 10 | 1.0 | Dragon King | vis:-2, mag:+3, def:-2, fire:2 |
+
+### 2.3 Descripciones Procedurales
+Cada bioma tiene 4-8 descripciones alternativas. Se selecciona una al azar al entrar:
+```javascript
+const desc = Array.isArray(loc.description) 
+  ? loc.description[Math.floor(Math.random() * loc.description.length)]
+  : loc.description;
+```
+
+## 3. Generación Procedural de Zonas
+
+### 3.1 Parámetros
+```javascript
+generateZone({
+  biome: "forest",      // Bioma base
+  idPrefix: "forest",   // Prefijo de IDs
+  rooms: 4,             // Número de salas
+  level: undefined      // Nivel (default: biome.minLevel)
+});
+```
+
+### 3.2 Algoritmo
+1. Crear N rooms con IDs secuenciales (`forest_1`, `forest_2`, ...)
+2. Asignar bioma, descripción random, encounterRate base
+3. Seleccionar enemigos del pool del bioma filtrados por levelRequirement
+4. Conectar rooms linealmente (este-oeste por defecto)
+
+### 3.3 Conexión de Zonas
+```javascript
+connectZones(world, fromId, toId, direction, reverseDirection);
+// Ejemplo:
+connectZones(world, 'town', 'forest_1', 'north', 'south');
+```
+
+## 4. Sistema de Jefes por Bioma
+
+### 4.1 Definición
+```javascript
+biomeBosses = {
+  forest: {
+    boss: "forest_titan",
+    miniBosses: ["alpha_wolf", "shaman_goblin"],
+    spawnChance: 0.10
+  },
+  // ... 7 biomas con jefes
+};
+```
+
+### 4.2 Lógica de Aparición
+```javascript
+// trySpawnBoss(biomeId)
+if (Math.random() > biome.spawnChance) return null;
+const isBoss = Math.random() < 0.3;  // 30% boss, 70% mini-boss
+return isBoss ? biome.boss : random(miniBosses);
+```
+
+### 4.3 Cooldown
+```javascript
+const BOSS_COOLDOWN = 8;  // Mínimo 8 movimientos entre apariciones
+_movesSinceLastBoss++;    // Incrementa en cada movimiento
+```
+
+## 5. NPCs y Questlines
+
+### 5.1 Estructura de NPC
+```javascript
+NPC_DATA = {
+  [npcId]: {
+    id, name, emoji, locationId, role, color, questId,
+    lore: string  // Descripción narrativa
+  }
+};
+```
+
+### 5.2 NPCs Implementados (6)
+| ID | Nombre | Ubicación | Quest | Rol |
+|----|--------|-----------|-------|-----|
+| elara | Elara la Vidente | town | explore_forest | Guardiana de Oakhaven |
+| valdris | Archimago Valdris | tower | collect_crystal | Archimago del Castillo |
+| brennan | Capitán Brennan | port | kill_pirates | Capitán de Saltwind Port |
+| eryndel | Guardiana Eryndel | garden_1 | collect_fairy_dust | Guardiana del Jardín |
+| theron | Theron el Explorador | mountain_1 | collect_ice_crystal | Explorador de Crestas |
+| pyrax | Pyrax, Guardián del Volcán | volcano_4 | defeat_dark_lord | Centinela del Volcán |
+
+### 5.3 Tipos de Misión
+```javascript
+QUEST_DATA = {
+  [questId]: {
+    title: { en, es },
+    type: "visit" | "collect" | "kill",
+    // visit: target (locationId)
+    // collect: item, qty, consumeItem
+    // kill: enemy, count
+    reward: { item?, xp?, gold? },
+    dialogues: {
+      inactive: [{en, es}, ...],  // Antes de aceptar
+      active: [{en, es}, ...],    // Durante
+      completed: [{en, es}, ...]  // Al completar
+    }
+  }
+};
+```
+
+### 5.4 Cadena de Misiones (Questline Principal)
+```
+town (Elara) --? forest_3 --? tower (Valdris) --? ruins_4 --? 
+port (Brennan) --? kill 3 pirates --? catacombs_1 --? 
+garden_1 (Eryndel) --? collect fairy_dust --? treasure_keep_1 --?
+mountain_1 (Theron) --? collect ice_crystal --? tundra_1 --?
+volcano_4 (Pyrax) --? dungeon_7 --? inferno_1 (Dragon King)
+```
+
+### 5.5 Sistema de Bloqueo de Zonas
+```javascript
+ZONE_GATES = {
+  ruin_4:       { item: "arcane_key",       msg: "..." },
+  catacomb_1:   { item: "navigation_chart", msg: "..." },
+  treasure_keep_1: { item: "garden_key",    msg: "..." },
+  tundra_1:     { item: "mountain_pass",    msg: "..." },
+  inferno_1:    { item: "dragon_key",       msg: "..." }
+};
+```
+
+## 6. Eventos de Viaje
+
+### 6.1 Sistema
+```javascript
+// getTravelEvent(biome) ? event object | null
+// showTravelEvent(event) ? Modal con elección
+```
+
+### 6.2 Tipos de Eventos (Implementados)
+- **Ambientales**: Descripciones especiales del bioma
+- **Encuentros**: NPCs viajeros, comerciantes
+- **Descubrimientos**: Tesoros escondidos, landmarks
+- **Peligros**: Trampas, clima severo, emboscadas
+
+## 7. Contenido Actual
+
+### 7.1 Métricas
+| Categoría | Cantidad |
+|-----------|----------|
+| Localizaciones (estáticas) | 20+ |
+| Localizaciones (generadas) | Ilimitadas (procedural) |
+| Enemigos base | 45+ |
+| Jefes de bioma | 7 principales + 14 mini |
+| Items | 300+ |
+| Recetas craft | 50+ |
+| Misiones | 6 principales |
+| NPCs | 6 |
+| Biomas | 14 |
+| Logros | 16 |
+| Entradas de journal | 9 |
+
+### 7.2 Progresión de Contenido
+| Horas | Contenido Desbloqueado |
+|-------|----------------------|
+| 0-1 | Town, Forest, Garden, primeros combates |
+| 1-3 | Cave, Swamp, primer jefe, crafting básico |
+| 3-6 | Mountain, Beach, Ruins, misiones intermedias |
+| 6-10 | Dungeon, Jungle, Volcano, jefes de área |
+| 10-15 | Tundra, Catacombs, Treasure Keep |
+| 15+ | Inferno, Dragon King, endgame |
+
+## 8. Problemas de Contenido
+
+### 8.1 Identificados
+1. **Misiones insuficientes**: Solo 6 para ~20 horas de juego
+2. **Endgame vacío**: Tras Dragon King no hay contenido
+3. **Procedural repetitivo**: generateZone() crea rooms idénticas
+4. **Lore disperso**: ENEMY_LORE, JOURNAL_ENTRIES, NPC lore no conectados
+5. **Falta de branching**: Questline es completamente lineal
+
+### 8.2 Soluciones Propuestas
+- [ ] **Side quests**: 20+ misiones secundarias por zona
+- [ ] **Procedural quests**: Generadas con templates
+- [ ] **Endless mode**: Dungeon infinito con dificultad escalante
+- [ ] **New Game+**: Reinicio con items/levels preservados
+- [ ] **Factions**: Sistema de reputación con NPCs
+- [ ] **Housing**: Base personalizable (decoración, storage)
+- [ ] **Pet system**: Compañeros con habilidades
+- [ ] **Seasonal events**: Contenido temporal
+

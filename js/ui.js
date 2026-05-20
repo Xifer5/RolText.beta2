@@ -10,6 +10,7 @@ import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
+import { t, localizeText } from "./i18n.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
 // El sistema busca en este orden:
@@ -116,6 +117,24 @@ function _setupRipple() {
   });
 }
 
+function _mobileSheetKeydown(event) {
+  if (event.key === 'Escape') {
+    _closeMobileSheet();
+  }
+}
+
+function _updateMobileSheetButtons(panelId) {
+  const buttons = {
+    mobileActionMenu: 'mob-inventoryBtn',
+    mobileMoveMenu: 'mob-moveMenuBtn',
+    mobilePanelMenu: 'mob-panelMenuBtn'
+  };
+  Object.values(buttons).forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.setAttribute('aria-expanded', btn.id === buttons[panelId] ? 'true' : 'false');
+  });
+}
+
 function _openMobileSheet(panelId) {
   const sheet = document.getElementById("mobileSheet");
   if (!sheet) return;
@@ -124,6 +143,8 @@ function _openMobileSheet(panelId) {
   document.querySelectorAll(".mobile-sheet-panel").forEach(panel => {
     panel.classList.toggle("hidden", panel.id !== panelId);
   });
+  _updateMobileSheetButtons(panelId);
+  document.addEventListener('keydown', _mobileSheetKeydown);
 }
 
 function _closeMobileSheet() {
@@ -131,6 +152,8 @@ function _closeMobileSheet() {
   if (!sheet) return;
   sheet.classList.add("hidden");
   sheet.setAttribute("aria-hidden", "true");
+  document.removeEventListener('keydown', _mobileSheetKeydown);
+  _updateMobileSheetButtons('');
 }
 
 /* ── Mobile nav — conectar botones ──────────────────────────── */
@@ -258,7 +281,7 @@ export function updateUI() {
   if (spRow) spRow.style.display = (p.statPoints > 0) ? "" : "none";
 
   const loc = window.worldMap?.[gameState.currentLocationId];
-  if (ui["location-name"]) ui["location-name"].textContent = loc?.name || gameState.currentLocationId;
+  if (ui["location-name"]) ui["location-name"].textContent = localizeText(loc?.name) || t("unknownLocation");
 
   // Enemy panel — boss detection + HP bar + debuffs
   if (gameState.currentEnemy) {
@@ -402,7 +425,7 @@ function updateLocationSubtitle(loc) {
     if (locImg.dataset.src !== src) {
       locImg.dataset.src = src;
       locImg.src = src;
-      locImg.alt = loc.name || "";
+      locImg.alt = localizeText(loc.name) || "";
       locImg.style.display = "";
     }
   }

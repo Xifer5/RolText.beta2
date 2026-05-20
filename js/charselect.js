@@ -5,6 +5,7 @@ import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
 import { gameState, resetState } from "./state.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
+import { t, formatText } from "./i18n.js";
 
 export function showCharacterSelect(onComplete) {
   // Remove existing if any
@@ -18,15 +19,15 @@ export function showCharacterSelect(onComplete) {
   modal.innerHTML = `
     <div class="modal-content" style="max-width:680px">
       <div class="modal-header">
-        <h2>⚔ Elige tu Destino</h2>
+        <h2>${t('characterSelectTitle')}</h2>
       </div>
       <p style="text-align:center;color:var(--c-muted);margin-bottom:20px;font-style:italic">
-        Tu elección define tu estilo de combate, habilidades únicas y desarrollo del personaje.
+        ${t('characterSelectDescription')}
       </p>
 
       <div class="name-row">
-        <label for="playerNameInput">Nombre del héroe</label>
-        <input type="text" id="playerNameInput" placeholder="Tu nombre..." maxlength="20" />
+        <label for="playerNameInput">${t('heroNameLabel')}</label>
+        <input type="text" id="playerNameInput" placeholder="${t('heroNamePlaceholder')}" maxlength="20" />
       </div>
 
       <div class="class-select-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin:var(--sp-5) 0">
@@ -48,10 +49,10 @@ export function showCharacterSelect(onComplete) {
       </div>
 
       <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
-        Comenzar aventura →
+        ${t('startAdventureButton')} →
       </button>
       <p style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--c-muted);font-style:italic" id="classSelectHint">
-        Selecciona una clase para continuar
+        ${t('selectClassHint')}
       </p>
     </div>
   `;
@@ -69,14 +70,14 @@ export function showCharacterSelect(onComplete) {
       const startBtn = document.getElementById("startAdventureBtn");
       startBtn.disabled = false;
       document.getElementById("classSelectHint").textContent =
-        `✓ ${CLASS_DEFINITIONS[selectedClass].name} seleccionado`;
+        `${t('classSelectedPrefix')} ${CLASS_DEFINITIONS[selectedClass].name} ${t('classSelectedSuffix')}`;
     });
   });
 
   // Start button
   document.getElementById("startAdventureBtn").addEventListener("click", () => {
     if (!selectedClass) return;
-    const name = document.getElementById("playerNameInput").value.trim() || "Aventurero";
+    const name = document.getElementById("playerNameInput").value.trim() || t('defaultPlayerName');
 
     resetState();
     gameState.player.name = name;
@@ -97,8 +98,12 @@ export function showCharacterSelect(onComplete) {
     modal.remove();
 
     const cls = CLASS_DEFINITIONS[selectedClass];
-    addMessage(`¡Bienvenido, ${name}! Has elegido el camino del ${cls.name}. ${cls.description_long}`, "system");
-    addMessage(`Empiezas con: STR ${gameState.player.strength} · AGI ${gameState.player.agility} · INT ${gameState.player.intelligence}`, "stat");
+    addMessage(formatText(t('characterSelectWelcome'), { name, className: cls.name, classDesc: cls.description_long }), "system");
+    addMessage(formatText(t('characterSelectStartingStats'), {
+      str: gameState.player.strength,
+      agi: gameState.player.agility,
+      intl: gameState.player.intelligence
+    }), "stat");
 
     updateUI();
 
@@ -107,7 +112,7 @@ export function showCharacterSelect(onComplete) {
     const profileRole = document.querySelector(".profile-role");
     const profileAvatar = document.querySelector(".profile-avatar");
     if (profileName) profileName.textContent = name;
-    if (profileRole) profileRole.textContent = `NIVEL 1 ${cls.name.toUpperCase()}`;
+    if (profileRole) profileRole.textContent = `${t('profileLevelPrefix')} 1 ${cls.name.toUpperCase()}`;
     if (profileAvatar) profileAvatar.textContent = cls.emoji;
 
     if (onComplete) onComplete();

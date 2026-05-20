@@ -8,7 +8,7 @@ import { addMessage } from "./story.js";
 import { initScrollManager } from "./scrollManager.js";
 import { setupPanelListeners } from "./panels.js";
 import { showCharacterSelect } from "./charselect.js";
-import { initLocalization, setLocale, getLocale, t } from "./i18n.js";
+import { initLocalization, setLocale, getLocale, t, localizeText } from "./i18n.js";
 import { setupKeyboard } from "./keyboard.js";
 import { initAudio, preloadSounds } from "./sounds.js";
 import { setupTravelEventModal } from "./travelEvents.js";
@@ -24,7 +24,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   try {
     const loc = window.worldMap?.[gameState.currentLocationId];
-    if (loc?.name) addMessage(`${t('locationIntro')} ${loc.name}: ${Array.isArray(loc.description) ? loc.description[0] : loc.description}`, "system");
+    if (loc?.name) {
+      const locationName = localizeText(loc.name);
+      const locationDesc = localizeText(Array.isArray(loc.description) ? loc.description[0] : loc.description);
+      addMessage(`${t('locationIntro')} ${locationName}: ${locationDesc}`, "system");
+    }
   } catch(e) {}
 
   setupMovement();
@@ -53,7 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
 // Wire New Game button to show character selection
 window.addEventListener("pixel:newGame", () => {
   showCharacterSelect(() => {
-    addMessage("¡Comienza tu aventura!", "system");
+    addMessage(t('adventureBeginMessage'), "system");
   });
 });
 

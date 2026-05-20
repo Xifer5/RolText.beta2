@@ -5,11 +5,12 @@ import { updateUI } from "./ui.js";
 import { playSound } from "./sounds.js";
 import { allItems } from "./items.js";
 import { checkAchievements } from "./achievements.js";
+import { t, formatText } from "./i18n.js";
 
 const TAB_META = {
-  forge:   { label: "⚒️ Forja",     desc: "Armas y armaduras" },
-  alchemy: { label: "⚗️ Alquimia",  desc: "Pociones y elixires" },
-  arcane:  { label: "🔮 Arcano",    desc: "Objetos encantados" }
+  forge:   { label: t('craftTabForge'),     desc: t('craftTabForgeDesc') },
+  alchemy: { label: t('craftTabAlchemy'),   desc: t('craftTabAlchemyDesc') },
+  arcane:  { label: t('craftTabArcane'),    desc: t('craftTabArcaneDesc') }
 };
 
 const RARITY_LABEL = {
@@ -24,7 +25,7 @@ function _matName(id) {
 function _recipesHTML(tab) {
   const recipes = craftingRecipes[tab] ?? {};
   if (!Object.keys(recipes).length) {
-    return `<div class="craft-empty">Sin recetas disponibles.</div>`;
+    return `<div class="craft-empty">${t('noRecipesAvailable')}</div>`;
   }
   return Object.entries(recipes).map(([key, r]) => {
     const craftable = canCraft(r, gameState.inventory, gameState.player.level).ok;
@@ -35,7 +36,7 @@ function _recipesHTML(tab) {
           <div class="craft-recipe-name">${r.name}</div>
           <div class="craft-rarity-tag rarity-${r.rarity}">${RARITY_LABEL[r.rarity] ?? r.rarity}</div>
         </div>
-        ${craftable ? `<span class="craft-can-dot" title="Puedes fabricar">✓</span>` : ""}
+        ${craftable ? `<span class="craft-can-dot" title="${t('youCanCraft')}">✓</span>` : ""}
       </div>`;
   }).join("");
 }
@@ -138,7 +139,7 @@ export function wireCraftingPanel(container) {
       const result = craftItem(recipe, gameState.inventory, gameState.player.level);
       if (result) {
         playSound("loot");
-        addMessage(`⚒️ Fabricaste: ${recipe.name}`, "loot");
+        addMessage(formatText(t('craftedItem'), { item: recipe.name }), "loot");
         checkAchievements();
         updateUI();
         refreshDetail();
@@ -156,7 +157,7 @@ export function wireCraftingPanel(container) {
       );
       refreshList();
       const detail = container.querySelector("#craftDetail");
-      if (detail) detail.innerHTML = `<div class="craft-empty">← Selecciona una receta para ver detalles</div>`;
+      if (detail) detail.innerHTML = `<div class="craft-empty">← ${t('selectRecipeToViewDetails')}</div>`;
     });
   });
 

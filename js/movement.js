@@ -8,6 +8,7 @@ import { playSound, playMusic } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
 import { trySpawnBoss } from "./biomeBosses.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
@@ -48,8 +49,8 @@ export function setupMovement() {
 export function handleMove(direction) {
   if (!direction) return;
   if (gameState.isGameOver) return;
-  if (gameState.isInCombat) { addMessage("¡No puedes moverte en combate!", "system"); return; }
-  if (gameState.isProcessingMove) { addMessage("Procesando tu movimiento... espera un momento.", "system"); return; }
+  if (gameState.isInCombat) { addMessage(t("cannotMoveCombat"), "system"); return; }
+  if (gameState.isProcessingMove) { addMessage(t("processingMove"), "system"); return; }
 
   gameState.isProcessingMove = true;
   updateUI();
@@ -57,7 +58,7 @@ export function handleMove(direction) {
   const cur = window.worldMap?.[gameState.currentLocationId];
   const nextId = cur?.exits?.[direction];
   if (!nextId || !window.worldMap[nextId]) {
-    addMessage("No puedes ir en esa dirección.", "system");
+    addMessage(t("cannotGoDirection"), "system");
     gameState.isProcessingMove = false;
     updateUI();
     return;
@@ -78,8 +79,8 @@ export function handleMove(direction) {
     // Consumir la llave al cruzar por primera vez
     gameState.inventory[gate.item]--;
     if (gameState.inventory[gate.item] <= 0) delete gameState.inventory[gate.item];
-    const keyName = allItems[gate.item]?.name ?? gate.item;
-    addMessage(`🗝️ Usas ${keyName} para abrir el paso.`, "loot");
+    const keyName = localizeText(allItems[gate.item]?.name ?? gate.item);
+    addMessage(formatText("usingKey", { item: keyName }), "loot");
   }
 
   // ── Mover al jugador ────────────────────────────────────────────
@@ -96,7 +97,10 @@ export function handleMove(direction) {
 
   const newLoc = window.worldMap[nextId];
 
-  addMessage(`Viajas hacia el ${dirLabel(direction)} hasta ${newLoc.name}.`, "narrative");
+  addMessage(formatText("travelTo", {
+    direction: dirLabel(direction),
+    location: localizeText(newLoc.name)
+  }), "narrative");
   const desc = Array.isArray(newLoc.description)
     ? newLoc.description[Math.floor(Math.random() * newLoc.description.length)]
     : newLoc.description;
@@ -106,9 +110,9 @@ export function handleMove(direction) {
   recordLocationVisit();
 
   // Contextual hints
-  if (newLoc.canRest)   addMessage("💤 Puedes descansar aquí (botón Rest).", "system");
+  if (newLoc.canRest)   addMessage(t("restHint"), "system");
   if (newLoc.id === "shop" || newLoc.id === "castle_shop" || newLoc.id === "port") {
-    addMessage("🛒 Tienda disponible (botón Shop).", "system");
+    addMessage(t("shopHint"), "system");
   }
 
   // ── Intentar aparición de jefe primero ────────────────────────────
@@ -123,7 +127,7 @@ export function handleMove(direction) {
       combatTarget = bossId;
       asBoss = true;
       _movesSinceLastBoss = 0;
-      addMessage(`⚠️ Una presencia oscura se acerca...`, "narrative");
+      addMessage(t("bossApproaches"), "narrative");
     }
   }
 
@@ -175,6 +179,6 @@ function normalizeDirection(direction) {
 }
 
 function dirLabel(dir) {
-  const map = { north:"norte", south:"sur", east:"este", west:"oeste", up:"arriba", down:"abajo", enter:"dentro", out:"afuera" };
-  return map[dir] || dir;
+  const key = `dir${String(dir || "").charAt(0).toUpperCase()}${String(dir || "").slice(1)}`;
+  return t(key) || dir || "";
 }

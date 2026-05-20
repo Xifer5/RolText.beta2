@@ -1,4 +1,5 @@
 import { addMessage } from "./story.js";
+import { t } from "./i18n.js";
 
 export const craftingRecipes = {
 
@@ -256,7 +257,7 @@ export function canCraft(recipe, inventory, playerLevel) {
 
 export function craftItem(recipe, inventory, playerLevel) {
   if (!canCraft(recipe, inventory, playerLevel).ok) {
-    addMessage("No puedes fabricar esto ahora.", "system");
+    addMessage(t('cannotCraftNow'), "system");
     return null;
   }
   for (const [mat, qty] of Object.entries(recipe.ingredients)) {

@@ -2,6 +2,7 @@ import { gameState, initializeGame } from "./state.js";
 import { updateUI, toggleMainMenu } from "./ui.js";
 import { saveGame, loadGame, deleteSave } from "./saveSystem.js";
 import { addMessage } from "./story.js";
+import { t } from "./i18n.js";
 
 export function setupMainMenuListeners() {
   /* pixel:openMenu — disparado desde teclado (tecla M) */
@@ -20,7 +21,6 @@ export function setupMainMenuListeners() {
 
   document.getElementById("saveGameBtn")?.addEventListener("click", () => {
     saveGame();
-    addMessage("Partida guardada.", "system");
   });
 
   document.getElementById("loadGameBtn")?.addEventListener("click", () => {
@@ -30,9 +30,9 @@ export function setupMainMenuListeners() {
   });
 
   document.getElementById("deleteSaveBtn")?.addEventListener("click", () => {
-    if (confirm("¿Borrar la partida guardada?")) {
+    if (confirm(t("confirmDeleteSave"))) {
       deleteSave();
-      addMessage("Partida eliminada.", "system");
+      addMessage(t("saveGameDeleted"), "system");
     }
   });
 

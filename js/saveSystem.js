@@ -1,6 +1,7 @@
 import { gameState, initialGameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { deepClone } from "./utils.js";
+import { t, formatText } from "./i18n.js";
 
 const SAVE_KEY = "pixelQuestSave";
 
@@ -12,18 +13,18 @@ export function saveGame() {
   try {
     const payload = { gameState, timestamp: new Date().toISOString(), version: "3.0" };
     localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
-    addMessage("💾 Partida guardada.", "system");
+    addMessage(t("saveGameSaved"), "system");
     window.dispatchEvent(new Event("pixel:saveChanged"));
     return true;
   } catch(e) {
-    addMessage("❌ Error al guardar.", "system");
+    addMessage(t("saveGameCorrupt"), "system");
     return false;
   }
 }
 
 export function loadGame() {
   const raw = localStorage.getItem(SAVE_KEY);
-  if (!raw) { addMessage("❌ Sin partida guardada.", "system"); return false; }
+  if (!raw) { addMessage(t("noSavedGame"), "system"); return false; }
   try {
     const parsed = JSON.parse(raw);
     if (!parsed.gameState) throw new Error("Formato inválido");
@@ -40,10 +41,10 @@ export function loadGame() {
       if (avatarEl && p.classEmoji) avatarEl.textContent = p.classEmoji;
     }, 100);
     window.dispatchEvent(new Event("pixel:stateUpdated"));
-    addMessage(`📂 Partida cargada. ¡Bienvenido de vuelta, ${gameState.player.name || "aventurero"}!`, "system");
+    addMessage(formatText("loadGameWelcome", { player: gameState.player.name || t("defaultPlayerName") }), "system");
     return true;
   } catch(e) {
-    addMessage("❌ Partida corrupta.", "system");
+    addMessage(t("saveGameCorrupt"), "system");
     return false;
   }
 }
