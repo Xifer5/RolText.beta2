@@ -222,6 +222,9 @@ export function updateUI() {
     hpWrap?.classList.toggle("hp-low",      hpPct <= 25 && hpPct > 10);
     hpWrap?.classList.toggle("hp-critical", hpPct <= 10);
   }
+  if (ui.screen) {
+    ui.screen.classList.toggle("low-hp-warning", hpPct <= 25);
+  }
   if (ui["hp-text"]) ui["hp-text"].textContent = `${p.hp}/${hpMax}`;
   if (ui["mp-bar"]) ui["mp-bar"].style.width = `${mpPct}%`;
   if (ui["mp-text"]) ui["mp-text"].textContent = `${p.mp}/${mpMax}`;

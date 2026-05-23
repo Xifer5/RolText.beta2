@@ -210,16 +210,33 @@ function showItemDetails(itemId, item) {
   detailDesc.textContent = localizeText(item.description) || formatText(t('defaultItemDetail'), { item: localizeText(item.name) });
 
   detailAttrs.innerHTML = '';
-  const pushAttr = (text) => { const li = document.createElement('li'); li.textContent = text; detailAttrs.appendChild(li); };
-  if (item.attack) pushAttr(formatText(t('attrAttack'), { value: item.attack }));
-  if (item.defense) pushAttr(formatText(t('attrDefense'), { value: item.defense }));
-  if (item.intelligence) pushAttr(formatText(t('attrIntelligence'), { value: item.intelligence }));
-  if (item.strength) pushAttr(formatText(t('attrStrength'), { value: item.strength }));
-  if (item.agility) pushAttr(formatText(t('attrAgility'), { value: item.agility }));
-  if (item.magic) pushAttr(formatText(t('attrMagic'), { value: item.magic }));
+  const equipped = item.slot ? gameState.equipment[item.slot] : null;
+  const pushAttr = (text, itemVal, statName) => {
+    const li = document.createElement('li');
+    let extra = '';
+    if (equipped && statName && typeof itemVal === 'number') {
+      const eqVal = equipped[statName] || 0;
+      const diff = itemVal - eqVal;
+      if (diff > 0) {
+        extra = ` <span class="stat-diff-positive">(+${diff} vs equipado)</span>`;
+      } else if (diff < 0) {
+        extra = ` <span class="stat-diff-negative">(${diff} vs equipado)</span>`;
+      }
+    }
+    li.innerHTML = `${text}${extra}`;
+    detailAttrs.appendChild(li);
+  };
+
+  if (item.attack) pushAttr(formatText(t('attrAttack'), { value: item.attack }), item.attack, 'attack');
+  if (item.defense) pushAttr(formatText(t('attrDefense'), { value: item.defense }), item.defense, 'defense');
+  if (item.intelligence) pushAttr(formatText(t('attrIntelligence'), { value: item.intelligence }), item.intelligence, 'intelligence');
+  if (item.strength) pushAttr(formatText(t('attrStrength'), { value: item.strength }), item.strength, 'strength');
+  if (item.agility) pushAttr(formatText(t('attrAgility'), { value: item.agility }), item.agility, 'agility');
+  if (item.magic) pushAttr(formatText(t('attrMagic'), { value: item.magic }), item.magic, 'magic');
+  if (item.hpBonus) pushAttr(formatText(t('attrMaxHpBonus'), { value: item.hpBonus }), item.hpBonus, 'hpBonus');
+  
   if (item.restoreHp) pushAttr(formatText(t('attrRestoreHp'), { value: item.restoreHp }));
   if (item.restoreMp) pushAttr(formatText(t('attrRestoreMp'), { value: item.restoreMp }));
-  if (item.hpBonus) pushAttr(formatText(t('attrMaxHpBonus'), { value: item.hpBonus }));
   if (item.effect) pushAttr(formatText(t('attrEffect'), { effect: item.effect.replace('_', ' '), potency: item.potency || '' }));
   if (item.price) pushAttr(formatText(t('attrPrice'), { value: item.price }));
 
