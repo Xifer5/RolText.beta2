@@ -12,6 +12,7 @@
 // Asegúrate de tener esos archivos en la misma carpeta o ajustar rutas.
 
 import { allItems, shopInventory, shopInventories } from "./items.js";
+import { t, formatText, localizeText } from "./i18n.js";
 import { enemyData } from "./enemies.js";
 import worldMap from "./worldMap.js";
 import { biomes } from "./biomes.js";
@@ -175,7 +176,7 @@ function addItem(item) {
 
   // ahora sí, añadir
   gameState.inventory[item.id] = (gameState.inventory[item.id] || 0) + 1;
-  addMessage(`Obtained ${item.name}.`, "loot");
+  addMessage(formatText('lootObtained', { items: localizeText(item.name) }), "loot");
 }
 
 function removeItem(itemId, amount = 1) {
@@ -194,14 +195,14 @@ function useItem(itemId, item) {
   if (!item) return;
 
   if (item.type === "consumable") {
-    if (item.id === "health_potion") {
+      if (item.id === "health_potion") {
       const stats = calculateTotalStats(gameState.player, gameState.equipment);
       gameState.player.hp = Math.min(gameState.player.hp + 25, stats.maxHp);
-      addMessage("Used Health Potion! Restored 25 HP.", "stat");
+      addMessage(formatText('usedItemRestoreHp', { item: localizeText(item.name), amount: 25 }), "stat");
     } else if (item.id === "mana_potion") {
       const stats = calculateTotalStats(gameState.player, gameState.equipment);
       gameState.player.mp = Math.min(gameState.player.mp + 10, stats.maxMp);
-      addMessage("Used Mana Potion! Restored 10 MP.", "stat");
+      addMessage(formatText('usedItemRestoreMp', { item: localizeText(item.name), amount: 10 }), "stat");
     }
 
     removeItem(itemId, 1);
@@ -213,7 +214,7 @@ function useItem(itemId, item) {
 
     gameState.equipment[item.slot] = item;
     removeItem(itemId, 1);
-    addMessage(`Equipped ${item.name}!`, "stat");
+    addMessage(formatText('equippedItem', { item: localizeText(item.name) }), "stat");
   }
 
   updateInventoryModal();

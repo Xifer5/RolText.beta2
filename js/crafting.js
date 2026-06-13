@@ -5,7 +5,7 @@ import { updateUI } from "./ui.js";
 import { playSound } from "./sounds.js";
 import { allItems } from "./items.js";
 import { checkAchievements } from "./achievements.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 const TAB_META = {
   forge:   { label: t('craftTabForge'),     desc: t('craftTabForgeDesc') },
@@ -14,12 +14,19 @@ const TAB_META = {
 };
 
 const RARITY_LABEL = {
-  common: "Común", uncommon: "Poco común", rare: "Raro",
-  epic: "Épico", legendary: "Legendario"
+  common: { en: "Common", es: "Común" },
+  uncommon: { en: "Uncommon", es: "Poco común" },
+  rare: { en: "Rare", es: "Raro" },
+  epic: { en: "Epic", es: "Épico" },
+  legendary: { en: "Legendary", es: "Legendario" }
 };
 
+function rarityLabel(rarity) {
+  return localizeText(RARITY_LABEL[rarity] ?? { en: rarity, es: rarity });
+}
+
 function _matName(id) {
-  return allItems[id]?.name ?? id.replace(/_/g, " ");
+  return localizeText(allItems[id]?.name) ?? id.replace(/_/g, " ");
 }
 
 function _recipesHTML(tab) {
@@ -34,7 +41,7 @@ function _recipesHTML(tab) {
         <span class="craft-recipe-icon">${r.icon ?? "⚙️"}</span>
         <div class="craft-recipe-info">
           <div class="craft-recipe-name">${r.name}</div>
-          <div class="craft-rarity-tag rarity-${r.rarity}">${RARITY_LABEL[r.rarity] ?? r.rarity}</div>
+          <div class="craft-rarity-tag rarity-${r.rarity}">${rarityLabel(r.rarity)}</div>
         </div>
         ${craftable ? `<span class="craft-can-dot" title="${t('youCanCraft')}">✓</span>` : ""}
       </div>`;
@@ -66,24 +73,24 @@ function _detailHTML(tab, recipeKey) {
   if (r.agility)      stats.push(`🏃 AGI +${r.agility}`);
   if (r.intelligence) stats.push(`🔮 INT +${r.intelligence}`);
   if (r.hpBonus)      stats.push(`❤️ MaxHP +${r.hpBonus}`);
-  if (r.restoreHp)    stats.push(`💊 Cura ${r.restoreHp} HP`);
-  if (r.restoreMp)    stats.push(`💧 Restaura ${r.restoreMp} MP`);
+  if (r.restoreHp)    stats.push(`💊 ${t('attrRestoreHp', { value: r.restoreHp })}`);
+  if (r.restoreMp)    stats.push(`💧 ${t('attrRestoreMp', { value: r.restoreMp })}`);
 
   return `
     <div class="craft-detail-card">
       <div class="craft-detail-header">
         <span class="craft-detail-icon">${recipe.icon ?? "⚙️"}</span>
         <div>
-          <div class="craft-detail-name">${recipe.name}</div>
-          <span class="craft-rarity-tag rarity-${recipe.rarity}">${RARITY_LABEL[recipe.rarity] ?? recipe.rarity}</span>
+          <div class="craft-detail-name">${localizeText(recipe.name) || recipe.name}</div>
+          <span class="craft-rarity-tag rarity-${recipe.rarity}">${localizeText(RARITY_LABEL[recipe.rarity] ?? { en: recipe.rarity, es: recipe.rarity })}</span>
         </div>
       </div>
       ${stats.length ? `<div class="craft-result-stats">${stats.join(" &nbsp;·&nbsp; ")}</div>` : ""}
-      <div class="craft-section-label">Materiales necesarios</div>
+      <div class="craft-section-label">${t('craftingMaterialsLabel')}</div>
       <ul class="craft-mats-list">${mats}</ul>
-      ${!levelOk ? `<p class="craft-level-warn">🔒 Requiere nivel ${recipe.levelReq}</p>` : ""}
+      ${!levelOk ? `<p class="craft-level-warn">🔒 ${formatText('craftingRequiresLevel', { level: recipe.levelReq })}</p>` : ""}
       <button id="craftBtn" class="btn ${craftable ? "" : "outlined"}" ${craftable ? "" : "disabled"}>
-        ${craftable ? `${recipe.icon ?? "⚒️"} Fabricar ${recipe.name}` : "Materiales insuficientes"}
+        ${craftable ? `${recipe.icon ?? "⚒️"} ${formatText('craftButton', {})} ${recipe.name}` : t('craftingInsufficientMaterials')}
       </button>
     </div>`;
 }

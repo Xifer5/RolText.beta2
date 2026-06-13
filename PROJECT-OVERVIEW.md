@@ -40,3 +40,26 @@ A browser-based text RPG with a Material Design 3 visual shell and a responsive 
 - Use `PROJECT-OVERVIEW.md` as your first reference when planning tasks.
 - Propose minimal, modular layout or style changes that improve readability and immersion.
 - Document design decisions in markdown when adding new UI patterns.
+
+## Current M3 Implementation Status
+
+### ✅ Priority 1 — Core M3 Polish (COMPLETE)
+All core UI elements have been polished with proper M3 interaction patterns:
+- **Topbar**: Icon buttons now have scale transforms (1.05 hover, 0.98 active) with dynamic borders
+- **Enemy panel**: Enhanced with 2px red border, gradient background, elevated shadow, and portrait glow
+- **Mobile header**: Improved padding, border emphasis, and gradient background
+- **Story filters**: Better visibility with solid backgrounds and enhanced active states
+- **Focus rings**: Consistent keyboard navigation across all interactive elements
+
+### ✅ Priority 2 — Visual System Consistency (COMPLETE)
+Visual hierarchy and depth now consistent across all panels and controls:
+- **Button state layers**: All buttons follow M3 pressed state pattern with inset shadows
+- **Surface gradients**: Skill panel, buff bar, story log, and mobile card use elevation gradients
+- **Badges & chips**: Consistent semantic colors with transparent borders
+- **Modal surfaces**: Enhanced backdrop blur and opacity for better modal emphasis
+- **Location hero**: Smooth elevation transitions on button interactions
+
+### ⏳ Priority 3 — Documentation & Refinement (IN PROGRESS)
+- See `UI-TASKS.md`, `M3-AUDIT.md`, and `DESIGN-GUIDELINES.md` for detailed status and patterns
+- Component patterns and interaction guidelines are now documented
+- Remaining tasks: modular CSS utilities, accessibility review, final refinements

@@ -3,6 +3,7 @@ import { createIconElement } from "./utils.js";
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
+import { t, formatText } from "./i18n.js";
 
 export function renderShop() {
   const buyList  = document.getElementById("shopBuyList");
@@ -17,7 +18,7 @@ export function renderShop() {
   const locId = gameState.currentLocationId;
   const worldRef = window.worldMap?.[locId];
   const titleEl = document.querySelector("#shopModal .modal-content h2");
-  if (titleEl) titleEl.textContent = `🛒 ${worldRef?.name || "Tienda"}`;
+  if (titleEl) titleEl.textContent = worldRef?.name || t('shopModalTitle');
 
   // Base inventory + class-specific bonus items
   const base = shopInventories[locId] || shopInventories.shop || [];
@@ -45,7 +46,7 @@ export function renderShop() {
   }
 
   if (!hasItems) {
-    sellList.innerHTML = `<li style="justify-content:center;color:var(--md-on-surface-var);font-style:italic">Sin objetos para vender</li>`;
+    sellList.innerHTML = `<li style="justify-content:center;color:var(--md-on-surface-var);font-style:italic">${t('shopNoItemsToSell')}</li>`;
   }
 }
 
@@ -78,7 +79,7 @@ function makeShopItem(item, mode, qty, price) {
 
   const btn = document.createElement("button");
   btn.className = "btn small shop-btn";
-  btn.textContent = mode === "buy" ? "Comprar" : "Vender";
+  btn.textContent = mode === "buy" ? t('shopBuyButton') : t('shopSellButton');
   if (mode === "sell") { btn.className += " tonal"; }
 
   li.appendChild(icon);
@@ -97,23 +98,23 @@ function buildAttrString(item) {
   if (item.agility)    parts.push(`AGI +${item.agility}`);
   if (item.intelligence) parts.push(`INT +${item.intelligence}`);
   if (item.hpBonus)    parts.push(`MaxHP +${item.hpBonus}`);
-  if (item.restoreHp)   parts.push(`HP +${item.restoreHp}`);
-  if (item.restoreMp)   parts.push(`MP +${item.restoreMp}`);
-  if (item.curesPoison) parts.push("Cura Veneno");
-  if (item.curesBurn)   parts.push("Cura Quemadura");
-  if (item.curesAll)    parts.push("Cura todos los efectos");
+  if (item.restoreHp)   parts.push(formatText('shopRestoresHp', { value: item.restoreHp }));
+  if (item.restoreMp)   parts.push(formatText('shopRestoresMp', { value: item.restoreMp }));
+  if (item.curesPoison) parts.push(t('shopCuresPoison'));
+  if (item.curesBurn)   parts.push(t('shopCuresBurn'));
+  if (item.curesAll)    parts.push(t('shopCuresAllEffects'));
   return parts.join(" · ");
 }
 
 export function buyItem(item) {
   if ((gameState.player.gold||0) < item.price) {
-    addMessage("¡No tienes suficiente oro!", "system");
-    showFloatingText("Sin oro", window.innerWidth/2, window.innerHeight/2, "#fbbf24");
+    addMessage(t('shopNoGold'), "system");
+    showFloatingText(t('shopNoGoldFloat'), window.innerWidth/2, window.innerHeight/2, "#fbbf24");
     return false;
   }
   gameState.player.gold -= item.price;
   addItemToInventory(gameState.inventory, item.id, 1);
-  addMessage(`Compras: ${item.name} por ${item.price} 🪙`, "shop");
+  addMessage(formatText('shopBuyMessage', { item: item.name, price: item.price }), "shop");
   renderShop();
   updateUI();
   return true;
@@ -125,12 +126,12 @@ function showFloatingText(text, x, y, color) {
 
 export function sellItem(itemId, price) {
   if (!removeItemFromInventory(gameState.inventory, itemId)) {
-    addMessage("No tienes ese objeto.", "system");
+    addMessage(t('shopNoItem'), "system");
     return false;
   }
   const item = allItems[itemId] || { name: itemId };
   gameState.player.gold += price;
-  addMessage(`Vendes: ${item.name} por ${price} 🪙`, "shop");
+  addMessage(formatText(t('shopSellMessage'), { item: item.name, price }), "shop");
   renderShop();
   updateUI();
   return true;

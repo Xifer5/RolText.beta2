@@ -93,7 +93,7 @@ export function startCombat(enemyType, isBoss = false) {
 
   if (isBoss) {
     addMessage(formatText(t('bossAppears'), { enemy: gameState.currentEnemy.type }), "combat");
-    showFloatingText("⚠ JEFE", window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
+    showFloatingText(t('bossAlert'), window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");
   }
@@ -157,7 +157,7 @@ async function playerMagic() {
 
   if ((gameState.player.mp || 0) < cost) {
     addMessage(t('notEnoughMana'), "system");
-    showFloatingText("Sin Maná", window.innerWidth/2, window.innerHeight/2, "#818cf8");
+    showFloatingText(t('noMana'), window.innerWidth/2, window.innerHeight/2, "#818cf8");
     return;
   }
 
@@ -497,5 +497,5 @@ function levelUp() {
     saveGame();
     showToast(t('autoSaveToast'));
   }, 1200);
-  showFloatingText("¡LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em");
+  showFloatingText(t('levelUpText') || "⭐ LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em");
 }

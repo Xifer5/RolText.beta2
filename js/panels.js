@@ -8,6 +8,7 @@ import { calculateTotalStats } from "./stats.js";
 import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, getAvailableSkills } from "./classes.js";
 import { renderJournal } from "./journal.js";
 import { renderBestiary } from "./bestiary.js";
+import { t, formatText } from "./i18n.js";
 
 const CLASS_AVATARS = {
   warrior: "img/avatar_warrior.png",
@@ -87,8 +88,8 @@ function renderAttributes() {
           <span class="avatar-emoji" ${cls && CLASS_AVATARS[p.class] ? 'style="display:none"' : ''}>${cls ? cls.emoji : '⚔️'}</span>
         </div>
         <div class="player-info">
-          <div class="player-name">${p.name || 'Aventurero'}</div>
-          <div class="player-level">Nv. ${p.level} ${cls ? cls.name : 'Sin Clase'}</div>
+          <div class="player-name">${p.name || t('defaultPlayerName')}</div>
+          <div class="player-level">Nv. ${p.level} ${cls ? cls.name : t('noClassSelected')}</div>
         </div>
       </div>
       ${cls ? `
@@ -99,21 +100,21 @@ function renderAttributes() {
             <div class="class-badge-desc">${cls.description_long}</div>
           </div>
         </div>
-      ` : `<div class="class-badge">⚔️ Sin clase — inicia un nuevo juego para elegir</div>`}
+      ` : `<div class="class-badge">⚔️ ${t('noClassSelected')}</div>`}
 
-      <h3 class="attr-section">Vitalidad</h3>
+      <h3 class="attr-section">${t('statPanelVitality')}</h3>
       ${statBar("❤️ HP", p.hp, derived.maxHp || p.maxHp, "#ef4444")}
       ${statBar("💧 MP", p.mp, derived.maxMp || p.maxMp, "#818cf8")}
       ${statBar("⭐ XP", p.experience, p.nextLevelXp, "#fbbf24")}
 
-      <h3 class="attr-section">Atributos Base</h3>
+      <h3 class="attr-section">${t('statPanelBaseAttributes')}</h3>
       <div class="attr-chips">
         ${statChip("💪", "Fuerza", p.strength, strBonus)}
         ${statChip("🏃", "Agilidad", p.agility, agiBonus)}
         ${statChip("🔮", "Inteligencia", p.intelligence, intBonus)}
       </div>
 
-      <h3 class="attr-section">Estadísticas Derivadas</h3>
+      <h3 class="attr-section">${t('statPanelDerivedStats')}</h3>
       <div class="attr-chips">
         ${statChip("⚔️", "Ataque", derived.attack, 0)}
         ${statChip("🛡️", "Defensa", derived.defense, 0)}
@@ -122,15 +123,15 @@ function renderAttributes() {
 
       ${p.statPoints > 0 ? `
         <div class="attr-points-banner">
-          ⚡ Tienes <strong>${p.statPoints}</strong> puntos de estadística sin gastar
+          ${formatText('statPanelUnspentPoints', { points: p.statPoints })}
           <button class="btn small" onclick="document.getElementById('statsBtn')?.click();document.getElementById('panelModal')?.classList.add('hidden')">
-            Mejorar stats →
+            ${t('statPanelUpgradeButton')}
           </button>
         </div>
       ` : ""}
 
       ${(unlockedBonuses || lockedBonuses) ? `
-        <h3 class="attr-section">Bonificaciones de Clase</h3>
+        <h3 class="attr-section">${t('statPanelClassBonuses')}</h3>
         <div class="level-bonuses">
           ${unlockedBonuses}
           ${lockedBonuses}
@@ -174,7 +175,7 @@ function renderEquipment() {
         <span class="equip-emoji">${slot.emoji}</span>
         <div class="equip-info">
           <span class="equip-slot-label">${slot.label}</span>
-          <span class="equip-item-name">${item ? item.name : "— Vacío —"}</span>
+          <span class="equip-item-name">${item ? item.name : t('emptySlot')}</span>
           ${attrs.length ? `<span class="equip-attrs">${attrs.join(" · ")}</span>` : ""}
         </div>
         ${item ? `<button class="btn small outlined" data-unequip="${slot.id}">✕</button>` : ""}
@@ -182,7 +183,7 @@ function renderEquipment() {
     `;
   }).join("");
 
-  openPanel("🛡️ Equipamiento", `
+  openPanel(t('equipmentPanelTitle'), `
     <div class="equip-panel">
       <div class="equip-summary">
         <div class="equip-sum-stat">⚔️ ${derived.attack}<small>ATK</small></div>
@@ -191,7 +192,7 @@ function renderEquipment() {
         <div class="equip-sum-stat">❤️ ${derived.maxHp}<small>HP máx</small></div>
       </div>
       <div class="equip-slots">${slotRows}</div>
-      <p class="muted" style="text-align:center;margin-top:var(--sp-4)">Para equipar objetos, ve al Inventario y usa el botón Equipar.</p>
+      <p class="muted" style="text-align:center;margin-top:var(--sp-4)">${t('equipmentEmptyHint')}</p>
     </div>
   `);
 
@@ -205,7 +206,7 @@ function renderEquipment() {
         if (!gameState.inventory[item.id]) gameState.inventory[item.id] = 0;
         gameState.inventory[item.id]++;
         gameState.equipment[slot] = null;
-        addMessage(`Desequipaste: ${item.name}`, "system");
+        addMessage(formatText('equipmentUnequipMessage', { item: item.name }), "system");
         updateUI();
         renderEquipment(); // re-render
       }
@@ -224,7 +225,7 @@ function renderSpellbook() {
   const classColor = clsDef?.color || "#d0bcff";
 
   if (!cls) {
-    openPanel("📖 Grimorio", `<div class="spell-empty"><p>Selecciona una clase al iniciar el juego para desbloquear habilidades.</p></div>`);
+    openPanel(t('spellbookTitle'), `<div class="spell-empty"><p>${t('spellbookNoClass')}</p></div>`);
     return;
   }
 
@@ -246,15 +247,15 @@ function renderSpellbook() {
           <button class="btn small ${canCast ? "" : "outlined"} spell-cast-btn"
             data-skill="${skill.id}"
             ${!canCast ? "disabled" : ""}
-            ${!gameState.isInCombat ? "title='Solo en combate'" : ""}>
-            ${gameState.isInCombat ? (canCast ? "⚡ Lanzar en combate" : "Sin maná") : "⚡ (solo en combate)"}
+            ${!gameState.isInCombat ? `title='${t('spellbookOnlyInCombat')}'` : ""}>
+            ${gameState.isInCombat ? (canCast ? t('spellbookCastCombat') : t('noMana')) : t('spellbookOnlyInCombat')}
           </button>
-        ` : `<p class="spell-locked-msg">🔒 Se desbloquea en nivel ${skill.levelReq}</p>`}
+        ` : `<p class="spell-locked-msg">${formatText('spellbookLockedSkill', { level: skill.levelReq })}</p>`}
       </div>
     `;
   }).join("");
 
-  openPanel("📖 Grimorio de Habilidades", `
+  openPanel(t('spellbookTitle'), `
     <div class="spellbook-panel">
       <div class="spell-class-header" style="border-color:${classColor}">
         <span style="font-size:1.8rem">${clsDef.emoji}</span>
@@ -274,7 +275,7 @@ function wireSpellbookButtons(container) {
     btn.addEventListener("click", () => {
       const skillId = btn.dataset.skill;
       if (!gameState.isInCombat) {
-        addMessage("Solo puedes usar habilidades en combate.", "system");
+        addMessage(t('onlyInCombat'), "system");
         return;
       }
       window.dispatchEvent(new CustomEvent("pixel:useSkill", { detail: { skillId } }));

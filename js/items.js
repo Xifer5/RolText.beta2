@@ -7,8 +7,8 @@ export const allItems = {
   // Pociones
   health_potion: {
     id: "health_potion",
-    name: "Health Potion",
-    description: "Restores 25 HP.",
+    name: { en: "Health Potion", es: "Poción de Salud" },
+    description: { en: "Restores 25 HP.", es: "Restaura 25 HP." },
     restoreHp: 25,
     icon: "./img/potionRed.png",
     type: "consumable",
@@ -16,8 +16,8 @@ export const allItems = {
   },
   mana_potion: {
     id: "mana_potion",
-    name: "Mana Potion",
-    description: "Restores 10 MP.",
+    name: { en: "Mana Potion", es: "Poción de Maná" },
+    description: { en: "Restores 10 MP.", es: "Restaura 10 MP." },
     restoreMp: 20,
     icon: "./img/potionBlue.png",
     type: "consumable",
@@ -25,7 +25,7 @@ export const allItems = {
   },
   healing_elixir: {
     id: "healing_elixir",
-    name: "Healing Elixir",
+    name: { en: "Healing Elixir", es: "Elixir de Curación" },
     type: "consumable",
     rarity: "rare",
     restoreHp: 60,
@@ -35,7 +35,7 @@ export const allItems = {
 
   mana_elixir: {
     id: "mana_elixir",
-    name: "Mana Elixir",
+    name: { en: "Mana Elixir", es: "Elixir de Maná" },
     type: "consumable",
     rarity: "uncommon",
     restoreMp: 50,
@@ -44,7 +44,7 @@ export const allItems = {
   },
   greater_elixir: {
     id: "greater_elixir",
-    name: "Greater Elixir",
+    name: { en: "Greater Elixir", es: "Elixir Superior" },
     type: "consumable",
     rarity: "rare",
     restoreHp: 100,
@@ -54,8 +54,8 @@ export const allItems = {
   },
   antidote: {
     id: "antidote",
-    name: "Antídoto",
-    description: "Cura el veneno.",
+    name: { en: "Antidote", es: "Antídoto" },
+    description: { en: "Cures poison.", es: "Cura el veneno." },
     type: "consumable",
     curesPoison: true,
     icon: "💚",
@@ -63,8 +63,8 @@ export const allItems = {
   },
   remedy: {
     id: "remedy",
-    name: "Remedio",
-    description: "Cura la quemadura.",
+    name: { en: "Remedy", es: "Remedio" },
+    description: { en: "Cures burn.", es: "Cura la quemadura." },
     type: "consumable",
     curesBurn: true,
     icon: "🧊",
@@ -72,8 +72,8 @@ export const allItems = {
   },
   panacea: {
     id: "panacea",
-    name: "Panacea",
-    description: "Cura todos los efectos negativos y restaura 20 HP.",
+    name: { en: "Panacea", es: "Panacea" },
+    description: { en: "Cures all negative effects and restores 20 HP.", es: "Cura todos los efectos negativos y restaura 20 HP." },
     type: "consumable",
     rarity: "uncommon",
     curesAll: true,
@@ -84,7 +84,7 @@ export const allItems = {
   //weapons
   goblin_dagger: {
     id: "goblin_dagger",
-    name: "Goblin Dagger",
+    name: { en: "Goblin Dagger", es: "Daga Goblin" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
@@ -94,8 +94,8 @@ export const allItems = {
   },
   sword: {
     id: "sword",
-    name: "Sword",
-    description: "A sturdy blade. +5 ATK",
+    name: { en: "Sword", es: "Espada" },
+    description: { en: "A sturdy blade. +5 ATK", es: "Una hoja resistente. +5 ATK" },
     slot: "rightHand",
     type: "weapon",
     attack: 4,
@@ -104,8 +104,8 @@ export const allItems = {
   },
   axe: {
     id: "axe",
-    name: "Axe",
-    description: "A heavy axe. +7 ATK",
+    name: { en: "Axe", es: "Hacha" },
+    description: { en: "A heavy axe. +7 ATK", es: "Un hacha pesada. +7 ATK" },
     slot: "rightHand",
     type: "weapon",
     attack: 5,
@@ -114,8 +114,8 @@ export const allItems = {
   },
   hammer: {
     id: "hammer",
-    name: "Hammer",
-    description: "A heavy hammer. +9 ATK",
+    name: { en: "Hammer", es: "Martillo" },
+    description: { en: "A heavy hammer. +9 ATK", es: "Un martillo pesado. +9 ATK" },
     slot: "rightHand",
     type: "weapon",
     attack: 6,
@@ -124,7 +124,7 @@ export const allItems = {
   },
   vine_whip: {
     id: "vine_whip",
-    name: "Vine Whip",
+    name: { en: "Vine Whip", es: "Látigo de Vid" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -133,7 +133,7 @@ export const allItems = {
   },
   giant_club: {
     id: "giant_club",
-    name: "Giant Club",
+    name: { en: "Giant Club", es: "Club Gigante" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -143,7 +143,7 @@ export const allItems = {
   },
   cutlass: {
     id: "cutlass",
-    name: "Cutlass",
+    name: { en: "Cutlass", es: "Alfanje" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -162,7 +162,7 @@ export const allItems = {
   },
   tiger_blade: {
     id: "tiger_blade",
-    name: "Tiger Blade",
+    name: { en: "Tiger Blade", es: "Hoja Tigre" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -173,7 +173,7 @@ export const allItems = {
 
   captain_sword: {
     id: "captain_sword",
-    name: "Captain Sword",
+    name: { en: "Captain Sword", es: "Espada del Capitán" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -183,7 +183,7 @@ export const allItems = {
   },
   serpent_sword: {
     id: "serpent_sword",
-    name: "Serpent Sword",
+    name: { en: "Serpent Sword", es: "Espada Serpiente" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -193,7 +193,7 @@ export const allItems = {
   },
   crystal_blade: {
     id: "crystal_blade",
-    name: "Crystal Blade",
+    name: { en: "Crystal Blade", es: "Hoja de Cristal" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -206,7 +206,7 @@ export const allItems = {
 
   royal_sword: {
     id: "royal_sword",
-    name: "Royal Sword",
+    name: { en: "Royal Sword", es: "Espada Real" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -216,7 +216,7 @@ export const allItems = {
   },
   katana: {
     id: "katana",
-    name: "Katana",
+    name: { en: "Katana", es: "Katana" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
@@ -226,7 +226,7 @@ export const allItems = {
   },
   demon_blade: {
     id: "demon_blade",
-    name: "Demon Blade",
+    name: { en: "Demon Blade", es: "Hoja Demonio" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -1181,8 +1181,8 @@ export const allItems = {
 
   iron_ore: {
     id: "iron_ore",
-    name: "Iron Ore",
-    type: "material",
+    name: { en: "Divine Sword", es: "Espada Divina" },
+    description: { en: "A divine weapon. +20 ATK", es: "Un arma divina. +20 ATK" },
     rarity: "common",
     price: 5,
     icon: "./img/ironOre.png",
@@ -1191,8 +1191,8 @@ export const allItems = {
   bat_wing: {
     id: "bat_wing",
     name: "Bat Wing",
-    type: "material",
-    rarity: "uncommon",
+    name: { en: "Excalibur", es: "Excalibur" },
+    description: { en: "An EPIC divine weapon. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF", es: "Un arma divina ÉPICA. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF" },
     price: 8,
     icon: "./img/batWing.png",
   },

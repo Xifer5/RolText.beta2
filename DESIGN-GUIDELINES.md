@@ -29,12 +29,48 @@ This document captures the design and workflow principles for Pixel Quest Echoes
 - Ensure responsive scaling by using fluid widths and hidden mobile-only sections.
 - Avoid overcrowding the center game area; keep story panels and buttons separated.
 
-## UI components to prioritize
-- Topbar navigation: ensure active tab states are visible and accessible.
-- Sidebar vitals: make HP, MP, XP bars clear and meaningful at a glance.
-- Location hero: blend image, title, and action button with M3 surface styling.
-- Mobile header: preserve compact vitals and avoid hidden content.
-- Story log and filters: keep filters visible and maintain readable text flow.
+## UI components to prioritize — STATUS & IMPROVEMENTS
+- ✅ **Topbar navigation**: Active tab states with visual feedback, icon buttons with scale & border dynamics
+- ✅ **Sidebar vitals**: HP, MP, XP bars clear with color coding and proper contrast
+- ✅ **Enemy panel**: Now prominently styled with 2px red border, gradient background, elevated shadow
+- ✅ **Location hero**: Gradient overlay with clear button elevation and hover feedback
+- ✅ **Mobile header**: Enhanced padding, border emphasis, gradient background for visual separation
+- ✅ **Story log & filters**: Visible filters with solid backgrounds, log with gradient for depth
+- ✅ **Skill panel & buff bar**: Gradient surfaces with proper elevation and button state feedback
+- ✅ **Badges & chips**: Consistent semantic colors with transparent borders for polish
+
+## Implementation Patterns (v2)
+
+### Interactive Controls — Button State Hierarchy
+All interactive elements follow this M3 pattern:
+1. **Default**: Surface with outline/border
+2. **Hover**: Transform: translateY(-1px), enhanced shadow, color/border emphasis
+3. **Active**: Transform: translateY(0), inset shadow for pressed feedback
+4. **Focus-visible**: Primary colored outline, outline-offset: 3px (or 2px for tight controls)
+
+**Examples**: `.btn-action`, `.menu-option`, `.sf-btn`, `.icon-btn`, `.qa-btn`
+
+### Surface Layers — Depth Via Gradients
+Containers now use subtle gradients for visual hierarchy:
+- **Single surface**: `var(--md-surface-c)` → solid
+- **Elevated surface**: `linear-gradient(135deg, var(--md-surface-c-high), var(--md-surface-c))` → gradient
+- **Emphasis container**: `var(--md-error-container)` + gradient overlay for special areas
+
+**Examples**: `#enemy-panel`, `.buff-bar`, `.skill-panel`, `.story`, `.mobile-player-card`
+
+### Focus Accessibility
+Keyboard navigation is critical:
+- All buttons/inputs have `:focus-visible` states
+- Focus ring: 3px solid primary color with 3px offset
+- Icon buttons: tighter 2px offset for compact spacing
+- No focus-visible state is disabled/invisible
+
+### Color Roles
+- **Primary** (`--md-primary`): Main actions, highlights, accent
+- **Error/Danger** (`--md-error`): Enemy indicators, damage, alerts
+- **Tertiary/Heal** (`--md-tertiary`): Healing, safe zones, positive actions
+- **Secondary**: Secondary containers, badges, calm UI sections
+- **On-surface variants**: Always use proper `--md-on-*` for text on colored backgrounds
 
 ## Workflow recommendations
 1. Start by reviewing `PROJECT-OVERVIEW.md` for the overall scope.
@@ -45,10 +81,15 @@ This document captures the design and workflow principles for Pixel Quest Echoes
    - document the intention in markdown.
 4. When proposing new features or patterns, include examples of the expected HTML/CSS structure.
 5. Always test both dark and light themes using `data-theme` toggling.
+6. Use the implementation patterns above to maintain consistency.
+
+## Recent polish completions (June 2026)
+- ✅ Priority 1: Core M3 Polish — Topbar, enemy panel, mobile header, story filters, focus rings
+- ✅ Priority 2: Visual System Consistency — Button state layers, surface gradients, badges, modal polish
+- ⏳ Priority 3: Documentation & workflow refinement (in progress)
 
 ## Suggested next tasks
-- Review the topbar buttons and add subtle M3 hover/pressed styling.
-- Improve the `enemy-panel` and `buff-bar` surfaces with distinct elevation.
-- Polish the mobile player header for better spacing and visual separation.
-- Add clear focus ring styling for keyboard navigation.
-- Document any UI components or new patterns in markdown.
+- Complete Priority 3 documentation and component pattern guide
+- Consider creating reusable CSS utility classes for common patterns (`.surface-elevated`, `.button-state-hover`, etc.)
+- Review and document accessibility patterns (keyboard, screen reader, color contrast)
+- Plan any remaining visual refinements based on Priority 3 recommendations

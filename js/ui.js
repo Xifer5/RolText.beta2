@@ -89,6 +89,7 @@ export function initUICache() {
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
     "screen","buff-bar","skill-panel","stat-points-row","char-portrait-emoji",
+    "questTracker","questTrackerContent","questTrackerOpenBtn",
     /* mobile bottom nav */
     "mob-combat","mob-nav",
     "mob-attackBtn","mob-magicBtn","mob-itemBtn","mob-fleeBtn",
@@ -404,6 +405,8 @@ export function updateUI() {
   if (ui["derived-defense"]) ui["derived-defense"].textContent = derived.defense ?? 0;
   if (ui["derived-magic"])   ui["derived-magic"].textContent   = derived.magic ?? 0;
 
+  updateQuestTracker();
+
   // NPC talk button — visible only when an NPC is present and not in combat
   const npcTalkBtn = ui["npc-talk-btn"] || document.getElementById("npc-talk-btn");
   if (npcTalkBtn) {
@@ -498,6 +501,48 @@ function updateBuffBar() {
   if (playerDebuffs.stun)   chips.push(`<span class="buff-chip debuff-stun">💫 Aturdido ×${playerDebuffs.stun.turns}</span>`);
   bar.innerHTML = chips.join("") || "";
   bar.style.display = chips.length ? "flex" : "none";
+}
+
+function updateQuestTracker() {
+  const container = document.getElementById("questTrackerContent");
+  if (!container) return;
+  const activeQuests = Object.values(QUEST_DATA).filter(q => getQuestStatus(q.id) === "active");
+  if (!activeQuests.length) {
+    container.innerHTML = `<div class="quest-tracker-empty">${t('questTrackerNoActive')}</div>`;
+    return;
+  }
+
+  const lines = activeQuests.slice(0, 2).map((q) => {
+    const progress = (() => {
+      switch (q.type) {
+        case "visit": {
+          const target = localizeText(window.worldMap?.[q.target]?.name) || q.target;
+          const done = !!(gameState.visitedLocations?.[q.target]);
+          return `${t('qlProgressVisit').replace('{{target}}', target)} ${done ? '✅' : '⬜'}`;
+        }
+        case "collect": {
+          const have = gameState.inventory?.[q.item] ?? 0;
+          const need = q.qty;
+          const itemName = localizeText(allItems[q.item]?.name) || q.item;
+          return `${formatText('qlProgressCollect', { item: itemName, have, need })}`;
+        }
+        case "kill": {
+          const killed = gameState.stats?.enemiesDefeated?.[q.enemy] ?? 0;
+          const need = q.count;
+          return `${formatText('qlProgressKill', { enemy: localizeText(q.enemy) || q.enemy, killed, need })}`;
+        }
+        default:
+          return t('qlProgressActive') || "In progress";
+      }
+    })();
+
+    return `<div class="quest-tracker-item">
+      <div class="quest-tracker-name">${localizeText(q.title)}</div>
+      <div class="quest-tracker-progress">${progress}</div>
+    </div>`;
+  }).join("");
+
+  container.innerHTML = lines;
 }
 
 function updateSkillPanel() {
@@ -719,7 +764,7 @@ export function setupUIListeners() {
     const loc = window.worldMap?.[gameState.currentLocationId];
     if (loc && ["shop","castle_shop","port"].includes(loc.id)) {
       renderShop(); document.getElementById("shopModal")?.classList.remove("hidden");
-    } else addMessage("Necesitas estar en una tienda.", "system");
+    } else addMessage(t('noShopHere'), "system");
   });
   document.getElementById("closeShopBtn")?.addEventListener("click",  () => document.getElementById("shopModal")?.classList.add("hidden"));
 
@@ -736,10 +781,10 @@ export function setupUIListeners() {
       const mpGain = gameState.player.maxMp - gameState.player.mp;
       gameState.player.hp = gameState.player.maxHp;
       gameState.player.mp = gameState.player.maxMp;
-      addMessage(`Descansas y recuperas ${hpGain} HP y ${mpGain} MP.`, "stat");
-      showFloatingText("¡Restaurado!", window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
+      addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
+      showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
       updateUI();
-    } else addMessage("No puedes descansar aquí.", "system");
+    } else addMessage(t('noRestHere'), "system");
   });
 
   // FAB
@@ -783,6 +828,12 @@ export function setupUIListeners() {
   // Quest log
   setupQuestLogTabs();
   document.getElementById("questLogBtn")?.addEventListener("click", () => {
+    renderQuestLog("active");
+    document.querySelectorAll(".ql-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "active"));
+    document.getElementById("questLogModal")?.classList.remove("hidden");
+  });
+
+  document.getElementById("questTrackerOpenBtn")?.addEventListener("click", () => {
     renderQuestLog("active");
     document.querySelectorAll(".ql-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "active"));
     document.getElementById("questLogModal")?.classList.remove("hidden");
@@ -838,10 +889,10 @@ export function setupUIListeners() {
       const mpGain = gameState.player.maxMp - gameState.player.mp;
       gameState.player.hp = gameState.player.maxHp;
       gameState.player.mp = gameState.player.maxMp;
-      addMessage(`Descansas y recuperas ${hpGain} HP y ${mpGain} MP.`, "stat");
-      showFloatingText("¡Restaurado!", window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
+      addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
+      showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
       updateUI();
-    } else addMessage("No puedes descansar aquí.", "system");
+    } else addMessage(t('noRestHere'), "system");
   });
   document.getElementById("mobActionShopBtn")?.addEventListener("click", () => {
     _closeMobileSheet();
@@ -849,7 +900,7 @@ export function setupUIListeners() {
     if (loc && ["shop","castle_shop","port"].includes(loc.id)) {
       renderShop();
       document.getElementById("shopModal")?.classList.remove("hidden");
-    } else addMessage("Necesitas estar en una tienda.", "system");
+    } else addMessage(t('noShopHere'), "system");
   });
   document.getElementById("mobActionQuestLogBtn")?.addEventListener("click", () => {
     _closeMobileSheet();

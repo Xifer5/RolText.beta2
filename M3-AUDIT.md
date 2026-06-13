@@ -35,16 +35,75 @@
 - Reserve accent colors for primary actions and danger states, while keeping text on-surface contrast high.
 - Use `--r-md` / `--r-lg` in horizontal groups and cards, and `--r-sm` on smaller chips/controls.
 
-## Changes made in this pass
-- Added surface, border, radius, and elevation to `.sidebar-block`.
-- Updated `#game` layout to use responsive `minmax()` column sizes with a `gap`.
-- Polished topbar nav tabs with hover, active, and focus-visible states.
-- Refined segmented story filter button hover/active states.
-- Added icon button pressed and keyboard focus visual feedback.
+## Changes made in this pass — Priority 1 & 2 (COMPLETE)
+
+### Priority 1 — Core M3 Polish
+✅ **Topbar & icon buttons**
+- Enhanced `.icon-btn` with dynamic borders, scale transforms (1.05 hover, 0.98 active)
+- Added proper focus-visible styling with primary border color
+- Improved transitions across color, border-color, box-shadow, transform
+
+✅ **Enemy panel**
+- Upgraded from 1px to 2px solid red border (`--md-error-container`)
+- Added gradient background for visual depth
+- Enhanced shadow: `var(--elev-2)` + inset gradient overlay
+- Portrait now has error-red glow on hover
+
+✅ **Mobile player header**
+- Padding: 16px → 20px for better breathing room
+- Border: 1px → 2px with stronger outline color
+- Background: solid → gradient(180deg) for depth effect
+
+✅ **Story filters (.sf-btn)**
+- Background: transparent → `var(--md-surface-c)` for better visibility
+- Border: 1px → 1.5px for stronger presence
+- Added border-color transitions to primary on hover
+- Active state: enhanced shadow with `var(--elev-1)`
+
+✅ **Global focus rings**
+- Added `.sf-btn:focus-visible` and `.compass-dir-label:focus-visible`
+- Consistent outline-offset: 3px for rounded elements
+
+### Priority 2 — Visual System Consistency
+✅ **Button state layers**
+- `.btn-action`: Added active pressed state with inset shadow, enhanced hover (brightness + elev-2)
+- `.menu-option`: Added hover border color change, transform feedback, pressed inset shadow
+- Both now follow M3 motion patterns with smooth transitions
+
+✅ **Skill panel & buff bar**
+- Both upgraded to gradient backgrounds: `linear-gradient(135deg, --md-surface-c-high, --md-surface-c)`
+- Skill buttons: improved hover with border-color change to primary, inset shadow on active
+- Better visual hierarchy with elevation
+
+✅ **Story log (.story)**
+- Background: solid → gradient for better depth perception
+- Heal messages: improved gradient opacity for better visibility
+- Better visual separation in both dark and light themes
+
+✅ **Badges & indicators**
+- `.rarity-badge`: Added transparent border for consistency
+- `.npc-quest-badge`: Added transparent border
+- `.profile-role`: Added transparent border
+- All use M3 semantic container colors
+
+✅ **Location hero button (.npc-talk-btn)**
+- Added smooth transitions with transform feedback
+- Elevation scaling: normal → elev-3 on hover → elev-1 on active
+
+✅ **Mobile sheet modal**
+- Enhanced backdrop blur: 6px (improved focus)
+- Increased background opacity: 0.45 (better modal emphasis)
+- Added border to modal-sheet-content for consistency
+
+## Validation Results
+✅ **Dark theme**: All components properly visible with excellent contrast and depth
+✅ **Light theme**: Maintained readability and visual hierarchy
+✅ **Focus accessibility**: Consistent keyboard navigation throughout
+✅ **Motion**: Smooth transitions on all interactive elements
+✅ **Both themes**: Gradients enhance depth without overwhelming
 
 ## Next recommended M3 improvements
-- Review `#location-hero` cards and buff bar surfaces to improve hero layering.
-- Polish `mobile-sheet` dialog surfaces and background blur for an M3 modal experience.
-- Make `story-filters` segmented buttons look more like an M3 segmented control.
-- Add subtle state layers for `.menu-option` and `.btn-action` pressed states.
-- Validate the new styles in both `dark` and `light` themes.
+- Review component patterns for potential modular CSS utilities
+- Consider adding M3 elevation states to more panels for layering effect
+- Polish any remaining button/control interactions for complete consistency
+- Document final M3 implementation in DESIGN-GUIDELINES.md
