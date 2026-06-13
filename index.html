@@ -451,9 +451,9 @@
       <div class="inventory-detail-col" id="inventoryDetail">
         <h3 data-i18n="itemDetailTitle">Detalles</h3>
         <div class="item-detail-empty" data-i18n="itemDetailEmpty">Selecciona un objeto para ver sus detalles.</div>
-        <div class="item-detail" id="itemDetailCard" style="display:none">
+        <div class="item-detail hidden" id="itemDetailCard">
           <button id="detailCloseBtn" class="btn-ghost small" data-i18n="detailClose">✕ Cerrar</button>
-          <div class="item-detail-header" style="margin-top:12px">
+          <div class="item-detail-header">
             <div class="item-detail-icon" id="detailIcon">🧪</div>
             <div>
               <div id="detailName" class="detail-name">Item</div>
@@ -465,13 +465,13 @@
             <ul id="detailAttrs" role="list"></ul>
           </div>
           <div class="item-detail-actions">
-            <button id="detailUseBtn" class="btn-action">Usar</button>
-            <button id="detailEquipBtn" class="btn-action secondary">Equipar</button>
+            <button id="detailUseBtn" class="btn-action hidden">Usar</button>
+            <button id="detailEquipBtn" class="btn-action secondary hidden">Equipar</button>
           </div>
         </div>
       </div>
     </div>
-    <div style="margin-top:20px">
+    <div class="inv-equipment-section">
       <h3>Equipamiento</h3>
       <ul id="equipmentList" role="list" class="equipment-slots-list">
         <li>🪖 <span id="equip-head" class="equip-val">Vacío</span></li>

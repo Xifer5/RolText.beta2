@@ -184,6 +184,7 @@ body {
 
 button { font-family: inherit; cursor: pointer; }
 .hidden { display: none !important; }
+.flex-spacer { flex: 1; }
 
 /* ── M3 Focus ring ──────────────────────────────────────── */
 :focus-visible {
@@ -1809,7 +1810,7 @@ button:focus-visible,
   font-weight: 500;
 }
 
-/* Inventory grid */
+/* Inventory grid — SPEC-0203 master-detail */
 .inventory-grid {
   display: grid;
   grid-template-columns: 1.1fr .9fr;
@@ -1855,7 +1856,8 @@ button:focus-visible,
 .shop-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
+  transition: grid-template-columns var(--dur-m1, .2s) var(--ease-dec, ease);
 }
 @media (max-width: 680px) {
   .inventory-grid,
@@ -1863,6 +1865,16 @@ button:focus-visible,
     grid-template-columns: 1fr;
   }
 }
+.inventory-grid.detail-open {
+  grid-template-columns: 2fr 3fr;
+}
+.inventory-detail-col {
+  overflow-y: auto;
+  max-height: 60vh;
+}
+.item-detail-header { margin-top: 12px; }
+.inv-equipment-section { margin-top: 20px; }
+.inv-item-namewrap { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .inventory-list-col h3,
 .inventory-detail-col h3,
 .modal-content h3 {
@@ -2048,6 +2060,26 @@ button:focus-visible,
 .equipment-compare-chip.is-up em { color: var(--c-heal); }
 .equipment-compare-chip.is-down em { color: var(--md-error); }
 .equipment-compare-chip.is-even em { color: var(--md-on-surface-variant); }
+
+/* Inventory — mobile master-detail (SPEC-0203) */
+@media (max-width: 640px) {
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+  .inventory-grid.detail-open {
+    grid-template-columns: 1fr;
+  }
+  .inventory-detail-col {
+    display: none;
+    max-height: none;
+  }
+  .inventory-grid.detail-open .inventory-list-col {
+    display: none;
+  }
+  .inventory-grid.detail-open .inventory-detail-col {
+    display: block;
+  }
+}
 
 /* Stat increase */
 .stat-increase-grid { display: flex; flex-direction: column; gap: 8px; }

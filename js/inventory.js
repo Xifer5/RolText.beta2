@@ -77,8 +77,7 @@ export function renderInventory() {
     iconDiv.appendChild(iconEl);
 
     const nameWrap = document.createElement('div');
-    nameWrap.style.display = 'flex';
-    nameWrap.style.flexDirection = 'column';
+    nameWrap.className = 'inv-item-namewrap';
     const name = document.createElement('div');
     name.className = 'inv-item-name';
     name.textContent = localizeText(item.name);
@@ -252,8 +251,8 @@ function showItemDetails(itemId, item) {
   const useBtn = document.getElementById('detailUseBtn');
   const equipBtn = document.getElementById('detailEquipBtn');
 
-  if (detailEmpty) detailEmpty.style.display = 'none';
-  if (detailCard) detailCard.style.display = 'block';
+  if (detailEmpty) detailEmpty.classList.add('hidden');
+  if (detailCard) detailCard.classList.remove('hidden');
 
   const grid = document.querySelector('.inventory-grid');
   if (grid) {
@@ -311,34 +310,29 @@ function showItemDetails(itemId, item) {
   detailIcon.appendChild(createIconElement(item.icon || (item.type === 'consumable' ? '🧪' : (item.type === 'weapon' ? '⚔️' : (item.type === 'armor' ? '🛡️' : '✨'))), 64));
 
   if (useBtn) {
-    if (item.type === 'consumable') {
-      useBtn.style.display = '';
+    const isConsumable = item.type === 'consumable';
+    useBtn.classList.toggle('hidden', !isConsumable);
+    if (isConsumable) {
       useBtn.disabled = false;
       useBtn.className = 'btn tiny';
       useBtn.textContent = t('btnUse');
       useBtn.onclick = () => {
-        const ok = useItem(itemId, item);
+        useItem(itemId, item);
         if (!gameState.inventory[itemId]) closeItemDetail();
       };
-    } else {
-      useBtn.style.display = 'none';
     }
   }
 
   if (equipBtn) {
+    equipBtn.classList.toggle('hidden', !item.slot);
     if (item.slot) {
-      equipBtn.style.display = '';
       equipBtn.disabled = false;
-      equipBtn.className = 'btn tiny';
+      equipBtn.className = 'btn tiny secondary';
       equipBtn.textContent = t('btnEquip');
       equipBtn.onclick = () => {
         const ok = equipItem(itemId, item);
-        if (ok) {
-          detailMeta.textContent = (item.rarity ? item.rarity + ' • ' : '') + (item.type || '') + ' • ' + (item.slot || '');
-        }
+        if (ok) detailMeta.textContent = (item.rarity ? item.rarity + ' • ' : '') + (item.type || '') + ' • ' + (item.slot || '');
       };
-    } else {
-      equipBtn.style.display = 'none';
     }
   }
 

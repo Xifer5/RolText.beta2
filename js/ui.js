@@ -547,7 +547,7 @@ function updateLocationSubtitle(loc) {
   const risk = getLocationRisk(loc);
   const dirLabels = { north:"N", south:"S", east:"E", west:"O", up:"↑", down:"↓", enter:"⬤", out:"↩" };
   const exitChips = exits.map(d => `<span class="exit-chip">${dirLabels[d]||d}</span>`).join("");
-  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ' <span class="exit-chip">💤 Descanso</span>' : ""}<span style="flex:1"></span>${exitChips}`;
+  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ' <span class="exit-chip">💤 Descanso</span>' : ""}<span class="flex-spacer"></span>${exitChips}`;
 }
 
 function updateProfileCard() {
