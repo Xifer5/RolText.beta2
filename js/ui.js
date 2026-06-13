@@ -371,7 +371,7 @@ export function updateUI() {
   if (ui.intelligence) ui.intelligence.textContent = `${p.intelligence||0}${intBonus?` +${intBonus}`:""}`;
   if (ui["stat-points"]) ui["stat-points"].textContent = p.statPoints||0;
   const spRow = ui["stat-points-row"] || document.getElementById("stat-points-row");
-  if (spRow) spRow.style.display = (p.statPoints > 0) ? "" : "none";
+  if (spRow) spRow.classList.toggle('hidden', !(p.statPoints > 0));
 
   const loc = window.worldMap?.[gameState.currentLocationId];
   const locName = localizeText(loc?.name) || t("unknownLocation");
@@ -438,10 +438,10 @@ export function updateUI() {
       if (enemyPortrait.dataset.src !== src) {
         enemyPortrait.dataset.src = src;
         enemyPortrait.src = src;
-        enemyPortrait.style.display = "";
+        enemyPortrait.classList.remove('hidden');
       }
     } else {
-      enemyPortrait.style.display = "none";
+      enemyPortrait.classList.add('hidden');
       enemyPortrait.dataset.src = "";
     }
   }
@@ -570,18 +570,18 @@ function updateProfileCard() {
         img.className = "avatar-img";
         img.alt = p.className || p.class;
         img.onerror = () => {
-          img.style.display = "none";
-          if (emojiEl) emojiEl.style.display = "";
+          img.classList.add('hidden');
+          if (emojiEl) emojiEl.classList.remove('hidden');
         };
         img.onload = () => {
-          if (emojiEl) emojiEl.style.display = "none";
+          if (emojiEl) emojiEl.classList.add('hidden');
         };
         portrait.appendChild(img);
       }
       if (img.dataset.src !== src) {
         img.dataset.src = src;
         img.src = src;
-        img.style.display = "";
+        img.classList.remove('hidden');
       }
     }
   } else if (emojiEl && p.classEmoji) {
@@ -896,8 +896,8 @@ export function setupUIListeners() {
     document.getElementById("inventoryModal")?.classList.add("hidden");
     const dc = document.getElementById("itemDetailCard");
     const de = document.querySelector("#inventoryDetail .item-detail-empty");
-    if (dc) dc.style.display = "none";
-    if (de) de.style.display = "";
+    if (dc) dc.classList.add('hidden');
+    if (de) de.classList.remove('hidden');
   });
 
   // Shop

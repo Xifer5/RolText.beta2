@@ -153,7 +153,7 @@
       <div class="gold-level-row">
         <span class="gold-val">🪙 <b id="gold">0</b></span>
         <span class="level-val">⭐ Lv.<b id="level">1</b></span>
-        <span class="pts-val" id="stat-points-row" style="display:none">✨ <b id="stat-points">0</b> pts</span>
+        <span class="pts-val hidden" id="stat-points-row">✨ <b id="stat-points">0</b> pts</span>
       </div>
     </div>
 
@@ -164,8 +164,8 @@
 
     <!-- Location hero -->
     <div id="location-hero">
-      <img id="location-img" class="location-img" src="" alt=""
-           style="display:none" onerror="this.style.display='none'">
+      <img id="location-img" class="location-img hidden" src="" alt=""
+           onerror="this.classList.add('hidden')">
       <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
       <div id="location-subtitle" class="location-subtitle"></div>
       <div class="location-actions" aria-label="Acciones de ubicacion">
@@ -210,8 +210,8 @@
 
     <!-- Enemy panel -->
     <div id="enemy-panel" class="hidden" role="region" aria-labelledby="enemy-name" aria-live="assertive">
-      <img id="enemy-portrait" class="enemy-portrait" src="" alt="" style="display:none"
-           onerror="this.style.display='none'">
+      <img id="enemy-portrait" class="enemy-portrait hidden" src="" alt=""
+           onerror="this.classList.add('hidden')">
       <div class="enemy-left">
         <div class="enemy-title-row">
           <strong id="enemy-name">Enemy</strong>
@@ -219,7 +219,7 @@
         </div>
         <div class="enemy-hp-row">
           <div class="enemy-hp-bar-wrap">
-            <div class="enemy-hp-bar-fill" id="enemy-hp-bar" style="width:100%"></div>
+            <div class="enemy-hp-bar-fill" id="enemy-hp-bar"></div>
           </div>
           <span id="enemy-hp" class="enemy-hp-num"></span>
         </div>
@@ -489,12 +489,12 @@
 
 <!-- STATS -->
 <div id="statsModal" class="modal hidden" role="dialog" aria-labelledby="stats-modal-title">
-  <div class="modal-content" style="max-width:440px">
+  <div class="modal-content modal-content-sm">
     <div class="modal-header">
         <h2 id="stats-modal-title" data-i18n="statsModalTitle">📈 Mejorar Atributos</h2>
         <button class="modal-close" id="closeStatsBtn">✕</button>
       </div>
-      <p class="modal-points-label"><span data-i18n="statPointsText">Puntos disponibles</span>: <strong id="modal-stat-points" class="gold-accent" style="font-size:1.3em">0</strong></p>
+      <p class="modal-points-label"><span data-i18n="statPointsText">Puntos disponibles</span>: <strong id="modal-stat-points" class="gold-accent stat-pts-display">0</strong></p>
       <p id="stat-class-hint" class="hint-text" data-i18n="statClassHint"></p>
       <div class="stat-increase-grid">
         <div class="stat-row">💪 STR — <span id="modal-strength">0</span>
@@ -507,7 +507,7 @@
           <button id="inc-int" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
         </div>
       </div>
-      <p class="hint-text" style="margin-top:16px" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
+      <p class="hint-text hint-text-mt" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
     </div>
   </div>
 
@@ -612,9 +612,9 @@
 
 <!-- GAME OVER -->
 <div id="gameOverModal" class="modal hidden" role="dialog" aria-labelledby="game-over-title">
-  <div class="modal-content" style="max-width:380px;text-align:center">
+  <div class="modal-content modal-content-xs modal-text-center">
     <h2 id="game-over-title" class="gameover-title" data-i18n="gameOverTitle">💀 GAME OVER 💀</h2>
-    <p style="margin:16px 0;color:var(--c-muted)" data-i18n="gameOverText">Has caído en tu aventura.</p>
+    <p class="modal-body-text" data-i18n="gameOverText">Has caído en tu aventura.</p>
     <button id="restartBtn" class="btn-action" data-i18n="retryButton">🔄 Intentar de nuevo</button>
   </div>
 </div>
@@ -633,15 +633,15 @@
 </div>
 
 <div id="endingModal" class="modal hidden" role="dialog" aria-labelledby="ending-title">
-  <div class="modal-content" style="max-width:440px;text-align:center">
+  <div class="modal-content modal-content-sm modal-text-center">
     <h2 id="ending-title" data-i18n="endingTitle">🏆 ¡Victoria! 🏆</h2>
-    <p id="endingMessage" style="margin:12px 0;color:var(--c-muted)" data-i18n="endingMessage">Has derrotado al Dragon King.</p>
+    <p id="endingMessage" class="modal-body-text" data-i18n="endingMessage">Has derrotado al Dragon King.</p>
     <div class="ending-stats-grid">
       <div><div class="es-label" data-i18n="endingLevelLabel">Nivel</div><div class="es-val" id="ending-level">0</div></div>
       <div><div class="es-label" data-i18n="endingGoldLabel">Oro</div><div class="es-val gold-accent" id="ending-gold">0</div></div>
       <div><div class="es-label" data-i18n="endingXpLabel">XP</div><div class="es-val" id="ending-xp">0</div></div>
     </div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
+    <div class="modal-actions-row">
       <button id="endingRestartBtn" class="btn-action" data-i18n="endingRestartButton">🔄 Reiniciar</button>
       <button id="endingCloseBtn" class="btn-action secondary" data-i18n="endingCloseButton">Cerrar</button>
     </div>

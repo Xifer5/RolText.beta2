@@ -1836,6 +1836,16 @@ button:focus-visible,
 }
 .gold-accent { color: var(--md-primary); font-weight: 700; }
 
+/* ── Modal size/layout utilities (SPEC-0301) ──────────────── */
+.modal-content-sm  { max-width: 440px; }
+.modal-content-xs  { max-width: 380px; }
+.modal-text-center { text-align: center; }
+.modal-body-text   { margin: 14px 0; color: var(--c-muted); }
+.modal-actions-row { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+.shop-columns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.stat-pts-display  { font-size: 1.3em; }
+.hint-text-mt      { margin-top: 16px; }
+
 .btn-action {
   border: none;
   background: var(--md-primary);
