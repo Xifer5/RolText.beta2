@@ -1724,6 +1724,26 @@ button:focus-visible,
 }
 
 /* ═══════════════════════════════════════════════════════════
+   TABLET — 761 px → 960 px  (SPEC-0401)
+   Centro + right-panel visible; left-panel y bottom-nav ocultos.
+   La página scrollea verticalmente — right-panel sigue el flow normal.
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 761px) and (max-width: 960px) {
+  #game {
+    grid-template-columns: 1fr 260px;
+    height: auto;
+  }
+  #right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    overflow-y: visible;
+  }
+  #mobile-bottom-nav { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    MODALES
    ═══════════════════════════════════════════════════════════ */
 .modal {
@@ -1785,6 +1805,27 @@ button:focus-visible,
   transition: background .15s var(--ease);
 }
 .modal-close:hover { background: var(--md-surface-c-high); color: var(--md-on-surface); }
+
+/* SPEC-0402 — bottom-sheet en mobile < 480px */
+@media (max-width: 480px) {
+  .modal {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-content {
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    max-width: 100%;
+    max-height: 92dvh;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+  .modal:not(.hidden) .modal-content {
+    animation: sheetSlideUp var(--md-dur-medium3, .3s) var(--ease-dec, ease) both;
+  }
+}
+@keyframes sheetSlideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
 
 .modal-gold,
 .modal-points-label {
