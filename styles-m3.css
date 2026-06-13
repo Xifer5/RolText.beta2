@@ -745,6 +745,27 @@ button:focus-visible,
   border-radius: 999px;
   border: 1px solid rgba(123, 211, 137, .3);
 }
+/* ── Chip base M3 (SPEC-0302) ───────────────────────────────── */
+.chip,
+.risk-chip,
+.mobile-risk-chip,
+.exit-chip,
+.buff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-c-high);
+  color: var(--md-on-surface);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
 .risk-chip,
 .mobile-risk-chip {
   border-color: var(--md-outline-variant);
@@ -770,6 +791,17 @@ button:focus-visible,
   background: var(--md-surface-c-high);
   color: var(--md-on-surface-variant);
 }
+/* exit-chip — salidas de zona en location-subtitle */
+.exit-chip {
+  background: var(--md-surface-c-high);
+  color: var(--md-on-surface-variant);
+  border-color: var(--md-outline-variant);
+}
+/* buff-chip — buffs/debuffs del jugador */
+.buff-chip { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+.buff-chip.debuff-poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
+.buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: #FDBA74; }
+.buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: #93C5FD; }
 .location-actions {
   position: absolute;
   top: 54px;

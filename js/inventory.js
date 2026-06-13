@@ -314,7 +314,7 @@ function showItemDetails(itemId, item) {
     useBtn.classList.toggle('hidden', !isConsumable);
     if (isConsumable) {
       useBtn.disabled = false;
-      useBtn.className = 'btn tiny';
+      useBtn.className = 'btn-action';
       useBtn.textContent = t('btnUse');
       useBtn.onclick = () => {
         useItem(itemId, item);
@@ -327,7 +327,7 @@ function showItemDetails(itemId, item) {
     equipBtn.classList.toggle('hidden', !item.slot);
     if (item.slot) {
       equipBtn.disabled = false;
-      equipBtn.className = 'btn tiny secondary';
+      equipBtn.className = 'btn-action secondary';
       equipBtn.textContent = t('btnEquip');
       equipBtn.onclick = () => {
         const ok = equipItem(itemId, item);
