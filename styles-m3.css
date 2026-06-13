@@ -1843,6 +1843,9 @@ button:focus-visible,
 .modal-body-text   { margin: 14px 0; color: var(--c-muted); }
 .modal-actions-row { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
 .shop-columns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 480px) {
+  .shop-columns-grid { grid-template-columns: 1fr; }
+}
 .stat-pts-display  { font-size: 1.3em; }
 .hint-text-mt      { margin-top: 16px; }
 

@@ -352,7 +352,6 @@ function closeItemDetail() {
 }
 
 function useItem(itemId, item) {
-  // consumable behaviors
   if (!removeItemFromInventory(gameState.inventory, itemId, 1)) {
     addMessage(t('itemNotOwned'), 'system');
     return false;
@@ -393,7 +392,6 @@ function useItem(itemId, item) {
     else addMessage(formatText(t('usedItemNoEffect'), { item: localizeText(item.name) }), 'stat');
     if (item.restoreHp) addMessage(formatText(t('restoredHpAmount'), { amount: item.restoreHp }), 'stat');
   } else if (item.restoreHp || item.restoreMp) {
-    // Generic handling for crafted/defined consumables with restoreHp/restoreMp properties
     if (item.restoreHp) {
       const amount = item.restoreHp;
       gameState.player.hp = Math.min(gameState.player.hp + amount, gameState.player.maxHp);
