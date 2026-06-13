@@ -36,6 +36,7 @@ export function renderInventory() {
 
   list.innerHTML = "";
   goldEl.textContent = gameState.player.gold;
+  let hasInventoryItems = false;
 
   const filterValue = inventoryFilterText.trim().toLowerCase();
   let foundItems = 0;
@@ -43,6 +44,7 @@ export function renderInventory() {
   for (const [itemId, qty] of Object.entries(gameState.inventory)) {
     const item = allItems[itemId];
     if (!item) continue;
+    hasInventoryItems = true;
 
     const nameText = localizeText(item.name).toLowerCase();
     const descText = localizeText(item.description || "").toLowerCase();
@@ -54,6 +56,16 @@ export function renderInventory() {
     foundItems += 1;
     const li = document.createElement("li");
     li.className = item.type === "quest" ? "inv-item quest-item" : "inv-item";
+    li.tabIndex = 0;
+    li.setAttribute("role", "button");
+    li.setAttribute("aria-label", `Ver detalles de ${item.name}`);
+    li.addEventListener("click", () => showItemDetails(itemId, item));
+    li.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        showItemDetails(itemId, item);
+      }
+    });
 
     // icon
     const iconDiv = document.createElement('div');
@@ -106,6 +118,7 @@ export function renderInventory() {
       btn.onclick = (e) => { e.stopPropagation(); useItem(itemId, item); };
     } else if (isEquippable) {
       btn.textContent = t('btnEquip');
+      btn.className = 'btn tiny equip-btn';
       btn.onclick = (e) => { e.stopPropagation(); equipItem(itemId, item); };
     } else if (item.type === 'quest') {
       btn.textContent = t('missionTag');
@@ -144,6 +157,14 @@ export function renderInventory() {
     list.appendChild(li);
   }
 
+  if (!hasInventoryItems) {
+    const empty = document.createElement("li");
+    empty.className = "empty-list-row";
+    empty.setAttribute("aria-disabled", "true");
+    empty.textContent = "Inventario vacio. Explora, compra o derrota enemigos para encontrar objetos.";
+    list.appendChild(empty);
+  }
+
   // Equipment
   const equipSlots = [
     { id: "equip-rightHand", slot: "rightHand" },
@@ -175,6 +196,48 @@ export function renderInventory() {
   if (!selectedInventoryItemId) {
     document.querySelectorAll('#inventoryList li.active').forEach(li => li.classList.remove('active'));
   }
+}
+
+function buildEquipmentComparison(item) {
+  if (!item?.slot) return null;
+  const currentStats = calculateTotalStats(gameState.player, gameState.equipment);
+  const nextEquipment = { ...gameState.equipment, [item.slot]: item };
+  const nextStats = calculateTotalStats(gameState.player, nextEquipment);
+  const rows = [
+    ["ATK", "attack"],
+    ["DEF", "defense"],
+    ["MAG", "magic"],
+    ["HP max", "maxHp"],
+    ["MP max", "maxMp"]
+  ].map(([label, key]) => {
+    const current = currentStats[key] || 0;
+    const next = nextStats[key] || 0;
+    const delta = next - current;
+    return { label, current, next, delta };
+  });
+  return rows;
+}
+
+function renderEquipmentComparison(item) {
+  const rows = buildEquipmentComparison(item);
+  if (!rows) return null;
+  const wrap = document.createElement("div");
+  wrap.className = "equipment-compare";
+  const title = document.createElement("div");
+  title.className = "equipment-compare-title";
+  title.textContent = "Comparacion al equipar";
+  wrap.appendChild(title);
+  const grid = document.createElement("div");
+  grid.className = "equipment-compare-grid";
+  rows.forEach(({ label, current, next, delta }) => {
+    const chip = document.createElement("div");
+    chip.className = `equipment-compare-chip ${delta > 0 ? "is-up" : delta < 0 ? "is-down" : "is-even"}`;
+    const sign = delta > 0 ? "+" : "";
+    chip.innerHTML = `<span>${label}</span><strong>${current} -> ${next}</strong><em>${sign}${delta}</em>`;
+    grid.appendChild(chip);
+  });
+  wrap.appendChild(grid);
+  return wrap;
 }
 
 function showItemDetails(itemId, item) {
@@ -240,6 +303,10 @@ function showItemDetails(itemId, item) {
   if (item.effect) pushAttr(formatText(t('attrEffect'), { effect: item.effect.replace('_', ' '), potency: item.potency || '' }));
   if (item.price) pushAttr(formatText(t('attrPrice'), { value: item.price }));
 
+  const oldCompare = detailAttrs.parentElement?.querySelector(".equipment-compare");
+  oldCompare?.remove();
+  const compareEl = renderEquipmentComparison(item);
+  if (compareEl) detailAttrs.insertAdjacentElement("afterend", compareEl);
   detailIcon.innerHTML = '';
   detailIcon.appendChild(createIconElement(item.icon || (item.type === 'consumable' ? '🧪' : (item.type === 'weapon' ? '⚔️' : (item.type === 'armor' ? '🛡️' : '✨'))), 64));
 

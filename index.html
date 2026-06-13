@@ -51,6 +51,38 @@
   </div>
 </header>
 
+<section id="mobile-status-hud" class="mobile-status-hud" aria-label="Estado del personaje">
+  <div class="mobile-hud-top">
+    <div class="mobile-hud-place">
+      <span class="mobile-hud-kicker">Zona</span>
+      <strong id="mobile-location-name">Oakhaven</strong>
+    </div>
+    <div class="mobile-hud-chips">
+      <span class="mobile-hud-chip" id="mobile-state-chip">Explorando</span>
+      <span class="mobile-hud-chip mobile-risk-chip" id="mobile-risk-chip">Zona normal</span>
+      <span class="mobile-hud-chip">Lv.<b id="mobile-level">1</b></span>
+      <span class="mobile-hud-chip"><b id="mobile-gold">0</b> oro</span>
+    </div>
+  </div>
+  <div class="mobile-hud-bars" aria-label="Vitalidad movil">
+    <div class="mobile-hud-meter">
+      <span>HP</span>
+      <div class="mobile-hud-track"><div class="mobile-hud-fill hp" id="mobile-hp-bar"></div></div>
+      <b id="mobile-hp-text">0/0</b>
+    </div>
+    <div class="mobile-hud-meter">
+      <span>MP</span>
+      <div class="mobile-hud-track"><div class="mobile-hud-fill mp" id="mobile-mp-bar"></div></div>
+      <b id="mobile-mp-text">0/0</b>
+    </div>
+    <div class="mobile-hud-meter">
+      <span>XP</span>
+      <div class="mobile-hud-track"><div class="mobile-hud-fill xp" id="mobile-xp-bar"></div></div>
+      <b id="mobile-xp-text">0/0</b>
+    </div>
+  </div>
+</section>
+
 <!-- ══ LAYOUT ══════════════════════════════════════════════════ -->
 <main id="game">
 
@@ -136,6 +168,14 @@
            style="display:none" onerror="this.style.display='none'">
       <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
       <div id="location-subtitle" class="location-subtitle"></div>
+      <div class="location-actions" aria-label="Acciones de ubicacion">
+        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona">
+          Descansar
+        </button>
+        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona">
+          Tienda
+        </button>
+      </div>
       <button id="npc-talk-btn" type="button" class="npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel">
         💬 <span data-i18n="npcTalkText">Hablar</span>
       </button>
@@ -305,9 +345,9 @@
   <!-- Modo navegación -->
   <div id="mob-nav" class="mob-bar">
     <button class="mob-btn mob-dir" data-direction="west"  aria-label="Oeste  (A/←)">◀</button>
-    <div style="display:flex;flex-direction:column;flex:1;gap:4px">
-      <button class="mob-btn mob-dir" data-direction="north" aria-label="Norte (W/↑)" style="min-height:40px">▲</button>
-      <button class="mob-btn mob-dir" data-direction="south" aria-label="Sur   (S/↓)" style="min-height:40px">▼</button>
+    <div class="mob-dir-stack">
+      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="north" aria-label="Norte (W/↑)">▲</button>
+      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="south" aria-label="Sur   (S/↓)">▼</button>
     </div>
     <button class="mob-btn mob-dir" data-direction="east"  aria-label="Este   (D/→)">▶</button>
     <div class="mob-sep"></div>

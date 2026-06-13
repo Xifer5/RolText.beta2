@@ -4,6 +4,7 @@ import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText } from "./i18n.js";
+import { calculateTotalStats } from "./stats.js";
 
 export function renderShop() {
   const buyList  = document.getElementById("shopBuyList");
@@ -46,47 +47,76 @@ export function renderShop() {
   }
 
   if (!hasItems) {
-    sellList.innerHTML = `<li style="justify-content:center;color:var(--md-on-surface-var);font-style:italic">${t('shopNoItemsToSell')}</li>`;
+    sellList.innerHTML = `<li class="empty-list-row" aria-disabled="true">${t('shopNoItemsToSell')}</li>`;
   }
 }
 
 function makeShopItem(item, mode, qty, price) {
   const li = document.createElement("li");
-  li.style.gap = "var(--sp-2)";
+  li.classList.add("shop-row");
 
   const icon = createIconElement(item.icon || "✨", 32);
-  icon.style.flexShrink = "0";
+  icon.classList.add("shop-row-icon");
 
   const info = document.createElement("div");
-  info.style.flex = "1";
+  info.className = "shop-row-info";
 
   const name = document.createElement("div");
   name.textContent = item.name + (qty ? ` ×${qty}` : "");
-  name.style.fontWeight = "600";
-  name.style.fontSize = ".875rem";
+  name.className = "shop-row-name";
 
   const attrs = buildAttrString(item);
   const sub = document.createElement("div");
   sub.textContent = attrs;
-  sub.style.cssText = "font-size:.72rem;color:var(--md-on-surface-var);margin-top:2px";
+  sub.className = "shop-row-attrs";
 
   info.appendChild(name);
   if (attrs) info.appendChild(sub);
+  if (mode === "buy" && item.slot) {
+    const compare = buildShopCompare(item);
+    if (compare) info.appendChild(compare);
+  }
 
   const priceSpan = document.createElement("span");
-  priceSpan.style.cssText = "color:var(--game-gold);font-weight:700;font-size:.85rem;flex-shrink:0";
+  priceSpan.className = "shop-row-price";
   priceSpan.textContent = `${price ?? item.price} 🪙`;
 
   const btn = document.createElement("button");
   btn.className = "btn small shop-btn";
   btn.textContent = mode === "buy" ? t('shopBuyButton') : t('shopSellButton');
   if (mode === "sell") { btn.className += " tonal"; }
+  if (mode === "buy" && (gameState.player.gold || 0) < item.price) {
+    btn.disabled = true;
+    btn.textContent = "Falta oro";
+    li.classList.add("is-unaffordable");
+  }
 
   li.appendChild(icon);
   li.appendChild(info);
   li.appendChild(priceSpan);
   li.appendChild(btn);
   return li;
+}
+
+function buildShopCompare(item) {
+  const currentStats = calculateTotalStats(gameState.player, gameState.equipment);
+  const nextStats = calculateTotalStats(gameState.player, { ...gameState.equipment, [item.slot]: item });
+  const stats = [
+    ["ATK", "attack"],
+    ["DEF", "defense"],
+    ["MAG", "magic"]
+  ].map(([label, key]) => ({ label, delta: (nextStats[key] || 0) - (currentStats[key] || 0) }));
+  if (stats.every(s => s.delta === 0)) return null;
+
+  const wrap = document.createElement("div");
+  wrap.className = "shop-compare";
+  stats.forEach(({ label, delta }) => {
+    const chip = document.createElement("span");
+    chip.className = `shop-compare-chip ${delta > 0 ? "is-up" : delta < 0 ? "is-down" : "is-even"}`;
+    chip.textContent = `${label} ${delta > 0 ? "+" : ""}${delta}`;
+    wrap.appendChild(chip);
+  });
+  return wrap;
 }
 
 function buildAttrString(item) {

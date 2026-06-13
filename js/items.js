@@ -288,6 +288,7 @@ export const allItems = {
   staff: {
     id: "staff",
     name: "Magic Staff",
+    type: "weapon",
     description: "A staff imbued with magic. +3 INT, +5 MAG",
     slot: "rightHand",
     intelligence: 3,
@@ -299,6 +300,7 @@ export const allItems = {
   wand: {
     id: "wand",
     name: "Magic Wand",
+    type: "weapon",
     description: "A wand imbued with magic. +5 INT, +8 MAG",
     slot: "rightHand",
     intelligence: 4,
@@ -310,6 +312,7 @@ export const allItems = {
   elemental_wand: {
     id: "elemental_wand",
     name: "Elemental Wand",
+    type: "weapon",
     description: "A elemental wand imbued with magic of elemnts. +7 INT, +10 MAG",
     slot: "rightHand",
     intelligence: 7,
@@ -321,6 +324,7 @@ export const allItems = {
   bless_staff: {
     id: "bless_staff",
     name: "Bless Staff",
+    type: "weapon",
     description: "A blessed staff imbued with magic. +10 INT, +15 MAG",
     slot: "rightHand",
     intelligence: 10,
@@ -1636,6 +1640,16 @@ export const allItems = {
     price: 50,
     icon: "./img/map.png",
   },
+  world_map: {
+    id: "world_map",
+    name: "World Map",
+    type: "key_item",
+    rarity: "epic",
+    price: 150,
+    description: "A map that shows the entire world. Useful for navigation and finding hidden locations.",
+    icon: "./img/Map.png",
+  },
+
   ancient_guardian_core: {
     id: "ancient_guardian_core",
     name: "Ancient Guardian Core",
@@ -1678,68 +1692,7 @@ export const allItems = {
     icon: "./img/infernoGem.png",
   },
 
-  // ── ÍTEMS DE MISIÓN (quest items) ─────────────────────────────
-  // No se pueden vender ni equipar. Son llaves de progresión narrativa.
 
-  world_map: {
-    id: "world_map",
-    name: "Mapa del Mundo",
-    description: "Un pergamino antiguo que revela las rutas de Aethoria. Entregado por Elara la Vidente.",
-    icon: "🌍",
-    type: "quest",
-    rarity: "uncommon",
-    price: 0
-  },
-
-  arcane_key: {
-    id: "arcane_key",
-    name: "Llave Arcana",
-    description: "Una llave de cristal grabada con runas de Eldrast. Abre el sello de las Ruinas de Eldrast.",
-    icon: "🔑",
-    type: "quest",
-    rarity: "epic",
-    price: 0
-  },
-
-  navigation_chart: {
-    id: "navigation_chart",
-    name: "Carta de Navegación",
-    description: "Un mapa detallado de los túneles subterráneos firmado por el Capitán Brennan. Abre el paso a las Catacumbas de Areth.",
-    icon: "🗺️",
-    type: "quest",
-    rarity: "rare",
-    price: 0
-  },
-
-  garden_key: {
-    id: "garden_key",
-    name: "Llave del Jardín",
-    description: "Forjada con magia hada por la Guardiana Eryndel. Abre La Bóveda Olvidada.",
-    icon: "🗝️",
-    type: "quest",
-    rarity: "rare",
-    price: 0
-  },
-
-  mountain_pass: {
-    id: "mountain_pass",
-    name: "Pase de Montaña",
-    description: "Un salvoconducto sellado con Ice Crystal por Theron el Explorador. Permite cruzar a la Tundra Eterna.",
-    icon: "📜",
-    type: "quest",
-    rarity: "rare",
-    price: 0
-  },
-
-  dragon_key: {
-    id: "dragon_key",
-    name: "Llave del Dragón",
-    description: "Forjada en el fuego del Volcán Eterno por Pyrax. Abre la Puerta del Dragón hacia el Trono del Rey Dragón.",
-    icon: "🐉",
-    type: "quest",
-    rarity: "legendary",
-    price: 0
-  },
 
 }
 
@@ -1756,8 +1709,6 @@ export const shopInventories = {
   shop: [
     "health_potion",
     "mana_potion",
-    "antidote",
-    "remedy",
     "sword",
     "armor",
     "staff",
@@ -1772,9 +1723,6 @@ export const shopInventories = {
   castle_shop: [
     "health_potion",
     "mana_potion",
-    "antidote",
-    "remedy",
-    "panacea",
     "iron_sword",
     "plate_armor",
     "royal_armor",

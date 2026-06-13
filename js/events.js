@@ -14,9 +14,10 @@ export function setupMainMenuListeners() {
   });
 
   document.getElementById("continueBtn")?.addEventListener("click", () => {
-    loadGame();
-    toggleMainMenu(false);
-    updateUI();
+    if (loadGame()) {
+      toggleMainMenu(false);
+      updateUI();
+    }
   });
 
   document.getElementById("saveGameBtn")?.addEventListener("click", () => {
@@ -24,9 +25,10 @@ export function setupMainMenuListeners() {
   });
 
   document.getElementById("loadGameBtn")?.addEventListener("click", () => {
-    loadGame();
-    toggleMainMenu(false);
-    updateUI();
+    if (loadGame()) {
+      toggleMainMenu(false);
+      updateUI();
+    }
   });
 
   document.getElementById("deleteSaveBtn")?.addEventListener("click", () => {
