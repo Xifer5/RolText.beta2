@@ -42,8 +42,7 @@
       "Bash(copy \".claude\\\\settings.local.json\" \".claude\\\\settings.local.json.bak\")",
       "Bash(del \".claude\\\\settings.local.json\")",
       "Bash(cp \".claude/settings.local.json\" \".claude/settings.local.json.bak\")",
-      "Bash(rm \".claude/settings.local.json\")",
-      "Bash(git checkout *)"
+      "Bash(rm \".claude/settings.local.json\")"
     ]
   }
 }
