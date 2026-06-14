@@ -1,7 +1,9 @@
 // js/stats.js
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
+import { t, tf } from "./i18n.js";
 import { updateUI } from "./ui.js";
+import { CLASS_BASE_RESISTANCES, ITEM_RESISTANCES } from "./damageTypes.js";
 
 /**
  * Calcula estadísticas derivadas a partir de los atributos base y equipo.
@@ -41,16 +43,28 @@ export function calculateTotalStats(player, equipment = {}) {
   stats.defense = Math.floor((stats.agility || 0) / 2) + defenseFromItems;
   stats.magic = (stats.intelligence || 0) + magicFromItems;
 
-  // Compute max values after attributes and hp bonuses
-  stats.maxHp = 80 + ((stats.strength || 0) * 2) + hpBonusSum;
-  
-  // MP multiplier based on class: Mage gets 15 MP per INT, others get 5
+  // Compute max values: base + attributes + equipment + class vitality bonus
+  const classBonusHp = player.bonusHp || 0;
+  const classBonusMp = player.bonusMp || 0;
+  stats.maxHp = 80 + ((stats.strength || 0) * 2) + hpBonusSum + classBonusHp;
   const mpPerInt = (player.class === "mage") ? 15 : 5;
-  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt);
+  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + classBonusMp;
 
   // Asegurar integridad
   stats.hp = Math.min(player.hp ?? stats.maxHp, stats.maxHp);
   stats.mp = Math.min(player.mp ?? stats.maxMp, stats.maxMp);
+
+  // Agregar resistencias: clase base + equipo (ítem propio o tabla ITEM_RESISTANCES)
+  const resistances = { ...(CLASS_BASE_RESISTANCES[player.class] || {}) };
+  for (const slot in equipment) {
+    const it = equipment[slot];
+    if (!it) continue;
+    const itemRes = it.resistances || ITEM_RESISTANCES[it.id] || {};
+    for (const [type, val] of Object.entries(itemRes)) {
+      resistances[type] = (resistances[type] || 0) + val;
+    }
+  }
+  stats.resistances = resistances;
 
   return stats;
 }
@@ -62,7 +76,7 @@ export function calculateMagicAttack(stats) {
 export function increaseStat(statName) {
   if (!gameState.player) return false;
   if ((gameState.player.statPoints ?? 0) <= 0) {
-    addMessage("Not enough stat points!", "system");
+    addMessage(t("statNoPoints"), "system");
     return false;
   }
   if (!["strength", "agility", "intelligence"].includes(statName)) return false;
@@ -77,7 +91,7 @@ export function increaseStat(statName) {
   gameState.player.hp = Math.min(gameState.player.hp ?? s.maxHp, s.maxHp);
   gameState.player.mp = Math.min(gameState.player.mp ?? s.maxMp, s.maxMp);
 
-  addMessage(`Increased ${statName.toUpperCase()} to ${gameState.player[statName]}!`, "stat");
+  addMessage(tf("statIncreased", { stat: statName.toUpperCase(), value: gameState.player[statName] }), "stat");
   return true;
 }
 

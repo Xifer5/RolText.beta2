@@ -547,7 +547,8 @@ export const enemyData = {
     magicAttack: 50,
     experience: 3000,
     gold: 1000,
-    drops: ["saint_grail", "excalibur", "dragon_armor"],
+    drops: ["saint_grail", "excalibur", "dragon_heart"],
+    deathMessage: "Gracias... por recordarme.",
     img: "img/enemies/dragon_king.png",
   },
 
@@ -683,6 +684,7 @@ export const enemyData = {
     experience: 800,
     gold: 800,
     drops: ["inferno_blade", "dragon_scale_armor"],
+    deathMessage: "Mi... ira... se apaga...",
     img: "img/enemies/inferno_dragon.png",
   },
 
@@ -699,7 +701,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 800,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["titan_branch", "inferno_blade"],
+    deathMessage: "El dragón... está llorando...",
     img: "img/enemies/forest_titan.png",
   },
   cave_devourer: {
@@ -713,7 +716,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 800,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["devourer_fang", "inferno_blade"],
+    deathMessage: "No... quería... que me olvidaran...",
     img: "img/enemies/cave_devourer.png",
   },
   mountain_colossus: {
@@ -727,7 +731,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 800,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["earthbreaker_core", "inferno_blade"],
+    deathMessage: "Seguí... de pie... hasta el final...",
     img: "img/enemies/mountain_colossus.png",
   },
   ancient_construct: {
@@ -741,7 +746,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 800,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["construct_eye", "ancient_relic"],
+    deathMessage: "Asterion no destruye el mundo. El mundo lo está matando. Busca... la Puerta del Dragón...",
     img: "img/enemies/ancient_construct.png",
   },
   swamp_abominatinon: {
@@ -755,7 +761,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 300,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["abomination_core", "inferno_blade"],
+    deathMessage: "Ya no hay... esperanza... para mí...",
     img: "img/enemies/swamp_abomination.png",
   },
 
@@ -770,7 +777,8 @@ export const enemyData = {
     magicAttack: 30,
     experience: 800,
     gold: 120,
-    drops: ["inferno_blade", "dragon_scale_armor"],
+    drops: ["wyrm_tail", "glacial_core"],
+    deathMessage: "Mil años... esperando... que alguien volviera...",
     img: "img/enemies/frost_wyrm.png",
   },
 

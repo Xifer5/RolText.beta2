@@ -1,3 +1,9 @@
+---
+tags: [spec, pendiente]
+serie: "01"
+estado: pendiente
+---
+
 # SPEC-0105 Location Risk Indicator
 
 ## Objetivo

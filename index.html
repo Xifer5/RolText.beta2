@@ -25,14 +25,14 @@
       </div>
     </div>
     <nav class="topbar-nav">
-      <button class="nav-tab active" data-panel="attributes"><span data-i18n="navAttributes">Atributos</span></button>
-      <button class="nav-tab" data-panel="equipment"><span data-i18n="navEquipment">Equipo</span></button>
-      <button class="nav-tab" data-panel="spellbook"><span data-i18n="navSpellbook">Grimorio</span></button>
-      <button class="nav-tab" data-panel="journal"><span data-i18n="navJournal">Diario</span></button>
-      <button class="nav-tab" data-panel="bestiary"><span data-i18n="navBestiary">Bestiario</span></button>
-      <button class="nav-tab" data-panel="minimap">🗺️ <span data-i18n="navMap">Mapa</span></button>
-      <button class="nav-tab" data-panel="achievements">🏆 <span data-i18n="navAchievements">Logros</span></button>
-      <button class="nav-tab" data-panel="crafting">⚒️ <span data-i18n="navCrafting">Forja</span></button>
+      <button class="nav-tab active" data-panel="attributes" data-tooltip="Estadísticas y atributos del personaje" data-tooltip-pos="bottom"><span data-i18n="navAttributes">Atributos</span></button>
+      <button class="nav-tab" data-panel="equipment" data-tooltip="Equipo equipado actualmente" data-tooltip-pos="bottom"><span data-i18n="navEquipment">Equipo</span></button>
+      <button class="nav-tab" data-panel="spellbook" data-tooltip="Habilidades y conjuros aprendidos" data-tooltip-pos="bottom"><span data-i18n="navSpellbook">Grimorio</span></button>
+      <button class="nav-tab" data-panel="journal" data-tooltip="Misiones activas y completadas" data-tooltip-pos="bottom"><span data-i18n="navJournal">Diario</span></button>
+      <button class="nav-tab" data-panel="bestiary" data-tooltip="Enemigos descubiertos en tu aventura" data-tooltip-pos="bottom"><span data-i18n="navBestiary">Bestiario</span></button>
+      <button class="nav-tab" data-panel="minimap" data-tooltip="Mapa del mundo explorado" data-tooltip-pos="bottom">🗺️ <span data-i18n="navMap">Mapa</span></button>
+      <button class="nav-tab" data-panel="achievements" data-tooltip="Logros desbloqueados" data-tooltip-pos="bottom">🏆 <span data-i18n="navAchievements">Logros</span></button>
+      <button class="nav-tab" data-panel="crafting" data-tooltip="Fabricar objetos con materiales" data-tooltip-pos="bottom">⚒️ <span data-i18n="navCrafting">Forja</span></button>
     </nav>
     <div class="topbar-actions">
       <div class="m3-input-container">
@@ -45,8 +45,8 @@
           <span class="m3-select-icon">▼</span>
         </div>
       </div>
-      <button class="icon-btn" id="themeToggleBtn" aria-label="Cambiar tema" data-i18n-attr="aria-label" data-i18n="themeToggleLabel">🌙</button>
-      <button class="icon-btn" id="floatingMenuBtn" aria-label="Menú principal" data-i18n-attr="aria-label" data-i18n="mainMenuLabel">☰</button>
+      <button class="icon-btn" id="themeToggleBtn" aria-label="Cambiar tema" data-i18n-attr="aria-label" data-i18n="themeToggleLabel" data-tooltip="Cambiar entre tema claro y oscuro" data-tooltip-pos="bottom">🌙</button>
+      <button class="icon-btn" id="floatingMenuBtn" aria-label="Menú principal" data-i18n-attr="aria-label" data-i18n="mainMenuLabel" data-tooltip="Menú: guardar partida, opciones, créditos" data-tooltip-pos="bottom">☰</button>
     </div>
   </div>
 </header>
@@ -60,6 +60,7 @@
     <div class="mobile-hud-chips">
       <span class="mobile-hud-chip" id="mobile-state-chip">Explorando</span>
       <span class="mobile-hud-chip mobile-risk-chip" id="mobile-risk-chip">Zona normal</span>
+      <span class="mobile-hud-chip time-chip" id="mobile-time-chip">☀️ Día</span>
       <span class="mobile-hud-chip">Lv.<b id="mobile-level">1</b></span>
       <span class="mobile-hud-chip"><b id="mobile-gold">0</b> oro</span>
     </div>
@@ -105,21 +106,21 @@
     <!-- Vitals -->
     <div class="sidebar-block vitals-block">
       <div class="block-label">Vitalidad</div>
-      <div class="vital-row">
+      <div class="vital-row" data-tooltip="Puntos de vida — llegar a 0 significa la muerte">
         <span class="vital-label">HP</span>
         <div class="vital-bar-wrap">
           <div class="vital-bar hp-bar" id="hp-bar"></div>
         </div>
         <span class="vital-num" id="hp-text">0/0</span>
       </div>
-      <div class="vital-row">
+      <div class="vital-row" data-tooltip="Puntos de maná — necesarios para usar magia y habilidades">
         <span class="vital-label">MP</span>
         <div class="vital-bar-wrap">
           <div class="vital-bar mp-bar" id="mp-bar"></div>
         </div>
         <span class="vital-num" id="mp-text">0/0</span>
       </div>
-      <div class="vital-row">
+      <div class="vital-row" data-tooltip="Experiencia — llena la barra para subir de nivel">
         <span class="vital-label xp-label">XP</span>
         <div class="vital-bar-wrap">
           <div class="vital-bar xp-bar" id="xp-bar"></div>
@@ -132,28 +133,28 @@
     <div class="sidebar-block stats-grid-block">
       <div class="block-label">Estadísticas</div>
       <div class="stats-trio">
-        <div class="stat-cell">
+        <div class="stat-cell" data-tooltip="Ataque — daño físico que infliges al enemigo">
           <span class="stat-val" id="derived-attack">0</span>
           <span class="stat-key">ATK</span>
         </div>
-        <div class="stat-cell">
+        <div class="stat-cell" data-tooltip="Defensa — reduce el daño físico que recibes">
           <span class="stat-val" id="derived-defense">0</span>
           <span class="stat-key">DEF</span>
         </div>
-        <div class="stat-cell">
+        <div class="stat-cell" data-tooltip="Magia — potencia de tus conjuros y habilidades mágicas">
           <span class="stat-val" id="derived-magic">0</span>
           <span class="stat-key">MAG</span>
         </div>
       </div>
       <div class="attrs-row">
-        <span class="attr-chip">STR <b id="strength">0</b></span>
-        <span class="attr-chip">AGI <b id="agility">0</b></span>
-        <span class="attr-chip">INT <b id="intelligence">0</b></span>
+        <span class="attr-chip" data-tooltip="Fuerza — aumenta el daño físico">STR <b id="strength">0</b></span>
+        <span class="attr-chip" data-tooltip="Agilidad — mejora la evasión y velocidad de ataque">AGI <b id="agility">0</b></span>
+        <span class="attr-chip" data-tooltip="Inteligencia — aumenta el poder mágico y MP máximo">INT <b id="intelligence">0</b></span>
       </div>
       <div class="gold-level-row">
-        <span class="gold-val">🪙 <b id="gold">0</b></span>
-        <span class="level-val">⭐ Lv.<b id="level">1</b></span>
-        <span class="pts-val hidden" id="stat-points-row">✨ <b id="stat-points">0</b> pts</span>
+        <span class="gold-val" data-tooltip="Monedas de oro para comprar objetos">🪙 <b id="gold">0</b></span>
+        <span class="level-val" data-tooltip="Nivel actual del personaje">⭐ Lv.<b id="level">1</b></span>
+        <span class="pts-val hidden" id="stat-points-row" data-tooltip="Puntos de atributo disponibles — asígnalos en Estadísticas">✨ <b id="stat-points">0</b> pts</span>
       </div>
     </div>
 
@@ -164,21 +165,21 @@
 
     <!-- Location hero -->
     <div id="location-hero">
-      <img id="location-img" class="location-img hidden" src="" alt=""
-           onerror="this.classList.add('hidden')">
+      <img id="location-img" class="location-img" src="" alt=""
+           style="display:none" onerror="this.style.display='none'">
       <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
       <div id="location-subtitle" class="location-subtitle"></div>
       <div class="location-actions" aria-label="Acciones de ubicacion">
-        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona">
+        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-tooltip="Descansar recupera HP y MP al máximo">
           Descansar
         </button>
-        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona">
+        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona" data-tooltip="Comprar y vender objetos">
           Tienda
         </button>
+        <button id="npc-talk-btn" type="button" class="location-action-btn npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel" data-tooltip="Hablar con el NPC — misiones, entrenamiento, información">
+          💬 <span data-i18n="npcTalkText">Hablar</span>
+        </button>
       </div>
-      <button id="npc-talk-btn" type="button" class="npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel">
-        💬 <span data-i18n="npcTalkText">Hablar</span>
-      </button>
     </div>
 
     <!-- Mobile Player Header (only visible on mobile) -->
@@ -210,8 +211,8 @@
 
     <!-- Enemy panel -->
     <div id="enemy-panel" class="hidden" role="region" aria-labelledby="enemy-name" aria-live="assertive">
-      <img id="enemy-portrait" class="enemy-portrait hidden" src="" alt=""
-           onerror="this.classList.add('hidden')">
+      <img id="enemy-portrait" class="enemy-portrait" src="" alt=""
+           style="display:none" onerror="this.style.display='none'">
       <div class="enemy-left">
         <div class="enemy-title-row">
           <strong id="enemy-name">Enemy</strong>
@@ -253,11 +254,11 @@
     <div id="actionsPanel" class="sidebar-block action-panel">
       <div class="block-label" data-i18n="actionsLabel">Acciones</div>
       <div class="quick-actions">
-        <button class="qa-btn" id="inventoryBtn">🎒<span data-i18n="quickInventory">Inventory</span></button>
-        <button class="qa-btn" id="statsBtn">📈<span data-i18n="quickStats">Stats</span></button>
-        <button class="qa-btn" id="restBtn">🛏️<span data-i18n="quickRest">Rest</span></button>
-        <button class="qa-btn" id="shopBtn">🛒<span data-i18n="quickShop">Tienda</span></button>
-        <button class="qa-btn wide" id="questLogBtn">📋<span data-i18n="quickQuests">Misiones</span></button>
+        <button class="qa-btn" id="inventoryBtn" data-tooltip="Ver y usar objetos del inventario">🎒<span data-i18n="quickInventory">Inventory</span></button>
+        <button class="qa-btn" id="statsBtn" data-tooltip="Estadísticas detalladas y especialización">📈<span data-i18n="quickStats">Stats</span></button>
+        <button class="qa-btn" id="restBtn" data-tooltip="Descansar para recuperar HP y MP (cuesta tiempo)">🛏️<span data-i18n="quickRest">Rest</span></button>
+        <button class="qa-btn" id="shopBtn" data-tooltip="Comprar y vender objetos en la tienda local">🛒<span data-i18n="quickShop">Tienda</span></button>
+        <button class="qa-btn wide" id="questLogBtn" data-tooltip="Ver misiones activas y su progreso">📋<span data-i18n="quickQuests">Misiones</span></button>
       </div>
     </div>
 
@@ -274,10 +275,10 @@
     <div id="combat-menu" class="sidebar-block combat-block hidden">
       <div class="block-label combat-label" data-i18n="combatLabel">⚔ En Combate</div>
       <div id="combat-content" class="combat-grid">
-        <button class="combat-btn attack" id="attackBtn" aria-keyshortcuts="1" data-i18n-attr="aria-label" data-i18n="combatAttackAria">⚔️<span data-i18n="combatAttack">Atacar</span><kbd class="key-hint">1</kbd></button>
-        <button class="combat-btn magic"  id="magicBtn"  aria-keyshortcuts="2" data-i18n-attr="aria-label" data-i18n="combatMagicAria">✨<span data-i18n="combatMagic">Magia</span><kbd class="key-hint">2</kbd></button>
-        <button class="combat-btn item"   id="itemBtn"   aria-keyshortcuts="3" data-i18n-attr="aria-label" data-i18n="combatItemAria">🧪<span data-i18n="combatItem">Ítem</span><kbd class="key-hint">3</kbd></button>
-        <button class="combat-btn flee"   id="fleeBtn"   aria-keyshortcuts="4" data-i18n-attr="aria-label" data-i18n="combatFleeAria">🏃<span data-i18n="combatFlee">Huir</span><kbd class="key-hint">4</kbd></button>
+        <button class="combat-btn attack" id="attackBtn" aria-keyshortcuts="1" data-i18n-attr="aria-label" data-i18n="combatAttackAria" data-tooltip="Ataque físico básico con tu arma equipada" data-tooltip-pos="bottom">⚔️<span data-i18n="combatAttack">Atacar</span><kbd class="key-hint">1</kbd></button>
+        <button class="combat-btn magic"  id="magicBtn"  aria-keyshortcuts="2" data-i18n-attr="aria-label" data-i18n="combatMagicAria" data-tooltip="Lanzar un conjuro mágico (consume MP)" data-tooltip-pos="bottom">✨<span data-i18n="combatMagic">Magia</span><kbd class="key-hint">2</kbd></button>
+        <button class="combat-btn item"   id="itemBtn"   aria-keyshortcuts="3" data-i18n-attr="aria-label" data-i18n="combatItemAria" data-tooltip="Usar un objeto consumible del inventario" data-tooltip-pos="bottom">🧪<span data-i18n="combatItem">Ítem</span><kbd class="key-hint">3</kbd></button>
+        <button class="combat-btn flee"   id="fleeBtn"   aria-keyshortcuts="4" data-i18n-attr="aria-label" data-i18n="combatFleeAria" data-tooltip="Intentar escapar del combate (puede fallar)" data-tooltip-pos="bottom">🏃<span data-i18n="combatFlee">Huir</span><kbd class="key-hint">4</kbd></button>
       </div>
     </div>
 
@@ -301,10 +302,10 @@
         </div>
       </div>
       <div class="compass-actions" aria-label="Acciones especiales">
-        <button class="compass-action-btn" data-direction="enter" aria-label="Entrar" data-i18n-attr="aria-label" data-i18n="enterButton">⏎ <span data-i18n="enterButton">Enter</span></button>
-        <button class="compass-action-btn compass-exit" data-direction="out" aria-label="Salir" data-i18n-attr="aria-label" data-i18n="exitButton">⟲ <span data-i18n="exitButton">Exit</span></button>
-        <button class="compass-action-btn" data-direction="up" aria-label="Subir" data-i18n-attr="aria-label" data-i18n="climbUp">⬆ <span data-i18n="climbUp">Subir</span></button>
-        <button class="compass-action-btn" data-direction="down" aria-label="Bajar" data-i18n-attr="aria-label" data-i18n="climbDown">⬇ <span data-i18n="climbDown">Bajar</span></button>
+        <button class="compass-action-btn" data-direction="enter" aria-label="Entrar" data-i18n-attr="aria-label" data-i18n="enterButton" data-tooltip="Entrar a la ubicación actual">⏎ <span data-i18n="enterButton">Enter</span></button>
+        <button class="compass-action-btn compass-exit" data-direction="out" aria-label="Salir" data-i18n-attr="aria-label" data-i18n="exitButton" data-tooltip="Salir / volver al área anterior">⟲ <span data-i18n="exitButton">Exit</span></button>
+        <button class="compass-action-btn" data-direction="up" aria-label="Subir" data-i18n-attr="aria-label" data-i18n="climbUp" data-tooltip="Subir al piso superior">⬆ <span data-i18n="climbUp">Subir</span></button>
+        <button class="compass-action-btn" data-direction="down" aria-label="Bajar" data-i18n-attr="aria-label" data-i18n="climbDown" data-tooltip="Bajar al piso inferior">⬇ <span data-i18n="climbDown">Bajar</span></button>
       </div>
     </div>
 
@@ -446,13 +447,31 @@
     <div class="inventory-grid">
       <div class="inventory-list-col">
         <h3 data-i18n="itemsSectionTitle">Objetos</h3>
+        <div id="inventoryFilters" class="inv-filter-bar" role="group" aria-label="Filtrar inventario">
+          <button class="inv-filter-chip active" data-filter="all">Todos</button>
+          <button class="inv-filter-chip" data-filter="consumable">Consumibles</button>
+          <button class="inv-filter-chip" data-filter="equip">Equipo</button>
+          <button class="inv-filter-chip" data-filter="quest">Misión</button>
+          <button id="showEquipOverviewBtn" class="inv-filter-chip inv-equip-chip" aria-label="Ver equipamiento">🛡️</button>
+        </div>
         <ul id="inventoryList" role="listbox"></ul>
       </div>
       <div class="inventory-detail-col" id="inventoryDetail">
-        <h3 data-i18n="itemDetailTitle">Detalles</h3>
-        <div class="item-detail-empty" data-i18n="itemDetailEmpty">Selecciona un objeto para ver sus detalles.</div>
+        <h3 id="invDetailTitle">Equipamiento</h3>
+        <div id="invEquipOverview">
+          <ul id="equipmentList" role="list" class="equipment-slots-list">
+            <li><span class="equip-slot-icon">🪖</span><span class="equip-slot-label">Cabeza</span><span id="equip-head" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">⚔️</span><span class="equip-slot-label">Mano D.</span><span id="equip-rightHand" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🛡️</span><span class="equip-slot-label">Mano I.</span><span id="equip-leftHand" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🥋</span><span class="equip-slot-label">Armadura</span><span id="equip-armor" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🦾</span><span class="equip-slot-label">Brazos</span><span id="equip-arms" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">👢</span><span class="equip-slot-label">Botas</span><span id="equip-boots" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">💍</span><span class="equip-slot-label">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">✨</span><span class="equip-slot-label">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></li>
+          </ul>
+        </div>
         <div class="item-detail hidden" id="itemDetailCard">
-          <button id="detailCloseBtn" class="btn-ghost small" data-i18n="detailClose">✕ Cerrar</button>
+          <button id="detailCloseBtn" class="btn-ghost small" data-i18n="detailClose">← Volver</button>
           <div class="item-detail-header">
             <div class="item-detail-icon" id="detailIcon">🧪</div>
             <div>
@@ -470,19 +489,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="inv-equipment-section">
-      <h3>Equipamiento</h3>
-      <ul id="equipmentList" role="list" class="equipment-slots-list">
-        <li>🪖 <span id="equip-head" class="equip-val">Vacío</span></li>
-        <li>⚔️ <span id="equip-rightHand" class="equip-val">Vacío</span></li>
-        <li>🛡️ <span id="equip-leftHand" class="equip-val">Vacío</span></li>
-        <li>🥋 <span id="equip-armor" class="equip-val">Vacío</span></li>
-        <li>🦾 <span id="equip-arms" class="equip-val">Vacío</span></li>
-        <li>👢 <span id="equip-boots" class="equip-val">Vacío</span></li>
-        <li>💍 <span id="equip-ring" class="equip-val">Vacío</span></li>
-        <li>✨ <span id="equip-accessory" class="equip-val">Vacío</span></li>
-      </ul>
     </div>
   </div>
 </div>
@@ -508,6 +514,11 @@
         </div>
       </div>
       <p class="hint-text hint-text-mt" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
+      <div class="mastery-section">
+        <h3 class="mastery-section-title">⚔️ Maestría de Armas</h3>
+        <div id="mastery-list" class="mastery-list"></div>
+      </div>
+      <div id="spec-section" class="spec-section"></div>
     </div>
   </div>
 
@@ -586,6 +597,9 @@
       <div class="npc-dialogue" id="npcDialogue"></div>
     </div>
 
+    <!-- Trainer section (SPEC-0702) -->
+    <div id="npcTrainerSection" class="npc-trainer-section hidden"></div>
+
     <!-- Actions -->
     <div class="npc-actions">
       <button id="npcActionBtn" class="btn-action hidden"></button>
@@ -663,6 +677,25 @@
   });
 })();
 </script>
+<!-- ══ INTRO SCREEN — CÓMIC ════════════════════════════════════ -->
+<div id="introScreen" class="intro-screen hidden" role="dialog" aria-modal="true" aria-label="Introducción al juego">
+
+  <!-- Flash blanco al girar página -->
+  <div id="introFlash" class="intro-flash"></div>
+
+  <!-- Página de cómic — paneles renderizados por intro.js -->
+  <div id="comicPage" class="comic-page" aria-live="polite"></div>
+
+  <!-- Barra de controles -->
+  <div class="intro-controls">
+    <button id="introSkipBtn" class="intro-btn intro-btn-ghost">Saltar intro</button>
+    <span id="introPageCounter" class="intro-page-counter">1 / 5</span>
+    <button id="introNextBtn" class="intro-btn intro-btn-primary intro-btn-dim" style="display:none">Saltar texto</button>
+    <button id="introStartBtn" class="intro-btn intro-btn-accent" style="display:none">⚔ Comenzar Aventura</button>
+  </div>
+
+</div>
+
 <script type="module" src="js/main.js" defer></script>
 </body>
 </html>

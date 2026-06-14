@@ -1,3 +1,9 @@
+---
+tags: [spec, pendiente]
+serie: "02"
+estado: pendiente
+---
+
 # SPEC-0207 Save Menu Feedback
 
 ## Objetivo

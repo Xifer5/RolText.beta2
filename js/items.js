@@ -1692,7 +1692,37 @@ export const allItems = {
     icon: "./img/infernoGem.png",
   },
 
-
+  // ── Pergaminos de habilidad (SPEC-0607) ──────────────
+  scroll_of_rally: {
+    id: "scroll_of_rally",
+    name: "Pergamino: Reagruparse",
+    type: "scroll",
+    icon: "📜",
+    teachesSkill: "rally",
+    description: "Enseña la habilidad universal Reagruparse (+20% HP, elimina debuff).",
+    price: 150,
+    rarity: "uncommon"
+  },
+  scroll_of_power: {
+    id: "scroll_of_power",
+    name: "Pergamino: Golpe Potente",
+    type: "scroll",
+    icon: "📜",
+    teachesSkill: "power_strike",
+    description: "Enseña la habilidad universal Golpe Potente (ignora defensa, 50% crit).",
+    price: 200,
+    rarity: "uncommon"
+  },
+  scroll_of_arcane: {
+    id: "scroll_of_arcane",
+    name: "Pergamino: Descarga Arcana",
+    type: "scroll",
+    icon: "📜",
+    teachesSkill: "arcane_bolt",
+    description: "Enseña la habilidad universal Descarga Arcana (2× magia pura).",
+    price: 250,
+    rarity: "rare"
+  },
 
 }
 
@@ -1728,6 +1758,9 @@ export const shopInventories = {
     "royal_armor",
     "ring_of_power",
     "ring_of_knowledge",
+    "scroll_of_rally",
+    "scroll_of_power",
+    "scroll_of_arcane",
   ],
   // port vendors focus on sea / exploration items and trinkets
   port: [

@@ -1,3 +1,9 @@
+---
+tags: [spec, pendiente]
+serie: "03"
+estado: pendiente
+---
+
 # SPEC-0301 M3 Inline Style Cleanup
 
 ## Objetivo

@@ -304,10 +304,54 @@ export const SKILLS_BY_CLASS = {
   ]
 };
 
+// Habilidades universales aprendibles con pergaminos/libros
+export const LEARNABLE_SKILLS = {
+  rally: {
+    id: "rally",
+    name: "Reagruparse",
+    emoji: "🌟",
+    mpCost: 15,
+    levelReq: 1,
+    description: "Recupera 20% HP y elimina un estado negativo activo.",
+    effect: (stats, enemy, player) => {
+      const heal = Math.floor((player.maxHp || 100) * 0.20);
+      player.hp = Math.min(player.maxHp, (player.hp || 0) + heal);
+      return { heal, removeOneDebuff: true, msg: `🌟 Reagruparse: +${heal} HP` };
+    }
+  },
+  power_strike: {
+    id: "power_strike",
+    name: "Golpe Potente",
+    emoji: "💫",
+    mpCost: 12,
+    levelReq: 1,
+    description: "Golpe que ignora defensa con 50% de probabilidad de crítico.",
+    effect: (stats) => {
+      const isCrit = Math.random() < 0.50;
+      const dmg = Math.max(1, Math.floor(stats.attack * (isCrit ? 2.2 : 1.5) * (0.9 + Math.random() * 0.2)));
+      return { damage: dmg, ignoresDef: true, msg: `💫 Golpe Potente: ${dmg} daño${isCrit ? " ¡CRÍTICO!" : ""}` };
+    }
+  },
+  arcane_bolt: {
+    id: "arcane_bolt",
+    name: "Descarga Arcana",
+    emoji: "🔮",
+    mpCost: 18,
+    levelReq: 1,
+    description: "Rayo mágico que ignora defensa. Usa tu mayor stat (ATK o MAGIC).",
+    effect: (stats) => {
+      const base = Math.max(stats.attack || 0, stats.magic || 0);
+      const dmg = Math.max(5, Math.floor(base * 2.0 * (0.85 + Math.random() * 0.3)));
+      return { damage: dmg, ignoresDef: true, msg: `🔮 Descarga Arcana: ${dmg} daño mágico puro` };
+    }
+  }
+};
+
 // Obtener habilidades disponibles para el player actual
-export function getAvailableSkills(playerClass, playerLevel) {
-  const skills = SKILLS_BY_CLASS[playerClass] || [];
-  return skills.filter(s => s.levelReq <= playerLevel);
+export function getAvailableSkills(playerClass, playerLevel, learnedSkillIds = []) {
+  const classSkills = (SKILLS_BY_CLASS[playerClass] || []).filter(s => s.levelReq <= playerLevel);
+  const learned = learnedSkillIds.map(id => LEARNABLE_SKILLS[id]).filter(Boolean);
+  return [...classSkills, ...learned];
 }
 
 // Aplicar bonificaciones de clase al estado inicial
@@ -320,9 +364,9 @@ export function applyClassBonuses(player, classId) {
   player.strength = cls.baseStats.strength;
   player.agility = cls.baseStats.agility;
   player.intelligence = cls.baseStats.intelligence;
-  player.maxHp = 80 + cls.baseStats.strength * 2 + cls.bonusHp;
-  player.maxMp = 20 + cls.baseStats.intelligence * 4 + cls.bonusMp;
-  player.hp = player.maxHp;
-  player.mp = player.maxMp;
+  // Store class vitality bonuses so calculateTotalStats can read them (single source of truth)
+  player.bonusHp = cls.bonusHp ?? 0;
+  player.bonusMp = cls.bonusMp ?? 0;
+  // maxHp/maxMp/hp/mp are set by the caller via calculateTotalStats after this returns
   return player;
 }

@@ -4,9 +4,12 @@ import { gameState } from "./state.js";
 import { allItems } from "./items.js";
 import { t, formatText, localizeText } from "./i18n.js";
 
-// NPC inverso: questId → NPC
+// NPC inverso: questId → NPC (soporta questId string y questIds array)
 const _questNpc = Object.fromEntries(
-  Object.values(NPC_DATA).map(n => [n.questId, n])
+  Object.values(NPC_DATA).flatMap(n => {
+    const ids = n.questIds ?? (n.questId ? [n.questId] : []);
+    return ids.map(id => [id, n]);
+  })
 );
 
 // ── RENDER PRINCIPAL ────────────────────────────────────────────────

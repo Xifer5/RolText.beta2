@@ -70,18 +70,19 @@ export function renderLocalMinimap() {
     const visitedClass = isVisited(targetId) ? "lmm-visited" : "lmm-adjacent";
     const safeClass = target.safeZone ? " lmm-safe" : "";
     cells[idx] = {
-      cls: `lmm-cell ${visitedClass}${safeClass}`,
+      cls: `lmm-cell lmm-travel ${visitedClass}${safeClass}`,
+      dir,
       html: `
         <span class="lmm-arrow">${DIR_ARROW[dir]}</span>
         <span class="lmm-icon">${BIOME_ICON[target.biome] || "•"}</span>
+        <span class="lmm-travel-hint">2×</span>
       `,
-      title: `${dir.toUpperCase()}: ${target.name}${target.safeZone ? " (Seguro)" : ""}`
+      title: `${target.name}${target.safeZone ? " (Seguro)" : ""} — Doble clic para viajar`
     };
   }
 
   // Esquinas con direcciones especiales (verticales/portal)
   const verticalExits = VERTICAL_DIRS.filter(d => exits[d]);
-  // top-left, top-right, bottom-left, bottom-right
   const cornerSlots = [0, 2, 6, 8];
   verticalExits.slice(0, 4).forEach((dir, i) => {
     const targetId = exits[dir];
@@ -90,18 +91,42 @@ export function renderLocalMinimap() {
     const idx = cornerSlots[i];
     const visitedClass = isVisited(targetId) ? "lmm-visited" : "lmm-adjacent";
     cells[idx] = {
-      cls: `lmm-cell lmm-special ${visitedClass}`,
+      cls: `lmm-cell lmm-special lmm-travel ${visitedClass}`,
+      dir,
       html: `
         <span class="lmm-special-tag">${DIR_LABEL[dir]}</span>
         <span class="lmm-icon">${BIOME_ICON[target.biome] || "•"}</span>
+        <span class="lmm-travel-hint">2×</span>
       `,
-      title: `${dir.toUpperCase()}: ${target.name}`
+      title: `${target.name} — Doble clic para viajar`
     };
   });
 
   grid.innerHTML = cells
-    .map(c => `<div class="${c.cls}" ${c.title ? `title="${c.title.replace(/"/g, '&quot;')}"` : ""}>${c.html}</div>`)
+    .map(c => {
+      const dirAttr = c.dir ? ` data-dir="${c.dir}" tabindex="0"` : "";
+      const titleAttr = c.title ? ` title="${c.title.replace(/"/g, '&quot;')}"` : "";
+      return `<div class="${c.cls}"${dirAttr}${titleAttr}>${c.html}</div>`;
+    })
     .join("");
+
+  // Wire double-click travel (guard prevents accumulation on re-render)
+  if (!grid.dataset.wired) {
+    grid.dataset.wired = "1";
+    grid.addEventListener("dblclick", e => {
+      const cell = e.target.closest("[data-dir]");
+      if (!cell) return;
+      window.dispatchEvent(new CustomEvent("pixel:move", { detail: { direction: cell.dataset.dir } }));
+      cell.classList.add("lmm-traveling");
+      setTimeout(() => cell.classList.remove("lmm-traveling"), 400);
+    });
+    grid.addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      const cell = document.activeElement.closest("[data-dir]");
+      if (!cell) return;
+      window.dispatchEvent(new CustomEvent("pixel:move", { detail: { direction: cell.dataset.dir } }));
+    });
+  }
 }
 
 // Auto-render al cambiar de localización

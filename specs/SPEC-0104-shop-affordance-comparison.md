@@ -1,3 +1,9 @@
+---
+tags: [spec, pendiente]
+serie: "01"
+estado: pendiente
+---
+
 # SPEC-0104 Shop Affordance And Comparison
 
 ## Objetivo

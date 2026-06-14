@@ -15,10 +15,13 @@ export const initialGameState = {
     strength: 10,
     agility: 8,
     intelligence: 7,
+    bonusHp: 0,
+    bonusMp: 0,
     gold: 50,
     experience: 0,
     nextLevelXp: 100,
-    statPoints: 0
+    statPoints: 0,
+    specialization: null
   },
   stats: {
     kills: 0,
@@ -45,7 +48,10 @@ export const initialGameState = {
   quests: {},           // { questId: "inactive"|"active"|"completed" }
   visitedLocations: {},  // { locationId: true } — rastrea zonas visitadas para quests tipo "visit"
   achievements: {},
-  playerDebuffs: {}    // { poison:{turns,damage}, burn:{turns,damage}, stun:{turns} }
+  playerDebuffs: {},   // { poison:{turns,damage}, burn:{turns,damage}, stun:{turns} }
+  weaponMastery: {},   // { damageType: { xp: number } }
+  learnedSkills: [],   // [ skillId, ... ] — from scrolls/books
+  difficulty: "easy"
 };
 
 export let gameState = deepClone(initialGameState);

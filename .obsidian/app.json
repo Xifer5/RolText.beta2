@@ -1,0 +1,9 @@
+{
+  "defaultViewMode": "preview",
+  "alwaysUpdateLinks": true,
+  "newLinkFormat": "relative",
+  "useMarkdownLinks": false,
+  "showFrontmatter": false,
+  "newFileLocation": "root",
+  "newFileFolderPath": ""
+}

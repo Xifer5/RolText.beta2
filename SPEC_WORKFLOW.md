@@ -39,6 +39,26 @@ Deuda visible:
 - `specs/SPEC-0207-save-menu-feedback.md`: guardado sin mensaje duplicado y carga fallida mantiene menu abierto; falta QA visual.
 - `specs/SPEC-0208-inventory-row-selection.md`: filas de inventario abren detalle con click/teclado; falta QA visual.
 - `specs/SPEC-0301-m3-inline-style-cleanup.md`: iniciada limpieza de inline styles en navegacion movil; falta QA visual.
+- `SPEC-0301-m3-inline-style-cleanup (charselect+panels)`: charselect.js y panels.js limpios de inline styles — --cls-color variable, clases utilitarias bonus-positive/hint-centered/spell-class-info; falta QA visual.
+- `SPEC-0302-m3-components`: contrato M3 de botones completado — variantes outlined, text, danger, disabled; falta QA visual.
+- `SPEC-0401-breakpoints`: breakpoints redefinidos — ≤1023px mobile/tablet, 768-1023px tablet 2col, 1280px+ wide desktop; falta QA visual.
+- `SPEC-0402-adaptive-modals`: bottom-sheet extendido de 480px a 640px, shop stacking actualizado; falta QA visual.
+- `specs/SPEC-0501-sell-confirmation.md`: confirmación al vender objetos rare/epic/legendary; quest items bloqueados; falta QA visual.
+- `specs/SPEC-0502-rarity-badges.md`: badges de rareza en inventario y tienda para uncommon+; falta QA visual.
+- `specs/SPEC-0503-bestiary-mobile-m3.md`: bestiario responsive M3 — clases base añadidas, portrait colapsa a 100% en ≤640px; falta QA visual.
+- `specs/SPEC-0504-inventory-filter-chips.md`: chips M3 de filtro en inventario (Todos/Consumibles/Equipo/Misión); empty state contextual; falta QA visual.
+- `specs/SPEC-0601-damage-types-resistances.md`: motor de tipos de daño + resistencias; tablas de armas/enemigos/clases; regenerate behavior; falta QA visual.
+- `specs/SPEC-0602-extended-status-effects.md`: bleed, weakness, blind añadidos; ENEMY_STATUS_EFFECTS expandido; falta QA visual.
+- `specs/SPEC-0603-armor-resistances.md`: ITEM_RESISTANCES en damageTypes.js — 22 ítems con resistencias por tipo; stats.js acumula correctamente; inventario muestra resistencias en detalle; falta QA visual.
+- `specs/SPEC-0604-enemy-ai-behaviors.md`: 8 patrones de behavior implementados (aggressive/defensive/berserker/boss/regenerate/mage/status/standard); todos los enemigos asignados en ENEMY_COMBAT_DATA; falta QA visual.
+- `specs/SPEC-0605-weapon-mastery.md`: maestría por tipo de daño; XP por ataque (2x en crítico); bonus 5-20% según tier; barra de progreso en modal de stats; falta QA visual.
+- `specs/SPEC-0608-range-system.md`: WEAPON_RANGE + ENEMY_RANGE en damageTypes.js; enemigos con mayor alcance obtienen ataque de iniciativa; flag hasInitiative limpiado tras primer ataque; falta QA visual.
+- `specs/SPEC-0701-day-night-cycle.md`: ciclo día/noche vinculado al tema visual; nightOnly/dayBonus/nightBonus en enemigos; tasa de encuentros +30% de noche; multiplicadores de daño por tipo; chip de tiempo en HUD móvil; falta QA visual.
+- `specs/SPEC-0606-class-specializations.md`: especializaciones permanentes al nivel 10 (3 por clase); bonuses pasivos de daño/defensa/evasión/oro/huida aplicados en combat.js; selector en stats modal; falta QA visual.
+- `specs/SPEC-0607-learning-system.md`: LEARNABLE_SKILLS en classes.js (rally/power_strike/arcane_bolt); 3 pergaminos en castle_shop; useItem() enseña skill y la añade a learnedSkills[]; aparece en panel de combate y grimorio; falta QA visual.
+- `specs/SPEC-0702-npc-trainers.md`: 2 NPCs entrenadores (Maestro Aldric en taverna, Herrero Garrett en armería); sección de entrenamiento en modal NPC; aprende habilidades por oro; falta QA visual.
+- `specs/SPEC-0703-contextual-travel-events.md`: 8 eventos de viaje que reaccionan a especialización/clase/hora; condición día/noche vía getter; explorador/duelista/asesino/mago con ventajas específicas; falta QA visual.
+- `specs/SPEC-0505-toast-position-tooltips.md`: toasts movidos al borde inferior-derecho de #screen (M3: bottom); .simple-toast con variantes; ~30 elementos con data-tooltip contextual; falta QA visual.
 
 ### P0 - Base para no romper UX
 

@@ -14,8 +14,8 @@ export const NPC_DATA = {
     locationId: "town",
     role: "Guardiana de Oakhaven",
     color: "#818cf8",
-    questId: "explore_forest",
-    lore: "Una anciana sabia que lleva décadas observando los movimientos del mal en Aethoria. Fue ella quien vio en sus visiones la llegada del Dragon King."
+    questIds: ["mq_01_la_cancion", "explore_forest"],
+    lore: "Una anciana que escucha el eco del mundo cuando todos duermen. Hace mil años vio en sueños al Rey Dragón Asterion dividir su alma en ocho sellos. Lleva décadas esperando a alguien capaz de oírlos."
   },
 
   valdris: {
@@ -25,8 +25,8 @@ export const NPC_DATA = {
     locationId: "tower",
     role: "Archimago del Castillo Griffon",
     color: "#b09ae0",
-    questId: "collect_crystal",
-    lore: "El mago más poderoso del reino. Lleva años estudiando las Ruinas de Eldrast, convencido de que ocultan la clave para derrotar al Rey Dragón."
+    questIds: ["mq_02_los_sellos", "mq_04_la_verdad", "collect_crystal"],
+    lore: "Lleva su nombre del bosque que estudió toda su vida. Fue el primero en descubrir que los fragmentos arcanos de Eldrast pertenecían a una sola esencia: Asterion, el guardián del mundo. Nadie le creyó."
   },
 
   brennan: {
@@ -37,7 +37,7 @@ export const NPC_DATA = {
     role: "Capitán de Saltwind Port",
     color: "#5a8de0",
     questId: "kill_pirates",
-    lore: "Veterano marino con treinta años en el mar. Conoce cada ruta submarina de la región y guarda los mapas de las Catacumbas de Areth."
+    lore: "Veterano marino con treinta años en el mar. Los piratas que bloquean las rutas costeras no buscan oro: buscan reliquias del dragón para venderlas al mejor postor. Brennan lo sabe y no lo tolera."
   },
 
   eryndel: {
@@ -47,8 +47,8 @@ export const NPC_DATA = {
     locationId: "garden_1",
     role: "Guardiana del Jardín Encantado",
     color: "#52c07a",
-    questId: "collect_fairy_dust",
-    lore: "Un hada ancestral que custodia los secretos del Jardín de Eryndel desde el primer amanecer del mundo. La Bóveda Olvidada responde solo a su magia."
+    questIds: ["mq_03_ecos", "collect_fairy_dust"],
+    lore: "El hada más antigua de Aetheria. Recuerda a Asterion jugando en este jardín cuando el mundo era joven. Con cada boss que despierta, ella pierde un pétalo de su memoria. Teme el día en que no recuerde nada."
   },
 
   theron: {
@@ -59,7 +59,7 @@ export const NPC_DATA = {
     role: "Explorador de las Crestas de Hierro",
     color: "#94a3b8",
     questId: "collect_ice_crystal",
-    lore: "El único ser conocido que cruzó la Tundra Eterna sin congelarse. Forja Pases de Montaña con cristales helados y el calor de su voluntad."
+    lore: "El único ser conocido que cruzó la Tundra Eterna sin congelarse. Encontró allí un recuerdo congelado: un niño humano prometiendo visitar al dragón. Han pasado mil años. Los cristales de hielo aún guardan ese eco."
   },
 
   pyrax: {
@@ -69,8 +69,38 @@ export const NPC_DATA = {
     locationId: "volcano_4",
     role: "Centinela del Volcán Eterno",
     color: "#f97316",
-    questId: "defeat_dark_lord",
-    lore: "Un elemental de fuego ancestral que vigila la Puerta del Dragón desde la primera erupción. Solo deja pasar a quienes ya miraron a los ojos al Señor Oscuro."
+    questIds: ["mq_05_el_ultimo_sueno", "defeat_dark_lord"],
+    lore: "Un elemental de fuego que vigila la Puerta del Dragón desde la primera erupción. Fue el último ser en ver a Asterion antes de que cerrara los ojos. Sabe que el dragón no murió de maldad. Murió de olvido."
+  },
+
+  // ── Entrenadores (SPEC-0702) ──────────────────────────────────────
+  mentor_aldric: {
+    id: "mentor_aldric",
+    name: "Maestro Aldric",
+    emoji: "📚",
+    locationId: "tavern",
+    role: "Mentor de la Taberna del Dragón Ebrio",
+    color: "#a78bfa",
+    lore: "Un aventurero retirado que pasó décadas viajando por Aethoria y recogiendo el conocimiento de cien batallas. Por unas monedas comparte lo que aprendió.",
+    trainerSkills: [
+      { skillId: "rally",        gold: 150 },
+      { skillId: "power_strike", gold: 200 },
+      { skillId: "arcane_bolt",  gold: 250 }
+    ]
+  },
+
+  weaponsmith_garrett: {
+    id: "weaponsmith_garrett",
+    name: "Herrero Garrett",
+    emoji: "⚒️",
+    locationId: "armory",
+    role: "Maestro del Armario Real",
+    color: "#6b7280",
+    lore: "Forjó las armas de tres generaciones de caballeros del reino. Conoce cada técnica de combate que existe, y las enseña a los dignos previo pago.",
+    trainerSkills: [
+      { skillId: "power_strike", gold: 180 },
+      { skillId: "rally",        gold: 130 }
+    ]
   }
 
 };

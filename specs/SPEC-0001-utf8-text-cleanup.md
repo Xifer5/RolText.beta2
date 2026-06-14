@@ -1,3 +1,9 @@
+---
+tags: [spec, pendiente]
+serie: "00"
+estado: pendiente
+---
+
 # SPEC-0001 UTF-8 Text Cleanup
 
 ## Objetivo
