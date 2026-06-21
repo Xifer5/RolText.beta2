@@ -64,8 +64,15 @@ export function renderInventory() {
     const equipBtn = document.getElementById("showEquipOverviewBtn");
     if (equipBtn) {
       equipBtn.addEventListener("click", () => {
-        const overview = document.getElementById("equipmentOverview");
-        if (overview) overview.classList.toggle("visible");
+        // Show equipment overview in the detail column
+        const overview = document.getElementById("invEquipOverview");
+        const card = document.getElementById("itemDetailCard");
+        const grid = document.querySelector(".inventory-grid");
+        if (card) { card.style.display = "none"; card.classList.add("hidden"); }
+        if (overview) overview.style.display = "";
+        if (grid) grid.classList.add("detail-open");
+        selectedInventoryItemId = null;
+        document.querySelectorAll("#inventoryList li.active").forEach(li => li.classList.remove("active"));
       });
     }
     filterBar.dataset.initialized = "1";
