@@ -300,7 +300,7 @@ function showItemDetails(itemId, item) {
   const equipOverview = document.getElementById('invEquipOverview');
   if (equipOverview) equipOverview.style.display = 'none';
   if (detailEmpty) detailEmpty.classList.add('hidden');
-  if (detailCard) detailCard.classList.remove('hidden');
+  if (detailCard) { detailCard.classList.remove('hidden'); detailCard.style.display = ''; }
 
   const grid = document.querySelector('.inventory-grid');
   if (grid) {
