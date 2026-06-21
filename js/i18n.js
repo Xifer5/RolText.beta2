@@ -573,7 +573,7 @@ const dictionaries = {
   }
 };
 
-const defaultLocale = "en";
+const defaultLocale = "es";
 let currentLocale = defaultLocale;
 
 export function t(key) {

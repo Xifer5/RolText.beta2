@@ -11,7 +11,7 @@ import { checkAchievements } from "./achievements.js";
 import { saveGame } from "./saveSystem.js";
 import { playSound, playMusic } from "./sounds.js";
 import { showToast } from "./toast.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -450,7 +450,7 @@ function endCombat(victory, fled = false) {
           gameState.inventory[item] = (gameState.inventory[item] || 0) + 1;
         });
         playSound("loot");
-        addMessage(formatText(t('lootObtained'), { items: loot.map(i => allItems[i]?.name ?? i.replace(/_/g, " ")).join(", ") }), "loot");
+        addMessage(formatText(t('lootObtained'), { items: loot.map(i => localizeText(allItems[i]?.name) ?? i.replace(/_/g, " ")).join(", ") }), "loot");
       }
     } catch(e) {}
 

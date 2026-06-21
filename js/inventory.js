@@ -58,7 +58,7 @@ export function renderInventory() {
     li.className = item.type === "quest" ? "inv-item quest-item" : "inv-item";
     li.tabIndex = 0;
     li.setAttribute("role", "button");
-    li.setAttribute("aria-label", `Ver detalles de ${item.name}`);
+    li.setAttribute("aria-label", `Ver detalles de ${localizeText(item.name)}`);
     li.addEventListener("click", () => showItemDetails(itemId, item));
     li.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -177,7 +177,7 @@ export function renderInventory() {
   ];
   equipSlots.forEach(({ id, slot }) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = gameState.equipment[slot]?.name || "Empty";
+    if (el) el.textContent = localizeText(gameState.equipment[slot]?.name) || t('emptySlot');
   });
 
   if (!gameState.inventory[selectedInventoryItemId]) {

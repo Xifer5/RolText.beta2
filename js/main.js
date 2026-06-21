@@ -16,6 +16,7 @@ import { renderLocalMinimap } from "./localMinimap.js";
 import { showIntro } from "./intro.js";
 
 window.addEventListener("DOMContentLoaded", () => {
+  initLocalization();
   initAudio();
   initScrollManager();
   setupMainMenuListeners();
