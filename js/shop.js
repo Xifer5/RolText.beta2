@@ -3,7 +3,7 @@ import { createIconElement } from "./utils.js";
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 import { calculateTotalStats } from "./stats.js";
 
 export function renderShop() {
@@ -19,7 +19,7 @@ export function renderShop() {
   const locId = gameState.currentLocationId;
   const worldRef = window.worldMap?.[locId];
   const titleEl = document.querySelector("#shopModal .modal-content h2");
-  if (titleEl) titleEl.textContent = worldRef?.name || t('shopModalTitle');
+  if (titleEl) titleEl.textContent = localizeText(worldRef?.name) || t('shopModalTitle');
 
   // Base inventory + class-specific bonus items
   const base = shopInventories[locId] || shopInventories.shop || [];
@@ -62,7 +62,7 @@ function makeShopItem(item, mode, qty, price) {
   info.className = "shop-row-info";
 
   const name = document.createElement("div");
-  name.textContent = item.name + (qty ? ` ×${qty}` : "");
+  name.textContent = localizeText(item.name) + (qty ? ` ×${qty}` : "");
   name.className = "shop-row-name";
 
   const attrs = buildAttrString(item);
@@ -144,7 +144,7 @@ export function buyItem(item) {
   }
   gameState.player.gold -= item.price;
   addItemToInventory(gameState.inventory, item.id, 1);
-  addMessage(formatText('shopBuyMessage', { item: item.name, price: item.price }), "shop");
+  addMessage(formatText(t('shopBuyMessage'), { item: localizeText(item.name), price: item.price }), "shop");
   renderShop();
   updateUI();
   return true;
@@ -161,7 +161,7 @@ export function sellItem(itemId, price) {
   }
   const item = allItems[itemId] || { name: itemId };
   gameState.player.gold += price;
-  addMessage(formatText(t('shopSellMessage'), { item: item.name, price }), "shop");
+  addMessage(formatText(t('shopSellMessage'), { item: localizeText(item.name), price }), "shop");
   renderShop();
   updateUI();
   return true;

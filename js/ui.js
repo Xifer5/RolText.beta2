@@ -861,7 +861,7 @@ function openShopAtCurrentLocation() {
     renderShop();
     document.getElementById("shopModal")?.classList.remove("hidden");
   } else {
-    addMessage("Necesitas estar en una tienda.", "system");
+    addMessage(t('noShopHere'), "system");
   }
 }
 
