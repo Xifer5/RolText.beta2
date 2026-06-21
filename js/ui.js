@@ -11,7 +11,7 @@ import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
-import { t, localizeText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
 // El sistema busca en este orden:
@@ -694,13 +694,13 @@ function openNpcModal(npc) {
   const badge = document.getElementById("npcQuestBadge");
   if (badge) {
     badge.className = `npc-quest-badge ${status}`;
-    badge.textContent = status === "inactive" ? "Misión disponible"
-                      : status === "active"   ? "En progreso"
-                      : "Completada ✓";
+    badge.textContent = status === "inactive" ? t("qlStatusAvailable")
+                      : status === "active"   ? t("qlStatusActive")
+                      : t("qlStatusCompleted");
   }
 
   const titleEl = document.getElementById("npcQuestTitle");
-  if (titleEl) titleEl.textContent = QUEST_DATA[questId]?.title ?? "";
+  if (titleEl) titleEl.textContent = localizeText(QUEST_DATA[questId]?.title) ?? "";
 
   const dialogueEl = document.getElementById("npcDialogue");
   if (dialogueEl) dialogueEl.innerHTML = lines.map(l => `<p>${l}</p>`).join("");
