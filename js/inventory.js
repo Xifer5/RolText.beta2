@@ -297,6 +297,8 @@ function showItemDetails(itemId, item) {
   const useBtn = document.getElementById('detailUseBtn');
   const equipBtn = document.getElementById('detailEquipBtn');
 
+  const equipOverview = document.getElementById('invEquipOverview');
+  if (equipOverview) equipOverview.style.display = 'none';
   if (detailEmpty) detailEmpty.classList.add('hidden');
   if (detailCard) detailCard.classList.remove('hidden');
 
@@ -390,9 +392,11 @@ function closeItemDetail() {
   selectedInventoryItemId = null;
   const detailCard = document.getElementById('itemDetailCard');
   const detailEmpty = document.querySelector('#inventoryDetail .item-detail-empty');
+  const equipOverview = document.getElementById('invEquipOverview');
   const grid = document.querySelector('.inventory-grid');
   if (detailCard) detailCard.style.display = 'none';
   if (detailEmpty) detailEmpty.style.display = '';
+  if (equipOverview) equipOverview.style.display = '';
   if (grid) grid.classList.remove('detail-open');
   document.querySelectorAll('#inventoryList li.active').forEach(li => li.classList.remove('active'));
 }
