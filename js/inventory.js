@@ -39,6 +39,11 @@ export function renderInventory() {
   if (typeSelect && !typeSelect.dataset.initialized) {
     typeSelect.addEventListener("change", (event) => {
       inventoryTypeFilter = event.target.value || "all";
+      // Reset chip to "Todos" when dropdown takes over
+      const filterBar = document.getElementById("inventoryFilters");
+      if (filterBar) filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(c => {
+        c.classList.toggle("active", c.dataset.filter === "all");
+      });
       renderInventory();
     });
     typeSelect.dataset.initialized = "1";
@@ -50,6 +55,9 @@ export function renderInventory() {
     filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(chip => {
       chip.addEventListener("click", () => {
         inventoryTypeFilter = chip.dataset.filter;
+        // Reset dropdown to blank/all when chip takes over
+        const sel = document.getElementById("inventoryTypeFilter");
+        if (sel) sel.value = chip.dataset.filter === "all" ? "all" : "";
         renderInventory();
       });
     });
@@ -71,7 +79,6 @@ export function renderInventory() {
   }
 
   if (searchInput) searchInput.value = inventoryFilterText;
-  if (typeSelect) typeSelect.value = inventoryTypeFilter;
 
   list.innerHTML = "";
   goldEl.textContent = gameState.player.gold;
