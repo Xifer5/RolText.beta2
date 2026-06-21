@@ -81,7 +81,7 @@ function _progressHtml(q, status) {
     return `<div class="ql-progress-text done">${t("qlProgressCompleted")}</div>`;
   }
   if (status === "inactive") {
-    return `<div class="ql-progress-text">${formatText("qlProgressInactive", { npc: _questNpc[q.id]?.name ?? t("unknownLocation") })}</div>`;
+    return `<div class="ql-progress-text">${formatText(t("qlProgressInactive"), { npc: _questNpc[q.id]?.name ?? t("unknownLocation") })}</div>`;
   }
 
   // active

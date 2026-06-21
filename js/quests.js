@@ -238,7 +238,7 @@ export function completeQuest(questId) {
 /** Líneas de diálogo según estado actual de la misión */
 export function getQuestDialogue(questId) {
   const q = QUEST_DATA[questId];
-  if (!q) return [t("qlProgressInactive", { npc: t("unknownLocation") })];
+  if (!q) return [formatText(t("qlProgressInactive"), { npc: t("unknownLocation") })];
   const status = getQuestStatus(questId);
 
   if (status === "completed") {

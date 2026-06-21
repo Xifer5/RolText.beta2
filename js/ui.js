@@ -684,7 +684,9 @@ function openNpcModal(npc) {
   document.getElementById("npcRole").textContent  = npc.role;
   document.getElementById("npcLore").textContent  = npc.lore;
 
-  const questId = npc.questId;
+  // Support both questId (singular) and questIds (array) — pick first active/inactive quest
+  const ids = npc.questId ? [npc.questId] : (npc.questIds || []);
+  const questId = ids.find(id => getQuestStatus(id) !== "completed") ?? ids[0];
   const status  = getQuestStatus(questId);
   const lines   = getQuestDialogue(questId);
   const label   = getQuestActionLabel(questId);
