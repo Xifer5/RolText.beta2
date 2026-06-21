@@ -121,12 +121,19 @@ function _progressHtml(q, status) {
   }
 }
 
+function _iconHtml(icon) {
+  if (!icon) return "📦";
+  if (icon.includes("/") || /\.(png|jpe?g|gif|webp|svg)$/i.test(icon))
+    return `<img src="${icon}" width="20" height="20" style="vertical-align:middle;border-radius:3px">`;
+  return icon;
+}
+
 // ── RECOMPENSA ──────────────────────────────────────────────────────
 function _rewardHtml(reward) {
   const parts = [];
   if (reward?.item) {
     const item = allItems[reward.item];
-    parts.push(`${item?.icon ?? "📦"} ${localizeText(item?.name) ?? reward.item}`);
+    parts.push(`${_iconHtml(item?.icon)} ${localizeText(item?.name) ?? reward.item}`);
   }
   if (reward?.xp)   parts.push(`✨ ${reward.xp} XP`);
   if (reward?.gold) parts.push(`🪙 ${reward.gold} ${t("endingGoldLabel").toLowerCase()}`);

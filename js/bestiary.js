@@ -3,6 +3,7 @@
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
 import { enemyData } from "./enemies.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 const ENEMY_LORE = {
   slime: {
@@ -131,7 +132,7 @@ export function renderBestiary() {
   return `
     <div class="bestiary-container">
       <div class="bestiary-progress">
-        <span>Criaturas descubiertas: <strong>${found}/${total}</strong></span>
+        <span>${formatText('bestiaryDiscoveredProgress', { found, total })}</span>
         <div class="bestiary-bar">
           <div class="bestiary-fill" style="width:${Math.round(found/total*100)}%"></div>
         </div>

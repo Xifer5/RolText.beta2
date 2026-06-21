@@ -3,6 +3,7 @@
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
 import { localizeText } from "./i18n.js";
+import { CLASS_DEFINITIONS } from "./classes.js";
 
 // Localized journal entries for progress milestones
 const JOURNAL_ENTRIES = [
@@ -105,8 +106,9 @@ export function getAvailableEntries() {
 export function renderJournal() {
   const entries = getAvailableEntries();
   const cls = gameState.player.class;
-  const clsName = gameState.player.className || localizeText({ en: "Adventurer", es: "Aventurero" });
-  const clsEmoji = gameState.player.classEmoji || "⚔️";
+  const clsDef = CLASS_DEFINITIONS[cls];
+  const clsName = clsDef?.name || localizeText({ en: "Adventurer", es: "Aventurero" });
+  const clsEmoji = clsDef?.emoji || "⚔️";
 
   return `
     <div class="journal-container">
@@ -115,7 +117,7 @@ export function renderJournal() {
           <span style="font-size:2.5rem">${clsEmoji}</span>
           <div>
             <div class="journal-name">${gameState.player.name || localizeText({ en: "Adventurer", es: "Aventurero" })}</div>
-            <div class="journal-class">${clsName} · Level ${gameState.player.level}</div>
+            <div class="journal-class">${clsName} · ${localizeText({ en: "Level", es: "Nivel" })} ${gameState.player.level}</div>
           </div>
         </div>
         <div class="journal-stats-row">

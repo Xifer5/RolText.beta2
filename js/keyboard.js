@@ -72,6 +72,7 @@ function onKey(e) {
   /* ── MOVIMIENTO ──────────────────────────────────────── */
   const dir = MOVE_KEYS[e.key];
   if (dir) {
+    if (document.querySelector(".modal:not(.hidden)")) return;
     window.dispatchEvent(
       new CustomEvent("pixel:move", { detail: { direction: dir } })
     );
