@@ -58,7 +58,8 @@
       "Bash(echo \"EXIT: $?\")",
       "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 BUN_CONFIG_NO_VERIFY_SSL=true ./setup)",
       "Bash(git commit *)",
-      "Bash(~/.claude/skills/gstack/bin/gstack-config set *)"
+      "Bash(~/.claude/skills/gstack/bin/gstack-config set *)",
+      "Skill(qa)"
     ]
   }
 }
