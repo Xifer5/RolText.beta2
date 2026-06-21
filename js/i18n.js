@@ -283,6 +283,7 @@ const dictionaries = {
     questRewardXp: "+{{xp}} XP for completing \"{{title}}\".",
     questRewardGold: "+{{gold}} gold rewarded.",
     levelUp: "⭐ LEVEL UP! You are now level {{level}}. +5 stat points.",
+    statIncreased: "{{stat}} increased to {{value}}.",
   },
   es: {
     brandSubtitle: "Explora · Combate · Forja tu destino",
@@ -568,6 +569,7 @@ const dictionaries = {
     questRewardXp: "✨ +{{xp}} XP por completar \"{{title}}\".",
     questRewardGold: "🪙 +{{gold}} de oro como recompensa.",
     levelUp: "⭐ ¡SUBISTE DE NIVEL! Ahora eres nivel {{level}}. +5 puntos de estadística.",
+    statIncreased: "{{stat}} aumentó a {{value}}.",
   }
 };
 

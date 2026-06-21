@@ -13,6 +13,7 @@ import { setupKeyboard } from "./keyboard.js";
 import { initAudio, preloadSounds } from "./sounds.js";
 import { setupTravelEventModal } from "./travelEvents.js";
 import { renderLocalMinimap } from "./localMinimap.js";
+import { showIntro } from "./intro.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   initAudio();
@@ -44,20 +45,27 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleMainMenu(false);
   addMessage(t('welcomeMessage'), "system");
 
-  // Show character select on first load if no class chosen
-  if (!gameState.player.class) {
-    setTimeout(() => {
-      showCharacterSelect(() => {
-        addMessage(t('adventureBeginMessage'), "system");
-      });
-    }, 600);
-  }
+  // New player (no class yet) must always see the intro
+  if (!gameState.player.class) sessionStorage.removeItem("introSeen");
+
+  showIntro(() => {
+    if (!gameState.player.class) {
+      setTimeout(() => {
+        showCharacterSelect(() => {
+          addMessage(t('adventureBeginMessage'), "system");
+        });
+      }, 300);
+    }
+  });
 });
 
-// Wire New Game button to show character selection
+// Wire New Game button — clear intro flag so story replays, then show character select
 window.addEventListener("pixel:newGame", () => {
-  showCharacterSelect(() => {
-    addMessage(t('adventureBeginMessage'), "system");
+  sessionStorage.removeItem("introSeen");
+  showIntro(() => {
+    showCharacterSelect(() => {
+      addMessage(t('adventureBeginMessage'), "system");
+    });
   });
 });
 

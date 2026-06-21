@@ -42,7 +42,23 @@
       "Bash(copy \".claude\\\\settings.local.json\" \".claude\\\\settings.local.json.bak\")",
       "Bash(del \".claude\\\\settings.local.json\")",
       "Bash(cp \".claude/settings.local.json\" \".claude/settings.local.json.bak\")",
-      "Bash(rm \".claude/settings.local.json\")"
+      "Bash(rm \".claude/settings.local.json\")",
+      "Bash(git checkout *)",
+      "Bash(git push *)",
+      "Bash(cp \".claude/settings.local.json.bak\" \".claude/settings.local.json\")",
+      "Bash(rm \".claude/settings.local.json.bak\")",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git clone *)",
+      "Bash(./setup)",
+      "Bash(npm install *)",
+      "Bash(PowerShell -Command \"irm bun.sh/install.ps1 | iex\")",
+      "Bash(export PATH=\"$PATH:/c/Users/Diego Ovando/.bun/bin\")",
+      "Bash(bun --version)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(NODE_TLS_REJECT_UNAUTHORIZED=0 BUN_CONFIG_NO_VERIFY_SSL=true ./setup)",
+      "Bash(git commit *)",
+      "Bash(~/.claude/skills/gstack/bin/gstack-config set *)"
     ]
   }
 }

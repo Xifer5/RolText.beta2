@@ -4446,3 +4446,241 @@ kbd {
   }
   .ripple-wave { display: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   INTRO — CÓMIC DE APERTURA
+   ══════════════════════════════════════════════════════════════ */
+
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #0a0a0f;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.intro-screen.hidden { display: none; }
+
+/* Flash blanco entre páginas */
+.intro-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.14s ease;
+}
+
+/* ── Página del cómic ──────────────────────────────────── */
+.comic-page {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+  padding: 12px 12px 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Layouts de cuadrícula */
+.comic-layout-wide-top    { grid-template-rows: 58% 1fr; grid-template-columns: 1fr 1fr; }
+.comic-layout-wide-top    .comic-panel:first-child { grid-column: 1 / -1; }
+.comic-layout-tall-left   { grid-template-columns: 55% 1fr; grid-template-rows: 1fr 1fr; }
+.comic-layout-tall-left   .comic-panel:first-child { grid-row: 1 / -1; }
+.comic-layout-wide-bottom { grid-template-rows: 1fr 1fr 48%; grid-template-columns: 1fr 1fr; }
+.comic-layout-wide-bottom .comic-panel:last-child  { grid-column: 1 / -1; }
+.comic-layout-full        { grid-template-columns: 1fr; }
+
+/* ── Panel individual ──────────────────────────────────── */
+.comic-panel {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #12121a;
+  border: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: scale(.96);
+  transition: opacity .44s cubic-bezier(.2,0,.2,1), transform .44s cubic-bezier(.2,0,.2,1);
+}
+.comic-panel.revealing,
+.comic-panel.revealed { opacity: 1; transform: scale(1); }
+
+/* ── Visual / imagen ───────────────────────────────────── */
+.cp-visual {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  overflow: hidden;
+  min-height: 60px;
+}
+.cp-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.cp-vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, rgba(0,0,0,.7) 100%);
+  pointer-events: none;
+}
+
+/* Fondos temáticos por visual cuando no hay imagen */
+.ipv-stars   { background: radial-gradient(ellipse at 50% 30%, #2d1b69 0%, #0a0a1f 70%); }
+.ipv-guardian { background: linear-gradient(160deg, #1a0a2e 0%, #2d1044 50%, #0a0a1f 100%); }
+.ipv-name    { background: linear-gradient(180deg, #0f0f1a 0%, #1a0030 100%); display: flex; align-items: center; justify-content: center; }
+.ipv-hourglass { background: linear-gradient(135deg, #1a1a0a 0%, #2d2d1a 50%, #0a0a0a 100%); }
+.ipv-cracks  { background: linear-gradient(135deg, #1a0a0a 0%, #3d1010 40%, #0a0a0a 100%); }
+.ipv-forest  { background: linear-gradient(180deg, #0a1a0a 0%, #1a3a1a 50%, #0a0a0a 100%); }
+.ipv-volcano { background: linear-gradient(180deg, #1a0a00 0%, #3d1500 40%, #1a0a00 100%); }
+.ipv-eyes    { background: radial-gradient(ellipse at 50% 50%, #300a0a 0%, #0a0000 100%); }
+.ipv-people  { background: linear-gradient(180deg, #0a0a1a 0%, #1a1a3a 60%, #050508 100%); }
+.ipv-candle  { background: radial-gradient(ellipse at 50% 60%, #3a2000 0%, #0a0a0a 80%); }
+.ipv-scroll  { background: linear-gradient(135deg, #1a1000 0%, #2a2000 50%, #0a0800 100%); }
+.ipv-hero    { background: linear-gradient(180deg, #0a0a1a 0%, #1a1040 50%, #050508 100%); }
+.ipv-title   { background: radial-gradient(ellipse at 50% 40%, #1a0a2e 0%, #050508 80%); min-height: 180px; }
+.ipv-dark    { background: #050508; }
+
+/* ── Nombre ASTERION (letras animadas) ─────────────────── */
+.ipv-name-letters {
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+  position: relative;
+}
+.name-letter {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(22px, 4vw, 42px);
+  color: #c8a96e;
+  opacity: 0;
+  transform: translateY(30px) rotate(10deg);
+  animation: letter-enter .6s cubic-bezier(.2,0,.2,1) forwards;
+  text-shadow: 0 0 20px rgba(200,169,110,.6);
+}
+.name-letter:nth-child(1)  { animation-delay: .1s; }
+.name-letter:nth-child(2)  { animation-delay: .2s; }
+.name-letter:nth-child(3)  { animation-delay: .32s; }
+.name-letter:nth-child(4)  { animation-delay: .44s; }
+.name-letter:nth-child(5)  { animation-delay: .56s; }
+.name-letter:nth-child(6)  { animation-delay: .68s; }
+.name-letter:nth-child(7)  { animation-delay: .80s; }
+.name-letter:nth-child(8)  { animation-delay: .92s; }
+.name-letter.pulsing { animation: name-pulse 2s ease-in-out infinite; opacity: 1; transform: none; }
+@keyframes letter-enter {
+  to { opacity: 1; transform: none; }
+}
+@keyframes name-pulse {
+  0%,100% { text-shadow: 0 0 20px rgba(200,169,110,.5); }
+  50%      { text-shadow: 0 0 40px rgba(200,169,110,1), 0 0 80px rgba(200,169,110,.4); }
+}
+
+/* ── Leyenda / caption ─────────────────────────────────── */
+.cp-caption {
+  padding: 10px 14px 12px;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(4px);
+}
+.cp-caption-text {
+  margin: 0;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(12px, 1.8vw, 16px);
+  line-height: 1.55;
+  color: #e8dcc8;
+  white-space: pre-line;
+}
+
+/* ── Overlay de título (página 5) ──────────────────────── */
+.cp-title-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 24px;
+}
+.intro-logo {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(18px, 4vw, 40px);
+  font-weight: 700;
+  color: #c8a96e;
+  text-shadow: 0 0 30px rgba(200,169,110,.8), 0 2px 8px rgba(0,0,0,.9);
+  letter-spacing: .1em;
+  animation: logo-glow 3s ease-in-out infinite;
+}
+.intro-subtitle {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(11px, 2vw, 20px);
+  color: #a08060;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+@keyframes logo-glow {
+  0%,100% { text-shadow: 0 0 30px rgba(200,169,110,.6); }
+  50%      { text-shadow: 0 0 60px rgba(200,169,110,1), 0 0 120px rgba(200,169,110,.3); }
+}
+
+/* ── Controles ─────────────────────────────────────────── */
+.intro-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(10,10,15,.9);
+  border-top: 1px solid rgba(255,255,255,.08);
+  flex-shrink: 0;
+}
+.intro-page-counter {
+  font-size: 12px;
+  color: rgba(255,255,255,.4);
+  font-family: 'Cinzel', serif;
+  letter-spacing: .05em;
+  flex: 1;
+  text-align: center;
+}
+.intro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: .04em;
+  padding: 8px 20px;
+  min-height: 36px;
+  transition: opacity .15s, background .15s, transform .1s;
+  white-space: nowrap;
+}
+.intro-btn:active { transform: scale(.97); }
+.intro-btn-ghost  { background: transparent; color: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.15); }
+.intro-btn-ghost:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); }
+.intro-btn-primary { background: var(--md-primary, #8b7355); color: #fff; }
+.intro-btn-primary:hover { opacity: .9; }
+.intro-btn-dim  { opacity: .55; }
+.intro-btn-accent { background: linear-gradient(135deg, #c8a96e, #a07840); color: #0a0808; font-weight: 700; box-shadow: 0 2px 12px rgba(200,169,110,.4); }
+.intro-btn-accent:hover { box-shadow: 0 4px 20px rgba(200,169,110,.6); }
+
+/* ── Animación de entrada de página ───────────────────── */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Responsive mobile ─────────────────────────────────── */
+@media (max-width: 599px) {
+  .comic-page { padding: 8px 8px 0; gap: 4px; }
+  .comic-layout-wide-top    { grid-template-rows: 52% 1fr; }
+  .comic-layout-tall-left   { grid-template-columns: 50% 1fr; }
+  .comic-layout-wide-bottom { grid-template-rows: 1fr 1fr 44%; }
+  .cp-caption { padding: 8px 10px 10px; }
+  .intro-btn  { font-size: 12px; padding: 7px 14px; }
+}

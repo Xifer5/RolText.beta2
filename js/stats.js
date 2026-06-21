@@ -1,7 +1,7 @@
 // js/stats.js
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
-import { t, tf } from "./i18n.js";
+import { t, formatText } from "./i18n.js";
 import { updateUI } from "./ui.js";
 import { CLASS_BASE_RESISTANCES, ITEM_RESISTANCES } from "./damageTypes.js";
 
@@ -91,7 +91,7 @@ export function increaseStat(statName) {
   gameState.player.hp = Math.min(gameState.player.hp ?? s.maxHp, s.maxHp);
   gameState.player.mp = Math.min(gameState.player.mp ?? s.maxMp, s.maxMp);
 
-  addMessage(tf("statIncreased", { stat: statName.toUpperCase(), value: gameState.player[statName] }), "stat");
+  addMessage(formatText("statIncreased", { stat: statName.toUpperCase(), value: gameState.player[statName] }), "stat");
   return true;
 }
 
