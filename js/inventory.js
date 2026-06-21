@@ -10,6 +10,18 @@ let selectedInventoryItemId = null;
 let inventoryFilterText = "";
 let inventoryTypeFilter = "all";
 
+const EQUIP_TYPES = new Set(["weapon","armor","arms","boots","hat","helmet","ring","shield","accessory"]);
+const CONSUMABLE_TYPES = new Set(["consumable","scroll"]);
+const QUEST_TYPES = new Set(["quest","key_item","material"]);
+
+function matchesTypeFilter(itemType, filter) {
+  if (filter === "all") return true;
+  if (filter === "consumable") return CONSUMABLE_TYPES.has(itemType);
+  if (filter === "equip") return EQUIP_TYPES.has(itemType);
+  if (filter === "quest") return QUEST_TYPES.has(itemType);
+  return itemType === filter;
+}
+
 export function renderInventory() {
   const list = document.getElementById("inventoryList");
   const goldEl = document.getElementById("inventoryGold");
@@ -31,6 +43,33 @@ export function renderInventory() {
     });
     typeSelect.dataset.initialized = "1";
   }
+
+  // Wire filter chips (once)
+  const filterBar = document.getElementById("inventoryFilters");
+  if (filterBar && !filterBar.dataset.initialized) {
+    filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(chip => {
+      chip.addEventListener("click", () => {
+        inventoryTypeFilter = chip.dataset.filter;
+        renderInventory();
+      });
+    });
+    const equipBtn = document.getElementById("showEquipOverviewBtn");
+    if (equipBtn) {
+      equipBtn.addEventListener("click", () => {
+        const overview = document.getElementById("equipmentOverview");
+        if (overview) overview.classList.toggle("visible");
+      });
+    }
+    filterBar.dataset.initialized = "1";
+  }
+
+  // Sync chip active state
+  if (filterBar) {
+    filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(chip => {
+      chip.classList.toggle("active", chip.dataset.filter === inventoryTypeFilter);
+    });
+  }
+
   if (searchInput) searchInput.value = inventoryFilterText;
   if (typeSelect) typeSelect.value = inventoryTypeFilter;
 
@@ -50,7 +89,7 @@ export function renderInventory() {
     const descText = localizeText(item.description || "").toLowerCase();
     const idText = itemId.toLowerCase();
     const matchesSearch = !filterValue || `${nameText} ${descText} ${idText}`.includes(filterValue);
-    const matchesType = inventoryTypeFilter === "all" || item.type === inventoryTypeFilter;
+    const matchesType = matchesTypeFilter(item.type, inventoryTypeFilter);
     if (!matchesSearch || !matchesType) continue;
 
     foundItems += 1;
