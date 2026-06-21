@@ -8,7 +8,7 @@ import { calculateTotalStats } from "./stats.js";
 import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, getAvailableSkills } from "./classes.js";
 import { renderJournal } from "./journal.js";
 import { renderBestiary } from "./bestiary.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 const CLASS_AVATARS = {
   warrior: "img/avatar_warrior.png",
@@ -72,15 +72,15 @@ function renderAttributes() {
   // Level bonuses unlocked
   const unlockedBonuses = cls ? Object.entries(cls.levelBonuses || {})
     .filter(([lvl]) => p.level >= parseInt(lvl))
-    .map(([lvl, bonus]) => `<div class="level-bonus unlocked">✅ Nv.${lvl} — <strong>${bonus.name}</strong>: ${bonus.desc}</div>`)
+    .map(([lvl, bonus]) => `<div class="level-bonus unlocked">✅ ${t('levelAbbr')}${lvl} — <strong>${bonus.name}</strong>: ${bonus.desc}</div>`)
     .join("") : "";
 
   const lockedBonuses = cls ? Object.entries(cls.levelBonuses || {})
     .filter(([lvl]) => p.level < parseInt(lvl))
-    .map(([lvl, bonus]) => `<div class="level-bonus locked">🔒 Nv.${lvl} — <strong>${bonus.name}</strong>: ${bonus.desc}</div>`)
+    .map(([lvl, bonus]) => `<div class="level-bonus locked">🔒 ${t('levelAbbr')}${lvl} — <strong>${bonus.name}</strong>: ${bonus.desc}</div>`)
     .join("") : "";
 
-  openPanel("📜 Atributos del Personaje", `
+  openPanel(t('attributesPanelTitle'), `
     <div class="attr-panel">
       <div class="player-avatar-section">
         <div class="player-avatar" style="background: radial-gradient(circle at 30% 30%, ${classColor}40, ${classColor}20); border-color: ${classColor};">
@@ -89,7 +89,7 @@ function renderAttributes() {
         </div>
         <div class="player-info">
           <div class="player-name">${p.name || t('defaultPlayerName')}</div>
-          <div class="player-level">Nv. ${p.level} ${cls ? cls.name : t('noClassSelected')}</div>
+          <div class="player-level">${t('levelAbbr')} ${p.level} ${cls ? cls.name : t('noClassSelected')}</div>
         </div>
       </div>
       ${cls ? `
@@ -175,7 +175,7 @@ function renderEquipment() {
         <span class="equip-emoji">${slot.emoji}</span>
         <div class="equip-info">
           <span class="equip-slot-label">${slot.label}</span>
-          <span class="equip-item-name">${item ? item.name : t('emptySlot')}</span>
+          <span class="equip-item-name">${item ? localizeText(item.name) : t('emptySlot')}</span>
           ${attrs.length ? `<span class="equip-attrs">${attrs.join(" · ")}</span>` : ""}
         </div>
         ${item ? `<button class="btn small outlined" data-unequip="${slot.id}">✕</button>` : ""}
@@ -206,7 +206,7 @@ function renderEquipment() {
         if (!gameState.inventory[item.id]) gameState.inventory[item.id] = 0;
         gameState.inventory[item.id]++;
         gameState.equipment[slot] = null;
-        addMessage(formatText('equipmentUnequipMessage', { item: item.name }), "system");
+        addMessage(formatText('equipmentUnequipMessage', { item: localizeText(item.name) }), "system");
         updateUI();
         renderEquipment(); // re-render
       }
@@ -240,7 +240,7 @@ function renderSpellbook() {
             <strong>${skill.name}</strong>
             <span class="spell-cost">💧 ${skill.mpCost} MP</span>
           </div>
-          <span class="spell-level-req ${unlocked ? "met" : ""}">Nv.${skill.levelReq}</span>
+          <span class="spell-level-req ${unlocked ? "met" : ""}">${t('levelAbbr')}${skill.levelReq}</span>
         </div>
         <p class="spell-desc">${skill.description}</p>
         ${unlocked ? `
@@ -261,7 +261,7 @@ function renderSpellbook() {
         <span style="font-size:1.8rem">${clsDef.emoji}</span>
         <div>
           <strong style="color:${classColor}">${clsDef.name}</strong>
-          <p style="font-size:.8rem;color:var(--md-on-surface-var);margin-top:4px">Estadística principal: ${clsDef.primaryStat.toUpperCase()} · MP actual: ${p.mp}/${calculateTotalStats(p, gameState.equipment).maxMp}</p>
+          <p style="font-size:.8rem;color:var(--md-on-surface-var);margin-top:4px">${t('statPanelPrimary') || 'Estadística principal'}: ${{ strength: t('statStrength'), agility: t('statAgility'), intelligence: t('statIntelligence') }[clsDef.primaryStat] || clsDef.primaryStat.toUpperCase()} · MP: ${p.mp}/${calculateTotalStats(p, gameState.equipment).maxMp}</p>
         </div>
       </div>
       <div class="spell-grid">${rows}</div>
@@ -297,7 +297,7 @@ export function setupPanelListeners() {
       <div class="modal-content" style="max-width:640px">
         <h2 id="panelModalTitle"></h2>
         <div id="panelModalBody"></div>
-        <button class="btn outlined" id="closePanelBtn" style="margin-top:var(--sp-5)">✕ Cerrar</button>
+        <button class="btn outlined" id="closePanelBtn" data-i18n="closeButton" style="margin-top:var(--sp-5)">✕ Cerrar</button>
       </div>
     `;
     document.body.appendChild(modal);
@@ -317,12 +317,12 @@ export function setupPanelListeners() {
       if (p === "attributes") renderAttributes();
       else if (p === "equipment") renderEquipment();
       else if (p === "spellbook") renderSpellbook();
-      else if (p === "journal") openPanel("📝 Diario del Aventurero", renderJournal());
-      else if (p === "bestiary") openPanel("🐉 Bestiario", renderBestiary());
-      else if (p === "minimap") openPanel("🗺️ Mapa del Mundo", renderMinimap());
-      else if (p === "achievements") openPanel("🏆 Logros", renderAchievements());
+      else if (p === "journal") openPanel(t('journalPanelTitle'), renderJournal());
+      else if (p === "bestiary") openPanel(t('bestiaryPanelTitle'), renderBestiary());
+      else if (p === "minimap") openPanel(t('mapPanelTitle'), renderMinimap());
+      else if (p === "achievements") openPanel(t('achievementsPanelTitle'), renderAchievements());
       else if (p === "crafting") {
-        openPanel("⚒️ Taller de Fabricación", renderCrafting());
+        openPanel(t('craftingPanelTitle'), renderCrafting());
         wireCraftingPanel(document.getElementById("panelModalBody"));
       }
     });
