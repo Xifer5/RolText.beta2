@@ -782,7 +782,8 @@ export function renderStatsModal() {
   const hint = document.getElementById("stat-class-hint");
   const cls = CLASS_DEFINITIONS[p.class];
   if (hint && cls) {
-    hint.textContent = `💡 ${cls.name}: stat principal → ${cls.primaryStat.toUpperCase()}`;
+    const STAT_LABELS = { strength: t('statStrength') || 'STR', agility: t('statAgility') || 'AGI', intelligence: t('statIntelligence') || 'INT' };
+    hint.textContent = `💡 ${cls.name}: stat principal → ${STAT_LABELS[cls.primaryStat] || cls.primaryStat.toUpperCase()}`;
   }
 
   const setup = (id, stat) => {
