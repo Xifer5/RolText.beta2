@@ -159,7 +159,7 @@ connectZones(worldMap, "catacomb_2", "catacomb_3", "east");
 connectZones(worldMap, "catacomb_3", "catacomb_4", "north");
 connectZones(worldMap, "catacomb_4", "catacomb_5", "north");
 connectZones(worldMap, "catacomb_5", "catacomb_6", "east");
-connectZones(worldMap, "catacomb_6", "mountain_4", "exit");
+connectZones(worldMap, "catacomb_6", "mountain_4", "out");
 
 
 connectZones(worldMap, "garden_1", "garden_2", "west");

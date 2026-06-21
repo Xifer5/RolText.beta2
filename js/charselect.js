@@ -3,6 +3,7 @@
 // ══════════════════════════════════════════════════════
 import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
 import { gameState, resetState } from "./state.js";
+import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText } from "./i18n.js";
@@ -82,6 +83,12 @@ export function showCharacterSelect(onComplete) {
     resetState();
     gameState.player.name = name;
     applyClassBonuses(gameState.player, selectedClass);
+    // Sync hp/mp to the recalculated maximums for the chosen class
+    const s = calculateTotalStats(gameState.player, gameState.equipment);
+    gameState.player.maxHp = s.maxHp;
+    gameState.player.maxMp = s.maxMp;
+    gameState.player.hp = s.maxHp;
+    gameState.player.mp = s.maxMp;
 
     // Give starting items by class
     if (selectedClass === "warrior") {
