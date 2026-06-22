@@ -319,9 +319,12 @@ function showItemDetails(itemId, item) {
 
   detailName.textContent = localizeText(item.name) || itemId;
   const metaParts = [];
-  if (item.rarity) metaParts.push(item.rarity);
-  if (item.type) metaParts.push(item.type);
-  if (item.slot) metaParts.push(item.slot);
+  const TYPE_KEYS = { weapon:"typeWeapon", armor:"typeArmor", shield:"typeShield", consumable:"typeConsumable", scroll:"typeScroll", accessory:"typeAccessory", ring:"typeRing", hat:"typeHat", helmet:"typeHelmet", arms:"typeArms", boots:"typeBoots", key_item:"typeKeyItem", material:"typeMaterial", quest:"typeQuest" };
+  const SLOT_KEYS = { head:"slotHead", rightHand:"slotRightHand", leftHand:"slotLeftHand", armor:"slotArmor", arms:"slotArms", boots:"slotBoots", ring:"slotRing", accessory:"slotAccessory" };
+  const RARITY_KEYS = { common:"rarityCommon", uncommon:"rarityUncommon", rare:"rarityRare", epic:"rarityEpic", legendary:"rarityLegendary" };
+  if (item.rarity) metaParts.push(t(RARITY_KEYS[item.rarity]) || item.rarity);
+  if (item.type) metaParts.push(t(TYPE_KEYS[item.type]) || item.type);
+  if (item.slot) metaParts.push(t(SLOT_KEYS[item.slot]) || item.slot);
   detailMeta.textContent = metaParts.join(' • ');
 
   detailDesc.textContent = localizeText(item.description) || formatText(t('defaultItemDetail'), { item: localizeText(item.name) });
@@ -386,7 +389,7 @@ function showItemDetails(itemId, item) {
       equipBtn.textContent = t('btnEquip');
       equipBtn.onclick = () => {
         const ok = equipItem(itemId, item);
-        if (ok) detailMeta.textContent = (item.rarity ? item.rarity + ' • ' : '') + (item.type || '') + ' • ' + (item.slot || '');
+        if (ok) showItemDetails(itemId);
       };
     }
   }

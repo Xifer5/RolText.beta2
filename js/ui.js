@@ -715,6 +715,7 @@ function openNpcModal(npc) {
         const curStatus = getQuestStatus(questId);
         if (curStatus === "inactive") {
           activateQuest(questId);
+          updateUI();
         } else if (curStatus === "active" && checkQuestCondition(questId)) {
           completeQuest(questId);
           updateUI();
