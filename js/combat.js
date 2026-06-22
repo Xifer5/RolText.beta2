@@ -94,6 +94,9 @@ export function startCombat(enemyType, isBoss = false) {
   if (isBoss) {
     addMessage(formatText(t('bossAppears'), { enemy: gameState.currentEnemy.type }), "combat");
     showFloatingText(t('bossAlert'), window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
+    if (enemyType === "dragon_king") {
+      setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 900);
+    }
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");
   }
@@ -433,6 +436,19 @@ function endCombat(victory, fled = false) {
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
     addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
+
+    // Boss death message (narrative payoff from enemies.js deathMessage field)
+    if (enemy.isBoss && enemy.deathMessage) {
+      setTimeout(() => addMessage(formatText(t("bossDiesMessage"), { message: enemy.deathMessage }), "system"), 400);
+    }
+
+    // Dragon King epilogue — climax of the main story
+    if (enemy.id === "dragon_king") {
+      setTimeout(() => addMessage(t("dragonKingThanks"),  "system"), 1200);
+      setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 2800);
+      setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
+      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 6200);
+    }
 
     // Record kill for bestiary
     recordEnemyKill(enemy.id);
