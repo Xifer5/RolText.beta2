@@ -434,14 +434,14 @@ export function updateUI() {
   const enemyPortrait = document.getElementById("enemy-portrait");
   if (enemyPortrait) {
     if (gameState.currentEnemy) {
-      const src = `${ENEMY_PORTRAIT_PATH}${gameState.currentEnemy.id}.png`;
+      const src = gameState.currentEnemy.img || `${ENEMY_PORTRAIT_PATH}${gameState.currentEnemy.id}.png`;
       if (enemyPortrait.dataset.src !== src) {
         enemyPortrait.dataset.src = src;
         enemyPortrait.src = src;
-        enemyPortrait.classList.remove('hidden');
+        enemyPortrait.style.display = "";
       }
     } else {
-      enemyPortrait.classList.add('hidden');
+      enemyPortrait.style.display = "none";
       enemyPortrait.dataset.src = "";
     }
   }
