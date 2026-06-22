@@ -151,6 +151,138 @@ export const QUEST_DATA = {
         { en: "The fate of Aethoria is in your hands.", es: "El destino de Aethoria está en tus manos." }
       ]
     }
+  },
+
+  // ── MISIONES PRINCIPALES — El Último Sueño del Dragón ─────────────
+
+  mq_01_la_cancion: {
+    id: "mq_01_la_cancion",
+    title: { en: "The Song of the World", es: "La Canción del Mundo" },
+    type: "visit",
+    target: "forest_1",
+    reward: { item: "ancient_relic", xp: 50 },
+    dialogues: {
+      inactive: [
+        { en: "I heard your name in a dream, adventurer.", es: "Escuché tu nombre en un sueño, aventurero." },
+        { en: "The stars weep and the dragon dreams of fire. Only one who hears the echo of the world can restore the song. Take this… it will react when you are near the truth.", es: "Las estrellas lloran y el dragón sueña con fuego. Solo quien escuche el eco del mundo podrá restaurar la canción. Toma esto… reaccionará cuando estés cerca de la verdad." },
+        { en: "Begin in the Valdris Forest, to the north. The echo will guide you.", es: "Empieza en el Bosque de Valdris, al norte. El eco te guiará." }
+      ],
+      active: [
+        { en: "The Valdris Forest awaits you. Head north from Oakhaven.", es: "El Bosque de Valdris te aguarda. Sigue al norte desde Oakhaven." }
+      ],
+      completed: [
+        { en: "You have taken the first step. The relic in your hands trembles… the guardian still breathes.", es: "Has dado el primer paso. La reliquia en tus manos tiembla… el guardián aún respira." },
+        { en: "Whatever you find out there, remember: you did not go to save the world. You went to listen to it.", es: "Sea lo que sea que encuentres ahí fuera, recuerda: no fuiste a salvar el mundo. Fuiste a escucharlo." }
+      ]
+    }
+  },
+
+  mq_02_los_sellos: {
+    id: "mq_02_los_sellos",
+    title: { en: "The Guardian's Seals", es: "Los Sellos del Guardián" },
+    type: "kill",
+    enemy: "forest_titan",
+    count: 1,
+    reward: { xp: 200, gold: 150 },
+    prerequisiteQuest: "mq_01_la_cancion",
+    dialogues: {
+      locked: [
+        { en: "I haven't finished my analysis yet. Come back when you've ventured into the forest.", es: "No he terminado mi análisis todavía. Vuelve cuando hayas adentrado en el bosque." }
+      ],
+      inactive: [
+        { en: "The arcane fragments I study carry the signature of an ancient essence.", es: "Los fragmentos arcanos que estudio llevan la firma de una esencia antigua." },
+        { en: "Someone — or something — divided its soul into eight parts. If all those seals shatter at once… the world will lose its magic. I must ask something difficult of you.", es: "Alguien — o algo — dividió su alma en ocho partes. Si esos sellos se rompen todos a la vez… el mundo quedará sin magia. Debo pedirte algo difícil." },
+        { en: "The Forest Titan is the first wound of the guardian. Defeat it. And listen to what it says as it falls.", es: "El Titán del Bosque es la primera herida del guardián. Derrótalo. Y escucha lo que diga al caer." }
+      ],
+      active: [
+        { en: "The Forest Titan roams the deep heart of the Valdris Forest.", es: "El Titán del Bosque vaga por el corazón profundo del Bosque de Valdris." },
+        { en: "It will not be easy. But it is necessary.", es: "No será fácil. Pero es necesario." }
+      ],
+      completed: [
+        { en: "Extraordinary. The Titan fell... but did you hear what it said? 'The dragon is crying.'", es: "Extraordinario. El titán cayó… ¿pero escuchaste lo que dijo? 'El dragón está llorando.'" },
+        { en: "This confirms everything I suspected. The guardians are not corrupted — they are grieving.", es: "Esto confirma todo lo que sospechaba. Los guardianes no están corrompidos — están de luto." }
+      ]
+    }
+  },
+
+  mq_03_ecos: {
+    id: "mq_03_ecos",
+    title: { en: "Echoes of the Past", es: "Ecos del Pasado" },
+    type: "collect",
+    item: "ancient_core",
+    qty: 1,
+    consumeItem: false,
+    reward: { item: "garden_key", xp: 250, gold: 100 },
+    prerequisiteQuest: "mq_02_los_sellos",
+    dialogues: {
+      locked: [
+        { en: "The garden is quiet today. Come back when you have learned more of the world.", es: "El jardín está en silencio hoy. Ven cuando hayas aprendido más del mundo." }
+      ],
+      inactive: [
+        { en: "Dragons also feel lonely, you know? Asterion played here with us when the world was young.", es: "Los dragones también se sienten solos, ¿sabes? Asterion jugaba aquí con nosotras cuando el mundo era joven." },
+        { en: "He taught us how to make stars bloom. But one day he stopped coming… and the garden began to wither.", es: "Nos enseñó a hacer florecer las estrellas. Pero un día dejó de venir… y el jardín empezó a marchitarse." },
+        { en: "An Ancient Core still holds his memory. The creatures guarding this garden carry it.", es: "Un Núcleo Antiguo aún guarda su recuerdo. Las criaturas que custodian este jardín lo portan." }
+      ],
+      active: [
+        { en: "The Ancient Core rests within this garden. Defeat the creatures guarding it.", es: "El Núcleo Antiguo descansa en este jardín. Derrota las criaturas que lo custodian." }
+      ],
+      completed: [
+        { en: "Yes… I can feel it. An echo of joy. Of play. Of an age when everything was alive.", es: "Sí… puedo sentirlo. Un eco de alegría. De juego. De una época en que todo estaba vivo." },
+        { en: "Take this Garden Key. The Forgotten Vault holds more of his memories. Perhaps they will show you how to reach him.", es: "Toma esta Llave del Jardín. La Bóveda Olvidada guarda más de sus recuerdos. Quizás te muestren cómo llegar a él." }
+      ]
+    }
+  },
+
+  mq_04_la_verdad: {
+    id: "mq_04_la_verdad",
+    title: { en: "The Truth of Eldrast", es: "La Verdad de Eldrast" },
+    type: "visit",
+    target: "ruin_4",
+    reward: { item: "arcane_relic", xp: 300 },
+    prerequisiteQuest: "mq_03_ecos",
+    dialogues: {
+      locked: [
+        { en: "You have not yet gathered the echoes from the garden. Eryndel is waiting for you.", es: "Aún no has recogido los ecos del jardín. Eryndel te espera." }
+      ],
+      inactive: [
+        { en: "The Ancient Construct in the Eldrast Ruins holds the truth we have been missing.", es: "El Constructo Antiguo en las Ruinas de Eldrast guarda la verdad que nos ha faltado." },
+        { en: "It will not speak willingly. But when it falls, it will have no choice. Bring the Arcane Key with you.", es: "No hablará de buena gana. Pero cuando caiga, no tendrá elección. Lleva la Llave Arcana contigo." },
+        { en: "Find the Dead Square in the ruins. What sleeps there has waited a long time for someone to hear it.", es: "Encuentra la Plaza de los Muertos en las ruinas. Lo que duerme allí ha esperado mucho tiempo a que alguien lo escuche." }
+      ],
+      active: [
+        { en: "The Eldrast Ruins lie east of the dungeons. Reach the Dead Square.", es: "Las Ruinas de Eldrast están al este de las mazmorras. Llega a la Plaza de los Muertos." }
+      ],
+      completed: [
+        { en: "'Asterion is not destroying the world. The world is killing him.' I knew it.", es: "'Asterion no destruye el mundo. El mundo lo está matando.' Lo sabía." },
+        { en: "The Dragon Gate exists. Seek Pyrax at the Eternal Volcano — he has guarded that door since the first eruption.", es: "La Puerta del Dragón existe. Busca a Pyrax en el Volcán Eterno — él ha custodiado esa puerta desde la primera erupción." }
+      ]
+    }
+  },
+
+  mq_05_el_ultimo_sueno: {
+    id: "mq_05_el_ultimo_sueno",
+    title: { en: "The Last Dream", es: "El Último Sueño" },
+    type: "visit",
+    target: "inferno_1",
+    reward: { xp: 500, gold: 300 },
+    prerequisiteQuest: "mq_04_la_verdad",
+    dialogues: {
+      locked: [
+        { en: "The Gate cannot be opened yet. First learn the truth of Eldrast.", es: "La Puerta no puede abrirse todavía. Primero aprende la verdad de Eldrast." }
+      ],
+      inactive: [
+        { en: "I feared this day. The Dragon Gate only opens when the world is ready to remember.", es: "Temía este día. La Puerta del Dragón solo se abre cuando el mundo está listo para recordar." },
+        { en: "And you… carry the echo in your hands. Go. But do not go to kill the dragon. Go to listen to him.", es: "Y tú… llevas el eco en tus manos. Ve. Pero no vayas a matar al dragón. Ve a escucharlo." },
+        { en: "You will need the three keys — Arcane, Garden, Dragon. Only then will the Throne open.", es: "Necesitarás las tres llaves — Arcana, Jardín, Dragón. Solo entonces se abrirá el Trono." }
+      ],
+      active: [
+        { en: "Beyond the Infernal Threshold lies the Dragon King's Throne. Carry the three keys.", es: "Más allá del Umbral del Infierno está el Trono del Rey Dragón. Lleva las tres llaves." }
+      ],
+      completed: [
+        { en: "You have seen it. You have heard it. The dragon's last dream… is over.", es: "Lo has visto. Lo has escuchado. El último sueño del dragón… ha terminado." },
+        { en: "Aetheria will remember. Not his name, perhaps. But his hope.", es: "Aetheria recordará. No su nombre, quizás. Pero sí su esperanza." }
+      ]
+    }
   }
 
 };
@@ -165,6 +297,8 @@ export function getQuestStatus(questId) {
 /** Activa una misión (inactive → active) */
 export function activateQuest(questId) {
   if (!gameState.quests) gameState.quests = {};
+  const q = QUEST_DATA[questId];
+  if (q?.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") return;
   if (!gameState.quests[questId] || gameState.quests[questId] === "inactive") {
     gameState.quests[questId] = "active";
   }
@@ -254,6 +388,11 @@ export function getQuestDialogue(questId) {
     return q.dialogues.active.map(localizeText);
   }
 
+  // inactive — show locked dialogue if prerequisite not yet completed
+  if (q.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") {
+    return (q.dialogues.locked ?? q.dialogues.inactive).map(localizeText);
+  }
+
   return q.dialogues.inactive.map(localizeText);
 }
 
@@ -262,9 +401,13 @@ export function getQuestDialogue(questId) {
  * null = no mostrar botón.
  */
 export function getQuestActionLabel(questId) {
+  const q = QUEST_DATA[questId];
   const status = getQuestStatus(questId);
   if (status === "completed") return null;
   if (status === "active" && checkQuestCondition(questId)) return t("qlActionTurnInQuest");
-  if (status === "inactive") return t("qlActionAcceptQuest");
+  if (status === "inactive") {
+    if (q?.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") return null;
+    return t("qlActionAcceptQuest");
+  }
   return null; // activa pero condición no cumplida
 }
