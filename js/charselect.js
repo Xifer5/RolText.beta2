@@ -2,6 +2,7 @@
 //  CHARACTER SELECTION — Pantalla de inicio de juego
 // ══════════════════════════════════════════════════════
 import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
+import { DIFFICULTY_CONFIG } from "./difficulty.js";
 import { gameState, resetState } from "./state.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
@@ -50,6 +51,19 @@ export function showCharacterSelect(onComplete) {
         `).join("")}
       </div>
 
+      <div class="difficulty-row">
+        <label class="difficulty-label">${t('difficultyLabel')}</label>
+        <div class="difficulty-chips" role="radiogroup" aria-label="${t('difficultyLabel')}">
+          ${Object.values(DIFFICULTY_CONFIG).map(d => `
+            <button type="button" class="diff-chip${d.id === 'easy' ? ' selected' : ''}" data-diff="${d.id}"
+                    style="--diff-color:${d.color}" role="radio" aria-checked="${d.id === 'easy'}">
+              ${d.emoji} ${d.name}
+            </button>
+          `).join("")}
+        </div>
+        <p class="diff-desc" id="diffDesc">${DIFFICULTY_CONFIG.easy.description}</p>
+      </div>
+
       <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
         ${t('startAdventureButton')} →
       </button>
@@ -62,6 +76,22 @@ export function showCharacterSelect(onComplete) {
   document.body.appendChild(modal);
 
   let selectedClass = null;
+  let selectedDifficulty = "easy";
+
+  // Difficulty selection
+  modal.querySelectorAll(".diff-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      modal.querySelectorAll(".diff-chip").forEach(c => {
+        c.classList.remove("selected");
+        c.setAttribute("aria-checked", "false");
+      });
+      chip.classList.add("selected");
+      chip.setAttribute("aria-checked", "true");
+      selectedDifficulty = chip.dataset.diff;
+      const desc = modal.querySelector("#diffDesc");
+      if (desc) desc.textContent = DIFFICULTY_CONFIG[selectedDifficulty]?.description || "";
+    });
+  });
 
   // Class selection
   const selectCard = (card) => {
@@ -93,6 +123,7 @@ export function showCharacterSelect(onComplete) {
     const name = document.getElementById("playerNameInput").value.trim() || t('defaultPlayerName');
 
     resetState();
+    gameState.difficulty = selectedDifficulty;
     gameState.player.name = name;
     applyClassBonuses(gameState.player, selectedClass);
     // Sync hp/mp to the recalculated maximums for the chosen class
@@ -123,6 +154,8 @@ export function showCharacterSelect(onComplete) {
       agi: gameState.player.agility,
       intl: gameState.player.intelligence
     }), "stat");
+    const diffCfg = DIFFICULTY_CONFIG[selectedDifficulty];
+    addMessage(formatText(t('difficultyChosenMsg'), { emoji: diffCfg.emoji, name: diffCfg.name }), "system");
 
     updateUI();
 

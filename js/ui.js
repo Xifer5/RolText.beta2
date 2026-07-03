@@ -12,6 +12,9 @@ import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { getMasteryDisplay } from "./mastery.js";
+import { getActiveSpec, canSpecialize } from "./specializations.js";
+import { showSpecializationModal } from "./specModal.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
 // El sistema busca en este orden:
@@ -764,6 +767,62 @@ export function renderStatsModal() {
   setup("inc-str", "strength");
   setup("inc-agi", "agility");
   setup("inc-int", "intelligence");
+
+  renderMasterySection();
+  renderSpecSection();
+}
+
+function renderMasterySection() {
+  const list = document.getElementById("mastery-list");
+  if (!list) return;
+  const rows = getMasteryDisplay();
+  if (!rows.length) {
+    list.innerHTML = `<p class="muted mastery-empty">${t('masteryEmptyHint')}</p>`;
+    return;
+  }
+  list.innerHTML = rows.map(m => {
+    const pct = m.next
+      ? Math.min(100, Math.round((m.xp - m.tier.xpReq) / (m.next.xpReq - m.tier.xpReq) * 100))
+      : 100;
+    const bonusLabel = m.tier.bonus ? ` (+${Math.round(m.tier.bonus * 100)}% ${t('masteryDamageLabel')})` : "";
+    return `
+      <div class="mastery-row">
+        <span class="mastery-emoji">${m.tier.emoji}</span>
+        <div class="mastery-info">
+          <span class="mastery-label"><strong>${m.label}</strong> — ${m.tier.title}${bonusLabel}</span>
+          <div class="mastery-bar-wrap"><div class="mastery-bar" style="width:${pct}%"></div></div>
+        </div>
+        <span class="mastery-xp">${m.next ? `${m.xp}/${m.next.xpReq}` : "MAX"}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderSpecSection() {
+  const section = document.getElementById("spec-section");
+  if (!section) return;
+  const p = gameState.player;
+  const spec = getActiveSpec();
+  if (spec) {
+    section.innerHTML = `
+      <h3 class="mastery-section-title">${t('specSectionTitle')}</h3>
+      <div class="spec-badge">
+        <span class="spec-badge-emoji">${spec.emoji}</span>
+        <div><strong>${spec.name}</strong><p>${spec.desc}</p></div>
+      </div>
+    `;
+  } else if (canSpecialize(p)) {
+    section.innerHTML = `
+      <h3 class="mastery-section-title">${t('specSectionTitle')}</h3>
+      <button class="btn-action" id="openSpecBtn" style="width:100%">${t('specChooseButton')}</button>
+    `;
+    section.querySelector("#openSpecBtn")?.addEventListener("click", () => {
+      document.getElementById("statsModal")?.classList.add("hidden");
+      showSpecializationModal();
+    });
+  } else {
+    section.innerHTML = `<p class="muted spec-locked">${t('specLockedHint')}</p>`;
+  }
 }
 
 // ── AUDIO CONTROLS ─────────────────────────────────────

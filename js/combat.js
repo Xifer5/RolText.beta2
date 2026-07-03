@@ -12,8 +12,45 @@ import { saveGame } from "./saveSystem.js";
 import { playSound, playMusic } from "./sounds.js";
 import { showToast } from "./toast.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { getDifficultyConfig } from "./difficulty.js";
+import { getMasteryBonus, addMasteryXP } from "./mastery.js";
+import { getActiveSpec, canSpecialize } from "./specializations.js";
+import { showSpecializationModal } from "./specModal.js";
+import {
+  applyResistance, getWeaponDamageType, getResistanceLabel,
+  ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
+} from "./damageTypes.js";
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Tipo de daño de cada habilidad de clase (para resistencias y bonos de especialización)
+const SKILL_DAMAGE_TYPES = {
+  fireball: "fire", meteor: "fire",
+  icebolt: "ice",
+  arcane_storm: "magic", singularity: "magic", arcane_bolt: "magic",
+  backstab: "pierce", shadow_strike: "pierce", double_strike: "pierce",
+  death_dance: "slash",
+  bash: "blunt", power_strike: "blunt",
+  whirlwind: "slash", berserker_rage: "slash", avatar_of_war: "slash",
+};
+
+// Nota "(🔥 Vuln. 30%)" para el log cuando el enemigo resiste o es vulnerable
+function resistanceNote(enemyId, damageType) {
+  const res = ENEMY_COMBAT_DATA[enemyId]?.resistances?.[damageType] ?? 0;
+  if (!res) return "";
+  return ` (${DAMAGE_TYPE_EMOJI[damageType] || ""} ${getResistanceLabel(res)})`;
+}
+
+function grantMasteryXP(damageType, amount = 5) {
+  const tierUp = addMasteryXP(damageType, amount);
+  if (tierUp) {
+    const label = DAMAGE_TYPES[tierUp.type] || tierUp.type;
+    const msg = formatText(t('masteryTierUp'), { type: label, tier: `${tierUp.tier.emoji} ${tierUp.tier.title}` });
+    addMessage(msg, "stat");
+    showToast(msg);
+    playSound("level_up");
+  }
+}
 
 // ── Status effects que cada enemigo puede aplicar al jugador ────────
 const ENEMY_STATUS_EFFECTS = {
@@ -76,15 +113,18 @@ export function startCombat(enemyType, isBoss = false) {
   const lvlMult = isBoss
     ? 1.6 + lvl * 0.08   // jefes escalan más fuerte
     : 1   + lvl * 0.05;
-  const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult);
-  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1));
+  const diff = getDifficultyConfig(gameState.difficulty);
+  const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult * diff.hp);
+  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk);
+  const scaledDef = Math.floor((base.defense ?? 0) * diff.def);
 
   gameState.currentEnemy = {
     id: enemyType,
     ...base,
-    hp:     scaledHp,
-    maxHp:  scaledHp,
-    attack: scaledAtk,
+    hp:      scaledHp,
+    maxHp:   scaledHp,
+    attack:  scaledAtk,
+    defense: scaledDef,
     isBoss
   };
   gameState.isInCombat = true;
@@ -109,9 +149,14 @@ export function startCombat(enemyType, isBoss = false) {
 async function playerAttack() {
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
+  const spec = getActiveSpec();
+  const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
+  const enemyRes = ENEMY_COMBAT_DATA[enemy.id]?.resistances;
 
-  // Check warcry buff
-  const atkMult = gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0;
+  // Warcry buff + maestría de arma + bono de especialización por tipo de daño
+  const masteryBonus = getMasteryBonus(weaponType);
+  const specDmgBonus = spec?.bonuses?.dmgType === weaponType ? (spec.bonuses.dmgBonus || 0) : 0;
+  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus);
   const rawDmg = Math.floor(stats.attack * atkMult);
   const defense = enemy.defense || 0;
   const variance = 0.9 + Math.random() * 0.2;
@@ -119,17 +164,18 @@ async function playerAttack() {
   // Rogue: chance of double strike
   let extraHit = 0;
   if (gameState.player.class === "rogue" && gameState.player.level >= 15 && Math.random() < 0.3) {
-    extraHit = Math.max(1, Math.floor(rawDmg * 0.7));
+    extraHit = applyResistance(Math.max(1, Math.floor(rawDmg * 0.7)), weaponType, enemyRes);
   }
 
-  // Critical hit: 10% base + AGI * 0.5% (rogues +10% bonus)
+  // Critical hit: 10% base + AGI * 0.5% (rogues +10%, spec critBonus)
   const critChance = 0.10
     + (gameState.player.agility || 0) * 0.005
-    + (gameState.player.class === "rogue" ? 0.10 : 0);
+    + (gameState.player.class === "rogue" ? 0.10 : 0)
+    + (spec?.bonuses?.critBonus || 0);
   const isCrit  = Math.random() < critChance;
   const critMul = isCrit ? 1.75 : 1.0;
 
-  const dmg = Math.max(1, Math.floor((rawDmg - defense) * variance * critMul));
+  const dmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul)), weaponType, enemyRes);
   const total = dmg + extraHit;
 
   playSound("attack");
@@ -142,7 +188,16 @@ async function playerAttack() {
     damage: dmg,
     extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
     crit: critLabel
-  }), "combat");
+  }) + resistanceNote(enemy.id, weaponType), "combat");
+
+  grantMasteryXP(weaponType);
+
+  // Asesino: los ataques normales pueden envenenar
+  if (spec?.bonuses?.poisonOnAttack && enemy.hp > 0 && Math.random() < 0.25 && !gameState.activeDebuffs?.poison) {
+    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
+    gameState.activeDebuffs.poison = { turns: 2, damage: Math.max(2, Math.floor(stats.attack * 0.15)) };
+    addMessage(formatText(t('specPoisonMsg'), { enemy: enemy.type }), "combat");
+  }
   showFloatingText(`-${total}${isCrit ? "!" : ""}`,
     window.innerWidth/2+50, window.innerHeight/2-50,
     "#ef4444", "2em", isCrit ? "critical" : "");
@@ -156,7 +211,10 @@ async function playerAttack() {
 
 async function playerMagic() {
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
-  const cost = gameState.player.class === "mage" && gameState.player.level >= 10 ? 7 : 10;
+  const spec = getActiveSpec();
+  const enemy = gameState.currentEnemy;
+  let cost = gameState.player.class === "mage" && gameState.player.level >= 10 ? 7 : 10;
+  if (spec?.bonuses?.mpDiscount) cost = Math.max(1, Math.round(cost * (1 - spec.bonuses.mpDiscount)));
 
   if ((gameState.player.mp || 0) < cost) {
     addMessage(t('notEnoughMana'), "system");
@@ -166,12 +224,17 @@ async function playerMagic() {
 
   gameState.player.mp -= cost;
   const mult = gameState.player.class === "mage" && gameState.player.level >= 20 ? 2.0 : 1.0;
-  const dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * (0.9 + Math.random()*0.2)));
+  // Escuela de magia: el ataque mágico toma el elemento de la especialización
+  const magicType = spec?.bonuses?.dmgType || "magic";
+  const magicBonus = 1 + getMasteryBonus(magicType) + (spec?.bonuses?.dmgBonus || 0);
+  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * (0.9 + Math.random()*0.2)));
+  dmg = applyResistance(dmg, magicType, ENEMY_COMBAT_DATA[enemy.id]?.resistances);
 
   playSound("magic");
   applyDamageToEnemy(dmg);
   playSound("hit");
-  addMessage(formatText(t('castMagic'), { damage: dmg }), "combat");
+  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType), "combat");
+  grantMasteryXP(magicType);
   showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em");
   shakeScreen();
 
@@ -187,18 +250,28 @@ async function useSkill(skillId) {
   const skill = skills.find(s => s.id === skillId);
   if (!skill) { addMessage(t('skillNotFound'), "system"); return; }
   if (p.level < skill.levelReq) { addMessage(formatText(t('skillLevelRequired'), { level: skill.levelReq }), "system"); return; }
-  if ((p.mp || 0) < skill.mpCost) { addMessage(t('noMana'), "system"); return; }
+  const spec = getActiveSpec();
+  let mpCost = skill.mpCost;
+  if (spec?.bonuses?.mpDiscount) mpCost = Math.max(1, Math.round(mpCost * (1 - spec.bonuses.mpDiscount)));
+  if ((p.mp || 0) < mpCost) { addMessage(t('noMana'), "system"); return; }
 
   const stats = calculateTotalStats(p, gameState.equipment);
   const result = skill.effect(stats, gameState.currentEnemy, p);
 
-  p.mp -= skill.mpCost;
+  p.mp -= mpCost;
   playSound("skill");
   addMessage(`${skill.emoji} ${result.msg}`, "combat");
 
   // Apply damage
   if (result.damage) {
-    const dmg = result.ignoresDef ? result.damage : Math.max(1, result.damage - (gameState.currentEnemy?.defense || 0));
+    let dmg = result.ignoresDef ? result.damage : Math.max(1, result.damage - (gameState.currentEnemy?.defense || 0));
+    const skillType = SKILL_DAMAGE_TYPES[skill.id];
+    if (skillType) {
+      const specBonus = spec?.bonuses?.dmgType === skillType ? (spec.bonuses.dmgBonus || 0) : 0;
+      dmg = Math.max(1, Math.floor(dmg * (1 + getMasteryBonus(skillType) + specBonus)));
+      dmg = applyResistance(dmg, skillType, ENEMY_COMBAT_DATA[gameState.currentEnemy?.id]?.resistances);
+      grantMasteryXP(skillType);
+    }
     applyDamageToEnemy(dmg);
     playSound("hit");
     showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em");
@@ -220,8 +293,11 @@ async function useSkill(skillId) {
   // Apply debuffs to enemy
   if (result.debuff) {
     if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
+    let debuffTurns = result.debuffTurns || 2;
+    // Escuela de Hielo: los congelamientos duran 1 turno extra
+    if (result.debuff === "frozen" && spec?.bonuses?.extraFrozenTurn) debuffTurns += 1;
     gameState.activeDebuffs[result.debuff] = {
-      turns: result.debuffTurns || 2,
+      turns: debuffTurns,
       damage: result.debuffDmg || 0
     };
   }
@@ -242,7 +318,9 @@ async function useSkill(skillId) {
 
 async function tryFlee() {
   const agiMod = (gameState.player.agility || 0) * 0.02;
-  const chance = 0.4 + agiMod + (gameState.player.class === "rogue" ? 0.15 : 0);
+  const chance = 0.4 + agiMod
+    + (gameState.player.class === "rogue" ? 0.15 : 0)
+    + (getActiveSpec()?.bonuses?.fleeBonus || 0);
   if (Math.random() < chance) {
     playSound("flee");
     addMessage(t('fleeSuccess'), "system");
@@ -312,17 +390,41 @@ async function enemyTurn() {
     addMessage(t('arcaneShieldAbsorbs'), "system");
   }
 
-  // Rogue evasion
-  const evasionChance = (stats.agility || 0) * 0.01 + (p.class === "rogue" ? 0.1 : 0) + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0);
+  // Rogue evasion (+ especialización Duelista)
+  const spec = getActiveSpec();
+  const evasionChance = (stats.agility || 0) * 0.01
+    + (p.class === "rogue" ? 0.1 : 0)
+    + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
+    + (spec?.bonuses?.evasionBonus || 0);
   if (Math.random() < evasionChance) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
+    // Duelista: 25% de contraatacar al esquivar
+    if (spec?.bonuses?.counterattack && Math.random() < 0.25) {
+      const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5));
+      applyDamageToEnemy(counterDmg);
+      playSound("attack");
+      addMessage(formatText(t('counterattackMsg'), { damage: counterDmg }), "combat");
+      showFloatingText(`-${counterDmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#fbbf24", "1.6em");
+      if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+    }
     updateUI(); return;
   }
+
+  // Tipo de daño del enemigo vs resistencias del jugador (clase + equipo)
+  const enemyCombat = ENEMY_COMBAT_DATA[enemy.id];
+  const atkType = useMagic
+    ? (enemyCombat?.magicDamageType || "magic")
+    : (enemyCombat?.attackDamageType || "physical");
 
   const defVal = Math.floor(stats.defense || 0);
   const variance = 0.85 + Math.random() * 0.3;
   const rawDmg = Math.max(0, atkVal - defVal);
-  const finalDmg = Math.max(1, Math.floor(rawDmg * variance * defenseMult * shieldMult));
+  let finalDmg = Math.max(1, Math.floor(rawDmg * variance * defenseMult * shieldMult));
+  // Maestro de Escudos: -25% daño físico recibido
+  if (spec?.bonuses?.physicalDefenseBonus && PHYSICAL_TYPES.has(atkType)) {
+    finalDmg = Math.max(1, Math.floor(finalDmg * (1 - spec.bonuses.physicalDefenseBonus)));
+  }
+  finalDmg = applyResistance(finalDmg, atkType, stats.resistances);
 
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
@@ -430,8 +532,12 @@ function endCombat(victory, fled = false) {
 
   if (victory && enemy) {
     playSound("enemy_die");
-    const xp = enemy.experience || 10;
-    const gold = enemy.gold || 5;
+    const diff = getDifficultyConfig(gameState.difficulty);
+    const xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult));
+    let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult));
+    // Explorador: +10% oro
+    const goldBonus = getActiveSpec()?.bonuses?.goldBonus;
+    if (goldBonus) gold = Math.floor(gold * (1 + goldBonus));
     gameState.player.experience = (gameState.player.experience || 0) + xp;
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
@@ -507,6 +613,13 @@ function levelUp() {
 
   playSound("level_up");
   addMessage(formatText(t('levelUp'), { level: p.level }), "stat");
+
+  // Especialización disponible a partir de nivel 10
+  if (canSpecialize(p)) {
+    addMessage(t('specUnlockedMsg'), "stat");
+    setTimeout(() => showSpecializationModal(), 1500);
+  }
+
   checkAchievements();
   // Autoguardar en cada level up
   setTimeout(() => {

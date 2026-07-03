@@ -4601,3 +4601,91 @@ kbd {
   .cp-caption { padding: 10px 12px 12px; }
   .intro-btn  { font-size: 13px; padding: 7px 14px; }
 }
+
+/* ══════════════════════════════════════════════════════
+   DIFFICULTY · MASTERY · SPECIALIZATION (Sprint 2)
+   ══════════════════════════════════════════════════════ */
+
+/* ── Selector de dificultad (character select) ── */
+.difficulty-row { margin: var(--sp-5) 0; text-align: center; }
+.difficulty-label {
+  display: block; font-size: .8rem; font-weight: 600;
+  color: var(--c-muted); text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: var(--sp-2);
+}
+.difficulty-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; }
+.diff-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 8px 16px;
+  border: 1.5px solid var(--md-outline, #49454f); border-radius: 20px;
+  background: transparent; color: var(--md-on-surface, #e6e1e5);
+  font-family: inherit; font-size: .85rem; cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.diff-chip:hover { border-color: var(--diff-color); transform: translateY(-1px); }
+.diff-chip.selected {
+  border-color: var(--diff-color);
+  background: color-mix(in srgb, var(--diff-color) 22%, transparent);
+  font-weight: 700;
+}
+.diff-desc {
+  margin-top: var(--sp-2); font-size: .78rem; font-style: italic;
+  color: var(--c-muted); min-height: 1.2em;
+}
+
+/* ── Maestría de armas (stats modal) ── */
+.mastery-section { margin-top: var(--sp-5); text-align: left; }
+.mastery-section-title {
+  font-size: .85rem; font-weight: 700; letter-spacing: .04em;
+  color: var(--md-on-surface-var, #cac4d0); margin-bottom: var(--sp-3);
+}
+.mastery-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.mastery-empty { font-size: .8rem; font-style: italic; }
+.mastery-row {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 8px 10px; border-radius: 10px;
+  background: var(--md-surface-2, #232129);
+}
+.mastery-emoji { font-size: 1.1rem; }
+.mastery-info { flex: 1; min-width: 0; }
+.mastery-label { display: block; font-size: .78rem; margin-bottom: 4px; }
+.mastery-bar-wrap {
+  height: 6px; border-radius: 3px; overflow: hidden;
+  background: var(--md-surface-4, #38343f);
+}
+.mastery-bar {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  transition: width .3s ease;
+}
+.mastery-xp { font-size: .72rem; color: var(--c-muted); white-space: nowrap; }
+
+/* ── Especialización ── */
+.spec-section { margin-top: var(--sp-5); text-align: left; }
+.spec-locked { font-size: .8rem; font-style: italic; }
+.spec-choice-grid { display: flex; flex-direction: column; gap: var(--sp-3); }
+.spec-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  padding: var(--sp-4); border-radius: 14px; text-align: left;
+  border: 1.5px solid var(--md-outline, #49454f);
+  background: var(--md-surface-2, #232129);
+  color: var(--md-on-surface, #e6e1e5);
+  font-family: inherit; cursor: pointer;
+  transition: border-color .15s, background .15s, transform .1s;
+}
+.spec-card:hover, .spec-card:focus-visible {
+  border-color: var(--md-primary, #d0bcff);
+  background: var(--md-surface-3, #2b2830);
+  transform: translateY(-1px);
+}
+.spec-card-emoji { font-size: 1.6rem; }
+.spec-card-name { font-weight: 700; font-size: .95rem; color: var(--md-primary, #d0bcff); }
+.spec-card-desc { font-size: .78rem; color: var(--c-muted); line-height: 1.4; }
+.spec-badge {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4); border-radius: 12px;
+  border: 1.5px solid var(--md-primary, #d0bcff);
+  background: color-mix(in srgb, var(--md-primary, #d0bcff) 12%, transparent);
+}
+.spec-badge-emoji { font-size: 1.8rem; }
+.spec-badge p { font-size: .76rem; color: var(--c-muted); margin-top: 2px; }
