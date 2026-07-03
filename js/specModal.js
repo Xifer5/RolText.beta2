@@ -22,6 +22,7 @@ export function showSpecializationModal() {
   modal.className = "modal";
   modal.style.cssText = "opacity:1;pointer-events:auto;z-index:290";
   modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
   modal.setAttribute("aria-labelledby", "specModalTitle");
 
   modal.innerHTML = `

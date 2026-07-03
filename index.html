@@ -51,21 +51,21 @@
   </div>
 </header>
 
-<section id="mobile-status-hud" class="mobile-status-hud" aria-label="Estado del personaje">
+<section id="mobile-status-hud" class="mobile-status-hud" aria-label="Estado del personaje" data-i18n-attr="aria-label" data-i18n="mobileHudLabel">
   <div class="mobile-hud-top">
     <div class="mobile-hud-place">
-      <span class="mobile-hud-kicker">Zona</span>
+      <span class="mobile-hud-kicker" data-i18n="hudZoneKicker">Zona</span>
       <strong id="mobile-location-name">Oakhaven</strong>
     </div>
     <div class="mobile-hud-chips">
       <span class="mobile-hud-chip" id="mobile-state-chip">Explorando</span>
       <span class="mobile-hud-chip mobile-risk-chip" id="mobile-risk-chip">Zona normal</span>
       <span class="mobile-hud-chip time-chip" id="mobile-time-chip">☀️ Día</span>
-      <span class="mobile-hud-chip">Lv.<b id="mobile-level">1</b></span>
-      <span class="mobile-hud-chip"><b id="mobile-gold">0</b> oro</span>
+      <span class="mobile-hud-chip"><span data-i18n="levelAbbr">Lv.</span><b id="mobile-level">1</b></span>
+      <span class="mobile-hud-chip"><b id="mobile-gold">0</b>&nbsp;<span data-i18n="goldUnit">oro</span></span>
     </div>
   </div>
-  <div class="mobile-hud-bars" aria-label="Vitalidad movil">
+  <div class="mobile-hud-bars" aria-label="Vitalidad" data-i18n-attr="aria-label" data-i18n="vitalsLabel">
     <div class="mobile-hud-meter">
       <span>HP</span>
       <div class="mobile-hud-track"><div class="mobile-hud-fill hp" id="mobile-hp-bar"></div></div>
@@ -169,11 +169,11 @@
            style="display:none" onerror="this.style.display='none'">
       <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
       <div id="location-subtitle" class="location-subtitle"></div>
-      <div class="location-actions" aria-label="Acciones de ubicacion">
-        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-tooltip="Descansar recupera HP y MP al máximo">
+      <div class="location-actions" aria-label="Acciones de ubicación" data-i18n-attr="aria-label" data-i18n="locationActionsLabel">
+        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-i18n-aria="restActionLabel" data-i18n="quickRest" data-tooltip="Descansar recupera HP y MP al máximo">
           Descansar
         </button>
-        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona" data-tooltip="Comprar y vender objetos">
+        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona" data-i18n-aria="shopActionLabel" data-i18n="quickShop" data-tooltip="Comprar y vender objetos">
           Tienda
         </button>
         <button id="npc-talk-btn" type="button" class="location-action-btn npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel" data-tooltip="Hablar con el NPC — misiones, entrenamiento, información">
@@ -215,7 +215,7 @@
         <button class="sf-btn" data-filter="loot" data-i18n="storyFilterLoot">🎁 Loot</button>
         <button class="sf-btn" data-filter="system" data-i18n="storyFilterSystem">⚙ Sistema</button>
       </div>
-      <div id="story" class="story" role="log" aria-label="Registro de eventos" aria-live="polite"></div>
+      <div id="story" class="story" role="log" aria-label="Registro de eventos" data-i18n-attr="aria-label" data-i18n="storyLogLabel" aria-live="polite"></div>
     </div>
 
   </section>
@@ -258,10 +258,10 @@
     <!-- NAVIGATION panel (shown outside combat) -->
     <div id="navigation-menu" class="sidebar-block nav-block">
       <div class="block-label" data-i18n="navigationLabel">🧭 Navegación</div>
-      <div id="navigation-content" class="compass-pad" aria-label="Compás de movimiento">
+      <div id="navigation-content" class="compass-pad" aria-label="Compás de movimiento" data-i18n-attr="aria-label" data-i18n="compassLabel">
         <!-- Middle row - Main compass -->
       </div>
-      <div class="compass-directionals" aria-label="Direcciones cardinales">
+      <div class="compass-directionals" aria-label="Direcciones cardinales" data-i18n-attr="aria-label" data-i18n="cardinalDirsLabel">
         <div class="compass-dir-row">
           <button class="compass-dir-label" data-direction="north">N</button>
         </div>
@@ -274,7 +274,7 @@
           <button class="compass-dir-label" data-direction="south">S</button>
         </div>
       </div>
-      <div class="compass-actions" aria-label="Acciones especiales">
+      <div class="compass-actions" aria-label="Acciones especiales" data-i18n-attr="aria-label" data-i18n="specialActionsLabel">
         <button class="compass-action-btn" data-direction="enter" aria-label="Entrar" data-i18n-attr="aria-label" data-i18n="enterButton" data-tooltip="Entrar a la ubicación actual">⏎ <span data-i18n="enterButton">Enter</span></button>
         <button class="compass-action-btn compass-exit" data-direction="out" aria-label="Salir" data-i18n-attr="aria-label" data-i18n="exitButton" data-tooltip="Salir / volver al área anterior">⟲ <span data-i18n="exitButton">Exit</span></button>
         <button class="compass-action-btn" data-direction="up" aria-label="Subir" data-i18n-attr="aria-label" data-i18n="climbUp" data-tooltip="Subir al piso superior">⬆ <span data-i18n="climbUp">Subir</span></button>
@@ -302,36 +302,36 @@
 
   <!-- Modo combate -->
   <div id="mob-combat" class="mob-bar hidden">
-    <button class="mob-btn mob-attack" id="mob-attackBtn" aria-keyshortcuts="1" aria-label="Atacar (tecla 1)">
-      <span class="mob-icon">⚔️</span><span>Atacar</span>
+    <button class="mob-btn mob-attack" id="mob-attackBtn" aria-keyshortcuts="1" aria-label="Atacar (tecla 1)" data-i18n-aria="combatAttackAria">
+      <span class="mob-icon">⚔️</span><span data-i18n="combatAttack">Atacar</span>
     </button>
-    <button class="mob-btn mob-magic"  id="mob-magicBtn"  aria-keyshortcuts="2" aria-label="Magia (tecla 2)">
-      <span class="mob-icon">✨</span><span>Magia</span>
+    <button class="mob-btn mob-magic"  id="mob-magicBtn"  aria-keyshortcuts="2" aria-label="Magia (tecla 2)" data-i18n-aria="combatMagicAria">
+      <span class="mob-icon">✨</span><span data-i18n="combatMagic">Magia</span>
     </button>
-    <button class="mob-btn"            id="mob-itemBtn"   aria-keyshortcuts="3" aria-label="Ítem (tecla 3)">
-      <span class="mob-icon">🧪</span><span>Ítem</span>
+    <button class="mob-btn"            id="mob-itemBtn"   aria-keyshortcuts="3" aria-label="Ítem (tecla 3)" data-i18n-aria="combatItemAria">
+      <span class="mob-icon">🧪</span><span data-i18n="combatItem">Ítem</span>
     </button>
-    <button class="mob-btn mob-flee"   id="mob-fleeBtn"   aria-keyshortcuts="4" aria-label="Huir (tecla 4)">
-      <span class="mob-icon">🏃</span><span>Huir</span>
+    <button class="mob-btn mob-flee"   id="mob-fleeBtn"   aria-keyshortcuts="4" aria-label="Huir (tecla 4)" data-i18n-aria="combatFleeAria">
+      <span class="mob-icon">🏃</span><span data-i18n="combatFlee">Huir</span>
     </button>
   </div>
 
   <!-- Modo navegación -->
   <div id="mob-nav" class="mob-bar">
-    <button class="mob-btn mob-dir" data-direction="west"  aria-label="Oeste  (A/←)">◀</button>
+    <button class="mob-btn mob-dir" data-direction="west"  aria-label="Oeste (A/←)" data-i18n-attr="aria-label" data-i18n="dirWestLabel">◀</button>
     <div class="mob-dir-stack">
-      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="north" aria-label="Norte (W/↑)">▲</button>
-      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="south" aria-label="Sur   (S/↓)">▼</button>
+      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="north" aria-label="Norte (W/↑)" data-i18n-attr="aria-label" data-i18n="dirNorthLabel">▲</button>
+      <button class="mob-btn mob-dir mob-dir-vertical" data-direction="south" aria-label="Sur (S/↓)" data-i18n-attr="aria-label" data-i18n="dirSouthLabel">▼</button>
     </div>
-    <button class="mob-btn mob-dir" data-direction="east"  aria-label="Este   (D/→)">▶</button>
+    <button class="mob-btn mob-dir" data-direction="east"  aria-label="Este (D/→)" data-i18n-attr="aria-label" data-i18n="dirEastLabel">▶</button>
     <div class="mob-sep"></div>
-    <button class="mob-btn mob-menu" id="mob-moveMenuBtn" aria-label="Movimientos">
+    <button class="mob-btn mob-menu" id="mob-moveMenuBtn" aria-label="Movimientos" data-i18n-attr="aria-label" data-i18n="mobMovesLabel">
       <span class="mob-icon">⏎</span><span>Mov.</span>
     </button>
-    <button class="mob-btn mob-menu" id="mob-inventoryBtn" aria-label="Acciones">
+    <button class="mob-btn mob-menu" id="mob-inventoryBtn" aria-label="Acciones" data-i18n-attr="aria-label" data-i18n="mobActionsLabel">
       <span class="mob-icon">🎒</span><span>Acc.</span>
     </button>
-    <button class="mob-btn mob-menu" id="mob-panelMenuBtn" aria-label="Menú">
+    <button class="mob-btn mob-menu" id="mob-panelMenuBtn" aria-label="Menú" data-i18n-attr="aria-label" data-i18n="mobMenuLabel">
       <span class="mob-icon">☰</span><span>Menu</span>
     </button>
   </div>
@@ -340,39 +340,39 @@
 
 <div id="mobileSheet" class="mobile-sheet hidden" aria-hidden="true">
   <div class="mobile-sheet-backdrop"></div>
-  <div class="mobile-sheet-content" role="dialog" aria-modal="true" aria-label="Menú móvil">
-    <button class="mobile-sheet-close" id="mobileSheetClose" aria-label="Cerrar">✕</button>
+  <div class="mobile-sheet-content" role="dialog" aria-modal="true" aria-label="Menú móvil" data-i18n-attr="aria-label" data-i18n="mobileSheetLabel">
+    <button class="mobile-sheet-close" id="mobileSheetClose" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
     <div class="mobile-sheet-panels">
       <div class="mobile-sheet-panel" id="mobileMoveMenu">
-        <h3>Movimientos</h3>
+        <h3 data-i18n="mobMovesLabel">Movimientos</h3>
         <div class="mobile-sheet-grid">
-          <button class="mob-sheet-btn" data-direction="enter">⏎ Enter</button>
-          <button class="mob-sheet-btn" data-direction="out">⟲ Exit</button>
-          <button class="mob-sheet-btn" data-direction="up">⬆ Subir</button>
-          <button class="mob-sheet-btn" data-direction="down">⬇ Bajar</button>
+          <button class="mob-sheet-btn" data-direction="enter">⏎ <span data-i18n="enterButton">Enter</span></button>
+          <button class="mob-sheet-btn" data-direction="out">⟲ <span data-i18n="exitButton">Exit</span></button>
+          <button class="mob-sheet-btn" data-direction="up">⬆ <span data-i18n="climbUp">Subir</span></button>
+          <button class="mob-sheet-btn" data-direction="down">⬇ <span data-i18n="climbDown">Bajar</span></button>
         </div>
       </div>
       <div class="mobile-sheet-panel hidden" id="mobileActionMenu">
-        <h3>Acciones</h3>
+        <h3 data-i18n="mobActionsLabel">Acciones</h3>
         <div class="mobile-sheet-grid">
-          <button class="mob-sheet-btn" id="mobActionInventoryBtn">🎒 Inventario</button>
-          <button class="mob-sheet-btn" id="mobActionStatsBtn">📈 Stats</button>
-          <button class="mob-sheet-btn" id="mobActionRestBtn">🛏️ Descansar</button>
-          <button class="mob-sheet-btn" id="mobActionShopBtn">🛒 Tienda</button>
-          <button class="mob-sheet-btn" id="mobActionQuestLogBtn">📋 Misiones</button>
+          <button class="mob-sheet-btn" id="mobActionInventoryBtn" data-i18n="sheetInventory">🎒 Inventario</button>
+          <button class="mob-sheet-btn" id="mobActionStatsBtn" data-i18n="sheetStats">📈 Stats</button>
+          <button class="mob-sheet-btn" id="mobActionRestBtn" data-i18n="sheetRest">🛏️ Descansar</button>
+          <button class="mob-sheet-btn" id="mobActionShopBtn" data-i18n="sheetShop">🛒 Tienda</button>
+          <button class="mob-sheet-btn" id="mobActionQuestLogBtn" data-i18n="sheetQuests">📋 Misiones</button>
         </div>
       </div>
       <div class="mobile-sheet-panel hidden" id="mobilePanelMenu">
-        <h3>Paneles</h3>
+        <h3 data-i18n="mobPanelsTitle">Paneles</h3>
         <div class="mobile-sheet-grid">
-          <button class="mob-sheet-btn" data-panel="attributes">Atributos</button>
-          <button class="mob-sheet-btn" data-panel="equipment">Equipo</button>
-          <button class="mob-sheet-btn" data-panel="spellbook">Grimorio</button>
-          <button class="mob-sheet-btn" data-panel="journal">Diario</button>
-          <button class="mob-sheet-btn" data-panel="bestiary">Bestiario</button>
-          <button class="mob-sheet-btn" data-panel="minimap">🗺️ Mapa</button>
-          <button class="mob-sheet-btn" data-panel="achievements">🏆 Logros</button>
-          <button class="mob-sheet-btn" data-panel="crafting">⚒️ Forja</button>
+          <button class="mob-sheet-btn" data-panel="attributes" data-i18n="navAttributes">Atributos</button>
+          <button class="mob-sheet-btn" data-panel="equipment" data-i18n="navEquipment">Equipo</button>
+          <button class="mob-sheet-btn" data-panel="spellbook" data-i18n="navSpellbook">Grimorio</button>
+          <button class="mob-sheet-btn" data-panel="journal" data-i18n="navJournal">Diario</button>
+          <button class="mob-sheet-btn" data-panel="bestiary" data-i18n="navBestiary">Bestiario</button>
+          <button class="mob-sheet-btn" data-panel="minimap" data-i18n="sheetMap">🗺️ Mapa</button>
+          <button class="mob-sheet-btn" data-panel="achievements" data-i18n="sheetAchievements">🏆 Logros</button>
+          <button class="mob-sheet-btn" data-panel="crafting" data-i18n="sheetCrafting">⚒️ Forja</button>
         </div>
       </div>
     </div>
@@ -382,65 +382,65 @@
 <!-- ══ MODALES ══════════════════════════════════════════════════ -->
 
 <!-- PANEL MODAL (Attributes / Equipment / Spellbook / Journal / Bestiary) -->
-<div id="panelModal" class="modal hidden" role="dialog" aria-labelledby="panelModalTitle">
+<div id="panelModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="panelModalTitle">
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="panelModalTitle"></h2>
-      <button class="modal-close" id="closePanelBtn" aria-label="Cerrar">✕</button>
+      <button class="modal-close" id="closePanelBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
     </div>
     <div id="panelModalBody"></div>
   </div>
 </div>
 
 <!-- INVENTORY -->
-<div id="inventoryModal" class="modal hidden" role="dialog" aria-labelledby="inventory-title">
+<div id="inventoryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="inventory-title">
   <div class="modal-content">
     <div class="modal-header">
       <h2 id="inventory-title" data-i18n="inventoryTitle">🎒 Inventario</h2>
-      <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar">✕</button>
+      <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
     </div>
     <p class="modal-gold"><span data-i18n="inventoryGold">Oro</span>: <span id="inventoryGold" class="gold-accent">0</span> 🪙</p>
     <div class="inventory-filter-row">
       <div class="m3-input-container inventory-search-group">
-        <input id="inventorySearchInput" type="search" placeholder="Buscar objetos..." autocomplete="off" aria-label="Buscar inventario">
-        <select id="inventoryTypeFilter" aria-label="Filtrar por tipo">
-          <option value="all">Todos</option>
-          <option value="consumable">Consumibles</option>
-          <option value="weapon">Armas</option>
-          <option value="armor">Armaduras</option>
-          <option value="shield">Escudos</option>
-          <option value="helmet">Casco</option>
-          <option value="boots">Botas</option>
-          <option value="ring">Anillos</option>
-          <option value="accessory">Accesorios</option>
-          <option value="quest">Misiones</option>
+        <input id="inventorySearchInput" type="search" placeholder="Buscar objetos..." autocomplete="off" aria-label="Buscar inventario" data-i18n-attr="placeholder" data-i18n="invSearchPlaceholder" data-i18n-aria="invSearchLabel">
+        <select id="inventoryTypeFilter" aria-label="Filtrar por tipo" data-i18n-attr="aria-label" data-i18n="invTypeFilterLabel">
+          <option value="all" data-i18n="invFilterAll">Todos</option>
+          <option value="consumable" data-i18n="invFilterConsumables">Consumibles</option>
+          <option value="weapon" data-i18n="invFilterWeapons">Armas</option>
+          <option value="armor" data-i18n="invFilterArmors">Armaduras</option>
+          <option value="shield" data-i18n="invFilterShields">Escudos</option>
+          <option value="helmet" data-i18n="invFilterHelmets">Cascos</option>
+          <option value="boots" data-i18n="invFilterBoots">Botas</option>
+          <option value="ring" data-i18n="invFilterRings">Anillos</option>
+          <option value="accessory" data-i18n="invFilterAccessories">Accesorios</option>
+          <option value="quest" data-i18n="invFilterQuests">Misiones</option>
         </select>
       </div>
     </div>
     <div class="inventory-grid">
       <div class="inventory-list-col">
         <h3 data-i18n="itemsSectionTitle">Objetos</h3>
-        <div id="inventoryFilters" class="inv-filter-bar" role="group" aria-label="Filtrar inventario">
-          <button class="inv-filter-chip active" data-filter="all">Todos</button>
-          <button class="inv-filter-chip" data-filter="consumable">Consumibles</button>
-          <button class="inv-filter-chip" data-filter="equip">Equipo</button>
-          <button class="inv-filter-chip" data-filter="quest">Misión</button>
-          <button id="showEquipOverviewBtn" class="inv-filter-chip inv-equip-chip" aria-label="Ver equipamiento">🛡️</button>
+        <div id="inventoryFilters" class="inv-filter-bar" role="group" aria-label="Filtrar inventario" data-i18n-attr="aria-label" data-i18n="invFilterBarLabel">
+          <button class="inv-filter-chip active" data-filter="all" aria-pressed="true" data-i18n="invFilterAll">Todos</button>
+          <button class="inv-filter-chip" data-filter="consumable" aria-pressed="false" data-i18n="invFilterConsumables">Consumibles</button>
+          <button class="inv-filter-chip" data-filter="equip" aria-pressed="false" data-i18n="invFilterEquipment">Equipo</button>
+          <button class="inv-filter-chip" data-filter="quest" aria-pressed="false" data-i18n="invFilterQuest">Misión</button>
+          <button id="showEquipOverviewBtn" class="inv-filter-chip inv-equip-chip" aria-label="Ver equipamiento" data-i18n-attr="aria-label" data-i18n="equipOverviewLabel">🛡️</button>
         </div>
         <ul id="inventoryList" role="listbox"></ul>
       </div>
       <div class="inventory-detail-col" id="inventoryDetail">
-        <h3 id="invDetailTitle">Equipamiento</h3>
+        <h3 id="invDetailTitle" data-i18n="invDetailEquipment">Equipamiento</h3>
         <div id="invEquipOverview">
           <ul id="equipmentList" role="list" class="equipment-slots-list">
-            <li><span class="equip-slot-icon">🪖</span><span class="equip-slot-label">Cabeza</span><span id="equip-head" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">⚔️</span><span class="equip-slot-label">Mano D.</span><span id="equip-rightHand" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🛡️</span><span class="equip-slot-label">Mano I.</span><span id="equip-leftHand" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🥋</span><span class="equip-slot-label">Armadura</span><span id="equip-armor" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🦾</span><span class="equip-slot-label">Brazos</span><span id="equip-arms" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">👢</span><span class="equip-slot-label">Botas</span><span id="equip-boots" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">💍</span><span class="equip-slot-label">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">✨</span><span class="equip-slot-label">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🪖</span><span class="equip-slot-label" data-i18n="slotHead">Cabeza</span><span id="equip-head" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">⚔️</span><span class="equip-slot-label" data-i18n="slotRightHand">Mano D.</span><span id="equip-rightHand" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🛡️</span><span class="equip-slot-label" data-i18n="slotLeftHand">Mano I.</span><span id="equip-leftHand" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🥋</span><span class="equip-slot-label" data-i18n="slotArmor">Armadura</span><span id="equip-armor" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">🦾</span><span class="equip-slot-label" data-i18n="slotArms">Brazos</span><span id="equip-arms" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">👢</span><span class="equip-slot-label" data-i18n="slotBoots">Botas</span><span id="equip-boots" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">💍</span><span class="equip-slot-label" data-i18n="slotRing">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></li>
+            <li><span class="equip-slot-icon">✨</span><span class="equip-slot-label" data-i18n="slotAccessory">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></li>
           </ul>
         </div>
         <div class="item-detail hidden" id="itemDetailCard">
@@ -467,11 +467,11 @@
 </div>
 
 <!-- STATS -->
-<div id="statsModal" class="modal hidden" role="dialog" aria-labelledby="stats-modal-title">
+<div id="statsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
   <div class="modal-content modal-content-sm">
     <div class="modal-header">
         <h2 id="stats-modal-title" data-i18n="statsModalTitle">📈 Mejorar Atributos</h2>
-        <button class="modal-close" id="closeStatsBtn">✕</button>
+        <button class="modal-close" id="closeStatsBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
       </div>
       <p class="modal-points-label"><span data-i18n="statPointsText">Puntos disponibles</span>: <strong id="modal-stat-points" class="gold-accent stat-pts-display">0</strong></p>
       <p id="stat-class-hint" class="hint-text" data-i18n="statClassHint"></p>
@@ -488,7 +488,7 @@
       </div>
       <p class="hint-text hint-text-mt" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
       <div class="mastery-section">
-        <h3 class="mastery-section-title">⚔️ Maestría de Armas</h3>
+        <h3 class="mastery-section-title" data-i18n="masterySectionTitle">⚔️ Maestría de Armas</h3>
         <div id="mastery-list" class="mastery-list"></div>
       </div>
       <div id="spec-section" class="spec-section"></div>
@@ -496,11 +496,11 @@
   </div>
 
   <!-- SHOP -->
-  <div id="shopModal" class="modal hidden" role="dialog" aria-labelledby="shop-modal-title">
+  <div id="shopModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="shop-modal-title">
     <div class="modal-content">
       <div class="modal-header">
         <h2 id="shop-modal-title" data-i18n="shopModalTitle">🛒 Tienda</h2>
-        <button class="modal-close" id="closeShopBtn">✕</button>
+        <button class="modal-close" id="closeShopBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
       </div>
       <p class="modal-gold"><span data-i18n="shopGoldLabel">Tu oro</span>: <span id="shopGold" class="gold-accent">0</span> 🪙</p>
       <div class="shop-grid">
@@ -513,7 +513,7 @@
 </div>
 
 <!-- MAIN MENU -->
-<div id="mainMenuModal" class="modal hidden" role="dialog" aria-labelledby="main-menu-title">
+<div id="mainMenuModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="main-menu-title">
   <div class="modal-content main-menu-content">
     <div class="main-menu-brand">⚔ Pixel Quest Echoes ⚔</div>
     <div class="menu-options">
@@ -586,7 +586,7 @@
   <div class="modal-content ql-modal-content">
     <div class="modal-header">
       <h2 id="ql-title" data-i18n="questLogTitle">📋 Diario de Misiones</h2>
-      <button class="modal-close" id="closeQuestLogBtn">✕</button>
+      <button class="modal-close" id="closeQuestLogBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
     </div>
     <div class="ql-tabs">
       <button class="ql-tab active" data-tab="active" data-i18n="qlTabActive">En progreso</button>
@@ -598,7 +598,7 @@
 </div>
 
 <!-- GAME OVER -->
-<div id="gameOverModal" class="modal hidden" role="dialog" aria-labelledby="game-over-title">
+<div id="gameOverModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="game-over-title">
   <div class="modal-content modal-content-xs modal-text-center">
     <h2 id="game-over-title" class="gameover-title" data-i18n="gameOverTitle">💀 GAME OVER 💀</h2>
     <p class="modal-body-text" data-i18n="gameOverText">Has caído en tu aventura.</p>
@@ -619,7 +619,7 @@
   </div>
 </div>
 
-<div id="endingModal" class="modal hidden" role="dialog" aria-labelledby="ending-title">
+<div id="endingModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ending-title">
   <div class="modal-content modal-content-sm modal-text-center">
     <h2 id="ending-title" data-i18n="endingTitle">🏆 ¡Victoria! 🏆</h2>
     <p id="endingMessage" class="modal-body-text" data-i18n="endingMessage">Has derrotado al Dragon King.</p>
@@ -651,7 +651,7 @@
 })();
 </script>
 <!-- ══ INTRO SCREEN — CÓMIC ════════════════════════════════════ -->
-<div id="introScreen" class="intro-screen hidden" role="dialog" aria-modal="true" aria-label="Introducción al juego">
+<div id="introScreen" class="intro-screen hidden" role="dialog" aria-modal="true" aria-label="Introducción al juego" data-i18n-attr="aria-label" data-i18n="introLabel">
 
   <!-- Flash blanco al girar página -->
   <div id="introFlash" class="intro-flash"></div>

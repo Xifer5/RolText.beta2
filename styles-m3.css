@@ -1859,6 +1859,49 @@ button:focus-visible,
 .item-detail-header { margin-top: 12px; }
 .inv-equipment-section { margin-top: 20px; }
 .inv-item-namewrap { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+
+/* a11y M3 — filter chips del inventario */
+.inv-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.inv-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--md-outline);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--md-on-surface-variant);
+  font-family: inherit;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.inv-filter-chip:hover { background: var(--md-surface-c-high); color: var(--md-on-surface); }
+.inv-filter-chip.active {
+  background: var(--md-secondary-container);
+  border-color: transparent;
+  color: var(--md-on-secondary-container);
+  font-weight: 600;
+}
+
+/* a11y M3 — touch targets ≥44px en táctil/móvil */
+@media (max-width: 1023px), (pointer: coarse) {
+  .inv-filter-chip { min-height: 44px; }
+  .modal-close { width: 44px; height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .location-action-btn { min-height: 44px; }
+  .craft-tab,
+  .ql-tab,
+  .nav-tab,
+  .sf-btn { min-height: 44px; }
+  .mob-dir-vertical { min-height: 44px; }
+}
 .inventory-list-col h3,
 .inventory-detail-col h3,
 .modal-content h3 {

@@ -364,7 +364,7 @@ export function updateUI() {
     if (isBoss) ep?.classList.add("is-boss"); else ep?.classList.remove("is-boss");
     
     if (ui["enemy-name"]) {
-      const badge = isBoss ? `<span class="boss-badge">⚠ Jefe</span>` : "";
+      const badge = isBoss ? `<span class="boss-badge">${t("bossBadge")}</span>` : "";
       const enemyAtk = gameState.currentEnemy.attack || 0;
       const enemyDef = gameState.currentEnemy.defense || 0;
       ui["enemy-name"].innerHTML =

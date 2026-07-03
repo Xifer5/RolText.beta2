@@ -42,7 +42,9 @@ export function renderInventory() {
       // Reset chip to "Todos" when dropdown takes over
       const filterBar = document.getElementById("inventoryFilters");
       if (filterBar) filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(c => {
-        c.classList.toggle("active", c.dataset.filter === "all");
+        const on = c.dataset.filter === "all";
+        c.classList.toggle("active", on);
+        c.setAttribute("aria-pressed", String(on));
       });
       renderInventory();
     });
@@ -81,7 +83,9 @@ export function renderInventory() {
   // Sync chip active state
   if (filterBar) {
     filterBar.querySelectorAll(".inv-filter-chip[data-filter]").forEach(chip => {
-      chip.classList.toggle("active", chip.dataset.filter === inventoryTypeFilter);
+      const on = chip.dataset.filter === inventoryTypeFilter;
+      chip.classList.toggle("active", on);
+      chip.setAttribute("aria-pressed", String(on));
     });
   }
 
@@ -338,9 +342,9 @@ function showItemDetails(itemId, item) {
       const eqVal = equipped[statName] || 0;
       const diff = itemVal - eqVal;
       if (diff > 0) {
-        extra = ` <span class="stat-diff-positive">(+${diff} vs equipado)</span>`;
+        extra = ` <span class="stat-diff-positive">(+${diff} ${t('vsEquipped')})</span>`;
       } else if (diff < 0) {
-        extra = ` <span class="stat-diff-negative">(${diff} vs equipado)</span>`;
+        extra = ` <span class="stat-diff-negative">(${diff} ${t('vsEquipped')})</span>`;
       }
     }
     li.innerHTML = `${text}${extra}`;

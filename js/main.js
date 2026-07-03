@@ -14,6 +14,7 @@ import { initAudio, preloadSounds } from "./sounds.js";
 import { setupTravelEventModal } from "./travelEvents.js";
 import { renderLocalMinimap } from "./localMinimap.js";
 import { showIntro } from "./intro.js";
+import { setupFocusTrap } from "./focusTrap.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   initLocalization();
@@ -39,6 +40,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupPanelListeners();
   setupKeyboard();
   setupTravelEventModal();
+  setupFocusTrap();
 
   // Pre-carga sonidos tras primera interacción del usuario
   document.addEventListener("pointerdown", preloadSounds, { once: true });
