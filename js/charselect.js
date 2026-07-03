@@ -31,9 +31,10 @@ export function showCharacterSelect(onComplete) {
         <input type="text" id="playerNameInput" placeholder="${t('heroNamePlaceholder')}" maxlength="20" />
       </div>
 
-      <div class="class-select-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin:var(--sp-5) 0">
+      <div class="class-select-grid" role="radiogroup" aria-label="${t('characterSelectTitle')}" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin:var(--sp-5) 0">
         ${Object.values(CLASS_DEFINITIONS).map(cls => `
-          <div class="class-card" data-class="${cls.id}" style="--cls-color:${cls.color}">
+          <div class="class-card" data-class="${cls.id}" style="--cls-color:${cls.color}"
+               role="radio" aria-checked="false" tabindex="0" aria-label="${cls.name}">
             <div class="class-card-emoji">${cls.emoji}</div>
             <div class="class-card-name" style="color:${cls.color}">${cls.name}</div>
             <p class="class-card-desc">${cls.description}</p>
@@ -63,15 +64,26 @@ export function showCharacterSelect(onComplete) {
   let selectedClass = null;
 
   // Class selection
+  const selectCard = (card) => {
+    modal.querySelectorAll(".class-card").forEach(c => {
+      c.classList.remove("selected");
+      c.setAttribute("aria-checked", "false");
+    });
+    card.classList.add("selected");
+    card.setAttribute("aria-checked", "true");
+    selectedClass = card.dataset.class;
+    const startBtn = document.getElementById("startAdventureBtn");
+    startBtn.disabled = false;
+    document.getElementById("classSelectHint").textContent =
+      `${t('classSelectedPrefix')} ${CLASS_DEFINITIONS[selectedClass].name} ${t('classSelectedSuffix')}`;
+  };
   modal.querySelectorAll(".class-card").forEach(card => {
-    card.addEventListener("click", () => {
-      modal.querySelectorAll(".class-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      selectedClass = card.dataset.class;
-      const startBtn = document.getElementById("startAdventureBtn");
-      startBtn.disabled = false;
-      document.getElementById("classSelectHint").textContent =
-        `${t('classSelectedPrefix')} ${CLASS_DEFINITIONS[selectedClass].name} ${t('classSelectedSuffix')}`;
+    card.addEventListener("click", () => selectCard(card));
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selectCard(card);
+      }
     });
   });
 

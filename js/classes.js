@@ -75,7 +75,9 @@ export const SKILLS_BY_CLASS = {
       effect: (stats, enemy) => {
         const dmg = Math.max(1, Math.floor(stats.attack * 1.4 * (0.9 + Math.random() * 0.2)));
         const atkMitigated = Math.floor((enemy.defense || 0) * 0.7);
-        return { damage: Math.max(1, dmg - atkMitigated), msg: `Golpe Brutal: ${dmg} daño (ignora defensa)` };
+        const final = Math.max(1, dmg - atkMitigated);
+        // ignoresDef: la mitigación (70% def) ya se aplicó aquí; sin el flag combat.js restaría la defensa otra vez
+        return { damage: final, ignoresDef: true, msg: `Golpe Brutal: ${final} daño (ignora 30% de la defensa)` };
       }
     },
     {

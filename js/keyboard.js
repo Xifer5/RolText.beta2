@@ -31,11 +31,10 @@ function onKey(e) {
   const tag = document.activeElement?.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
-  /* ESC — cierra el modal más reciente que esté visible */
+  /* ESC — lo gestiona setupDismissShortcuts (ui.js): cierra sheet primero y luego
+     el modal superior. Tener un segundo handler aquí cerraba dos modales por pulsación. */
   if (e.key === "Escape") {
-    const modals = [...document.querySelectorAll(".modal:not(.hidden)")];
-    if (modals.length > 0) {
-      modals[modals.length - 1].classList.add("hidden");
+    if (document.querySelector(".modal:not(.hidden)")) {
       e.preventDefault();
       return;
     }

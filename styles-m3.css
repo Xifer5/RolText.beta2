@@ -1355,109 +1355,6 @@ button:focus-visible,
   color: var(--md-on-primary-container);
 }
 
-/* ═══════════════════════════════════════════════════════
-   MOBILE PLAYER HEADER
-   ═══════════════════════════════════════════════════════ */
-#mobile-player-header { display: none; }
-@media (max-width: 960px) {
-  #mobile-player-header {
-    display: block;
-    padding: 20px 0 16px;
-    margin-bottom: 16px;
-    border-bottom: 2px solid var(--md-outline);
-    background: linear-gradient(180deg, var(--md-surface-c-low), transparent);
-  }
-  /* En combate el HUD sticky ya muestra las vitales: cede su espacio al panel del enemigo */
-  #screen:has(#enemy-panel:not(.hidden)) #mobile-player-header { display: none; }
-  .mobile-player-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px;
-    background: linear-gradient(135deg, var(--md-surface-c-high), var(--md-surface-c));
-    border-radius: var(--r-lg);
-    border: 1px solid var(--md-outline);
-    box-shadow: var(--elev-2);
-    margin: 0 16px;
-  }
-  .mobile-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: var(--md-primary-container);
-    border: 2px solid var(--md-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-    position: relative;
-  }
-  .mobile-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-  }
-  #mobile-avatar-emoji {
-    font-size: 24px;
-  }
-  .mobile-player-info {
-    flex: 1;
-    min-width: 0;
-  }
-  .mobile-player-name {
-    font-family: var(--font-title);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--md-on-surface);
-    margin-bottom: 6px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-  .mobile-vitals-compact {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .compact-vital {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-  }
-  .compact-vital-bar {
-    flex: 1;
-    height: 6px;
-    background: var(--md-surface-c-high);
-    border-radius: 999px;
-    overflow: hidden;
-    position: relative;
-  }
-  .compact-vital-bar.hp-bar { background: rgba(239, 68, 68, .2); }
-  .compact-vital-bar.hp-bar::after { background: #ef4444; }
-  .compact-vital-bar.mp-bar { background: rgba(129, 140, 248, .2); }
-  .compact-vital-bar.mp-bar::after { background: #818cf8; }
-  .compact-vital-bar.xp-bar { background: rgba(236, 197, 111, .2); }
-  .compact-vital-bar.xp-bar::after { background: #ecc56f; }
-  .compact-vital-bar::after {
-    content: '';
-    display: block;
-    height: 100%;
-    width: var(--fill-width, 0%);
-    transition: width .25s ease;
-  }
-  .compact-vital-text {
-    font-family: var(--font-ui);
-    color: var(--md-on-surface-variant);
-    font-size: 11px;
-    white-space: nowrap;
-    min-width: 35px;
-    text-align: right;
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════
    MOBILE BOTTOM NAV
    ═══════════════════════════════════════════════════════════ */
@@ -4278,6 +4175,27 @@ kbd {
     black calc(100% - 52px),
     transparent 100%
   );
+}
+@media (max-width: 960px) {
+  /* En móvil el log puede quedar en ~90px: fades de 72px lo dejarían ilegible */
+  .story {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 8px,
+      black calc(100% - 14px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 8px,
+      black calc(100% - 14px),
+      transparent 100%
+    );
+  }
+  /* En combate el panel del enemigo ya identifica la escena: el hero cede su espacio al log */
+  #screen:has(#enemy-panel:not(.hidden)) #location-hero { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════
