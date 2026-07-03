@@ -14,7 +14,7 @@ export const worldMap = {
     safeZone: true,
     canRest: true,
     level: 1,
-    description: "Un bullicioso centro comercial rodeado de suaves colinas.",
+    description: { en: "A bustling trading hub surrounded by gentle hills.", es: "Un bullicioso centro comercial rodeado de suaves colinas." },
     exits: { north: "forest_cross", south: "swamp_dock", east: "shop", west: "tavern" }
   },
   shop: {
@@ -22,7 +22,7 @@ export const worldMap = {
     name: "Adventurer's Supply",
     biome: "none",
     level: 1,
-    description: "Equipo, pociones y rumores de aventureros.",
+    description: { en: "Gear, potions and adventurer's rumors.", es: "Equipo, pociones y rumores de aventureros." },
     exits: { west: "town" }
   },
   tavern: {
@@ -31,7 +31,7 @@ export const worldMap = {
     biome: "none",
     canRest: true,
     level: 1,
-    description: "Fuego cálido, cerveza fría y bardos ruidosos.",
+    description: { en: "Warm fire, cold ale and rowdy bards.", es: "Fuego cálido, cerveza fría y bardos ruidosos." },
     exits: { east: "town", south: "cellar" }
   },
   cellar: {
@@ -39,7 +39,7 @@ export const worldMap = {
     name: "Old Cellar",
     biome: "none",
     level: 1,
-    description: "Barriles, ratas... ¿y un pasadizo oculto?",
+    description: { en: "Barrels, rats… and a hidden passage?", es: "Barriles, ratas... ¿y un pasadizo oculto?" },
     exits: { north: "tavern", down: "cave_1" }
   },
 
@@ -51,7 +51,7 @@ export const worldMap = {
     safeZone: true,
     canRest: true,
     level: 3,
-    description: "Piedra fría, estandartes al viento y armaduras que resuenan.",
+    description: { en: "Cold stone, banners in the wind and echoing armor.", es: "Piedra fría, estandartes al viento y armaduras que resuenan." },
     exits: { west: "mountain_3", east: "castle_shop", down: "armory" }
   },
   castle_shop: {
@@ -59,7 +59,7 @@ export const worldMap = {
     name: "Keep Quartermaster",
     biome: "none",
     level: 3,
-    description: "Military-grade gear.",
+    description: { en: "Military-grade gear for seasoned warriors.", es: "Equipo de grado militar para guerreros experimentados." },
     exits: { west: "castle" }
   },
   tower: {
@@ -67,7 +67,7 @@ export const worldMap = {
     name: "Castle Tower",
     biome: "none",
     level: 3,
-    description: "The Tower of the Castle, You can talk to the Master Mage of the castle here.",
+    description: { en: "The Tower of the Castle. The Master Mage resides here.", es: "La Torre del Castillo. Aquí reside el Archimago." },
     exits: { north: "armory", down: "ruin_6" }
   },
   armory: {
@@ -75,7 +75,7 @@ export const worldMap = {
     name: "Armory",
     biome: "none",
     level: 3,
-    description: "Weapons and armor for brave adventurers.",
+    description: { en: "Weapons and armor for brave adventurers.", es: "Armas y armaduras para aventureros valientes." },
     exits: { north: "castle", south: "tower" }
   },
 
@@ -87,7 +87,7 @@ export const worldMap = {
     safeZone: true,
     canRest: true,
     level: 2,
-    description: "Smell of salt, gulls overhead, ships creak in the bay.",
+    description: { en: "Smell of salt, gulls overhead, ships creak in the bay.", es: "Olor a sal, gaviotas volando, barcos crujiendo en la bahía." },
     exits: { down: "cave_6", east: "beach_6" }
   }
 };

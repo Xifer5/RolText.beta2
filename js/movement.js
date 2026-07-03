@@ -101,9 +101,10 @@ export function handleMove(direction) {
     direction: dirLabel(direction),
     location: localizeText(newLoc.name)
   }), "narrative");
-  const desc = Array.isArray(newLoc.description)
+  const rawDesc = Array.isArray(newLoc.description)
     ? newLoc.description[Math.floor(Math.random() * newLoc.description.length)]
     : newLoc.description;
+  const desc = localizeText(rawDesc);
   if (desc) addMessage(desc, "narrative");
 
   // Record visit for journal/bestiary

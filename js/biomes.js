@@ -15,14 +15,14 @@ export const biomes = {
     encounterRate: 0.35,
     enemies: ["slime", "wolf", "goblin", "fungedBeast"],
     description: [
-      "The trees loom tall above you.",
-      "You hear rustling in the bushes.",
-      "Birds scatter as you pass between the trees.",
-      "Faint sunlight breaks through the forest canopy.",
-      "In this part of the deep forest the Trees looks scary.",
-      "The animals and plants are really wild. What is happening in the forest?",
-      "The air is filled with the scent of pine and earth.",
-      "All the nature here is beautiful and wild"
+      { en: "The trees loom tall above you.", es: "Los árboles se alzan imponentes sobre ti." },
+      { en: "You hear rustling in the bushes.", es: "Escuchas un crujido entre los arbustos." },
+      { en: "Birds scatter as you pass between the trees.", es: "Los pájaros huyen al pasar entre los árboles." },
+      { en: "Faint sunlight breaks through the forest canopy.", es: "Tenues rayos de sol se filtran por el dosel del bosque." },
+      { en: "In this part of the deep forest the trees look scary.", es: "En esta parte del bosque profundo, los árboles parecen amenazantes." },
+      { en: "The animals and plants are really wild. What is happening in the forest?", es: "Los animales y plantas son muy salvajes. ¿Qué está pasando en el bosque?" },
+      { en: "The air is filled with the scent of pine and earth.", es: "El aire está impregnado con el aroma de pino y tierra húmeda." },
+      { en: "All the nature here is beautiful and wild.", es: "Toda la naturaleza aquí es hermosa y salvaje." },
     ],
     modifiers: {
       visibility: -1.5,
@@ -38,13 +38,11 @@ export const biomes = {
     encounterRate: 0.40,
     enemies: ["thief", "orc", "imp", "fungedBeast", "elf", "pegasus"],
     description: [
-      "You can feel the magic in these gardens.",
-      "So many flower is hipnotic.",
-      "How this beauty could be so dangerous?",
-      "Are the flowers whispering? Maybe is something inside the garden.",
-      "There is a beautiful waterfall. Something is shining, maybe is something inside the waterfall.",
-
-
+      { en: "You can feel the magic in these gardens.", es: "Puedes sentir la magia en estos jardines." },
+      { en: "So many flowers, it's hypnotic.", es: "Tantas flores, es hipnótico." },
+      { en: "How could such beauty be so dangerous?", es: "¿Cómo puede tanta belleza ser tan peligrosa?" },
+      { en: "Are the flowers whispering? Maybe there's something inside the garden.", es: "¿Están susurrando las flores? Quizás hay algo dentro del jardín." },
+      { en: "There is a beautiful waterfall. Something is shining inside it.", es: "Hay una hermosa cascada. Algo brilla dentro de ella." },
     ],
     modifiers: {
       visibility: -1.0,
@@ -60,7 +58,7 @@ export const biomes = {
     encounterRate: 0.40,
     enemies: ["ancient_guardian", "treasure_guardian"],
     description: [
-      "This place is full of gold and jewels.",
+      { en: "This place is full of gold and jewels.", es: "Este lugar está lleno de oro y joyas." },
     ],
     modifiers: {
       visibility: -1.0,
@@ -75,12 +73,12 @@ export const biomes = {
     encounterRate: 0.35,
     enemies: ["beholder", "warlock", "linchorn", "chimera"],
     description: [
-      "A vast, endless expanse of blood-red sand. The heat here is oppressive, a tangible force that seems to drain the will to move. The defining feature is the wind—it constantly shifts the dunes, creating high, sculpted crests, and carries a sound like a thousand mournful voices. This is the Sea of Whispering Sands, where ancient travelers are said to be buried just beneath the surface, their final words carried on the breeze.",
-      "This desert is composed not of sand, but of millions of tiny, weathered shards of obsidian and jade. It is the remnants of a cataclysmic magical explosion. The ground glints with a painful brilliance under the relentless sun. In the center, a sunken crater holds a pool of water that shimmers with an unnatural, oily sheen, surrounded by bizarre, thorny cacti that pulse with faint, purple light.",
-      "The soil here is a rust-colored powder, so rich in iron that the entire area gives off a faint magnetic pull. Thunderstorms are frequent, and the flashes of lightning often strike the ground, fusing the dust into sharp, glassy ribbons. The air tastes of ozone and metallic decay. Strange, heavy-bodied creatures with thick, scaled hides are the only life that thrive in this mineral-rich wasteland.",
-      "A landscape dominated by the ghostly remains of a forest turned to stone. Hundreds of fossilized trees, gray and skeletal, jut from the cracked, dry earth. They offer no shade, only eerie, fixed shadows that stretch and warp as the sun crosses the sky. The silence is profound and heavy, a testament to the sudden, terrible event that once froze life in this desolate place.",
-      "This long, winding valley is perpetually shrouded in a thick, dust-laden haze. The sun never seems to fully rise or set, leaving the land in a state of dim, orange-tinged twilight. Navigation is difficult as landmarks are obscured. The only sign of life is the occasional, deep track of something massive and slow-moving that passes through the gloom, heading toward a destination you cannot see.",
-      "An expanse of cracked, parched earth that stretches to the horizon. The ground is a mosaic of deep fissures and jagged plates, with occasional geysers of steam venting from the depths below. The air is dry and hot, carrying the scent of sulfur and minerals. In the distance, mirages create illusions of water and greenery that vanish as you approach."
+      { en: "A vast, endless expanse of blood-red sand. The heat is oppressive, a tangible force draining your will to move.", es: "Una vasta extensión de arena color sangre. El calor es opresivo, una fuerza tangible que drena tu voluntad de moverte." },
+      { en: "The ground glints with obsidian and jade shards—remnants of a cataclysmic magical explosion.", es: "El suelo brilla con fragmentos de obsidiana y jade: vestigios de una explosión mágica catastrófica." },
+      { en: "Iron-rich dust fills the air with a metallic scent. Thunderstorms fuse the ground into glassy ribbons.", es: "El polvo rico en hierro llena el aire con un olor metálico. Las tormentas fusionan el suelo en cintas vítridas." },
+      { en: "A forest turned to stone. Hundreds of fossilized trees jut from the cracked, dry earth.", es: "Un bosque convertido en piedra. Cientos de árboles fosilizados emergen de la tierra agrietada y seca." },
+      { en: "A haze-laden valley in dim orange twilight. Massive tracks pass through the gloom toward an unseen destination.", es: "Un valle cubierto de neblina en un crepúsculo anaranjado. Enormes huellas atraviesan la penumbra hacia un destino desconocido." },
+      { en: "Cracked earth stretches to the horizon with steam venting from the depths. The air smells of sulfur.", es: "La tierra agrietada se extiende hasta el horizonte con vapor emergiendo de las profundidades. El aire huele a azufre." },
     ],
     modifiers: {
       visibility: 1.0,
@@ -96,10 +94,10 @@ export const biomes = {
     encounterRate: 0.45,
     enemies: ["cave_bat", "cave_bear", "goblin_shaman"],
     description: [
-      "The cave walls feel cold and damp.",
-      "Water dripping echoes endlessly.",
-      "Shadows dance along the rocky surfaces.",
-      "A distant growl makes you tense up."
+      { en: "The cave walls feel cold and damp.", es: "Las paredes de la cueva se sienten frías y húmedas." },
+      { en: "Water dripping echoes endlessly.", es: "El goteo de agua resuena sin fin." },
+      { en: "Shadows dance along the rocky surfaces.", es: "Las sombras danzan sobre las superficies rocosas." },
+      { en: "A distant growl makes you tense up.", es: "Un gruñido lejano te pone en alerta." },
     ],
     modifiers: {
       visibility: 0.7,
@@ -115,13 +113,12 @@ export const biomes = {
     encounterRate: 0.40,
     enemies: ["wyvern", "mountain_giant", "drider", "centaurus"],
     description: [
-      "Freezing winds whip across your face.",
-      "The air is thin and heavy.",
-      "Loose gravel slides under your boots.",
-      "You see massive figures moving in the distance.",
-      "The air is filled with the scent of sulfur and brimstone.",
-      "The ground is covered in loose, unstable rock.",
-
+      { en: "Freezing winds whip across your face.", es: "Vientos helados te azotan el rostro." },
+      { en: "The air is thin and heavy.", es: "El aire es escaso y pesado." },
+      { en: "Loose gravel slides under your boots.", es: "La gravilla suelta se desliza bajo tus botas." },
+      { en: "You see massive figures moving in the distance.", es: "Ves figuras masivas moviéndose a lo lejos." },
+      { en: "The air is filled with the scent of sulfur and brimstone.", es: "El aire está impregnado de azufre y piedra caliza." },
+      { en: "The ground is covered in loose, unstable rock.", es: "El suelo está cubierto de roca suelta e inestable." },
     ],
     modifiers: {
       visibility: 1.2,
@@ -137,10 +134,10 @@ export const biomes = {
     encounterRate: 0.50,
     enemies: ["stone_golem", "ancient_guardian", "hydra", "chimera"],
     description: [
-      "Ancient pillars crumble upon your touch.",
-      "Blue runes glow faintly on broken walls.",
-      "The air feels charged with forgotten magic.",
-      "Whispers echo from nowhere."
+      { en: "Ancient pillars crumble upon your touch.", es: "Los pilares antiguos se desmoronan al tocarlos." },
+      { en: "Blue runes glow faintly on broken walls.", es: "Runas azules brillan tenuemente en las paredes rotas." },
+      { en: "The air feels charged with forgotten magic.", es: "El aire parece cargado de magia olvidada." },
+      { en: "Whispers echo from nowhere.", es: "Susurros resuenan de la nada." },
     ],
     modifiers: {
       visibility: 0.9,
@@ -156,11 +153,11 @@ export const biomes = {
     encounterRate: 0.55,
     enemies: ["zombie", "squeletor", "imp"],
     description: [
-      "Thick fog makes it hard to see ahead.",
-      "Your boots sink into the muddy ground.",
-      "A foul smell fills the humid air.",
-      "Something splashes nearby… too large to be a frog.",
-      "The smell is so strong that make you feel seek"
+      { en: "Thick fog makes it hard to see ahead.", es: "La espesa niebla dificulta ver hacia adelante." },
+      { en: "Your boots sink into the muddy ground.", es: "Tus botas se hunden en el suelo fangoso." },
+      { en: "A foul smell fills the humid air.", es: "Un olor nauseabundo llena el aire húmedo." },
+      { en: "Something splashes nearby… too large to be a frog.", es: "Algo salpica cerca... demasiado grande para ser una rana." },
+      { en: "The smell is so strong it makes you feel sick.", es: "El olor es tan intenso que te revuelve el estómago." },
     ],
     modifiers: {
       visibility: 0.6,
@@ -177,11 +174,11 @@ export const biomes = {
     encounterRate: 0.50,
     enemies: ["diablo", "dragon", "vine_serpent", "inferno_elemental"],
     description: [
-      "Heat waves distort the air.",
-      "Streams of lava crackle nearby.",
-      "Ash falls like snow around you.",
-      "The ground trembles with volcanic activity.",
-      "Fire, you are walking over ¡Fire!"
+      { en: "Heat waves distort the air.", es: "Las ondas de calor distorsionan el aire." },
+      { en: "Streams of lava crackle nearby.", es: "Torrentes de lava crepitan cerca." },
+      { en: "Ash falls like snow around you.", es: "La ceniza cae como nieve a tu alrededor." },
+      { en: "The ground trembles with volcanic activity.", es: "El suelo tiembla con la actividad volcánica." },
+      { en: "Fire — you are walking over fire!", es: "¡Fuego! ¡Estás caminando sobre fuego!" },
     ],
     modifiers: {
       visibility: 1.0,
@@ -198,11 +195,11 @@ export const biomes = {
     encounterRate: 0.30,
     enemies: ["wolf", "mountain_giant", "wyvern", "beholder"],
     description: [
-      "The cold bites at your skin.",
-      "Snow crunches with every step.",
-      "Your breath freezes on the air.",
-      "Icy winds carry distant howls.",
-      "Ice and Cold is all you can feel"
+      { en: "The cold bites at your skin.", es: "El frío muerde tu piel." },
+      { en: "Snow crunches with every step.", es: "La nieve cruje con cada paso." },
+      { en: "Your breath freezes in the air.", es: "Tu aliento se congela en el aire." },
+      { en: "Icy winds carry distant howls.", es: "Los vientos helados traen aullidos lejanos." },
+      { en: "Ice and cold is all you can feel.", es: "Hielo y frío es todo lo que puedes sentir." },
     ],
     modifiers: {
       visibility: 1.1,
@@ -212,7 +209,6 @@ export const biomes = {
     }
   },
 
-
   beach: {
     id: "beach",
     name: "Sunny Beach",
@@ -220,12 +216,11 @@ export const biomes = {
     encounterRate: 0.30,
     enemies: ["centaurus", "kraken", "sea_serpent", "mermaid", "medusa", "pirate", "pirate_captain"],
     description: [
-      "The sand here is replaced by millions of smooth, dark, volcanic shingle stones. When the tide recedes, they create a cacophony of sound—the deep, rattling, withdrawing clatter of stone on stone. The water itself is a chilling, deep sapphire, and the sea stacks rising offshore are crowned with the crumbling ruins of ancient, forgotten shrines. The air is crisp and carries the potent scent of salt and iodine.",
-      "A secluded stretch of ivory-white sand fringed by tall, swaying palms. The water is turquoise and warm, shallow for hundreds of feet before it drops off. What makes this beach unique are the sea caves carved into the limestone cliffs. When the wind blows into them, it creates a melodic, mournful sound, like a choir singing softly across the water.",
-      "This beach is strewn with the skeletal remains of massive sea creatures: colossal ribs, cracked skulls the size of carriages, and pieces of polished driftwood that look like petrified bone. The sand is a dark, gritty brown, stained by years of tidal decomposition. The tide line is marked by a layer of strange, phosphorescent algae that glows faintly at night. The atmosphere is one of brooding, lonely majesty.",
-      "An idyllic beach where the sand is mixed with tiny, perfectly rounded amber stones. When the sun hits them, the entire shoreline glitters with a warm, golden fire. The waves are gentle, but the water tastes curiously sweet. A single, enormous, moss-covered archway of coral stands at the edge of the water, a natural gateway to the restless sea.",
-      "This is a rugged, wild beach where the land ends in sheer, jagged cliffs. The beach below is narrow and dangerous, littered with the wreckage of a hundred ships—splintered masts, barnacled figureheads, and rotted chests. The waves crash against the rocks with a violence that shakes the ground, and the cry of gulls is harsh and incessant. It is a place of scavengers and dark secrets.",
-
+      { en: "Dark volcanic stones replace the sand. The deep sapphire water crashes against crumbling sea stacks.", es: "Piedras volcánicas oscuras reemplazan la arena. El agua de color zafiro choca contra los arrecifes erosionados." },
+      { en: "Ivory-white sand fringed by tall palms. Sea caves in the cliffs produce a melodic, mournful sound when the wind blows.", es: "Arena blanco marfil rodeada de altas palmeras. Las cuevas marinas en los acantilados producen un sonido melodioso cuando sopla el viento." },
+      { en: "The beach is strewn with the skeletal remains of massive sea creatures. Phosphorescent algae glows faintly at night.", es: "La playa está sembrada con los restos esqueléticos de enormes criaturas marinas. Algas fosforescentes brillan tenuemente de noche." },
+      { en: "Amber stones mixed with the sand glitter with golden fire when the sun hits them.", es: "Piedras de ámbar mezcladas con la arena brillan como fuego dorado cuando les da el sol." },
+      { en: "A rugged beach below sheer cliffs, littered with shipwrecks. Waves crash with a violence that shakes the ground.", es: "Una playa escarpada bajo acantilados verticales, plagada de naufragios. Las olas chocan con una violencia que sacude el suelo." },
     ],
     modifiers: {
       visibility: 1.1,
@@ -242,12 +237,11 @@ export const biomes = {
     encounterRate: 0.30,
     enemies: ["gorilla_warrior", "jungle_tiger", "vine_serpent", "jungle_spirit"],
     description: [
-      "The air is a thick, hot soup, saturated with the smell of wet earth and decaying wood. The foliage is so dense that true darkness reigns even at noon. A constant, gentle rain falls, not from the sky, but from the condensed water dripping from the leaves of the towering, emerald trees. The ground is a treacherous swamp of tangled roots and slick, moss-covered logs, and the sounds of unseen, chittering life are deafening.",
-      "An unsettling, quiet jungle. The trees are draped in thick, gray-green, sentient-looking vines that hang like the beards of ancient giants. These vines seem to shift slightly when you look away, and the wind passing through them creates a low, sibilant sound, like hundreds of voices exchanging secrets. Flowers here are rare, but when found, they are unnaturally large and vibrant, attracting huge, iridescent insects.",
-      "This jungle is constantly enveloped in a cool, white mist that rolls in from the mountain peaks. The ground is rocky and uneven, dotted with strange, luminous fungi that glow with a cool blue light. Every few hours, the mist clears dramatically, revealing a vast, open valley that disappears again moments later. Navigating here is a challenge of memory and trust.",
-      "A low-lying, humid jungle near a great river. The banks are mud-choked and lined with massive, bulbous trees whose lower branches dip into the slow-moving, brown water. This place is defined by the incredible density of its undergrowth and the constant, subtle movement of reptiles. The sounds are dominated by the croaking of frogs and the unsettling, dry rasp of scales dragging across the wet ground.",
-      "This jungle sits atop a massive, flat mesa, accessible only by a crumbling, ancient stone staircase. The trees are shorter and gnarled, adapted to the high winds. The ground is surprisingly clear, a carpet of short, wiry grass. From the edge of the plateau, you can look down over the clouds, and the silence is broken only by the shriek of the giant, colorful birds that make their nests in the sheer cliff face.",
-
+      { en: "The air is a thick, hot soup saturated with wet earth and decaying wood. True darkness reigns even at noon.", es: "El aire es una sopa espesa y caliente, saturada de tierra húmeda y madera en descomposición. La oscuridad reina incluso al mediodía." },
+      { en: "Sentient-looking vines drape the trees like the beards of ancient giants. When the wind blows through them, it sounds like hundreds of voices exchanging secrets.", es: "Las enredaderas que cubren los árboles parecen tener vida propia, como barbas de gigantes antiguos. Cuando el viento las agita, suenan como cientos de voces intercambiando secretos." },
+      { en: "Cool mist rolls in from the mountain peaks. Luminous fungi glow with blue light, illuminating the rocky ground.", es: "Una bruma fresca llega desde los picos montañosos. Los hongos luminosos brillan con luz azul, iluminando el suelo rocoso." },
+      { en: "A low-lying jungle near a great river. Massive trees dip their branches into the slow, brown water. The rasp of scales on wet ground follows you.", es: "Una jungla baja cerca de un gran río. Los árboles masivos sumergen sus ramas en el agua marrón y lenta. El arrastre de escamas sobre el suelo húmedo te sigue." },
+      { en: "A jungle atop a flat mesa. Gnarled trees resist the high winds. From the edge, you look down over the clouds.", es: "Una jungla sobre una meseta plana. Árboles retorcidos resisten los fuertes vientos. Desde el borde, miras hacia abajo sobre las nubes." },
     ],
     modifiers: {
       visibility: -2,
@@ -256,6 +250,7 @@ export const biomes = {
       WaterDamage: 2,
     }
   },
+
   dungeon: {
     id: "dungeon",
     name: "Dungeon",
@@ -263,11 +258,11 @@ export const biomes = {
     encounterRate: 0.50,
     enemies: ["stone_golem", "warlock", "linchorn"],
     description: [
-      "Ancient pillars crumble upon your touch.",
-      "Blue runes glow faintly on broken walls.",
-      "The air feels charged with forgotten magic.",
-      "Whispers echo from nowhere.",
-      "Someone told You that there should be a secret chamber somewhere in the dungeons"
+      { en: "Ancient pillars crumble upon your touch.", es: "Los pilares antiguos se desmoronan al tocarlos." },
+      { en: "Blue runes glow faintly on broken walls.", es: "Runas azules brillan tenuemente en las paredes rotas." },
+      { en: "The air feels charged with forgotten magic.", es: "El aire parece cargado de magia olvidada." },
+      { en: "Whispers echo from nowhere.", es: "Susurros resuenan de la nada." },
+      { en: "There should be a secret chamber somewhere in these dungeons.", es: "Debe haber una cámara secreta en algún lugar de estas mazmorras." },
     ],
     modifiers: {
       visibility: 0.5,
@@ -283,10 +278,10 @@ export const biomes = {
     encounterRate: 0.50,
     enemies: ["stone_golem", "warlock", "linchorn"],
     description: [
-      "Ancient pillars crumble upon your touch.",
-      "Blue runes glow faintly on broken walls.",
-      "The air feels charged with forgotten magic.",
-      "Whispers echo from nowhere."
+      { en: "Ancient pillars crumble upon your touch.", es: "Los pilares antiguos se desmoronan al tocarlos." },
+      { en: "Blue runes glow faintly on broken walls.", es: "Runas azules brillan tenuemente en las paredes rotas." },
+      { en: "The air feels charged with forgotten magic.", es: "El aire parece cargado de magia olvidada." },
+      { en: "Whispers echo from nowhere.", es: "Susurros resuenan de la nada." },
     ],
     modifiers: {
       visibility: 0.5,
@@ -302,7 +297,7 @@ export const biomes = {
     encounterRate: 1.0,
     enemies: ["dragon_king"],
     description: [
-      "This is the Inferno, this is the final test for the worthy adventurers.",
+      { en: "This is the Inferno — the final test for the worthy.", es: "Este es el Infierno: la prueba final para los dignos." },
     ],
     modifiers: {
       visibility: -2,

@@ -133,7 +133,7 @@ export const allItems = {
   },
   giant_club: {
     id: "giant_club",
-    name: { en: "Giant Club", es: "Club Gigante" },
+    name: { en: "Giant Club", es: "Maza Gigante" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -152,7 +152,7 @@ export const allItems = {
   },
   trident: {
     id: "trident",
-    name: "Trident",
+    name: { en: "Trident", es: "Tridente" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -162,7 +162,7 @@ export const allItems = {
   },
   tiger_blade: {
     id: "tiger_blade",
-    name: { en: "Tiger Blade", es: "Hoja Tigre" },
+    name: { en: "Tiger Blade", es: "Hoja del Tigre" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -226,7 +226,7 @@ export const allItems = {
   },
   demon_blade: {
     id: "demon_blade",
-    name: { en: "Demon Blade", es: "Hoja Demonio" },
+    name: { en: "Demon Blade", es: "Hoja del Demonio" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -237,8 +237,8 @@ export const allItems = {
 
   divine_sword: {
     id: "divine_sword",
-    name: "Divine Sword",
-    description: "A divine weapon. +20 ATK",
+    name: { en: "Divine Sword", es: "Espada Divina" },
+    description: { en: "A divine weapon. +20 ATK", es: "Un arma divina. +20 ATK" },
     slot: "rightHand",
     type: "weapon",
     attack: 30,
@@ -247,8 +247,8 @@ export const allItems = {
   },
   excalibur: {
     id: "excalibur",
-    name: "Excalibur Sword",
-    description: "An EPIC divine weapon. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF",
+    name: { en: "Excalibur", es: "Excalibur" },
+    description: { en: "An EPIC divine weapon. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF", es: "Un arma divina ÉPICA. +50 ATK, +20 FUE, +20 AGI, +20 INT, +50 HP MÁX, +20 DEF" },
     slot: "rightHand",
     type: "weapon",
     attack: 50,
@@ -263,12 +263,11 @@ export const allItems = {
   // Crafting Results
   iron_sword: {
     id: "iron_sword",
-    name: "Iron Sword",
+    name: { en: "Iron Sword", es: "Espada de Hierro" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
     attack: 6,
-    icon: "🗡",
     price: 40,
     icon: "./img/swordIron.png",
   },
@@ -276,7 +275,7 @@ export const allItems = {
 
   dragon_king_sword: {
     id: "dragon_king_sword",
-    name: "Dragon King Sword",
+    name: { en: "Dragon King Sword", es: "Espada del Rey Dragón" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -287,9 +286,9 @@ export const allItems = {
   //magic weapons
   staff: {
     id: "staff",
-    name: "Magic Staff",
+    name: { en: "Magic Staff", es: "Báculo Mágico" },
+    description: { en: "A staff imbued with magic. +3 INT, +5 MAG", es: "Un báculo imbuido de magia. +3 INT, +5 MAG" },
     type: "weapon",
-    description: "A staff imbued with magic. +3 INT, +5 MAG",
     slot: "rightHand",
     intelligence: 3,
     magic: 5,
@@ -299,9 +298,9 @@ export const allItems = {
   },
   wand: {
     id: "wand",
-    name: "Magic Wand",
+    name: { en: "Magic Wand", es: "Varita Mágica" },
+    description: { en: "A wand imbued with magic. +5 INT, +8 MAG", es: "Una varita imbuida de magia. +5 INT, +8 MAG" },
     type: "weapon",
-    description: "A wand imbued with magic. +5 INT, +8 MAG",
     slot: "rightHand",
     intelligence: 4,
     magic: 8,
@@ -311,9 +310,9 @@ export const allItems = {
   },
   elemental_wand: {
     id: "elemental_wand",
-    name: "Elemental Wand",
+    name: { en: "Elemental Wand", es: "Varita Elemental" },
+    description: { en: "An elemental wand imbued with the magic of elements. +7 INT, +10 MAG", es: "Una varita elemental imbuida de la magia de los elementos. +7 INT, +10 MAG" },
     type: "weapon",
-    description: "A elemental wand imbued with magic of elemnts. +7 INT, +10 MAG",
     slot: "rightHand",
     intelligence: 7,
     magic: 10,
@@ -323,9 +322,9 @@ export const allItems = {
   },
   bless_staff: {
     id: "bless_staff",
-    name: "Bless Staff",
+    name: { en: "Bless Staff", es: "Báculo Bendito" },
+    description: { en: "A blessed staff imbued with magic. +10 INT, +15 MAG", es: "Un báculo bendito imbuido de magia. +10 INT, +15 MAG" },
     type: "weapon",
-    description: "A blessed staff imbued with magic. +10 INT, +15 MAG",
     slot: "rightHand",
     intelligence: 10,
     magic: 15,
@@ -335,7 +334,7 @@ export const allItems = {
   },
   water_staff: {
     id: "water_staff",
-    name: "Water Staff",
+    name: { en: "Water Staff", es: "Báculo de Agua" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -347,7 +346,7 @@ export const allItems = {
   },
   ocean_staff: {
     id: "ocean_staff",
-    name: "Ocean Staff",
+    name: { en: "Ocean Staff", es: "Báculo del Océano" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -359,7 +358,7 @@ export const allItems = {
   },
   flame_staff: {
     id: "flame_staff",
-    name: "Flame Staff",
+    name: { en: "Flame Staff", es: "Báculo de Llamas" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -371,7 +370,7 @@ export const allItems = {
   },
   spirit_staff: {
     id: "spirit_staff",
-    name: "Spirit Staff",
+    name: { en: "Spirit Staff", es: "Báculo del Espíritu" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -385,8 +384,8 @@ export const allItems = {
   //shields
   wooden_shield: {
     id: "wooden_shield",
-    name: "Wooden Shield",
-    description: "Basic shield. +2 DEF",
+    name: { en: "Wooden Shield", es: "Escudo de Madera" },
+    description: { en: "Basic shield. +2 DEF", es: "Escudo básico. +2 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 1,
@@ -395,8 +394,8 @@ export const allItems = {
   },
   shield: {
     id: "shield",
-    name: "Wooden Shield",
-    description: "Basic shield. +3 DEF",
+    name: { en: "Wooden Shield", es: "Escudo de Madera" },
+    description: { en: "Basic shield. +3 DEF", es: "Escudo básico. +3 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 2,
@@ -405,8 +404,8 @@ export const allItems = {
   },
   shield_of_elves: {
     id: "shield_of_elves",
-    name: "Shield of the Elf",
-    description: "An Elf shield. +8 DEF",
+    name: { en: "Shield of the Elf", es: "Escudo Élfico" },
+    description: { en: "An Elf shield. +8 DEF", es: "Un escudo élfico. +8 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 3,
@@ -415,8 +414,8 @@ export const allItems = {
   },
   iron_shield: {
     id: "iron_shield",
-    name: "Iron Shield",
-    description: "Basic iron shield. +7 DEF",
+    name: { en: "Iron Shield", es: "Escudo de Hierro" },
+    description: { en: "Basic iron shield. +7 DEF", es: "Escudo de hierro básico. +7 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 4,
@@ -425,8 +424,8 @@ export const allItems = {
   },
   strong_shield: {
     id: "strong_shield",
-    name: "Strong Shield",
-    description: "A very strong Shield. +10 DEF",
+    name: { en: "Strong Shield", es: "Escudo Reforzado" },
+    description: { en: "A very strong shield. +10 DEF", es: "Un escudo muy resistente. +10 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 5,
@@ -435,8 +434,8 @@ export const allItems = {
   },
   tower_shield: {
     id: "tower_shield",
-    name: "tower_shield",
-    description: "A very strong Shield. +15 DEF",
+    name: { en: "Tower Shield", es: "Escudo Torre" },
+    description: { en: "A very strong shield. +15 DEF", es: "Un escudo enorme y resistente. +15 DEF" },
     slot: "leftHand",
     type: "shield",
     defense: 10,
@@ -446,8 +445,8 @@ export const allItems = {
   //boots
   boots_leather: {
     id: "boots_leather",
-    name: "Leather Boots",
-    description: "Simple boots. +2 AGI",
+    name: { en: "Leather Boots", es: "Botas de Cuero" },
+    description: { en: "Simple boots. +2 AGI", es: "Botas sencillas. +2 AGI" },
     slot: "boots",
     type: "boots",
     agility: 2,
@@ -456,206 +455,206 @@ export const allItems = {
   },
   boots: {
     id: "boots",
-    name: "Boots",
+    name: { en: "Boots", es: "Botas" },
+    description: { en: "Common boots. +2 DEF", es: "Botas comunes. +2 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "common",
     defense: 1,
     price: 40,
-    description: "Common boots that give +2 DEF",
     icon: "./img/boots7.png"
   },
   leather_boots: {
     id: "leather_boots",
-    name: "Leather Boots",
+    name: { en: "Leather Boots", es: "Botas de Cuero" },
+    description: { en: "Leather boots. +4 DEF", es: "Botas de cuero. +4 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "common",
     defense: 2,
     price: 40,
-    description: "leather boots that give +4 DEF",
     icon: "./img/bootsLeather.png"
   },
   iron_boots: {
     id: "iron_boots",
-    name: "Iron Boots",
+    name: { en: "Iron Boots", es: "Botas de Hierro" },
+    description: { en: "Iron boots. +5 DEF", es: "Botas de hierro. +5 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "common",
     defense: 3,
     price: 90,
-    description: "Iron boots that give +5 DEF",
     icon: "./img/boots1.png"
   },
   plate_boots: {
     id: "plate_boots",
-    name: "Plate Boots",
+    name: { en: "Plate Boots", es: "Botas de Placa" },
+    description: { en: "Plate boots. +7 DEF", es: "Botas de placa. +7 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "common",
     defense: 5,
     price: 100,
-    description: "Plate boots that give +7 DEF",
     icon: "./img/boots3.png"
   },
   magic_boots: {
     id: "magic_boots",
-    name: "MAgic Boots",
+    name: { en: "Magic Boots", es: "Botas Mágicas" },
+    description: { en: "Magic boots. +6 DEF, +5 INT", es: "Botas mágicas. +6 DEF, +5 INT" },
     type: "boots",
     slot: "boots",
     rarity: "common",
     defense: 5,
     intelligence: 5,
     price: 420,
-    description: "Magic boots that give +6 DEF, +5 INT",
     icon: "./img/bootsMagic.png"
   },
   strength_boots: {
     id: "strength_boots",
-    name: "Strength Boots",
+    name: { en: "Strength Boots", es: "Botas de Fuerza" },
+    description: { en: "Strength boots. +6 DEF, +5 STR", es: "Botas de fuerza. +6 DEF, +5 FUE" },
     type: "boots",
     slot: "boots",
     rarity: "rare",
     defense: 5,
     strength: 5,
     price: 420,
-    description: "Strength boots that give +6 DEF, +5 STR",
     icon: "./img/bootsMagic.png"
   },
   black_boots: {
     id: "black_boots",
-    name: "Black Boots",
+    name: { en: "Black Boots", es: "Botas Negras" },
+    description: { en: "Black boots. +8 DEF", es: "Botas negras. +8 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "rare",
     defense: 8,
     price: 400,
-    description: "Black boots that give +8 DEF",
     icon: "./img/bootsBlack.png"
   },
   divine_boots: {
     id: "divine_boots",
-    name: "Divine Boots",
+    name: { en: "Divine Boots", es: "Botas Divinas" },
+    description: { en: "Divine boots. +10 DEF", es: "Botas divinas. +10 DEF" },
     type: "boots",
     slot: "boots",
     rarity: "epic",
     defense: 10,
     price: 500,
-    description: "Divine boots that give +10 DEF",
     icon: "./img/bootsBlack.png"
   },
   //arms
   gloves: {
     id: "gloves",
-    name: "Gloves",
+    name: { en: "Gloves", es: "Guantes" },
+    description: { en: "Common gloves. +2 DEF", es: "Guantes comunes. +2 DEF" },
     type: "arms",
     slot: "arms",
     rarity: "common",
     defense: 1,
     price: 30,
-    description: "A common gloves that give +2 DEF",
     icon: "./img/arm2.png"
   },
   leather_gloves: {
     id: "leather_gloves",
-    name: "Leather Gloves",
+    name: { en: "Leather Gloves", es: "Guantes de Cuero" },
+    description: { en: "Leather gloves. +4 DEF", es: "Guantes de cuero. +4 DEF" },
     type: "arms",
     slot: "arms",
     rarity: "common",
     defense: 2,
     price: 40,
-    description: "A leather gloves that give +4 DEF",
     icon: "./img/arm1.png"
   },
 
   bracers: {
     id: "bracers",
-    name: "Bracers",
+    name: { en: "Bracers", es: "Brazaletes" },
+    description: { en: "Basic bracers. +5 DEF", es: "Brazaletes básicos. +5 DEF" },
     type: "arms",
     slot: "arms",
     rarity: "common",
     defense: 3,
     price: 50,
-    description: "Just basic bracers that give +5 DEF",
     icon: "./img/arm4.png"
   },
 
   iron_bracers: {
     id: "iron_bracers",
-    name: "Iron Bracers",
+    name: { en: "Iron Bracers", es: "Brazaletes de Hierro" },
+    description: { en: "Iron bracers. +6 DEF", es: "Brazaletes de hierro. +6 DEF" },
     type: "arms",
     slot: "arms",
     rarity: "common",
     defense: 4,
     price: 60,
-    description: "Iron bracers that give +6 DEF",
     icon: "./img/arm5.png"
   },
 
   plate_bracers: {
     id: "plate_bracers",
-    name: "Plate Bracers",
+    name: { en: "Plate Bracers", es: "Brazaletes de Placa" },
+    description: { en: "Good plate bracers. +8 DEF", es: "Buenos brazaletes de placa. +8 DEF" },
     type: "arms",
     slot: "arms",
     rarity: "uncommon",
     defense: 5,
     price: 100,
-    description: "Good Plate bracers that give +8 DEF",
     icon: "./img/armBattle.png"
   },
 
   magic_bracers: {
     id: "magic_bracers",
-    name: "Magic Bracers",
+    name: { en: "Magic Bracers", es: "Brazaletes Mágicos" },
+    description: { en: "Magic bracers. +5 DEF, +5 INT", es: "Brazaletes mágicos. +5 DEF, +5 INT" },
     type: "arms",
     slot: "arms",
     rarity: "rare",
     defense: 5,
     intelligence: 5,
     price: 300,
-    description: "Magic bracers that give +5 DEF and +5 INT",
     icon: "./img/armGem.png",
   },
   strength_bracers: {
     id: "strength_bracers",
-    name: "Strength Bracers",
+    name: { en: "Strength Bracers", es: "Brazaletes de Fuerza" },
+    description: { en: "Strength bracers. +6 DEF, +5 STR", es: "Brazaletes de fuerza. +6 DEF, +5 FUE" },
     type: "arms",
     slot: "arms",
     rarity: "rare",
     defense: 5,
     strength: 5,
     price: 400,
-    description: "Strenght bracers that give +6 DEF and +5 STR",
     icon: "./img/armBronce.png",
   },
   black_bracers: {
     id: "black_bracers",
-    name: "Black Bracers",
+    name: { en: "Black Bracers", es: "Brazaletes Negros" },
+    description: { en: "Black bracers. +8 DEF, +6 STR", es: "Brazaletes negros. +8 DEF, +6 FUE" },
     type: "arms",
     slot: "arms",
     rarity: "rare",
     defense: 8,
     strength: 6,
     price: 500,
-    description: "Black bracers that give +8 DEF and +6 STR",
     icon: "./img/armBronc2.png",
   },
   divine_bracers: {
     id: "divine_bracers",
-    name: "Divine Bracers",
+    name: { en: "Divine Bracers", es: "Brazaletes Divinos" },
+    description: { en: "Divine bracers. +10 DEF, +10 STR", es: "Brazaletes divinos. +10 DEF, +10 FUE" },
     type: "arms",
     slot: "arms",
     rarity: "rare",
     defense: 10,
     strength: 10,
     price: 1000,
-    description: "Divine bracers that give +10 DEF and +10 STR",
     icon: "./img/armAngel.png",
   },
   arms_bracelet: {
     id: "arms_bracelet",
-    name: "Iron Bracelet",
-    description: "Bracelet for arms. +2 DEF",
+    name: { en: "Iron Bracelet", es: "Brazalete de Hierro" },
+    description: { en: "Bracelet for arms. +2 DEF", es: "Brazalete para los brazos. +2 DEF" },
     slot: "arms",
     type: "arms",
     defense: 2,
@@ -665,8 +664,8 @@ export const allItems = {
   //ring
   ring_silver: {
     id: "ring_silver",
-    name: "Silver Ring",
-    description: "A shiny ring. +4 MAG",
+    name: { en: "Silver Ring", es: "Anillo de Plata" },
+    description: { en: "A shiny ring. +4 MAG", es: "Un anillo brillante. +4 MAG" },
     slot: "ring",
     type: "ring",
     magic: 10,
@@ -676,8 +675,8 @@ export const allItems = {
   },
   ring_strength: {
     id: "ring_strength",
-    name: "Ring of Strength",
-    description: "Increases physical power. +2 STR",
+    name: { en: "Ring of Strength", es: "Anillo de Fuerza" },
+    description: { en: "Increases physical power. +2 STR", es: "Aumenta el poder físico. +2 FUE" },
     slot: "ring",
     type: "ring",
     strength: 2,
@@ -686,8 +685,8 @@ export const allItems = {
   },
   ring_agility: {
     id: "ring_agility",
-    name: "Ring of Agility",
-    description: "Enhances movement. +2 AGI",
+    name: { en: "Ring of Agility", es: "Anillo de Agilidad" },
+    description: { en: "Enhances movement. +2 AGI", es: "Mejora el movimiento. +2 AGI" },
     slot: "ring",
     type: "ring",
     agility: 2,
@@ -696,8 +695,8 @@ export const allItems = {
   },
   ring_intelligence: {
     id: "ring_intelligence",
-    name: "Ring of Intelligence",
-    description: "Boosts magical power. +2 INT",
+    name: { en: "Ring of Intelligence", es: "Anillo de Inteligencia" },
+    description: { en: "Boosts magical power. +2 INT", es: "Potencia el poder mágico. +2 INT" },
     slot: "ring",
     type: "ring",
     intelligence: 2,
@@ -706,8 +705,8 @@ export const allItems = {
   },
   ring_of_knowledge: {
     id: "ring_of_knowledge",
-    name: "Ring of Knowledge",
-    description: "Boosts magical power. +10 INT",
+    name: { en: "Ring of Knowledge", es: "Anillo del Conocimiento" },
+    description: { en: "Boosts magical power. +10 INT", es: "Potencia el poder mágico. +10 INT" },
     slot: "ring",
     type: "ring",
     intelligence: 10,
@@ -716,8 +715,8 @@ export const allItems = {
   },
   ring_of_power: {
     id: "ring_of_power",
-    name: "Ring of Power",
-    description: "Increases physical power. +10 STR",
+    name: { en: "Ring of Power", es: "Anillo del Poder" },
+    description: { en: "Increases physical power. +10 STR", es: "Aumenta el poder físico. +10 FUE" },
     slot: "ring",
     type: "ring",
     strength: 10,
@@ -726,8 +725,8 @@ export const allItems = {
   },
   ring_of_elven: {
     id: "ring_of_elven",
-    name: "Ring of Elven",
-    description: "Enhances movement. +10 AGI",
+    name: { en: "Ring of Elven", es: "Anillo Élfico" },
+    description: { en: "Enhances movement. +10 AGI", es: "Mejora el movimiento. +10 AGI" },
     slot: "ring",
     type: "ring",
     agility: 10,
@@ -736,7 +735,7 @@ export const allItems = {
   },
   ring_of_inferno: {
     id: "ring_of_inferno",
-    name: "Ring of Inferno",
+    name: { en: "Ring of Inferno", es: "Anillo del Infierno" },
     type: "ring",
     slot: "ring",
     rarity: "legendary",
@@ -754,8 +753,8 @@ export const allItems = {
   //helmet
   helmet_leather: {
     id: "helmet_leather",
-    name: "Leather Helmet",
-    description: "Simple helmet. +2 DEF",
+    name: { en: "Leather Helmet", es: "Casco de Cuero" },
+    description: { en: "Simple helmet. +2 DEF", es: "Casco sencillo. +2 DEF" },
     slot: "head",
     type: "helmet",
     defense: 1,
@@ -764,153 +763,153 @@ export const allItems = {
   },
   helmet: {
     id: "helmet",
-    name: "Helmet",
+    name: { en: "Helmet", es: "Casco" },
+    description: { en: "A common helmet. +5 DEF", es: "Un casco común. +5 DEF" },
     type: "helmet",
     slot: "head",
     rarity: "common",
     defense: 2,
     price: 70,
-    description: "A common helmet that give +5 DEF",
     icon: "./img/helmet.png"
   },
   iron_helmet: {
     id: "iron_helmet",
-    name: "Iron Helmet",
+    name: { en: "Iron Helmet", es: "Casco de Hierro" },
+    description: { en: "An iron helmet. +6 DEF", es: "Un casco de hierro. +6 DEF" },
     type: "helmet",
     slot: "head",
     rarity: "common",
     defense: 3,
     price: 80,
-    description: "An Iron helmet that give +6 DEF",
     icon: "./img/helmet3.png"
   },
   plate_helmet: {
     id: "plate_helmet",
-    name: "Plate Helmet",
+    name: { en: "Plate Helmet", es: "Casco de Placa" },
+    description: { en: "A plate helmet. +7 DEF", es: "Un casco de placa. +7 DEF" },
     type: "helmet",
     slot: "head",
     rarity: "uncommon",
     defense: 5,
     price: 90,
-    description: "A Plate helmet that give +7 DEF",
     icon: "./img/helmet2.png"
   },
 
   viking_helmet: {
     id: "viking_helmet",
-    name: "Viking Helmet",
+    name: { en: "Viking Helmet", es: "Casco Vikingo" },
+    description: { en: "A Viking helmet. +8 DEF, +5 ATK", es: "Un casco vikingo. +8 DEF, +5 ATK" },
     type: "helmet",
     slot: "head",
     rarity: "rare",
     defense: 6,
     attack: 5,
     price: 600,
-    description: "A Viking helmet that give +8 DEF, +5 ATK",
     icon: "./img/helmetViking.png"
   },
   spartan_helmet: {
     id: "spartan_helmet",
-    name: "Spartan Helmet",
+    name: { en: "Spartan Helmet", es: "Casco Espartano" },
+    description: { en: "A Spartan helmet. +10 DEF, +7 ATK", es: "Un casco espartano. +10 DEF, +7 ATK" },
     type: "helmet",
     slot: "head",
     rarity: "rare",
     defense: 7,
     attack: 7,
     price: 800,
-    description: "A Spartan helmet that give +10 DEF, +7 ATK",
     icon: "./img/helmetSpartan.png"
   },
   giant_orc_helmet: {
     id: "giant_orc_helmet",
-    name: "SGiant Orc Helmet",
+    name: { en: "Giant Orc Helmet", es: "Casco del Orco Gigante" },
+    description: { en: "The helmet of the Giant Orc. +15 DEF, +10 ATK", es: "El casco del Orco Gigante. +15 DEF, +10 ATK" },
     type: "helmet",
     slot: "head",
     rarity: "epic",
     defense: 10,
     attack: 10,
     price: 800,
-    description: "the helmet of the Giant Orc that rules in the mountain that give +15 DEF, +10 ATK",
     icon: "./img/helmetOrc.png"
   },
   divine_helmet: {
     id: "divine_helmet",
-    name: "Divine Helmet",
+    name: { en: "Divine Helmet", es: "Casco Divino" },
+    description: { en: "The Divine Helmet blessed by the Gods. +20 DEF, +15 ATK", es: "El Casco Divino bendecido por los Dioses. +20 DEF, +15 ATK" },
     type: "helmet",
     slot: "head",
     rarity: "epic",
     defense: 12,
     attack: 15,
     price: 2000,
-    description: "the Divine Helmet blessed by the Gods that give +20 DEF, +15 ATK",
     icon: "./img/helmetBless.png"
   },
 
-  //hemets MAGIC
+  //helmets MAGIC
   hat: {
     id: "hat",
-    name: "Hat",
+    name: { en: "Hat", es: "Sombrero" },
+    description: { en: "Common hat. +2 DEF", es: "Sombrero común. +2 DEF" },
     type: "hat",
     slot: "head",
     rarity: "common",
     defense: 1,
     price: 40,
-    description: "Common hat that give +2 DEF",
     icon: "./img/hat1.png"
   },
   leather_hat: {
     id: "leather_hat",
-    name: "Leather Hat",
+    name: { en: "Leather Hat", es: "Sombrero de Cuero" },
+    description: { en: "Leather hat. +4 DEF", es: "Sombrero de cuero. +4 DEF" },
     type: "hat",
     slot: "head",
     rarity: "common",
     defense: 2,
     price: 60,
-    description: "Leather hat that give +4 DEF",
     icon: "./img/hat2.png"
   },
 
   Magic_hat: {
     id: "magic_hat",
-    name: "MAgic Hat",
+    name: { en: "Magic Hat", es: "Sombrero Mágico" },
+    description: { en: "Magic hat. +4 DEF, +5 INT", es: "Sombrero mágico. +4 DEF, +5 INT" },
     type: "hat",
     slot: "head",
     rarity: "common",
     defense: 2,
     intelligence: 5,
     price: 200,
-    description: "Magic hat that give +4 DEF, +5 INT",
     icon: "./img/hatMage.png"
   },
   acolyte_hat: {
     id: "acolyte_hat",
-    name: "The Hat of the Acolyte",
+    name: { en: "Acolyte's Hat", es: "Sombrero del Acólito" },
+    description: { en: "Only an Acolyte can use this. +5 DEF, +8 INT", es: "Solo un Acólito puede usar esto. +5 DEF, +8 INT" },
     type: "hat",
     slot: "head",
     rarity: "rare",
     defense: 3,
     intelligence: 8,
     price: 600,
-    description: "Only an Acolyte can use this item that give +5 DEF, +8 INT",
     icon: "./img/hatMage2.png"
   },
   dark_mage_hat: {
     id: "dark_mage_hat",
-    name: "The Dark Hat",
+    name: { en: "The Dark Hat", es: "El Sombrero Oscuro" },
+    description: { en: "Only high dark mages use this. +10 DEF, +10 INT", es: "Solo los grandes magos oscuros usan esto. +10 DEF, +10 INT" },
     type: "hat",
     slot: "head",
     rarity: "epic",
     defense: 4,
     intelligence: 10,
     price: 1000,
-    description: "The Dark Hat, only the high dark mages use this that give +10 DEF, +10 INT",
     icon: "./img/helmetBlackMage.png"
   },
 
   //accessory
   emblem_hero: {
     id: "emblem_hero",
-    name: "Hero Emblem",
-    description: "Emblem for heroes. +2 STR",
+    name: { en: "Hero Emblem", es: "Emblema del Héroe" },
+    description: { en: "Emblem for heroes. +2 STR", es: "Emblema para héroes. +2 FUE" },
     slot: "accessory",
     type: "accessory",
     strength: 2,
@@ -920,7 +919,7 @@ export const allItems = {
   // Armaduras
   leather_armor: {
     id: "leather_armor",
-    name: "Leather Armor",
+    name: { en: "Leather Armor", es: "Armadura de Cuero" },
     type: "armor",
     rarity: "uncommon",
     slot: "armor",
@@ -930,8 +929,8 @@ export const allItems = {
   },
   armor: {
     id: "armor",
-    name: "Leather Armor",
-    description: "Simple armor. +5 DEF",
+    name: { en: "Leather Armor", es: "Armadura de Cuero" },
+    description: { en: "Simple armor. +5 DEF", es: "Armadura sencilla. +5 DEF" },
     slot: "armor",
     type: "armor",
     defense: 4,
@@ -940,7 +939,7 @@ export const allItems = {
   },
   dark_armor: {
     id: "dark_armor",
-    name: "Dark Armor",
+    name: { en: "Dark Armor", es: "Armadura Oscura" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -950,7 +949,7 @@ export const allItems = {
   },
   jungle_armor: {
     id: "jungle_armor",
-    name: "Jungle Armor",
+    name: { en: "Jungle Armor", es: "Armadura de la Jungla" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -960,8 +959,8 @@ export const allItems = {
   },
   chainmail: {
     id: "chainmail",
-    name: "Chainmail Armor",
-    description: "Strong armor. +10 DEF",
+    name: { en: "Chainmail Armor", es: "Cota de Malla" },
+    description: { en: "Strong armor. +10 DEF", es: "Armadura resistente. +10 DEF" },
     slot: "armor",
     type: "armor",
     defense: 10,
@@ -970,7 +969,7 @@ export const allItems = {
   },
   sea_armor: {
     id: "sea_armor",
-    name: "Sea Armor",
+    name: { en: "Sea Armor", es: "Armadura Marina" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -980,7 +979,7 @@ export const allItems = {
   },
   captain_coat: {
     id: "captain_coat",
-    name: "Captain Coat",
+    name: { en: "Captain Coat", es: "Abrigo del Capitán" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -990,7 +989,7 @@ export const allItems = {
   },
   royal_armor: {
     id: "royal_armor",
-    name: "Royal Armor",
+    name: { en: "Royal Armor", es: "Armadura Real" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -1000,8 +999,8 @@ export const allItems = {
   },
   plate_armor: {
     id: "plate_armor",
-    name: "Plate Armor",
-    description: "Strong armor. +20 DEF",
+    name: { en: "Plate Armor", es: "Armadura de Placas" },
+    description: { en: "Strong armor. +20 DEF", es: "Armadura resistente. +20 DEF" },
     slot: "armor",
     type: "armor",
     defense: 20,
@@ -1010,7 +1009,7 @@ export const allItems = {
   },
   stone_armor: {
     id: "stone_armor",
-    name: "Stone Armor",
+    name: { en: "Stone Armor", es: "Armadura de Piedra" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1021,7 +1020,7 @@ export const allItems = {
 
   dragon_king_armor: {
     id: "dragon_king_armor",
-    name: "Dragon King Armor",
+    name: { en: "Dragon King Armor", es: "Armadura del Rey Dragón" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -1032,8 +1031,8 @@ export const allItems = {
   //armor magic
   robe: {
     id: "robe",
-    name: "Mage Robe",
-    description: "Enchanted robe. +2 INT, +1 DEF",
+    name: { en: "Mage Robe", es: "Túnica de Mago" },
+    description: { en: "Enchanted robe. +2 INT, +1 DEF", es: "Túnica encantada. +2 INT, +1 DEF" },
     slot: "armor",
     type: "armor",
     intelligence: 2,
@@ -1043,8 +1042,8 @@ export const allItems = {
   },
   gown: {
     id: "gown",
-    name: "Mage Gown",
-    description: "Enchanted gown. +5 INT, +3 DEF",
+    name: { en: "Mage Gown", es: "Vestimenta de Mago" },
+    description: { en: "Enchanted gown. +5 INT, +3 DEF", es: "Vestimenta encantada. +5 INT, +3 DEF" },
     slot: "armor",
     type: "armor",
     intelligence: 5,
@@ -1054,8 +1053,8 @@ export const allItems = {
   },
   arcane_robe: {
     id: "arcane_robe",
-    name: "Arcane Mage Robe",
-    description: "Enchanted arcane robe. +8 INT, +5 DEF",
+    name: { en: "Arcane Mage Robe", es: "Túnica Arcana de Mago" },
+    description: { en: "Enchanted arcane robe. +8 INT, +5 DEF", es: "Túnica arcana encantada. +8 INT, +5 DEF" },
     slot: "armor",
     type: "armor",
     intelligence: 8,
@@ -1065,7 +1064,7 @@ export const allItems = {
   },
   aqua_robe: {
     id: "aqua_robe",
-    name: "Aqua Robe",
+    name: { en: "Aqua Robe", es: "Túnica Aqua" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1076,7 +1075,7 @@ export const allItems = {
   },
   coral_robe: {
     id: "coral_robe",
-    name: "Coral Robe",
+    name: { en: "Coral Robe", es: "Túnica de Coral" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1087,7 +1086,7 @@ export const allItems = {
   },
   fire_robe: {
     id: "fire_robe",
-    name: "Fire Robe",
+    name: { en: "Fire Robe", es: "Túnica de Fuego" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1098,7 +1097,7 @@ export const allItems = {
   },
   nature_robe: {
     id: "nature_robe",
-    name: "Nature Robe",
+    name: { en: "Nature Robe", es: "Túnica de la Naturaleza" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1110,7 +1109,7 @@ export const allItems = {
 
   ethereal_robe: {
     id: "ethereal_robe",
-    name: "Ethereal Robe",
+    name: { en: "Ethereal Robe", es: "Túnica Etérea" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1123,8 +1122,8 @@ export const allItems = {
   // Accesorios
   saint_grial: {
     id: "saint_grial",
-    name: "Saint Grial",
-    description: "This is the Quest object. Boosts attack and magical power. +30 STR +20 AGI +20 INT",
+    name: { en: "Saint Grail", es: "Santo Grial" },
+    description: { en: "The Quest object. +30 STR, +20 AGI, +20 INT", es: "El objeto de la Misión. +30 FUE, +20 AGI, +20 INT" },
     slot: "accessory",
     type: "accessory",
     intelligence: 20,
@@ -1133,11 +1132,10 @@ export const allItems = {
     hpBonus: 80,
     price: 60,
     icon: "./img/saintGrial.png",
-
   },
   dragon_king_crown: {
     id: "dragon_king_crown",
-    name: "Dragon King Crown",
+    name: { en: "Dragon King Crown", es: "Corona del Rey Dragón" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
@@ -1156,18 +1154,16 @@ export const allItems = {
 
   herb: {
     id: "herb",
-    name: "Healing Herb",
+    name: { en: "Healing Herb", es: "Hierba Curativa" },
     type: "material",
     rarity: "common",
     price: 5,
     icon: "./img/herbs.png",
-
-
   },
 
   wolf_pelt: {
     id: "wolf_pelt",
-    name: "Wolf Pelt",
+    name: { en: "Wolf Pelt", es: "Piel de Lobo" },
     type: "material",
     rarity: "uncommon",
     price: 8,
@@ -1176,7 +1172,7 @@ export const allItems = {
 
   fungus_core: {
     id: "fungus_core",
-    name: "Fungus Core",
+    name: { en: "Fungus Core", es: "Núcleo Fúngico" },
     type: "material",
     rarity: "rare",
     price: 18,
@@ -1185,8 +1181,9 @@ export const allItems = {
 
   iron_ore: {
     id: "iron_ore",
-    name: { en: "Divine Sword", es: "Espada Divina" },
-    description: { en: "A divine weapon. +20 ATK", es: "Un arma divina. +20 ATK" },
+    name: { en: "Iron Ore", es: "Mineral de Hierro" },
+    description: { en: "A raw iron ore used for crafting.", es: "Un mineral de hierro en bruto para craftear." },
+    type: "material",
     rarity: "common",
     price: 5,
     icon: "./img/ironOre.png",
@@ -1194,16 +1191,16 @@ export const allItems = {
 
   bat_wing: {
     id: "bat_wing",
-    name: "Bat Wing",
-    name: { en: "Excalibur", es: "Excalibur" },
-    description: { en: "An EPIC divine weapon. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF", es: "Un arma divina ÉPICA. +50 ATK, +20 STR, +20 AGI, +20 INT, +50 MAX HP, +20 DEF" },
+    name: { en: "Bat Wing", es: "Ala de Murciélago" },
+    type: "material",
+    rarity: "common",
     price: 8,
     icon: "./img/batWing.png",
   },
 
   crystal_shard: {
     id: "crystal_shard",
-    name: "Crystal Shard",
+    name: { en: "Crystal Shard", es: "Fragmento de Cristal" },
     type: "material",
     rarity: "rare",
     price: 20,
@@ -1212,7 +1209,7 @@ export const allItems = {
 
   golem_fragment: {
     id: "golem_fragment",
-    name: "Golem Fragment",
+    name: { en: "Golem Fragment", es: "Fragmento de Gólem" },
     type: "material",
     rarity: "epic",
     price: 35,
@@ -1221,7 +1218,7 @@ export const allItems = {
 
   ice_crystal: {
     id: "ice_crystal",
-    name: "Ice Crystal",
+    name: { en: "Ice Crystal", es: "Cristal de Hielo" },
     type: "material",
     rarity: "uncommon",
     price: 15,
@@ -1230,7 +1227,7 @@ export const allItems = {
 
   wyvern_scale: {
     id: "wyvern_scale",
-    name: "Wyvern Scale",
+    name: { en: "Wyvern Scale", es: "Escama de Wyvern" },
     type: "material",
     rarity: "rare",
     price: 35,
@@ -1239,7 +1236,7 @@ export const allItems = {
 
   giant_bone: {
     id: "giant_bone",
-    name: "Giant Bone",
+    name: { en: "Giant Bone", es: "Hueso Gigante" },
     type: "material",
     rarity: "rare",
     price: 25,
@@ -1248,7 +1245,7 @@ export const allItems = {
 
   ancient_relic: {
     id: "ancient_relic",
-    name: "Ancient Relic",
+    name: { en: "Ancient Relic", es: "Reliquia Antigua" },
     type: "material",
     rarity: "epic",
     price: 50,
@@ -1257,7 +1254,7 @@ export const allItems = {
 
   enchanted_dust: {
     id: "enchanted_dust",
-    name: "Enchanted Dust",
+    name: { en: "Enchanted Dust", es: "Polvo Encantado" },
     type: "material",
     rarity: "uncommon",
     price: 12,
@@ -1266,27 +1263,25 @@ export const allItems = {
 
   runestone: {
     id: "runestone",
-    name: "Runestone",
+    name: { en: "Runestone", es: "Piedra Rúnica" },
     type: "material",
     rarity: "rare",
     price: 30,
     icon: "./img/runeBlack.png",
-
   },
 
   ancient_core: {
     id: "ancient_core",
-    name: "Ancient Core",
+    name: { en: "Ancient Core", es: "Núcleo Antiguo" },
     type: "material",
     rarity: "epic",
     price: 40,
     icon: "./img/runeSpirit.png",
-
   },
 
   arcane_relic: {
     id: "arcane_relic",
-    name: "Arcane Relic",
+    name: { en: "Arcane Relic", es: "Reliquia Arcana" },
     type: "material",
     rarity: "legendary",
     price: 100,
@@ -1295,17 +1290,16 @@ export const allItems = {
 
   poison_gland: {
     id: "poison_gland",
-    name: "Poison Gland",
+    name: { en: "Poison Gland", es: "Glándula Venenosa" },
     type: "material",
     rarity: "common",
     price: 6,
     icon: "./img/poisonGland.png"
-
   },
 
   acid_sac: {
     id: "acid_sac",
-    name: "Acid Sac",
+    name: { en: "Acid Sac", es: "Saco Ácido" },
     type: "material",
     rarity: "uncommon",
     price: 10,
@@ -1314,17 +1308,16 @@ export const allItems = {
 
   necrotic_bone: {
     id: "necrotic_bone",
-    name: "Necrotic Bone",
+    name: { en: "Necrotic Bone", es: "Hueso Necrótico" },
     type: "material",
     rarity: "rare",
     price: 22,
     icon: "./img/necroticBone.png",
-
   },
 
   toxic_heart: {
     id: "toxic_heart",
-    name: "Toxic Heart",
+    name: { en: "Toxic Heart", es: "Corazón Tóxico" },
     type: "material",
     rarity: "epic",
     price: 45,
@@ -1333,7 +1326,7 @@ export const allItems = {
 
   magma_fragment: {
     id: "magma_fragment",
-    name: "Magma Fragment",
+    name: { en: "Magma Fragment", es: "Fragmento de Magma" },
     type: "material",
     rarity: "uncommon",
     price: 18,
@@ -1342,7 +1335,7 @@ export const allItems = {
 
   pyro_core: {
     id: "pyro_core",
-    name: "Pyro Core",
+    name: { en: "Pyro Core", es: "Núcleo Pirótico" },
     type: "material",
     rarity: "rare",
     price: 28,
@@ -1351,7 +1344,7 @@ export const allItems = {
 
   dragon_scale: {
     id: "dragon_scale",
-    name: "Dragon Scale",
+    name: { en: "Dragon Scale", es: "Escama de Dragón" },
     type: "material",
     rarity: "epic",
     price: 75,
@@ -1360,7 +1353,7 @@ export const allItems = {
 
   heart_of_inferno: {
     id: "heart_of_inferno",
-    name: "Heart of the Inferno",
+    name: { en: "Heart of the Inferno", es: "Corazón del Infierno" },
     type: "material",
     rarity: "legendary",
     price: 150,
@@ -1369,7 +1362,7 @@ export const allItems = {
 
   frost_shard: {
     id: "frost_shard",
-    name: "Frost Shard",
+    name: { en: "Frost Shard", es: "Fragmento Helado" },
     type: "material",
     rarity: "uncommon",
     price: 14,
@@ -1378,17 +1371,16 @@ export const allItems = {
 
   ice_essence: {
     id: "ice_essence",
-    name: "Ice Essence",
+    name: { en: "Ice Essence", es: "Esencia de Hielo" },
     type: "material",
     rarity: "rare",
     price: 24,
     icon: "./img/iceEssence.png",
-
   },
 
   glacial_core: {
     id: "glacial_core",
-    name: "Glacial Core",
+    name: { en: "Glacial Core", es: "Núcleo Glacial" },
     type: "material",
     rarity: "epic",
     price: 60,
@@ -1402,21 +1394,20 @@ export const allItems = {
 
   titan_branch: {
     id: "titan_branch",
-    name: "Titan Branch",
+    name: { en: "Titan Branch", es: "Rama Titán" },
     type: "material",
     rarity: "rare",
     price: 40,
     icon: "./img/titanBranch.png",
-
   },
 
   forest_emblem: {
     id: "forest_emblem",
-    name: "Forest Emblem",
+    name: { en: "Forest Emblem", es: "Emblema del Bosque" },
     type: "accessory",
     slot: "accessory",
     rarity: "epic",
-    description: "A forest Emblem that give +5 Magic, +2 DEF.",
+    description: { en: "A forest emblem. +5 Magic, +2 DEF.", es: "Un emblema del bosque. +5 Magia, +2 DEF." },
     magic: 5,
     defense: 2,
     hpBonus: 20,
@@ -1426,7 +1417,7 @@ export const allItems = {
 
   devourer_fang: {
     id: "devourer_fang",
-    name: "Devourer Fang",
+    name: { en: "Devourer Fang", es: "Colmillo del Devorador" },
     type: "material",
     rarity: "rare",
     price: 45,
@@ -1435,7 +1426,7 @@ export const allItems = {
 
   earthbreaker_core: {
     id: "earthbreaker_core",
-    name: "Earthbreaker Core",
+    name: { en: "Earthbreaker Core", es: "Núcleo Rompetierras" },
     type: "material",
     rarity: "epic",
     price: 100,
@@ -1444,7 +1435,7 @@ export const allItems = {
 
   colossus_heart: {
     id: "colossus_heart",
-    name: "Colossus Heart",
+    name: { en: "Colossus Heart", es: "Corazón del Coloso" },
     type: "material",
     rarity: "rare",
     price: 55,
@@ -1453,20 +1444,20 @@ export const allItems = {
 
   mountain_emblem: {
     id: "mountain_emblem",
-    name: "Mountain Emblem",
+    name: { en: "Mountain Emblem", es: "Emblema de la Montaña" },
     type: "accessory",
     slot: "accessory",
     rarity: "epic",
     defense: 4,
     hpBonus: 30,
     price: 120,
-    description: "The Mountain Emblem gives +4 DEF",
+    description: { en: "The Mountain Emblem. +4 DEF", es: "El Emblema de la Montaña. +4 DEF" },
     icon: "./img/runeKey.png"
   },
 
   construct_eye: {
     id: "construct_eye",
-    name: "Construct Eye",
+    name: { en: "Construct Eye", es: "Ojo del Constructo" },
     type: "material",
     rarity: "rare",
     price: 50
@@ -1474,20 +1465,20 @@ export const allItems = {
 
   arcane_emblem: {
     id: "arcane_emblem",
-    name: "Arcane Emblem",
+    name: { en: "Arcane Emblem", es: "Emblema Arcano" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
     magic: 8,
     defense: 3,
     price: 150,
-    description: "The Arcane Emblem gives +3 DEF, +8 Magic",
+    description: { en: "The Arcane Emblem. +3 DEF, +8 Magic", es: "El Emblema Arcano. +3 DEF, +8 Magia" },
     icon: "./img/runeMagic.png"
   },
 
   abomination_core: {
     id: "abomination_core",
-    name: "Abomination Core",
+    name: { en: "Abomination Core", es: "Núcleo de la Abominación" },
     type: "material",
     rarity: "rare",
     price: 48
@@ -1495,20 +1486,20 @@ export const allItems = {
 
   plague_emblem: {
     id: "plague_emblem",
-    name: "Plague Emblem",
+    name: { en: "Plague Emblem", es: "Emblema de la Plaga" },
     type: "accessory",
     slot: "accessory",
     rarity: "epic",
     strength: 3,
     magic: 3,
     price: 120,
-    description: "The Plague Emblem gives +3 STR, +3 Magic",
+    description: { en: "The Plague Emblem. +3 STR, +3 Magic", es: "El Emblema de la Plaga. +3 FUE, +3 Magia" },
     icon: "./img/runeRed.png"
   },
 
   inferno_eye: {
     id: "inferno_eye",
-    name: "Inferno Eye",
+    name: { en: "Inferno Eye", es: "Ojo del Infierno" },
     type: "material",
     rarity: "epic",
     price: 85
@@ -1516,21 +1507,20 @@ export const allItems = {
 
   inferno_emblem: {
     id: "inferno_emblem",
-    name: "Inferno Emblem",
+    name: { en: "Inferno Emblem", es: "Emblema del Infierno" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
     attack: 5,
     magic: 5,
     price: 200,
-    description: "The Inferno Emblem gives +5 ATK, +5 Magic",
+    description: { en: "The Inferno Emblem. +5 ATK, +5 Magic", es: "El Emblema del Infierno. +5 ATK, +5 Magia" },
     icon: "./img/runeRed2.png"
-
   },
 
   wyrm_tail: {
     id: "wyrm_tail",
-    name: "Frost Wyrm Tail",
+    name: { en: "Frost Wyrm Tail", es: "Cola del Wyrm Helado" },
     type: "material",
     rarity: "epic",
     price: 70
@@ -1538,33 +1528,33 @@ export const allItems = {
 
   tundra_emblem: {
     id: "tundra_emblem",
-    name: "Tundra Emblem",
+    name: { en: "Tundra Emblem", es: "Emblema de la Tundra" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
     defense: 5,
     magic: 4,
     price: 180,
-    description: "The Tundra Emblem gives +5 DEF, +4 Magic",
+    description: { en: "The Tundra Emblem. +5 DEF, +4 Magic", es: "El Emblema de la Tundra. +5 DEF, +4 Magia" },
     icon: "./img/runePurple.png"
   },
 
   forest_emblem_upgraded: {
     id: "forest_emblem_upgraded",
-    name: "Forest Emblem+",
+    name: { en: "Forest Emblem+", es: "Emblema del Bosque+" },
     type: "accessory",
     slot: "accessory",
     rarity: "epic",
     magic: 10,
     defense: 5,
     price: 180,
-    description: "The Forest Emblem gives +5 DEF, +10 Magic",
+    description: { en: "The Forest Emblem+. +5 DEF, +10 Magic", es: "El Emblema del Bosque+. +5 DEF, +10 Magia" },
     icon: "./img/runeGreen2.png"
   },
 
   inferno_emblem_upgraded: {
     id: "inferno_emblem_upgraded",
-    name: "Inferno Emblem+",
+    name: { en: "Inferno Emblem+", es: "Emblema del Infierno+" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
@@ -1574,67 +1564,46 @@ export const allItems = {
     attack: 10,
     magic: 10,
     price: 300,
-    escription: "The Inferno Emblem gives +10 STR, +10 AGI, +10 INT, +10 ATK, +10 Magic",
+    description: { en: "The Inferno Emblem+. +10 STR, +10 AGI, +10 INT, +10 ATK, +10 Magic", es: "El Emblema del Infierno+. +10 FUE, +10 AGI, +10 INT, +10 ATK, +10 Magia" },
     icon: "./img/runeFire.png"
-
   },
 
   rusty_coin: {
     id: "rusty_coin",
-    name: "Rusty Coin",
+    name: { en: "Rusty Coin", es: "Moneda Oxidada" },
     type: "material",
     rarity: "common",
     price: 5,
     icon: "🪙"
   },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // ...existing code...
-
-
-
-
   slime_gel: {
     id: "slime_gel",
-    name: "Slime Gel",
+    name: { en: "Slime Gel", es: "Gel de Slime" },
     type: "material",
     rarity: "common",
     price: 4,
-
   },
   golden_key: {
     id: "golden_key",
-    name: "Golden Key",
+    name: { en: "Golden Key", es: "Llave Dorada" },
     type: "key_item",
     rarity: "rare",
     price: 100,
     icon: "./img/goldenKey.png",
-
+  },
+  garden_key: {
+    id: "garden_key",
+    name: { en: "Garden Key", es: "Llave del Jardín" },
+    description: { en: "A magical key that opens the Garden Vault.", es: "Una llave mágica que abre la Bóveda del Jardín." },
+    type: "key_item",
+    rarity: "rare",
+    price: 0,
+    icon: "🗝️",
   },
   treasure_map: {
     id: "treasure_map",
-    name: "Treasure Map",
+    name: { en: "Treasure Map", es: "Mapa del Tesoro" },
     type: "key_item",
     rarity: "uncommon",
     price: 50,
@@ -1642,26 +1611,25 @@ export const allItems = {
   },
   world_map: {
     id: "world_map",
-    name: "World Map",
+    name: { en: "World Map", es: "Mapa del Mundo" },
     type: "key_item",
     rarity: "epic",
     price: 150,
-    description: "A map that shows the entire world. Useful for navigation and finding hidden locations.",
+    description: { en: "A map that shows the entire world.", es: "Un mapa que muestra el mundo entero." },
     icon: "./img/Map.png",
   },
 
   ancient_guardian_core: {
     id: "ancient_guardian_core",
-    name: "Ancient Guardian Core",
+    name: { en: "Ancient Guardian Core", es: "Núcleo del Guardián Antiguo" },
     type: "material",
     rarity: "legendary",
     price: 200,
     icon: "./img/ancientGuardianCore.png",
-
   },
   treasure_guardian_core: {
     id: "treasure_guardian_core",
-    name: "Treasure Guardian Core",
+    name: { en: "Treasure Guardian Core", es: "Núcleo del Guardián del Tesoro" },
     type: "material",
     rarity: "epic",
     price: 120,
@@ -1669,7 +1637,7 @@ export const allItems = {
   },
   treasure_guardian_heart: {
     id: "treasure_guardian_heart",
-    name: "Treasure Guardian Heart",
+    name: { en: "Treasure Guardian Heart", es: "Corazón del Guardián del Tesoro" },
     type: "material",
     rarity: "rare",
     price: 80,
@@ -1677,7 +1645,7 @@ export const allItems = {
   },
   dragon_heart: {
     id: "dragon_heart",
-    name: "Dragon Heart",
+    name: { en: "Dragon Heart", es: "Corazón de Dragón" },
     type: "material",
     rarity: "legendary",
     price: 250,
@@ -1685,7 +1653,7 @@ export const allItems = {
   },
   inferno_gem: {
     id: "inferno_gem",
-    name: "Inferno Gem",
+    name: { en: "Inferno Gem", es: "Gema del Infierno" },
     type: "material",
     rarity: "legendary",
     price: 220,
@@ -1695,31 +1663,31 @@ export const allItems = {
   // ── Pergaminos de habilidad (SPEC-0607) ──────────────
   scroll_of_rally: {
     id: "scroll_of_rally",
-    name: "Pergamino: Reagruparse",
+    name: { en: "Scroll: Rally", es: "Pergamino: Reagruparse" },
     type: "scroll",
     icon: "📜",
     teachesSkill: "rally",
-    description: "Enseña la habilidad universal Reagruparse (+20% HP, elimina debuff).",
+    description: { en: "Teaches the universal skill Rally (+20% HP, removes debuffs).", es: "Enseña la habilidad universal Reagruparse (+20% HP, elimina debuffs)." },
     price: 150,
     rarity: "uncommon"
   },
   scroll_of_power: {
     id: "scroll_of_power",
-    name: "Pergamino: Golpe Potente",
+    name: { en: "Scroll: Power Strike", es: "Pergamino: Golpe Potente" },
     type: "scroll",
     icon: "📜",
     teachesSkill: "power_strike",
-    description: "Enseña la habilidad universal Golpe Potente (ignora defensa, 50% crit).",
+    description: { en: "Teaches the universal skill Power Strike (ignores defense, 50% crit).", es: "Enseña la habilidad universal Golpe Potente (ignora defensa, 50% crit)." },
     price: 200,
     rarity: "uncommon"
   },
   scroll_of_arcane: {
     id: "scroll_of_arcane",
-    name: "Pergamino: Descarga Arcana",
+    name: { en: "Scroll: Arcane Bolt", es: "Pergamino: Descarga Arcana" },
     type: "scroll",
     icon: "📜",
     teachesSkill: "arcane_bolt",
-    description: "Enseña la habilidad universal Descarga Arcana (2× magia pura).",
+    description: { en: "Teaches the universal skill Arcane Bolt (2× pure magic damage).", es: "Enseña la habilidad universal Descarga Arcana (2× daño mágico puro)." },
     price: 250,
     rarity: "rare"
   },
