@@ -834,9 +834,6 @@ button:focus-visible,
 }
 .location-action-btn.hidden { display: none !important; }
 .npc-talk-btn {
-  position: absolute;
-  top: 12px; right: 12px;
-  z-index: 3;
   background: var(--md-primary-container);
   color: var(--md-on-primary-container);
   border: none;
@@ -873,6 +870,8 @@ button:focus-visible,
   box-shadow: var(--elev-2), inset 0 0 20px rgba(255,75,75,.06);
   position: relative;
   overflow: hidden;
+  /* #screen es flex-column con overflow:hidden — sin esto el panel se aplasta y recorta el retrato */
+  flex-shrink: 0;
 }
 #enemy-panel::before {
   content: '';
@@ -1368,6 +1367,8 @@ button:focus-visible,
     border-bottom: 2px solid var(--md-outline);
     background: linear-gradient(180deg, var(--md-surface-c-low), transparent);
   }
+  /* En combate el HUD sticky ya muestra las vitales: cede su espacio al panel del enemigo */
+  #screen:has(#enemy-panel:not(.hidden)) #mobile-player-header { display: none; }
   .mobile-player-card {
     display: flex;
     align-items: center;
@@ -3938,7 +3939,6 @@ button:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  margin-top: 10px;
   padding: 8px 20px;
   border-radius: 99px;
   border: 1.5px solid var(--gold-dim);
@@ -4587,8 +4587,8 @@ kbd {
 .cp-caption-text {
   margin: 0;
   font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(12px, 1.8vw, 16px);
-  line-height: 1.55;
+  font-size: clamp(15px, 2.2vw, 18px);
+  line-height: 1.6;
   color: #e8dcc8;
   white-space: pre-line;
 }
@@ -4616,7 +4616,7 @@ kbd {
 }
 .intro-subtitle {
   font-family: 'Cinzel', serif;
-  font-size: clamp(11px, 2vw, 20px);
+  font-size: clamp(13px, 2vw, 20px);
   color: #a08060;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -4652,7 +4652,7 @@ kbd {
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-family: 'Cinzel', serif;
   letter-spacing: .04em;
   padding: 8px 20px;
@@ -4675,12 +4675,11 @@ kbd {
   to   { opacity: 1; transform: none; }
 }
 
-/* ── Responsive mobile ─────────────────────────────────── */
+/* ── Responsive mobile: slideshow, una viñeta por pantalla ── */
 @media (max-width: 599px) {
-  .comic-page { padding: 8px 8px 0; gap: 4px; }
-  .comic-layout-wide-top    { grid-template-rows: 52% 1fr; }
-  .comic-layout-tall-left   { grid-template-columns: 50% 1fr; }
-  .comic-layout-wide-bottom { grid-template-rows: 1fr 1fr 44%; }
-  .cp-caption { padding: 8px 10px 10px; }
-  .intro-btn  { font-size: 12px; padding: 7px 14px; }
+  .comic-page { padding: 8px 8px 0; gap: 0; grid-template-columns: 1fr; grid-template-rows: 1fr; }
+  .comic-panel { display: none; }
+  .comic-panel.active { display: flex; }
+  .cp-caption { padding: 10px 12px 12px; }
+  .intro-btn  { font-size: 13px; padding: 7px 14px; }
 }

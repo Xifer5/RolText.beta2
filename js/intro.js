@@ -114,6 +114,10 @@ const PAGES = [
 ];
 
 const TYPEWRITER_MS = 30;
+const TOTAL_PANELS  = PAGES.reduce((n, p) => n + p.panels.length, 0);
+
+// En móvil la intro es un slideshow: una viñeta por pantalla
+const _isMobileIntro = () => window.matchMedia("(max-width: 599px)").matches;
 
 let _pg        = 0;
 let _panelIdx  = -1;
@@ -161,8 +165,7 @@ function _loadPage(pageIdx) {
   _typing   = false;
   _clearTypeTimer();
 
-  const counter = document.getElementById("introPageCounter");
-  if (counter) counter.textContent = `${pageIdx + 1} / ${PAGES.length}`;
+  _updateCounter();
 
   const container = document.getElementById("comicPage");
   if (!container) return;
@@ -255,6 +258,13 @@ function _revealNext() {
   const panel   = page.panels[_panelIdx];
   const panelEl = document.querySelector(`.comic-panel[data-pi="${_panelIdx}"]`);
   if (!panelEl) return;
+
+  // Slideshow móvil: solo el panel activo es visible
+  const prevActive = document.querySelector(".comic-panel.active");
+  if (prevActive && prevActive !== panelEl) prevActive.classList.remove("active");
+  panelEl.classList.add("active");
+  void panelEl.offsetWidth; // reflow: permite animar la entrada tras display:none
+  _updateCounter();
 
   panelEl.classList.remove("pending");
   panelEl.classList.add("revealing");
@@ -355,6 +365,18 @@ function _skipTypewriter() {
 
 function _clearTypeTimer() {
   if (_typeTimer) { clearInterval(_typeTimer); _typeTimer = null; }
+}
+
+// ── Contador: páginas en desktop, viñetas en móvil ────────────
+function _updateCounter() {
+  const counter = document.getElementById("introPageCounter");
+  if (!counter) return;
+  if (_isMobileIntro()) {
+    const before = PAGES.slice(0, _pg).reduce((n, p) => n + p.panels.length, 0);
+    counter.textContent = `${before + Math.max(_panelIdx + 1, 1)} / ${TOTAL_PANELS}`;
+  } else {
+    counter.textContent = `${_pg + 1} / ${PAGES.length}`;
+  }
 }
 
 // ── Estado del botón ──────────────────────────────────────────
