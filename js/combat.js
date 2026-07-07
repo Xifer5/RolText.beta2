@@ -17,6 +17,7 @@ import { getMasteryBonus, addMasteryXP } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { showSpecializationModal } from "./specModal.js";
 import { maybeShowHint } from "./onboarding.js";
+import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
@@ -106,6 +107,24 @@ export function getRandomEncounter(locationId) {
   return null;
 }
 
+// SPEC-0802: pre-decide la próxima acción del enemigo (y si un jefe la oculta)
+// para que el chip de intent siempre anuncie futuro, nunca pasado.
+function rollEnemyIntent() {
+  const enemy = gameState.currentEnemy;
+  if (!enemy || enemy.hp <= 0) return;
+  enemy.nextAction = decideNextAction({
+    behavior: ENEMY_COMBAT_DATA[enemy.id]?.behavior,
+    isBoss: enemy.isBoss,
+    hp: enemy.hp,
+    maxHp: enemy.maxHp,
+    magicAttack: enemy.magicAttack,
+    hasStatusEffect: !!ENEMY_STATUS_EFFECTS[enemy.id],
+    lastAction: enemy.lastAction,
+    enraged: enemy.enraged
+  });
+  enemy.intentHidden = isIntentHidden(enemy);
+}
+
 export function startCombat(enemyType, isBoss = false) {
   const base = enemyData?.[enemyType];
   if (!base) { addMessage(formatText(t('enemyUnknownError'), { type: enemyType }), "system"); return; }
@@ -143,6 +162,7 @@ export function startCombat(enemyType, isBoss = false) {
   }
   playSound("combat_start");
   playMusic("combat");
+  rollEnemyIntent(); // SPEC-0802: primer telegraph antes de pintar el panel
   updateUI();
   maybeShowHint("first_combat"); // SPEC-0801: primer combate
 }
@@ -340,6 +360,10 @@ async function enemyTurn() {
   const p = gameState.player;
   const stats = calculateTotalStats(p, gameState.equipment);
 
+  // SPEC-0802: la guardia expira al empezar su turno — así los ticks de
+  // veneno/quemadura de abajo hacen daño completo
+  enemy.isDefending = false;
+
   // Tick player debuffs (poison/burn damage)
   if (processPlayerDebuffs()) return;
 
@@ -373,10 +397,40 @@ async function enemyTurn() {
     if (frozenDebuff.turns <= 0) { delete gameState.activeDebuffs.frozen; addMessage(t('frozenWearsOff'), "system"); }
   }
 
-  // Enemy AI: magic or physical
-  const useMagic = enemy.magicAttack && Math.random() < 0.3;
+  // SPEC-0802: ejecuta la acción telegrafiada (el chip mostró esto al jugador)
+  const action = enemy.nextAction || "attack";
+  enemy.lastAction = action;
+
+  if (action === "defend") {
+    enemy.isDefending = true;
+    addMessage(formatText(t("enemyDefends"), { enemy: enemy.type }), "combat");
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+  if (action === "regen") {
+    const heal = Math.max(1, Math.floor(enemy.maxHp * REGEN_PCT));
+    enemy.hp = Math.min(enemy.maxHp, enemy.hp + heal);
+    addMessage(formatText(t("enemyRegens"), { enemy: enemy.type, heal }), "combat");
+    showFloatingText(`+${heal}`, window.innerWidth / 2 + 50, window.innerHeight / 2 - 80, "#4ade80", "1.6em");
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+  if (action === "enrage") {
+    enemy.enraged = true;
+    enemy.attack = Math.max(1, Math.floor(enemy.attack * ENRAGE_ATK_MULT));
+    addMessage(formatText(t("enemyEnrages"), { enemy: enemy.type }), "combat");
+    shakeScreen();
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
+  const useMagic = action === "magic" && enemy.magicAttack;
+  const powerMult = action === "power_attack" ? POWER_ATTACK_MULT : 1.0;
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
-  const atkVal = Math.floor(atkBase * frozenMult);
+  const atkVal = Math.floor(atkBase * powerMult * frozenMult);
 
   // Player defense (warrior stance halves damage)
   const defenseMult = gameState.activeBuffs?.defend_stance > 0 ? 0.5 : 1.0;
@@ -409,6 +463,7 @@ async function enemyTurn() {
       showFloatingText(`-${counterDmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#fbbf24", "1.6em");
       if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
     }
+    rollEnemyIntent(); // SPEC-0802: la acción esquivada se consumió
     updateUI(); return;
   }
 
@@ -431,7 +486,9 @@ async function enemyTurn() {
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
 
-  const attackLabel = useMagic ? t('magicAttackLabel') : t('physicalAttackLabel');
+  const attackLabel = useMagic ? t('magicAttackLabel')
+    : action === "power_attack" ? t('powerAttackLabel')
+    : t('physicalAttackLabel');
   addMessage(formatText(t('enemyUsedAttack'), { enemy: enemy.type, attack: attackLabel, damage: finalDmg }), "combat");
   showFloatingText(`-${finalDmg}`, window.innerWidth/2-80, window.innerHeight/2, "#fca5a5", "1.8em");
   shakeScreen();
@@ -450,8 +507,9 @@ async function enemyTurn() {
   }
 
   // Apply a new status effect if enemy has one and player doesn't already have it
+  // SPEC-0802: la acción "status" telegrafiada garantiza el intento de efecto
   const se = ENEMY_STATUS_EFFECTS[enemy.id];
-  if (se && Math.random() < se.chance) {
+  if (se && Math.random() < (action === "status" ? 1 : se.chance)) {
     if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
     if (!gameState.playerDebuffs[se.type]) {
       if (se.type === "stun") {
@@ -467,6 +525,10 @@ async function enemyTurn() {
       updateUI();
     }
   }
+
+  // SPEC-0802: telegraph de la próxima acción
+  rollEnemyIntent();
+  updateUI();
 }
 
 // ── Helpers ─────────────────────────────────────────────
@@ -513,8 +575,15 @@ function processPlayerDebuffs() {
 }
 
 function applyDamageToEnemy(dmg) {
-  if (!gameState.currentEnemy) return;
-  gameState.currentEnemy.hp = Math.max(0, (gameState.currentEnemy.hp || 0) - dmg);
+  const enemy = gameState.currentEnemy;
+  if (!enemy) return;
+  let final = dmg;
+  // SPEC-0802: en guardia recibe la mitad del daño del jugador (mín. 1)
+  if (enemy.isDefending && dmg > 1) {
+    final = Math.max(1, Math.ceil(dmg * DEFEND_DAMAGE_MULT));
+    addMessage(formatText(t("enemyBlocksDamage"), { enemy: enemy.type, blocked: dmg - final }), "combat");
+  }
+  enemy.hp = Math.max(0, (enemy.hp || 0) - final);
   updateUI();
 }
 

@@ -14,6 +14,7 @@ import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, acti
 import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
+import { ACTION_META } from "./enemyAI.js";
 import { showSpecializationModal } from "./specModal.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
@@ -367,11 +368,25 @@ export function updateUI() {
       const badge = isBoss ? `<span class="boss-badge">${t("bossBadge")}</span>` : "";
       const enemyAtk = gameState.currentEnemy.attack || 0;
       const enemyDef = gameState.currentEnemy.defense || 0;
+      // SPEC-0802: chip de intent — próxima acción telegrafiada (❓ si el jefe la oculta)
+      let intentChip = "";
+      const nextAction = gameState.currentEnemy.nextAction;
+      if (nextAction) {
+        const meta = gameState.currentEnemy.intentHidden
+          ? ACTION_META.unknown
+          : (ACTION_META[nextAction] || ACTION_META.attack);
+        const label = t(meta.labelKey);
+        intentChip =
+          `<span class="enemy-intent-chip" role="img" ` +
+          `aria-label="${t("intentChipAria")}: ${label}" ` +
+          `data-tooltip="${t("intentChipAria")}">${meta.icon} ${label}</span>`;
+      }
       ui["enemy-name"].innerHTML =
         badge + gameState.currentEnemy.type +
         `<span class="enemy-stats-row">` +
         `<span class="enemy-stat-badge">⚔ <b>${enemyAtk}</b></span>` +
         `<span class="enemy-stat-badge">🛡 <b>${enemyDef}</b></span>` +
+        intentChip +
         `</span>`;
     }
     const ePct = Math.max(0, Math.round((gameState.currentEnemy.hp / gameState.currentEnemy.maxHp) * 100));

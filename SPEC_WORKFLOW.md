@@ -60,6 +60,7 @@ Deuda visible:
 - `specs/SPEC-0703-contextual-travel-events.md`: 8 eventos de viaje que reaccionan a especialización/clase/hora; condición día/noche vía getter; explorador/duelista/asesino/mago con ventajas específicas; falta QA visual.
 - `specs/SPEC-0505-toast-position-tooltips.md`: toasts movidos al borde inferior-derecho de #screen (M3: bottom); .simple-toast con variantes; ~30 elementos con data-tooltip contextual; falta QA visual.
 - `specs/SPEC-0801-first-five-minutes.md`: onboarding contextual de primera sesión — 6 hints M3 no bloqueantes (movimiento, Elara, quest tracker, combate, botín, descanso/guardado); persistencia en localStorage fuera del save; toggle en menú; QA Playwright 21/21 + 9 tests node. ✅ COMPLETA.
+- `specs/SPEC-0802-enemy-intent.md`: enemy intent — activa los 8 behaviors dormidos de SPEC-0604 en enemyTurn (golpe fuerte/defensa/regeneración/furia/magia/estado) y telegrafía la próxima acción en chip M3 del panel enemigo; jefes ocultan ❓ ~35%; QA Playwright 6/6 (telegraph verificado contra ejecución real) + 12 tests node. ✅ COMPLETA.
 
 ### P0 - Base para no romper UX
 
