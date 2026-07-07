@@ -12,6 +12,7 @@ import { allItems } from "./items.js";
 import { playSound } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { maybeShowHint } from "./onboarding.js";
 
 // ── DEFINICIONES ───────────────────────────────────────────────────
 export const QUEST_DATA = {
@@ -301,6 +302,7 @@ export function activateQuest(questId) {
   if (q?.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") return;
   if (!gameState.quests[questId] || gameState.quests[questId] === "inactive") {
     gameState.quests[questId] = "active";
+    maybeShowHint("quest_tracker"); // SPEC-0801: primera misión aceptada
   }
 }
 

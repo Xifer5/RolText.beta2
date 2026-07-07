@@ -3,10 +3,24 @@ import { updateUI, toggleMainMenu } from "./ui.js";
 import { saveGame, loadGame, deleteSave } from "./saveSystem.js";
 import { addMessage } from "./story.js";
 import { t } from "./i18n.js";
+import { isOnboardingEnabled, toggleOnboarding } from "./onboarding.js";
+import { showToast } from "./toast.js";
+
+function updateOnboardingLabel() {
+  const btn = document.getElementById("onboardingToggleBtn");
+  if (btn) btn.textContent = t(isOnboardingEnabled() ? "onbTipsOn" : "onbTipsOff");
+}
 
 export function setupMainMenuListeners() {
   /* pixel:openMenu — disparado desde teclado (tecla M) */
   window.addEventListener("pixel:openMenu", () => toggleMainMenu(true));
+
+  updateOnboardingLabel();
+  document.getElementById("onboardingToggleBtn")?.addEventListener("click", () => {
+    const enabled = toggleOnboarding();
+    updateOnboardingLabel();
+    showToast(t(enabled ? "onbTipsReactivated" : "onbTipsDisabled"), "info");
+  });
 
   document.getElementById("newGameBtn")?.addEventListener("click", () => {
     toggleMainMenu(false);

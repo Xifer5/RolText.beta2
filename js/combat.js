@@ -16,6 +16,7 @@ import { getDifficultyConfig } from "./difficulty.js";
 import { getMasteryBonus, addMasteryXP } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { showSpecializationModal } from "./specModal.js";
+import { maybeShowHint } from "./onboarding.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
@@ -143,6 +144,7 @@ export function startCombat(enemyType, isBoss = false) {
   playSound("combat_start");
   playMusic("combat");
   updateUI();
+  maybeShowHint("first_combat"); // SPEC-0801: primer combate
 }
 
 // ── Player Actions ──────────────────────────────────────
@@ -573,6 +575,7 @@ function endCombat(victory, fled = false) {
         });
         playSound("loot");
         addMessage(formatText(t('lootObtained'), { items: loot.map(i => localizeText(allItems[i]?.name) ?? i.replace(/_/g, " ")).join(", ") }), "loot");
+        maybeShowHint("first_loot"); // SPEC-0801: primer botín
       }
     } catch(e) {}
 

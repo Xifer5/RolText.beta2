@@ -9,6 +9,7 @@ import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
 import { trySpawnBoss } from "./biomeBosses.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { maybeShowHint } from "./onboarding.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
@@ -112,6 +113,10 @@ export function handleMove(direction) {
 
   // Contextual hints
   if (newLoc.canRest)   addMessage(t("restHint"), "system");
+  // SPEC-0801: zona segura + herido → hint de descanso/guardado;
+  // volver a town → fallback del hint de Elara si se perdió la ventana inicial
+  if (newLoc.canRest && gameState.player.hp < gameState.player.maxHp) maybeShowHint("rest_save");
+  if (newLoc.id === "town") maybeShowHint("talk_elara");
   if (newLoc.id === "shop" || newLoc.id === "castle_shop" || newLoc.id === "port") {
     addMessage(t("shopHint"), "system");
   }

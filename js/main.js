@@ -15,6 +15,7 @@ import { setupTravelEventModal } from "./travelEvents.js";
 import { renderLocalMinimap } from "./localMinimap.js";
 import { showIntro } from "./intro.js";
 import { setupFocusTrap } from "./focusTrap.js";
+import { maybeShowHint } from "./onboarding.js";
 
 window.addEventListener("DOMContentLoaded", () => {
   initLocalization();
@@ -56,6 +57,7 @@ window.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         showCharacterSelect(() => {
           addMessage(t('adventureBeginMessage'), "system");
+          setTimeout(() => maybeShowHint("welcome_move"), 600);
         });
       }, 300);
     }
@@ -68,6 +70,7 @@ window.addEventListener("pixel:newGame", () => {
   showIntro(() => {
     showCharacterSelect(() => {
       addMessage(t('adventureBeginMessage'), "system");
+      setTimeout(() => maybeShowHint("welcome_move"), 600);
     });
   });
 });

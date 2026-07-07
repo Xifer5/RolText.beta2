@@ -4732,3 +4732,81 @@ kbd {
 }
 .spec-badge-emoji { font-size: 1.8rem; }
 .spec-badge p { font-size: .76rem; color: var(--c-muted); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   ONBOARDING HINTS (SPEC-0801) — primeros 5 minutos
+   ═══════════════════════════════════════════════════════════ */
+#onb-container {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.onb-card {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 380px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--md-outline-variant);
+  border-left: 4px solid var(--md-primary);
+  background: var(--md-surface-c-high);
+  color: var(--md-on-surface);
+  box-shadow: var(--elev-3);
+  font-family: var(--font-body);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .3s var(--ease-spring), transform .3s var(--ease-spring);
+}
+.onb-card.visible { opacity: 1; transform: translateY(0); }
+.onb-icon { font-size: 1.5rem; line-height: 1.2; flex-shrink: 0; }
+.onb-text { font-size: 14px; line-height: 1.45; flex: 1; }
+.onb-btn {
+  flex-shrink: 0;
+  align-self: flex-end;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.onb-btn:hover  { filter: brightness(1.08); }
+.onb-btn:focus-visible { outline: 2px solid var(--md-on-surface); outline-offset: 2px; }
+
+.onb-highlight {
+  outline: 3px solid var(--md-primary);
+  outline-offset: 3px;
+  border-radius: 8px;
+  animation: onbPulse 1.4s ease-in-out infinite;
+}
+@keyframes onbPulse {
+  0%, 100% { outline-color: var(--md-primary); }
+  50%      { outline-color: transparent; }
+}
+
+@media (max-width: 767px) {
+  #onb-container {
+    left: 8px;
+    right: 8px;
+    bottom: calc(122px + env(safe-area-inset-bottom, 0px));
+  }
+  .onb-card { max-width: none; flex-wrap: wrap; }
+  .onb-btn { align-self: flex-end; margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onb-card { transition: opacity .2s ease; transform: none; }
+  .onb-highlight { animation: none; }
+}
