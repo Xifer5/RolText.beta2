@@ -7,8 +7,12 @@ import { localizeText } from "./i18n.js";
 
 const EVENT_CHANCE = 0.22;
 
+// worldFlags — memoria persistente de decisiones; los guards ?? cubren saves anteriores a SPEC-0803
+const setFlag = k => { (gameState.worldFlags ??= {})[k] = true; };
+const hasFlag = k => !!(gameState.worldFlags ?? {})[k];
+
 // biomes: null = cualquier bioma | array = biomas específicos
-const TRAVEL_EVENTS = [
+export const TRAVEL_EVENTS = [
 
   // ── Universales ─────────────────────────────────────────────────
   {
@@ -22,6 +26,7 @@ const TRAVEL_EVENTS = [
         label: { en: "Help them", es: "Ayudarle" },
         icon: "💊",
         apply() {
+          setFlag("traveler_helped");
           const hasPot = (gameState.inventory.health_potion ?? 0) > 0;
           if (hasPot) {
             gameState.inventory.health_potion--;
@@ -37,6 +42,7 @@ const TRAVEL_EVENTS = [
         label: { en: "Keep going", es: "Seguir tu camino" },
         icon: "🚶",
         apply() {
+          setFlag("traveler_ignored");
           return { en: `You pass by. These lands spare neither the weak nor the indifferent.`, es: `Pasas de largo. Estas tierras no perdonan a los débiles... ni a los indiferentes.` };
         }
       }
@@ -54,6 +60,7 @@ const TRAVEL_EVENTS = [
         label: { en: "Pick it up", es: "Recogerla" },
         icon: "💰",
         apply() {
+          setFlag("purse_taken");
           const amount = 15 + Math.floor(Math.random() * 20);
           gameState.player.gold = (gameState.player.gold ?? 0) + amount;
           return { en: `Inside are ${amount} gold coins. Someone had a bad day. +${amount} gold`, es: `Dentro hay ${amount} monedas de oro. Alguien tuvo mala suerte hoy. +${amount} oro` };
@@ -63,6 +70,7 @@ const TRAVEL_EVENTS = [
         label: { en: "Leave it", es: "Dejarla" },
         icon: "🤷",
         apply() {
+          setFlag("purse_left");
           return { en: `You leave it as it was. Perhaps its owner will come back for it.`, es: `La dejas donde estaba. Quizás su dueño vuelva a buscarla.` };
         }
       }
@@ -80,6 +88,7 @@ const TRAVEL_EVENTS = [
         label: { en: "Pray at the statue", es: "Orar ante la estatua" },
         icon: "🙏",
         apply() {
+          setFlag("shrine_prayed");
           const hp = 15, mp = 8;
           gameState.player.hp = Math.min(gameState.player.maxHp, (gameState.player.hp ?? 0) + hp);
           gameState.player.mp = Math.min(gameState.player.maxMp, (gameState.player.mp ?? 0) + mp);
@@ -112,6 +121,7 @@ const TRAVEL_EVENTS = [
           }
           gameState.player.gold -= 8;
           gameState.inventory.health_potion = (gameState.inventory.health_potion ?? 0) + 1;
+          setFlag("merchant_bought");
           return { en: `Seems genuine. Or at least it doesn't smell bad. −8 gold, +1 Health Potion`, es: `Parece auténtica. O al menos no huele mal. −8 oro, +1 Poción de Salud` };
         }
       },
@@ -636,15 +646,212 @@ const TRAVEL_EVENTS = [
         }
       }
     ]
+  },
+
+  // ── Follow-ups (SPEC-0803) — el mundo recuerda tus decisiones ────
+  {
+    id: "traveler_grateful",
+    icon: "🧑‍🦯",
+    followUp: true,
+    condition: () => hasFlag("traveler_helped") && !hasFlag("traveler_resolved"),
+    title: { en: "A Familiar Face", es: "Una cara conocida" },
+    text: { en: "A figure by a campfire waves at you. It's the wounded traveler you helped — their wounds have healed, and their eyes light up on seeing you.", es: "Una figura junto a una hoguera te saluda. Es el viajero herido al que ayudaste: sus heridas han sanado y sus ojos se iluminan al verte." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Greet them", es: "Saludarle" },
+        icon: "👋",
+        apply() {
+          setFlag("traveler_resolved");
+          gameState.player.gold = (gameState.player.gold ?? 0) + 40;
+          gameState.inventory.health_potion = (gameState.inventory.health_potion ?? 0) + 1;
+          return { en: `"I owe you my life." They press a pouch and a potion into your hands. +40 gold, +1 Health Potion`, es: `«Te debo la vida.» Te pone en las manos una bolsa y una poción. +40 oro, +1 Poción de Salud` };
+        }
+      },
+      {
+        label: { en: "Refuse any reward", es: "Rehusar la recompensa" },
+        icon: "🙏",
+        apply() {
+          setFlag("traveler_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: `"Then take my story instead." Their tale of the roads teaches you plenty. +25 XP`, es: `«Entonces acepta mi historia.» Su relato de los caminos te enseña mucho. +25 XP` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "traveler_grave",
+    icon: "🪦",
+    followUp: true,
+    condition: () => hasFlag("traveler_ignored") && !hasFlag("traveler_resolved"),
+    title: { en: "By the Roadside", es: "Al borde del camino" },
+    text: { en: "A fresh burial mound by the road, a walking stick planted on top. The wounded traveler you passed by never made it.", es: "Un túmulo reciente junto al camino, con un bastón clavado encima. El viajero herido al que pasaste de largo no lo consiguió." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Pay your respects", es: "Presentar tus respetos" },
+        icon: "🕯️",
+        apply() {
+          setFlag("traveler_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 15;
+          return { en: `You stand in silence. These lands forgive nothing — a lesson you won't forget. +15 XP`, es: `Guardas silencio. Estas tierras no perdonan nada: una lección que no olvidarás. +15 XP` };
+        }
+      },
+      {
+        label: { en: "Walk on", es: "Seguir adelante" },
+        icon: "🚶",
+        apply() {
+          setFlag("traveler_resolved");
+          return { en: `You look away and keep walking. The road remembers, even if you'd rather not.`, es: `Apartas la mirada y sigues andando. El camino recuerda, aunque tú prefieras no hacerlo.` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "farmer_searching",
+    icon: "🧑‍🌾",
+    followUp: true,
+    condition: () => hasFlag("purse_taken") && !hasFlag("purse_resolved"),
+    title: { en: "The Searching Farmer", es: "El granjero que busca" },
+    text: { en: "A farmer combs the roadside, distraught. \"My coin purse... a whole harvest's earnings. Have you seen it?\"", es: "Un granjero rastrea el borde del camino, desesperado. «Mi bolsa de monedas... lo ganado con toda una cosecha. ¿La has visto?»" },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Return the money (−25 gold)", es: "Devolverle el dinero (−25 oro)" },
+        icon: "🤝",
+        apply() {
+          setFlag("purse_resolved");
+          if ((gameState.player.gold ?? 0) >= 25) {
+            gameState.player.gold -= 25;
+            gameState.player.experience = (gameState.player.experience ?? 0) + 50;
+            return { en: `You hand back what you found. His relief is worth more than gold. −25 gold, +50 XP`, es: `Le devuelves lo que encontraste. Su alivio vale más que el oro. −25 oro, +50 XP` };
+          }
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: `You confess you spent it and promise to repay him someday. He nods, weary. +25 XP`, es: `Confiesas que lo gastaste y prometes devolvérselo algún día. Él asiente, cansado. +25 XP` };
+        }
+      },
+      {
+        label: { en: "Lie: \"haven't seen it\"", es: "Mentir: «no la he visto»" },
+        icon: "🤫",
+        apply() {
+          setFlag("purse_resolved");
+          return { en: `He thanks you anyway and trudges off. The coins in your pocket feel heavier now.`, es: `Te da las gracias de todos modos y se aleja arrastrando los pies. Las monedas de tu bolsillo pesan más ahora.` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "farmer_grateful",
+    icon: "🧑‍🌾",
+    followUp: true,
+    condition: () => hasFlag("purse_left") && !hasFlag("purse_resolved"),
+    title: { en: "The Grateful Farmer", es: "El granjero agradecido" },
+    text: { en: "A farmer recognizes you. \"I saw you from the hill — you found my purse and left it be. I got everything back thanks to you.\"", es: "Un granjero te reconoce. «Te vi desde la colina: encontraste mi bolsa y la dejaste en su sitio. Lo recuperé todo gracias a ti.»" },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Accept his reward", es: "Aceptar su recompensa" },
+        icon: "💰",
+        apply() {
+          setFlag("purse_resolved");
+          gameState.player.gold = (gameState.player.gold ?? 0) + 30;
+          return { en: `"Honesty deserves payment." He insists you take it. +30 gold`, es: `«La honradez merece pago.» Insiste en que lo aceptes. +30 oro` };
+        }
+      },
+      {
+        label: { en: "Decline politely", es: "Rechazarla con humildad" },
+        icon: "😊",
+        apply() {
+          setFlag("purse_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 20;
+          return { en: `He smiles and shares the best shortcuts in the region instead. +20 XP`, es: `Sonríe y a cambio te enseña los mejores atajos de la región. +20 XP` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "merchant_returns",
+    icon: "🧙",
+    followUp: true,
+    condition: () => hasFlag("merchant_bought") && !hasFlag("merchant_resolved"),
+    title: { en: "The Merchant Returns", es: "El mercader regresa" },
+    text: { en: "The hooded merchant emerges from the shadows. \"My favorite customer! For you, something special: a greater elixir, almost a gift.\"", es: "El mercader encapuchado surge de las sombras. «¡Mi cliente favorito! Para ti, algo especial: un gran elixir, casi un regalo.»" },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Buy the elixir (−15 gold)", es: "Comprar el elixir (−15 oro)" },
+        icon: "🧪",
+        apply() {
+          if ((gameState.player.gold ?? 0) < 15) {
+            return { en: `"No coin? Then we shall meet again, friend." He vanishes with a chuckle.`, es: `«¿Sin monedas? Entonces volveremos a vernos, amigo.» Se desvanece con una risita.` };
+          }
+          gameState.player.gold -= 15;
+          gameState.inventory.greater_elixir = (gameState.inventory.greater_elixir ?? 0) + 1;
+          setFlag("merchant_resolved");
+          return { en: `The elixir glows faintly. This time it really is top quality. −15 gold, +1 Greater Elixir`, es: `El elixir emite un leve brillo. Esta vez sí es de primera calidad. −15 oro, +1 Gran Elixir` };
+        }
+      },
+      {
+        label: { en: "Decline the offer", es: "Rechazar la oferta" },
+        icon: "🛑",
+        apply() {
+          setFlag("merchant_resolved");
+          return { en: `"Your loss." The merchant bows and fades away — this time for good.`, es: `«Tú te lo pierdes.» El mercader hace una reverencia y se desvanece... esta vez para siempre.` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "shrine_gratitude",
+    icon: "🏛️",
+    followUp: true,
+    condition: () => hasFlag("shrine_prayed") && !hasFlag("shrine_resolved"),
+    title: { en: "The Shrine's Gratitude", es: "La gratitud del santuario" },
+    text: { en: "A warm presence surrounds you mid-step. The shrine's spirit has followed your journey — and wishes to repay your prayer.", es: "Una presencia cálida te envuelve a mitad de camino. El espíritu del santuario ha seguido tu viaje... y desea recompensar tu plegaria." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Accept the blessing", es: "Aceptar la bendición" },
+        icon: "✨",
+        apply() {
+          setFlag("shrine_resolved");
+          gameState.player.maxHp = (gameState.player.maxHp ?? 100) + 5;
+          gameState.player.hp = Math.min(gameState.player.maxHp, (gameState.player.hp ?? 0) + 5);
+          return { en: `Divine energy settles in your body forever. +5 Max HP`, es: `La energía divina se asienta en tu cuerpo para siempre. +5 HP máximo` };
+        }
+      },
+      {
+        label: { en: "Decline respectfully", es: "Declinar con respeto" },
+        icon: "🙏",
+        apply() {
+          setFlag("shrine_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 20;
+          return { en: `The presence hums, pleased by your humility, and shares ancient wisdom instead. +20 XP`, es: `La presencia vibra, complacida por tu humildad, y a cambio comparte antigua sabiduría. +20 XP` };
+        }
+      }
+    ]
   }
 
 ];
 
+export function eligibleEvents(biome) {
+  const available = TRAVEL_EVENTS.filter(e =>
+    (e.biomes === null || (biome && biome !== "none" && e.biomes.includes(biome))) &&
+    (!e.condition || e.condition())
+  );
+  // Un follow-up pendiente tiene prioridad absoluta sobre los eventos normales
+  const followUps = available.filter(e => e.followUp);
+  return followUps.length ? followUps : available;
+}
+
 export function getTravelEvent(biome) {
   if (Math.random() > EVENT_CHANCE) return null;
-  const filtered = TRAVEL_EVENTS.filter(e =>
-    e.biomes === null || (biome && biome !== "none" && e.biomes.includes(biome))
-  );
+  const filtered = eligibleEvents(biome);
   if (!filtered.length) return null;
   return filtered[Math.floor(Math.random() * filtered.length)];
 }

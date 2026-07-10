@@ -51,7 +51,8 @@ export const initialGameState = {
   playerDebuffs: {},   // { poison:{turns,damage}, burn:{turns,damage}, stun:{turns} }
   weaponMastery: {},   // { damageType: { xp: number } }
   learnedSkills: [],   // [ skillId, ... ] — from scrolls/books
-  difficulty: "easy"
+  difficulty: "easy",
+  worldFlags: {}       // { flag: true } — memoria de decisiones (SPEC-0803)
 };
 
 export let gameState = deepClone(initialGameState);
