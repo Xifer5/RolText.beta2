@@ -6,11 +6,25 @@ import { checkAchievements } from "./achievements.js";
 import { localizeText } from "./i18n.js";
 import { applyDerivedMaxes } from "./stats.js";
 
-const EVENT_CHANCE = 0.22;
+// Pacing (SPEC-0804): cooldown duro + probabilidad creciente hasta un tope
+export const COOLDOWN_STEPS = 3;
+export const BASE_CHANCE = 0.10;
+export const RAMP_PER_STEP = 0.05;
+export const MAX_CHANCE = 0.35;
+export const RECENT_MEMORY = 3;
 
 // worldFlags — memoria persistente de decisiones; los guards ?? cubren saves anteriores a SPEC-0803
 const setFlag = k => { (gameState.worldFlags ??= {})[k] = true; };
 const hasFlag = k => !!(gameState.worldFlags ?? {})[k];
+
+// travelPacing — guard ??= para saves anteriores a SPEC-0804
+const pacing = () => (gameState.travelPacing ??= { steps: 0, recent: [] });
+
+/** Probabilidad de evento según movimientos pacíficos desde el último. */
+export function eventChance(steps) {
+  if (steps <= COOLDOWN_STEPS) return 0;
+  return Math.min(MAX_CHANCE, BASE_CHANCE + RAMP_PER_STEP * (steps - COOLDOWN_STEPS - 1));
+}
 
 // biomes: null = cualquier bioma | array = biomas específicos
 export const TRAVEL_EVENTS = [
@@ -851,11 +865,22 @@ export function eligibleEvents(biome) {
   return followUps.length ? followUps : available;
 }
 
-export function getTravelEvent(biome) {
-  if (Math.random() > EVENT_CHANCE) return null;
-  const filtered = eligibleEvents(biome);
-  if (!filtered.length) return null;
-  return filtered[Math.floor(Math.random() * filtered.length)];
+export function getTravelEvent(biome, rng = Math.random) {
+  const p = pacing();
+  p.steps = (p.steps ?? 0) + 1;
+  if (rng() >= eventChance(p.steps)) return null;
+
+  let pool = eligibleEvents(biome);
+  // anti-repetición: los normales recientes salen del sorteo (los follow-ups no,
+  // p. ej. el mercader sin resolver debe poder volver); si vacía el pool, fallback
+  const fresh = pool.filter(e => e.followUp || !(p.recent ?? []).includes(e.id));
+  if (fresh.length) pool = fresh;
+  if (!pool.length) return null;
+
+  const event = pool[Math.floor(rng() * pool.length)];
+  p.steps = 0;
+  p.recent = [...(p.recent ?? []), event.id].slice(-RECENT_MEMORY);
+  return event;
 }
 
 export function showTravelEvent(event) {

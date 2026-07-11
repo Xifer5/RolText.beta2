@@ -1,7 +1,10 @@
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { gameState, resetState } from "../js/state.js";
-import { TRAVEL_EVENTS, eligibleEvents } from "../js/travelEvents.js";
+import {
+  TRAVEL_EVENTS, eligibleEvents, getTravelEvent, eventChance,
+  COOLDOWN_STEPS, BASE_CHANCE, MAX_CHANCE, RECENT_MEMORY
+} from "../js/travelEvents.js";
 
 const ev = id => TRAVEL_EVENTS.find(e => e.id === id);
 const choose = (id, i) => ev(id).choices[i].apply();
@@ -137,4 +140,84 @@ test("los follow-ups respetan el filtro de bioma universal (biomes null)", () =>
   for (const biome of ["forest", "desert", "tundra", null]) {
     assert.deepEqual(ids(eligibleEvents(biome)), ["merchant_returns"]);
   }
+});
+
+// ── SPEC-0804 — pacing: cooldown + pity timer + anti-repetición ──
+
+// RNG determinista en secuencia
+const rngOf = (...vals) => { let i = 0; return () => vals[i++ % vals.length]; };
+
+test("curva: 0% en cooldown, 10% en el paso 4, tope 35% desde el 9", () => {
+  const close = (a, b) => assert.ok(Math.abs(a - b) < 1e-9, `${a} ≈ ${b}`);
+  for (let s = 1; s <= COOLDOWN_STEPS; s++) assert.equal(eventChance(s), 0);
+  close(eventChance(4), BASE_CHANCE);
+  close(eventChance(5), 0.15);
+  close(eventChance(8), 0.30);
+  close(eventChance(9), MAX_CHANCE);
+  close(eventChance(50), MAX_CHANCE);
+});
+
+test("durante el cooldown jamás sale evento, ni con rng=0", () => {
+  resetState();
+  for (let i = 0; i < COOLDOWN_STEPS; i++) {
+    assert.equal(getTravelEvent("forest", rngOf(0)), null);
+  }
+  // paso 4: con rng=0 (< 10%) ya puede salir
+  assert.notEqual(getTravelEvent("forest", rngOf(0)), null);
+});
+
+test("tras disparar: contador a 0, ID en recientes, y cooldown de nuevo", () => {
+  resetState();
+  gameState.travelPacing.steps = 10;
+  const ev = getTravelEvent("forest", rngOf(0));
+  assert.ok(ev);
+  assert.equal(gameState.travelPacing.steps, 0);
+  assert.deepEqual(gameState.travelPacing.recent, [ev.id]);
+  for (let i = 0; i < COOLDOWN_STEPS; i++) {
+    assert.equal(getTravelEvent("forest", rngOf(0)), null);
+  }
+});
+
+test("anti-repetición: un evento reciente no vuelve a salir si hay alternativas", () => {
+  resetState();
+  for (let round = 0; round < 6; round++) {
+    gameState.travelPacing.steps = 20;
+    const before = [...gameState.travelPacing.recent];
+    const ev = getTravelEvent("forest", rngOf(0)); // rng 0 elige siempre el índice 0
+    assert.ok(ev, `ronda ${round}: salió evento`);
+    assert.ok(!before.includes(ev.id), `ronda ${round}: ${ev.id} no estaba en recientes`);
+  }
+  assert.equal(gameState.travelPacing.recent.length, RECENT_MEMORY);
+});
+
+test("anti-repetición: si el filtro vacía el pool, cae al pool completo", () => {
+  resetState();
+  // fuerza recientes = TODOS los ids elegibles del bioma
+  gameState.travelPacing.recent = eligibleEvents("forest").map(e => e.id);
+  gameState.travelPacing.steps = 20;
+  // RECENT_MEMORY normalmente lo impide, pero el fallback debe cubrirlo igual
+  const ev = getTravelEvent("forest", rngOf(0));
+  assert.ok(ev, "sale evento aunque todos estén en recientes");
+});
+
+test("follow-ups: exentos de anti-repetición pero sujetos a cooldown", () => {
+  resetState();
+  gameState.worldFlags = { merchant_bought: true };
+  gameState.travelPacing.steps = 10;
+  const first = getTravelEvent(null, rngOf(0));
+  assert.equal(first?.id, "merchant_returns");
+  // sin resolver: en cooldown no vuelve...
+  assert.equal(getTravelEvent(null, rngOf(0)), null);
+  // ...pero pasado el cooldown vuelve aunque esté en recientes
+  gameState.travelPacing.steps = 10;
+  assert.equal(getTravelEvent(null, rngOf(0))?.id, "merchant_returns");
+});
+
+test("save antiguo sin travelPacing: se crea solo y el roundtrip lo conserva", () => {
+  resetState();
+  delete gameState.travelPacing;
+  assert.equal(getTravelEvent("forest", rngOf(0.99)), null); // paso 1: cooldown
+  assert.equal(gameState.travelPacing.steps, 1);
+  const loaded = JSON.parse(JSON.stringify(gameState));
+  assert.deepEqual(loaded.travelPacing, { steps: 1, recent: [] });
 });
