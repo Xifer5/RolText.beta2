@@ -3010,6 +3010,45 @@ button:focus-visible,
 .muted { color: var(--md-on-surface-variant); font-size: 13px; font-style: italic; }
 
 /* ═══════════════════════════════════════════════════════════
+   SAVE SLOTS (SPEC-0805)
+   ═══════════════════════════════════════════════════════════ */
+.save-slots-content { max-width: 480px; }
+.save-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.save-slot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-c);
+}
+.save-slot-row.empty { opacity: .65; }
+.save-slot-info { min-width: 0; }
+.save-slot-name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+.save-slot-meta {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  line-height: 1.45;
+}
+.save-slot-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
    TOASTS — contenedor compartido (logros + simples, js/toast.js)
    ═══════════════════════════════════════════════════════════ */
 .toast-container {

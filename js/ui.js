@@ -4,7 +4,7 @@ import { renderShop } from "./shop.js";
 import { renderCrafting } from "./crafting.js";
 import { renderInventory } from "./inventory.js";
 import { calculateMagicAttack, calculateTotalStats, increaseStat } from "./stats.js";
-import { hasSavedGame } from "./saveSystem.js";
+import { latestSlotId, readSlot, listSlots } from "./saveSystem.js";
 import { CLASS_DEFINITIONS, getAvailableSkills } from "./classes.js";
 import { getNpcAt } from "./npcs.js";
 import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
@@ -726,27 +726,25 @@ export function updateSaveInfo() {
   const saveInfo  = document.getElementById("saveInfo");
   const continueBtn = document.getElementById("continueBtn");
   const loadBtn   = document.getElementById("loadGameBtn");
-  const deleteBtn = document.getElementById("deleteSaveBtn");
   if (!saveInfo) return;
 
-  const exists = hasSavedGame();
-  if (exists) {
+  const latest = latestSlotId();
+  if (latest) {
     try {
-      const data = JSON.parse(localStorage.getItem("pixelQuestSave"));
+      const data = readSlot(latest);
       const date = new Date(data.timestamp);
       const lvl  = data.gameState?.player?.level ?? "?";
       const cls  = data.gameState?.player?.className || "Aventurero";
       const gold = data.gameState?.player?.gold ?? 0;
-      saveInfo.innerHTML = `<p>💾 ${date.toLocaleString()}</p><p>${cls} · Nivel ${lvl} · ${gold} 🪙</p>`;
+      const count = listSlots().filter(s => s.data).length;
+      saveInfo.innerHTML = `<p>💾 ${date.toLocaleString()} · ${count}/4</p><p>${cls} · Nivel ${lvl} · ${gold} 🪙</p>`;
       if (continueBtn) continueBtn.disabled = false;
       if (loadBtn)     loadBtn.disabled     = false;
-      if (deleteBtn)   deleteBtn.disabled   = false;
     } catch { saveInfo.innerHTML = "<p>Partida corrupta</p>"; }
   } else {
     saveInfo.innerHTML = "<p>Sin partida guardada</p>";
     if (continueBtn) continueBtn.disabled = true;
     if (loadBtn)     loadBtn.disabled     = true;
-    if (deleteBtn)   deleteBtn.disabled   = true;
   }
 }
 

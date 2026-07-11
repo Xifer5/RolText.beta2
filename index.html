@@ -521,7 +521,6 @@
       <button id="continueBtn" class="menu-option" data-i18n="continueButton">▶️ Continuar</button>
       <button id="saveGameBtn" class="menu-option" data-i18n="saveGameButton">💾 Guardar</button>
       <button id="loadGameBtn" class="menu-option" data-i18n="loadGameButton">📂 Cargar</button>
-      <button id="deleteSaveBtn" class="menu-option danger" data-i18n="deleteSaveButton">🗑️ Borrar partida</button>
       <button id="onboardingToggleBtn" class="menu-option">💡 Consejos de novato: ON</button>
       <button id="closeMenuBtn" class="menu-option ghost" data-i18n="closeButton">✕ Cerrar</button>
     </div>
@@ -539,6 +538,18 @@
       </div>
     </div>
     <div class="save-info" id="saveInfo"></div>
+  </div>
+</div>
+
+<!-- SAVE SLOTS (SPEC-0805) -->
+<div id="saveSlotsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="save-slots-title">
+  <div class="modal-content save-slots-content">
+    <div class="modal-header">
+      <h2 id="save-slots-title" data-i18n="saveSlotsTitle">💾 Partidas guardadas</h2>
+      <button class="modal-close" id="closeSaveSlotsBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
+    </div>
+    <p id="saveSlotsHint" class="muted"></p>
+    <div id="saveSlotsList" class="save-slots-list"></div>
   </div>
 </div>
 

@@ -1,7 +1,7 @@
 import { gameState, initializeGame } from "./state.js";
 import { updateUI, toggleMainMenu } from "./ui.js";
-import { saveGame, loadGame, deleteSave } from "./saveSystem.js";
-import { addMessage } from "./story.js";
+import { loadGame } from "./saveSystem.js";
+import { openSaveSlotsModal, setupSaveSlotsModal } from "./saveSlotsModal.js";
 import { t } from "./i18n.js";
 import { isOnboardingEnabled, toggleOnboarding } from "./onboarding.js";
 import { showToast } from "./toast.js";
@@ -35,22 +35,14 @@ export function setupMainMenuListeners() {
   });
 
   document.getElementById("saveGameBtn")?.addEventListener("click", () => {
-    saveGame();
+    openSaveSlotsModal("save");
   });
 
   document.getElementById("loadGameBtn")?.addEventListener("click", () => {
-    if (loadGame()) {
-      toggleMainMenu(false);
-      updateUI();
-    }
+    openSaveSlotsModal("load");
   });
 
-  document.getElementById("deleteSaveBtn")?.addEventListener("click", () => {
-    if (confirm(t("confirmDeleteSave"))) {
-      deleteSave();
-      addMessage(t("saveGameDeleted"), "system");
-    }
-  });
+  setupSaveSlotsModal();
 
   document.getElementById("closeMenuBtn")?.addEventListener("click", () => {
     toggleMainMenu(false);
