@@ -17,6 +17,8 @@ export const initialGameState = {
     intelligence: 7,
     bonusHp: 0,
     bonusMp: 0,
+    permanentHpBonus: 0,  // level-ups y bendiciones — entra en la fórmula de calculateTotalStats
+    permanentMpBonus: 0,
     gold: 50,
     experience: 0,
     nextLevelXp: 100,

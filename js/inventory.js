@@ -1,6 +1,6 @@
 import { gameState } from "./state.js";
 import { allItems, addItemToInventory, removeItemFromInventory } from "./items.js";
-import { calculateTotalStats } from "./stats.js";
+import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
 import { createIconElement } from "./utils.js";
 import { addMessage } from "./story.js";
 import { updateUI, renderStatsModal } from "./ui.js";
@@ -505,13 +505,8 @@ function equipItem(itemId, item) {
   if (oldItem && oldItem.id) addItemToInventory(gameState.inventory, oldItem.id, 1);
   addMessage(formatText(t('equippedItem'), { item: localizeText(item.name) }), 'stat');
 
-  // Recalculate derived stats after equipping and apply to player's maxHP/maxMP so STR/INT bonuses take effect
-  const derived = calculateTotalStats(gameState.player, gameState.equipment);
-  // Apply new maxes to player state and clamp current hp/mp
-  gameState.player.maxHp = derived.maxHp;
-  gameState.player.maxMp = derived.maxMp;
-  gameState.player.hp = Math.min(gameState.player.hp ?? gameState.player.maxHp, gameState.player.maxHp);
-  gameState.player.mp = Math.min(gameState.player.mp ?? gameState.player.maxMp, gameState.player.maxMp);
+  // Recalculate derived stats after equipping so STR/INT/HP bonuses take effect
+  applyDerivedMaxes();
   updateUI();
   renderInventory();
   return true;

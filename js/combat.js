@@ -1,6 +1,6 @@
 import { gameState } from "./state.js";
 import { enemyData } from "./enemies.js";
-import { calculateTotalStats, calculateMagicAttack } from "./stats.js";
+import { calculateTotalStats, calculateMagicAttack, applyDerivedMaxes } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI, showFloatingText, shakeScreen } from "./ui.js";
 import { getLoot } from "./lootTables.js";
@@ -674,8 +674,9 @@ function levelUp() {
   // Class-based HP/MP growth
   const hpGain = p.class === "warrior" ? 15 : p.class === "mage" ? 6 : 10;
   const mpGain = p.class === "mage" ? 12 : p.class === "rogue" ? 5 : 3;
-  p.maxHp = (p.maxHp || 100) + hpGain;
-  p.maxMp = (p.maxMp || 30) + mpGain;
+  p.permanentHpBonus = (p.permanentHpBonus || 0) + hpGain;
+  p.permanentMpBonus = (p.permanentMpBonus || 0) + mpGain;
+  applyDerivedMaxes();
   p.hp = p.maxHp;
   p.mp = p.maxMp;
 

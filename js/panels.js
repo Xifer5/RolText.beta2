@@ -4,7 +4,7 @@
 //  📝 Journal · 🐉 Bestiary
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
-import { calculateTotalStats } from "./stats.js";
+import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
 import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, getAvailableSkills } from "./classes.js";
 import { renderJournal } from "./journal.js";
 import { renderBestiary } from "./bestiary.js";
@@ -206,6 +206,7 @@ function renderEquipment() {
         if (!gameState.inventory[item.id]) gameState.inventory[item.id] = 0;
         gameState.inventory[item.id]++;
         gameState.equipment[slot] = null;
+        applyDerivedMaxes();
         addMessage(formatText('equipmentUnequipMessage', { item: localizeText(item.name) }), "system");
         updateUI();
         renderEquipment(); // re-render

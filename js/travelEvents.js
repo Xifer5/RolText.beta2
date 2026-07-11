@@ -4,6 +4,7 @@ import { updateUI } from "./ui.js";
 import { playSound } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { localizeText } from "./i18n.js";
+import { applyDerivedMaxes } from "./stats.js";
 
 const EVENT_CHANCE = 0.22;
 
@@ -820,7 +821,8 @@ export const TRAVEL_EVENTS = [
         icon: "✨",
         apply() {
           setFlag("shrine_resolved");
-          gameState.player.maxHp = (gameState.player.maxHp ?? 100) + 5;
+          gameState.player.permanentHpBonus = (gameState.player.permanentHpBonus ?? 0) + 5;
+          applyDerivedMaxes();
           gameState.player.hp = Math.min(gameState.player.maxHp, (gameState.player.hp ?? 0) + 5);
           return { en: `Divine energy settles in your body forever. +5 Max HP`, es: `La energía divina se asienta en tu cuerpo para siempre. +5 HP máximo` };
         }

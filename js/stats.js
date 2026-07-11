@@ -46,9 +46,9 @@ export function calculateTotalStats(player, equipment = {}) {
   // Compute max values: base + attributes + equipment + class vitality bonus
   const classBonusHp = player.bonusHp || 0;
   const classBonusMp = player.bonusMp || 0;
-  stats.maxHp = 80 + ((stats.strength || 0) * 2) + hpBonusSum + classBonusHp;
+  stats.maxHp = 80 + ((stats.strength || 0) * 2) + hpBonusSum + classBonusHp + (player.permanentHpBonus || 0);
   const mpPerInt = (player.class === "mage") ? 15 : 5;
-  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + classBonusMp;
+  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + classBonusMp + (player.permanentMpBonus || 0);
 
   // Asegurar integridad
   stats.hp = Math.min(player.hp ?? stats.maxHp, stats.maxHp);
@@ -73,6 +73,34 @@ export function calculateMagicAttack(stats) {
   return Math.round((stats.magic ?? 0) * 1.5);
 }
 
+/**
+ * Única vía para sincronizar player.maxHp/maxMp con la fórmula derivada.
+ * Llamar tras cualquier cambio que afecte los máximos (stats, equipo, bonos permanentes).
+ */
+export function applyDerivedMaxes() {
+  const p = gameState.player;
+  const s = calculateTotalStats(p, gameState.equipment);
+  p.maxHp = s.maxHp;
+  p.maxMp = s.maxMp;
+  p.hp = Math.min(p.hp ?? s.maxHp, s.maxHp);
+  p.mp = Math.min(p.mp ?? s.maxMp, s.maxMp);
+}
+
+/**
+ * Saves anteriores a permanentHpBonus acumulaban level-ups y bendiciones
+ * mutando maxHp/maxMp directamente. Reconstruye esos bonos como la diferencia
+ * entre el máximo guardado y el que da la fórmula. Devuelve true si migró.
+ */
+export function migratePermanentBonuses(player, equipment = {}) {
+  if (player.permanentHpBonus !== undefined) return false;
+  player.permanentHpBonus = 0;
+  player.permanentMpBonus = 0;
+  const s = calculateTotalStats(player, equipment);
+  player.permanentHpBonus = Math.max(0, (player.maxHp ?? s.maxHp) - s.maxHp);
+  player.permanentMpBonus = Math.max(0, (player.maxMp ?? s.maxMp) - s.maxMp);
+  return true;
+}
+
 export function increaseStat(statName) {
   if (!gameState.player) return false;
   if ((gameState.player.statPoints ?? 0) <= 0) {
@@ -85,11 +113,7 @@ export function increaseStat(statName) {
   gameState.player[statName] = (gameState.player[statName] || 0) + 1;
 
   // Recalculate maxes and clamp current hp/mp
-  const s = calculateTotalStats(gameState.player, gameState.equipment);
-  gameState.player.maxHp = s.maxHp;
-  gameState.player.maxMp = s.maxMp;
-  gameState.player.hp = Math.min(gameState.player.hp ?? s.maxHp, s.maxHp);
-  gameState.player.mp = Math.min(gameState.player.mp ?? s.maxMp, s.maxMp);
+  applyDerivedMaxes();
 
   addMessage(formatText("statIncreased", { stat: statName.toUpperCase(), value: gameState.player[statName] }), "stat");
   return true;

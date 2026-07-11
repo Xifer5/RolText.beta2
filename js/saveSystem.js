@@ -2,6 +2,7 @@ import { gameState, initialGameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { deepClone } from "./utils.js";
 import { t, formatText } from "./i18n.js";
+import { migratePermanentBonuses, applyDerivedMaxes } from "./stats.js";
 
 const SAVE_KEY = "pixelQuestSave";
 
@@ -30,6 +31,8 @@ export function loadGame() {
     if (!parsed.gameState) throw new Error("Formato inválido");
     // Merge: defaults primero → guardado encima, garantiza que campos nuevos existan
     Object.assign(gameState, deepClone(initialGameState), deepClone(parsed.gameState));
+    // Saves antiguos acumulaban level-ups mutando maxHp/maxMp; reconstruye los bonos permanentes
+    if (migratePermanentBonuses(gameState.player, gameState.equipment)) applyDerivedMaxes();
     // Restore profile card
     setTimeout(() => {
       const p = gameState.player;
