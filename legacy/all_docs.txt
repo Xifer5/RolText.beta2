@@ -1,24 +1,24 @@
 ===== README.md =====
 # RolText.beta2
 
-Notes — Icons & Responsive UX
+Notes ï¿½ Icons & Responsive UX
 ---------------------------------
 
-- To use PNG/JPG/SVG images as item icons, set each item's `icon` property to just the filename (e.g. `"sword.png"`) or to an object `{ type: 'img', src: 'sword.png' }`.
-- Don't hard-code full paths like `pruebas/6.1/img/sword.png` — instead, set a global `window.ASSET_BASE` before the game loads (for example inside `index.html` or your server templates):
+- To use PNG/JPG/SVG images as item icons, set each item's `icon` property to just the filename (e.g. `"sword.webp"`) or to an object `{ type: 'img', src: 'sword.webp' }`.
+- Don't hard-code full paths like `pruebas/6.1/img/sword.webp` ï¿½ instead, set a global `window.ASSET_BASE` before the game loads (for example inside `index.html` or your server templates):
 
 ```html
 <script>window.ASSET_BASE = '/img/items/';</script>
 <script type="module" src="js/main.js"></script>
 ```
 
-The code will resolve `"sword.png"` to `window.ASSET_BASE + 'sword.png'` (default base is `./img/items/`).
+The code will resolve `"sword.webp"` to `window.ASSET_BASE + 'sword.webp'` (default base is `./img/items/`).
 
 - UI/UX improvements in this release:
 	- Smooth modal open/close transitions for better polish
 	- Inventory detail pane animates when opening/closing
 	- Responsive styles & layout for small screens
-	- Item icons render as images (if available) or fall back to emoji — broken image URLs no longer leak as raw path text
+	- Item icons render as images (if available) or fall back to emoji ï¿½ broken image URLs no longer leak as raw path text
 
 If you want, I can add more UX polish (keyboard navigation, animated equip feedback, shop confirmations, buy/sell filters, restock logic, etc.).
 
@@ -125,27 +125,27 @@ This document captures the design and workflow principles for Pixel Quest Echoes
 ===== UI-TASKS.md =====
 # RolText UI Tasks
 
-## Priority 1 — Core M3 polish
+## Priority 1 ï¿½ Core M3 polish
 - [ ] Add hover/pressed state layers to topbar buttons and navigation tabs.
 - [ ] Improve `enemy-panel` surface contrast and elevation.
 - [ ] Refine the mobile player header spacing and visual separation.
 - [ ] Ensure story filters and log text remain readable in both dark and light themes.
 - [ ] Add consistent focus ring styling for keyboard navigation.
 
-## Priority 2 — Visual system consistency
+## Priority 2 ï¿½ Visual system consistency
 - [ ] Use M3 semantic colors for badges, chips, and status indicators.
 - [ ] Apply `--r-md` and `--r-lg` consistently on panels and cards.
 - [ ] Add subtle background surfaces behind `skill-panel` and `buff-bar`.
 - [ ] Confirm `location-hero` works with image and text overlay spacing.
 
-## Priority 3 — Documentation and workflow
+## Priority 3 ï¿½ Documentation and workflow
 - [ ] Document component patterns in `DESIGN-GUIDELINES.md`.
 - [ ] Update `PROJECT-OVERVIEW.md` when new UI modules or patterns are introduced.
 - [ ] Review JS panel toggles and identify opportunities for smaller UI improvements.
 - [ ] Capture design decisions in markdown before making larger style changes.
 
 ## Notes
-- Prefer small, modular CSS updates that don’t require structural HTML changes.
+- Prefer small, modular CSS updates that donï¿½t require structural HTML changes.
 - Validate both theme modes using the `data-theme` attribute.
 - Keep the agent prompt and docs synced with any new workflow changes.
 
@@ -273,70 +273,70 @@ Start by using `PROJECT-OVERVIEW.md` as the project knowledge base, then read th
 ===== spec\SPEC-001-Arquitectura-General.md =====
 # SPEC-001: Arquitectura General de Pixel Quest Echoes
 
-## 1. Visión del Sistema
+## 1. Visiï¿½n del Sistema
 
-Pixel Quest Echoes es un RPG de texto basado en navegador con las siguientes características técnicas:
+Pixel Quest Echoes es un RPG de texto basado en navegador con las siguientes caracterï¿½sticas tï¿½cnicas:
 - **Frontend**: Vanilla JavaScript ES6+ modular, sin framework
-- **UI/UX**: Material Design 3 (MD3) con theming dinámico (dark/light)
-- **Estado**: Patrón Singleton centralizado (`gameState`)
-- **Comunicación**: Event-driven architecture via `CustomEvent`
+- **UI/UX**: Material Design 3 (MD3) con theming dinï¿½mico (dark/light)
+- **Estado**: Patrï¿½n Singleton centralizado (`gameState`)
+- **Comunicaciï¿½n**: Event-driven architecture via `CustomEvent`
 - **Persistencia**: localStorage con versionado de save files
-- **Responsive**: Mobile-first con navegación adaptativa
+- **Responsive**: Mobile-first con navegaciï¿½n adaptativa
 
 ## 2. Diagrama de Arquitectura
 
 ```
 +-------------------------------------------------------------+
-¦                        PRESENTATION LAYER                      ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-¦  ¦  index.html ¦ ¦  styles-m3   ¦ ¦  MD3 Components     ¦   ¦
-¦  ¦  (Estructura)¦ ¦  (Tokens CSS)¦ ¦  (Modales, Sheets)  ¦   ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-+-------------------------------------------------------------¦
-¦                      INTERACTION LAYER                       ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-¦  ¦  keyboard.js¦ ¦  events.js  ¦ ¦  ui.js              ¦   ¦
-¦  ¦  (Input)     ¦ ¦  (Handlers)  ¦ ¦  (Render/Update)    ¦   ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-+-------------------------------------------------------------¦
-¦                       CORE LAYER                               ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-¦  ¦  state.js   ¦ ¦  main.js    ¦ ¦  i18n.js            ¦   ¦
-¦  ¦  (Store)     ¦ ¦  (Bootstrap) ¦ ¦  (Localization)     ¦   ¦
-¦  +-------------+ +-------------+ +---------------------+   ¦
-+-------------------------------------------------------------¦
-¦                      GAME SYSTEMS LAYER                        ¦
-¦  +----------+ +----------+ +----------+ +----------+       ¦
-¦  ¦ combat.js¦ ¦movement.js¦ ¦crafting.js¦ ¦quests.js ¦       ¦
-¦  ¦inventory.js¦ ¦shop.js  ¦ ¦journal.js¦ ¦bestiary.js¦       ¦
-¦  ¦panels.js ¦ ¦mapgen.js ¦ ¦npcs.js   ¦ ¦achievements¦       ¦
-¦  +----------+ +----------+ +----------+ +----------+       ¦
-+-------------------------------------------------------------¦
-¦                      DATA LAYER                                ¦
-¦  +----------+ +----------+ +----------+ +----------+         ¦
-¦  ¦items.js  ¦ ¦enemies.js¦ ¦biomes.js ¦ ¦locations.js¦       ¦
-¦  ¦lootTables¦ ¦classes.js¦ ¦worldMap  ¦ ¦craftingRecipes¦    ¦
-¦  +----------+ +----------+ +----------+ +----------+         ¦
-+-------------------------------------------------------------¦
-¦                    INFRASTRUCTURE LAYER                        ¦
-¦  +----------+ +----------+ +----------+ +----------+         ¦
-¦  ¦saveSystem¦ ¦sounds.js ¦ ¦scrollMgr ¦ ¦localMinimap¦       ¦
-¦  ¦utils.js  ¦ ¦toast.js  ¦ ¦travelEvts¦ ¦minimap.js ¦       ¦
-¦  +----------+ +----------+ +----------+ +----------+         ¦
+ï¿½                        PRESENTATION LAYER                      ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
+ï¿½  ï¿½  index.html ï¿½ ï¿½  styles-m3   ï¿½ ï¿½  MD3 Components     ï¿½   ï¿½
+ï¿½  ï¿½  (Estructura)ï¿½ ï¿½  (Tokens CSS)ï¿½ ï¿½  (Modales, Sheets)  ï¿½   ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½                      INTERACTION LAYER                       ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
+ï¿½  ï¿½  keyboard.jsï¿½ ï¿½  events.js  ï¿½ ï¿½  ui.js              ï¿½   ï¿½
+ï¿½  ï¿½  (Input)     ï¿½ ï¿½  (Handlers)  ï¿½ ï¿½  (Render/Update)    ï¿½   ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½                       CORE LAYER                               ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
+ï¿½  ï¿½  state.js   ï¿½ ï¿½  main.js    ï¿½ ï¿½  i18n.js            ï¿½   ï¿½
+ï¿½  ï¿½  (Store)     ï¿½ ï¿½  (Bootstrap) ï¿½ ï¿½  (Localization)     ï¿½   ï¿½
+ï¿½  +-------------+ +-------------+ +---------------------+   ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½                      GAME SYSTEMS LAYER                        ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+       ï¿½
+ï¿½  ï¿½ combat.jsï¿½ ï¿½movement.jsï¿½ ï¿½crafting.jsï¿½ ï¿½quests.js ï¿½       ï¿½
+ï¿½  ï¿½inventory.jsï¿½ ï¿½shop.js  ï¿½ ï¿½journal.jsï¿½ ï¿½bestiary.jsï¿½       ï¿½
+ï¿½  ï¿½panels.js ï¿½ ï¿½mapgen.js ï¿½ ï¿½npcs.js   ï¿½ ï¿½achievementsï¿½       ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+       ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½                      DATA LAYER                                ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+         ï¿½
+ï¿½  ï¿½items.js  ï¿½ ï¿½enemies.jsï¿½ ï¿½biomes.js ï¿½ ï¿½locations.jsï¿½       ï¿½
+ï¿½  ï¿½lootTablesï¿½ ï¿½classes.jsï¿½ ï¿½worldMap  ï¿½ ï¿½craftingRecipesï¿½    ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+         ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½                    INFRASTRUCTURE LAYER                        ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+         ï¿½
+ï¿½  ï¿½saveSystemï¿½ ï¿½sounds.js ï¿½ ï¿½scrollMgr ï¿½ ï¿½localMinimapï¿½       ï¿½
+ï¿½  ï¿½utils.js  ï¿½ ï¿½toast.js  ï¿½ ï¿½travelEvtsï¿½ ï¿½minimap.js ï¿½       ï¿½
+ï¿½  +----------+ +----------+ +----------+ +----------+         ï¿½
 +-------------------------------------------------------------+
 ```
 
-## 3. Patrones de Diseño Implementados
+## 3. Patrones de Diseï¿½o Implementados
 
-| Patrón | Implementación | Uso |
+| Patrï¿½n | Implementaciï¿½n | Uso |
 |--------|---------------|-----|
-| **Singleton** | `gameState` exportado desde `state.js` | Estado global único |
+| **Singleton** | `gameState` exportado desde `state.js` | Estado global ï¿½nico |
 | **Observer** | `CustomEvent` con namespace `pixel:*` | Desacoplamiento entre sistemas |
 | **Module** | ES6 `import/export` | Encapsulamiento por feature |
-| **Factory** | `generateZone()` en `mapgen.js` | Generación procedural de contenido |
+| **Factory** | `generateZone()` en `mapgen.js` | Generaciï¿½n procedural de contenido |
 | **Strategy** | `SKILLS_BY_CLASS` en `classes.js` | Habilidades por clase |
 | **State Machine** | `isInCombat`, `isGameOver`, `isProcessingMove` | Estados del juego |
-| **Component** | Modales reutilizables en HTML | UI dinámica |
+| **Component** | Modales reutilizables en HTML | UI dinï¿½mica |
 
 ## 4. Flujo de Datos
 
@@ -345,9 +345,9 @@ Usuario Input ? keyboard.js/events.js ? Action Handler ? gameState Mutation ?
 CustomEvent Dispatch ? UI Update (ui.js/panels.js) ? DOM Render ? localStorage (opcional)
 ```
 
-## 5. Convenciones de Código
+## 5. Convenciones de Cï¿½digo
 
-### 5.1 Estructura de Módulos
+### 5.1 Estructura de Mï¿½dulos
 ```javascript
 // 1. Imports externos
 import { gameState } from "./state.js";
@@ -355,7 +355,7 @@ import { gameState } from "./state.js";
 // 2. Imports internos
 import { addMessage } from "./story.js";
 
-// 3. Constantes del módulo
+// 3. Constantes del mï¿½dulo
 const MODULE_CONSTANT = value;
 
 // 4. Funciones exportadas
@@ -367,42 +367,42 @@ function _helper() { }
 
 ### 5.2 Naming Conventions
 - **PascalCase**: Clases/Constructores (no hay en este proyecto)
-- **camelCase**: Variables, funciones, métodos
+- **camelCase**: Variables, funciones, mï¿½todos
 - **SCREAMING_SNAKE_CASE**: Constantes globales
-- **Prefijo `_`**: Funciones privadas del módulo
+- **Prefijo `_`**: Funciones privadas del mï¿½dulo
 
 ### 5.3 Event Namespace
 Todos los eventos custom usan el prefijo `pixel:`:
-- `pixel:move` — Movimiento del jugador
-- `pixel:attack`, `pixel:magic`, `pixel:flee` — Acciones de combate
-- `pixel:startCombat` — Inicio de combate
-- `pixel:useSkill` — Uso de habilidad
-- `pixel:openMenu` — Abrir menú principal
-- `pixel:newGame` — Nueva partida
-- `pixel:localeChanged` — Cambio de idioma
-- `pixel:locationChanged` — Cambio de ubicación
-- `pixel:saveChanged`, `pixel:stateUpdated` — Persistencia
+- `pixel:move` ï¿½ Movimiento del jugador
+- `pixel:attack`, `pixel:magic`, `pixel:flee` ï¿½ Acciones de combate
+- `pixel:startCombat` ï¿½ Inicio de combate
+- `pixel:useSkill` ï¿½ Uso de habilidad
+- `pixel:openMenu` ï¿½ Abrir menï¿½ principal
+- `pixel:newGame` ï¿½ Nueva partida
+- `pixel:localeChanged` ï¿½ Cambio de idioma
+- `pixel:locationChanged` ï¿½ Cambio de ubicaciï¿½n
+- `pixel:saveChanged`, `pixel:stateUpdated` ï¿½ Persistencia
 
-## 6. Dependencias entre Módulos
+## 6. Dependencias entre Mï¿½dulos
 
-### 6.1 Grafo de Dependencias Críticas
+### 6.1 Grafo de Dependencias Crï¿½ticas
 ```
-state.js (raíz)
+state.js (raï¿½z)
   +-- combat.js ? enemies.js, stats.js, lootTables.js, classes.js
   +-- movement.js ? combat.js, biomes.js, travelEvents.js
   +-- inventory.js ? items.js, stats.js, i18n.js
   +-- panels.js ? journal.js, bestiary.js, minimap.js, crafting.js
   +-- questlog.js ? quests.js, npcs.js
-  +-- main.js ? TODOS los módulos (bootstrap)
+  +-- main.js ? TODOS los mï¿½dulos (bootstrap)
 ```
 
 ### 6.2 Reglas de Dependencia
 1. **Nunca** importar ciclicamente (A ? B ? A)
-2. **Nunca** importar `main.js` desde otros módulos
-3. **Siempre** usar `gameState` como única fuente de verdad
+2. **Nunca** importar `main.js` desde otros mï¿½dulos
+3. **Siempre** usar `gameState` como ï¿½nica fuente de verdad
 4. **Preferir** eventos sobre imports directos para desacoplamiento
 
-## 7. Gestión de Estado
+## 7. Gestiï¿½n de Estado
 
 ### 7.1 Estructura de gameState
 ```javascript
@@ -443,47 +443,47 @@ state.js (raíz)
 ## 8. Rendimiento
 
 ### 8.1 Optimizaciones Actuales
-- Lazy loading de imágenes (`onerror="this.style.display='none'"`)
-- Event delegation para listas dinámicas
+- Lazy loading de imï¿½genes (`onerror="this.style.display='none'"`)
+- Event delegation para listas dinï¿½micas
 - CSS containment en modales (`contain: layout style paint`)
 
 ### 8.2 Cuellos de Botella Identificados
 - Re-render completo de inventario en cada cambio
-- Cálculo de stats en cada frame de combate
-- Generación de HTML string en memoria para modales grandes
+- Cï¿½lculo de stats en cada frame de combate
+- Generaciï¿½n de HTML string en memoria para modales grandes
 
 ## 9. Seguridad
 
 ### 9.1 Vectores de Ataque
-- **XSS**: HTML injection via nombres de jugador (mitigado: `textContent` en mayoría)
+- **XSS**: HTML injection via nombres de jugador (mitigado: `textContent` en mayorï¿½a)
 - **Save Tampering**: localStorage editable por usuario (aceptable para SP)
 - **Cheat Engine**: Valores en memoria modificables (aceptable para SP)
 
 ## 10. Versionado
 
 Formato de save actual: `version: "3.0"`
-Estrategia de migración: Merge con defaults (`Object.assign(initial, saved)`)
+Estrategia de migraciï¿½n: Merge con defaults (`Object.assign(initial, saved)`)
 
 ===== spec\SPEC-002-Sistema-Combate.md =====
 # SPEC-002: Sistema de Combate por Turnos
 
 ## 1. Resumen Ejecutivo
 
-Sistema de combate por turnos basado en estadísticas derivadas, con soporte para:
+Sistema de combate por turnos basado en estadï¿½sticas derivadas, con soporte para:
 - 3 clases con 6 habilidades cada una (18 skills total)
-- Buffs/debuffs con duración por turnos
-- Evasión y críticos basados en agilidad
-- Daño elemental (fuego, veneno, hielo)
+- Buffs/debuffs con duraciï¿½n por turnos
+- Evasiï¿½n y crï¿½ticos basados en agilidad
+- Daï¿½o elemental (fuego, veneno, hielo)
 - Fuga con probabilidad modificada por AGI
 
 ## 2. Flujo de Combate
 
 ```
 +-------------+     +-------------+     +-------------+
-¦   INICIO    ¦----?¦  JUGADOR    ¦----?¦   ENEMIGO   ¦
-¦  startCombat¦     ¦   TURNO     ¦     ¦   TURNO     ¦
+ï¿½   INICIO    ï¿½----?ï¿½  JUGADOR    ï¿½----?ï¿½   ENEMIGO   ï¿½
+ï¿½  startCombatï¿½     ï¿½   TURNO     ï¿½     ï¿½   TURNO     ï¿½
 +-------------+     +-------------+     +-------------+
-       ?                                    ¦
+       ?                                    ï¿½
        +------------------------------------+
                     (loop hasta victoria/derrota/fuga)
 ```
@@ -494,26 +494,26 @@ const COMBAT_STATES = {
   IDLE: 'idle',           // Fuera de combate
   PLAYER_TURN: 'player',  // Esperando input del jugador
   ENEMY_TURN: 'enemy',    // Ejecutando IA del enemigo
-  RESOLVING: 'resolving', // Animación/efecto en progreso
+  RESOLVING: 'resolving', // Animaciï¿½n/efecto en progreso
   ENDED: 'ended'          // Combate terminado
 };
 ```
 
-## 3. Fórmulas de Daño
+## 3. Fï¿½rmulas de Daï¿½o
 
-### 3.1 Daño Físico del Jugador
+### 3.1 Daï¿½o Fï¿½sico del Jugador
 ```
 damage = max(1, floor((attack * atkMult * variance * critMult) - enemyDefense))
 
 Donde:
 - attack = derived.attack (base + equipo + STR)
 - atkMult = 1.3 si warcry activo, 1.0 base
-- variance = random(0.9, 1.1)  // ±10%
-- critMult = 1.75 si crítico, 1.0 base
+- variance = random(0.9, 1.1)  // ï¿½10%
+- critMult = 1.75 si crï¿½tico, 1.0 base
 - critChance = 0.10 + (AGI * 0.005) + (rogue ? 0.10 : 0)
 ```
 
-### 3.2 Daño Mágico del Jugador
+### 3.2 Daï¿½o Mï¿½gico del Jugador
 ```
 damage = max(1, floor(magicAttack * mult * variance))
 
@@ -523,7 +523,7 @@ Donde:
 - cost = 7 MP si mage nivel 10+, 10 MP base
 ```
 
-### 3.3 Daño del Enemigo
+### 3.3 Daï¿½o del Enemigo
 ```
 damage = max(1, floor((enemyAttack * frozenMult * variance * defenseMult * shieldMult) - playerDefense))
 
@@ -531,36 +531,36 @@ Donde:
 - frozenMult = 0.75 si enemigo congelado, 1.0 base
 - defenseMult = 0.5 si defend_stance activo, 1.0 base
 - shieldMult = 0.6 si arcane_shield activo, 1.0 base
-- variance = random(0.85, 1.15)  // ±15%
+- variance = random(0.85, 1.15)  // ï¿½15%
 ```
 
-### 3.4 Evasión
+### 3.4 Evasiï¿½n
 ```
 evasionChance = (AGI * 0.01) + (rogue ? 0.10 : 0) + (rogue nivel 5+ ? 0.25 : 0)
-// Cap implícito: ~50% máximo para rogue nivel 20
+// Cap implï¿½cito: ~50% mï¿½ximo para rogue nivel 20
 ```
 
 ## 4. Sistema de Buffs/Debuffs
 
 ### 4.1 Buffs del Jugador (activeBuffs)
-| Buff | Efecto | Duración | Origen |
+| Buff | Efecto | Duraciï¿½n | Origen |
 |------|--------|----------|--------|
 | `warcry` | ATK +30% | 3-4 turnos | Skill Warrior |
-| `defend_stance` | Daño recibido ×0.5 | 1 turno | Skill Warrior |
-| `arcane_shield` | Absorbe 40% daño | 1 golpe | Skill Mage |
+| `defend_stance` | Daï¿½o recibido ï¿½0.5 | 1 turno | Skill Warrior |
+| `arcane_shield` | Absorbe 40% daï¿½o | 1 golpe | Skill Mage |
 
 ### 4.2 Debuffs del Enemigo (activeDebuffs)
-| Debuff | Efecto | Duración | Origen |
+| Debuff | Efecto | Duraciï¿½n | Origen |
 |--------|--------|----------|--------|
-| `poison` | Daño/turno | 2-4 turnos | Skill Rogue, enemigos |
-| `burn` | Daño/turno | 2-3 turnos | Skill Mage, enemigos de fuego |
-| `frozen` | ATK enemigo ×0.75 | 2 turnos | Skill Mage |
+| `poison` | Daï¿½o/turno | 2-4 turnos | Skill Rogue, enemigos |
+| `burn` | Daï¿½o/turno | 2-3 turnos | Skill Mage, enemigos de fuego |
+| `frozen` | ATK enemigo ï¿½0.75 | 2 turnos | Skill Mage |
 
 ### 4.3 Debuffs del Jugador (playerDebuffs)
-| Debuff | Efecto | Duración | Aplicado por |
+| Debuff | Efecto | Duraciï¿½n | Aplicado por |
 |--------|--------|----------|--------------|
-| `poison` | 3-15 daño/turno | 2-3 turnos | Slime, Funged Beast, etc. |
-| `burn` | 5-15 daño/turno | 2-3 turnos | Goblin Shaman, Warlock, etc. |
+| `poison` | 3-15 daï¿½o/turno | 2-3 turnos | Slime, Funged Beast, etc. |
+| `burn` | 5-15 daï¿½o/turno | 2-3 turnos | Goblin Shaman, Warlock, etc. |
 | `stun` | Pierde 1 turno | 1 turno | Vampire, Medusa |
 
 ### 4.4 Tick de Efectos
@@ -568,7 +568,7 @@ evasionChance = (AGI * 0.01) + (rogue ? 0.10 : 0) + (rogue nivel 5+ ? 0.25 : 0)
 function tickBuffs() {
   // Decrementar contadores
   // Eliminar si turns <= 0
-  // Aplicar daño DOT antes del turno del enemigo
+  // Aplicar daï¿½o DOT antes del turno del enemigo
 }
 ```
 
@@ -577,36 +577,36 @@ function tickBuffs() {
 ### 5.1 Warrior (??)
 | ID | Nombre | MP | Nivel | Efecto |
 |----|--------|-----|-------|--------|
-| `bash` | Golpe Brutal | 8 | 1 | Daño ×1.4, ignora 30% DEF |
-| `defend` | Postura Defensiva | 5 | 3 | Cura 15% HP, mitiga 50% daño |
+| `bash` | Golpe Brutal | 8 | 1 | Daï¿½o ï¿½1.4, ignora 30% DEF |
+| `defend` | Postura Defensiva | 5 | 3 | Cura 15% HP, mitiga 50% daï¿½o |
 | `warcry` | Grito de Guerra | 12 | 6 | ATK +30% por 3 turnos |
 | `whirlwind` | Torbellino | 20 | 10 | 2-3 ataques aleatorios |
-| `berserker_rage` | Frenesí Bersérker | 15 | 15 | Pierde 15% HP, daño ×3 |
+| `berserker_rage` | Frenesï¿½ Bersï¿½rker | 15 | 15 | Pierde 15% HP, daï¿½o ï¿½3 |
 | `avatar_of_war` | Avatar de la Guerra | 30 | 20 | Cura 30% HP + warcry 4 turnos |
 
 ### 5.2 Mage (??)
 | ID | Nombre | MP | Nivel | Efecto |
 |----|--------|-----|-------|--------|
-| `fireball` | Bola de Fuego | 12 | 1 | Daño + quemadura 2 turnos |
-| `icebolt` | Rayo de Hielo | 10 | 3 | Daño + congelación (ATK -25%) |
-| `arcane_shield` | Escudo Arcano | 15 | 6 | Absorbe 40% próximo daño |
-| `meteor` | Meteoro | 35 | 10 | Daño ×3, ignora DEF |
+| `fireball` | Bola de Fuego | 12 | 1 | Daï¿½o + quemadura 2 turnos |
+| `icebolt` | Rayo de Hielo | 10 | 3 | Daï¿½o + congelaciï¿½n (ATK -25%) |
+| `arcane_shield` | Escudo Arcano | 15 | 6 | Absorbe 40% prï¿½ximo daï¿½o |
+| `meteor` | Meteoro | 35 | 10 | Daï¿½o ï¿½3, ignora DEF |
 | `arcane_storm` | Tormenta Arcana | 28 | 15 | 3 rayos, ignora DEF |
-| `singularity` | Singularidad | 50 | 20 | Daño ×4.5 + drena 25% HP enemigo |
+| `singularity` | Singularidad | 50 | 20 | Daï¿½o ï¿½4.5 + drena 25% HP enemigo |
 
 ### 5.3 Rogue (???)
 | ID | Nombre | MP | Nivel | Efecto |
 |----|--------|-----|-------|--------|
-| `backstab` | Golpe Furtivo | 8 | 1 | Crítico garantizado ×2.5 |
+| `backstab` | Golpe Furtivo | 8 | 1 | Crï¿½tico garantizado ï¿½2.5 |
 | `poison` | Veneno | 6 | 3 | Veneno 4 turnos |
 | `smoke_bomb` | Bomba de Humo | 10 | 6 | 70% escape inmediato |
-| `double_strike` | Golpe Doble | 15 | 10 | 2 ataques con chance de crítico |
-| `shadow_strike` | Golpe de Sombra | 18 | 15 | Crítico ×4, ignora DEF |
-| `death_dance` | Danza de la Muerte | 28 | 20 | 5 ataques con 40% crítico |
+| `double_strike` | Golpe Doble | 15 | 10 | 2 ataques con chance de crï¿½tico |
+| `shadow_strike` | Golpe de Sombra | 18 | 15 | Crï¿½tico ï¿½4, ignora DEF |
+| `death_dance` | Danza de la Muerte | 28 | 20 | 5 ataques con 40% crï¿½tico |
 
 ## 6. Escala de Enemigos
 
-### 6.1 Fórmula de Escalado
+### 6.1 Fï¿½rmula de Escalado
 ```javascript
 // Enemigo normal
 lvlMult = 1 + (playerLevel - 1) * 0.05
@@ -626,15 +626,15 @@ Ver `enemies.js` para datos completos. Estructura:
   type: string,           // Nombre visible
   levelRequirement: number,
   hp: number,             // Vida base
-  maxHp: number,          // Vida máxima (redundante con hp)
-  attack: number,         // ATK físico
+  maxHp: number,          // Vida mï¿½xima (redundante con hp)
+  attack: number,         // ATK fï¿½sico
   defense: number,
-  magicAttack: number,    // ATK mágico (opcional)
+  magicAttack: number,    // ATK mï¿½gico (opcional)
   experience: number,
   gold: number,
   drops: string[],        // IDs de items
   img: string,            // Ruta de imagen
-  isBoss: boolean         // Si es jefe de área
+  isBoss: boolean         // Si es jefe de ï¿½rea
 }
 ```
 
@@ -644,32 +644,32 @@ Ver `enemies.js` para datos completos. Estructura:
 ```javascript
 function enemyTurn() {
   // 1. Aplicar DOTs al enemigo (veneno/quemadura)
-  // 2. Reducir duración de debuffs
-  // 3. Decidir ataque: 30% mágico si tiene magicAttack
-  // 4. Aplicar daño al jugador
+  // 2. Reducir duraciï¿½n de debuffs
+  // 3. Decidir ataque: 30% mï¿½gico si tiene magicAttack
+  // 4. Aplicar daï¿½o al jugador
   // 5. Chance de aplicar status effect (definido en ENEMY_STATUS_EFFECTS)
 }
 ```
 
 ### 7.2 Tabla de Status Effects de Enemigos
 Ver `ENEMY_STATUS_EFFECTS` en `combat.js`:
-- `slime`: 30% poison, 3 daño, 2 turnos
+- `slime`: 30% poison, 3 daï¿½o, 2 turnos
 - `vampire`: 25% stun, 1 turno
-- `dragon_king`: 45% burn, 15 daño, 3 turnos
+- `dragon_king`: 45% burn, 15 daï¿½o, 3 turnos
 
 ## 8. Interfaz de Combate
 
 ### 8.1 Estados Visuales
-- **Fuera de combate**: Panel de navegación visible, combate oculto
-- **En combate**: Panel de combate visible, navegación oculta
-- **Sincronización**: Desktop (`combat-menu`/`navigation-menu`) y Mobile (`mob-combat`/`mob-nav`)
+- **Fuera de combate**: Panel de navegaciï¿½n visible, combate oculto
+- **En combate**: Panel de combate visible, navegaciï¿½n oculta
+- **Sincronizaciï¿½n**: Desktop (`combat-menu`/`navigation-menu`) y Mobile (`mob-combat`/`mob-nav`)
 
 ### 8.2 Atajos de Teclado
-| Tecla | Acción | Condición |
+| Tecla | Acciï¿½n | Condiciï¿½n |
 |-------|--------|-----------|
 | `1` | Atacar | En combate |
 | `2` | Magia | En combate |
-| `3` | Ítems | En combate (abre inventario) |
+| `3` | ï¿½tems | En combate (abre inventario) |
 | `4` | Huir | En combate |
 
 ### 8.3 Accesibilidad
@@ -679,11 +679,11 @@ Ver `ENEMY_STATUS_EFFECTS` en `combat.js`:
 
 ## 9. Balance y Curva de Dificultad
 
-### 9.1 Progresión Esperada
+### 9.1 Progresiï¿½n Esperada
 | Nivel | Zona Sugerida | Enemigos | Boss |
 |-------|--------------|----------|------|
-| 1-3 | Forest, Garden | Slime, Goblin, Wolf | — |
-| 4-6 | Cave, Swamp | Cave Bat, Zombie, Orc | — |
+| 1-3 | Forest, Garden | Slime, Goblin, Wolf | ï¿½ |
+| 4-6 | Cave, Swamp | Cave Bat, Zombie, Orc | ï¿½ |
 | 7-9 | Mountain, Beach | Wyvern, Pirate, Giant | Forest Titan |
 | 10-12 | Ruins, Dungeon | Stone Golem, Warlock | Cave Devourer |
 | 13-15 | Volcano, Jungle | Inferno Elemental, Diablo | Inferno Dragon |
@@ -692,32 +692,32 @@ Ver `ENEMY_STATUS_EFFECTS` en `combat.js`:
 ### 9.2 Problemas de Balance Actuales
 1. **Excalibur**: Requiere 10 de cada material (imposible sin grind excesivo)
 2. **Dragon King**: 3000 HP vs ~200 HP jugador nivel 15 (desequilibrado)
-3. **Mage nivel 20**: Daño ×2 hace que el juego sea trivial
-4. **Rogue evasión**: 50% evasión a nivel 20 rompe el combate
+3. **Mage nivel 20**: Daï¿½o ï¿½2 hace que el juego sea trivial
+4. **Rogue evasiï¿½n**: 50% evasiï¿½n a nivel 20 rompe el combate
 
 ## 10. Mejoras Propuestas
 
-### 10.1 Mecánicas
+### 10.1 Mecï¿½nicas
 - [ ] **Sistema de combos**: Bonus por alternar tipos de ataque
 - [ ] **Contrataques**: Chance de contraatacar al bloquear
 - [ ] **Morale**: El enemigo puede huir si HP < 20%
-- [ ] **Cover system**: Posicionamiento táctico (front/back row)
+- [ ] **Cover system**: Posicionamiento tï¿½ctico (front/back row)
 
 ### 10.2 UX
 - [ ] **Timeline visual**: Mostrar orden de turnos
-- [ ] **Damage numbers**: Animación de daño flotante (descomentar)
+- [ ] **Damage numbers**: Animaciï¿½n de daï¿½o flotante (descomentar)
 - [ ] **Screen shake**: Feedback de impacto (descomentar)
 - [ ] **Battle log**: Historial de acciones del combate actual
 
-### 10.3 Técnicas
-- [ ] **State machine formal**: Reemplar flags booleanos con máquina de estados
+### 10.3 Tï¿½cnicas
+- [ ] **State machine formal**: Reemplar flags booleanos con mï¿½quina de estados
 - [ ] **Action queue**: Cola de acciones para evitar race conditions
-- [ ] **Combat snapshot**: Guardar estado del combate para reconexión
+- [ ] **Combat snapshot**: Guardar estado del combate para reconexiï¿½n
 
 ===== spec\SPEC-003-Progresion-Economia.md =====
-# SPEC-003: Sistema de Progresión y Economía
+# SPEC-003: Sistema de Progresiï¿½n y Economï¿½a
 
-## 1. Progresión del Jugador
+## 1. Progresiï¿½n del Jugador
 
 ### 1.1 Curva de Experiencia
 ```javascript
@@ -739,14 +739,14 @@ nextLevelXp = floor(previousXp * 1.5)
 
 ### 1.3 Bonificaciones de Clase por Nivel
 Ver `CLASS_DEFINITIONS` en `classes.js`. Desbloqueos cada 5 niveles:
-- **Nivel 5**: Bonificación pasiva permanente
-- **Nivel 10**: Mecánica nueva (coste reducido, ignore DEF)
-- **Nivel 15**: Proc chance (doble golpe, evasión aumentada)
-- **Nivel 20**: Multiplicador de daño ×2 o evasión 50%
+- **Nivel 5**: Bonificaciï¿½n pasiva permanente
+- **Nivel 10**: Mecï¿½nica nueva (coste reducido, ignore DEF)
+- **Nivel 15**: Proc chance (doble golpe, evasiï¿½n aumentada)
+- **Nivel 20**: Multiplicador de daï¿½o ï¿½2 o evasiï¿½n 50%
 
 ## 2. Sistema de Atributos
 
-### 2.1 Derivación de Stats
+### 2.1 Derivaciï¿½n de Stats
 ```javascript
 attack      = strength + equipment.attack + buffs
  defense     = floor(agility / 2) + equipment.defense + buffs
@@ -756,18 +756,18 @@ maxMp       = 20 + (intelligence * 4) + classBonusMp
 ```
 
 ### 2.2 Eficiencia de Atributos
-| Stat | Efecto por punto | Clase óptima |
+| Stat | Efecto por punto | Clase ï¿½ptima |
 |------|-----------------|--------------|
 | STR | +1 ATK, +2 HP | Warrior |
-| AGI | +0.5 DEF, +0.5% evasión, +0.5% crit | Rogue |
+| AGI | +0.5 DEF, +0.5% evasiï¿½n, +0.5% crit | Rogue |
 | INT | +1 MAG, +4 MP, +0.5% magic pen | Mage |
 
 ### 2.3 Soft Caps y Diminishing Returns
-- **Evasión**: Cap suave al 50% (rogue nivel 20 alcanza ~55%)
-- **Crítico**: Cap suave al 40% (base 10% + AGI*0.5% + rogue 10%)
+- **Evasiï¿½n**: Cap suave al 50% (rogue nivel 20 alcanza ~55%)
+- **Crï¿½tico**: Cap suave al 40% (base 10% + AGI*0.5% + rogue 10%)
 - **Magic Pen**: No implementado actualmente
 
-## 3. Economía
+## 3. Economï¿½a
 
 ### 3.1 Fuentes de Oro
 | Fuente | Cantidad | Frecuencia |
@@ -776,44 +776,44 @@ maxMp       = 20 + (intelligence * 4) + classBonusMp
 | Jefes | 100-800g | Por derrota |
 | Venta de items | 50% precio | Bajo demanda |
 | Misiones | 30-200g | Por entrega |
-| Logros | — | One-time |
+| Logros | ï¿½ | One-time |
 
 ### 3.2 Sumideros de Oro
-| Uso | Precio típico |
+| Uso | Precio tï¿½pico |
 |-----|--------------|
-| Poción HP | 10g |
-| Poción MP | 12g |
-| Arma básica | 30-65g |
+| Pociï¿½n HP | 10g |
+| Pociï¿½n MP | 12g |
+| Arma bï¿½sica | 30-65g |
 | Armadura | 40-300g |
 | Recetas craft | Materiales |
 
-### 3.3 Inflación Control
+### 3.3 Inflaciï¿½n Control
 - **Problema**: Jugador nivel 10+ acumula miles de oro sin gasto
-- **Solución propuesta**: 
-  - Reparación de equipo (durabilidad)
+- **Soluciï¿½n propuesta**: 
+  - Reparaciï¿½n de equipo (durabilidad)
   - Servicios de entrenamiento (pagar por XP)
   - Apuestas/Gambling en taverna
-  - Banco con interés negativo (storage fee)
+  - Banco con interï¿½s negativo (storage fee)
 
 ## 4. Sistema de Crafting
 
-### 4.1 Categorías
+### 4.1 Categorï¿½as
 | Tab | Tipo | Recetas | Focus |
 |-----|------|---------|-------|
 | Forja | Armas, Armaduras, Accesorios | 25+ | STR/DEF |
-| Alquimia | Pociones, Elixires, Antídotos | 8+ | Restauración |
+| Alquimia | Pociones, Elixires, Antï¿½dotos | 8+ | Restauraciï¿½n |
 | Arcano | Anillos, Emblemas, Encantamientos | 12+ | MAG/INT |
 
-### 4.2 Fórmula de Éxito
+### 4.2 Fï¿½rmula de ï¿½xito
 ```javascript
-// Actual: 100% éxito si tienes materiales
+// Actual: 100% ï¿½xito si tienes materiales
 // Propuesto:
 successChance = baseChance + (playerLevel - recipeLevel) * 0.05
 qualityBonus = random(1, 3) si successChance > 1.2
 ```
 
 ### 4.3 Materiales por Bioma
-Ver `lootTables.js` para distribución completa. Key materials:
+Ver `lootTables.js` para distribuciï¿½n completa. Key materials:
 - **Forest**: herb, wolf_pelt, fungus_core
 - **Cave**: iron_ore, bat_wing, crystal_shard
 - **Mountain**: ice_crystal, wyvern_scale, giant_bone
@@ -823,13 +823,13 @@ Ver `lootTables.js` para distribución completa. Key materials:
 ## 5. Tiendas
 
 ### 5.1 Tipos de Tienda
-| ID | Ubicación | Especialización | Nivel |
+| ID | Ubicaciï¿½n | Especializaciï¿½n | Nivel |
 |----|-----------|----------------|-------|
 | `shop` | Town | General | 1+ |
 | `castle_shop` | Castle | Equipo avanzado | 5+ |
-| `port` | Port | Marítimo/exploración | 7+ |
+| `port` | Port | Marï¿½timo/exploraciï¿½n | 7+ |
 
-### 5.2 Stock Dinámico
+### 5.2 Stock Dinï¿½mico
 ```javascript
 // Actual: Inventario fijo
 // Propuesto:
@@ -840,7 +840,7 @@ restockTimer = 10 minutos real o 1 descanso
 ## 6. Recompensas de Misiones
 
 ### 6.1 Tabla de Recompensas
-| Misión | XP | Oro | Item especial |
+| Misiï¿½n | XP | Oro | Item especial |
 |--------|-----|-----|--------------|
 | explore_forest | 50 | 30 | world_map |
 | collect_crystal | 120 | 80 | arcane_key |
@@ -849,7 +849,7 @@ restockTimer = 10 minutos real o 1 descanso
 | collect_ice_crystal | 150 | 100 | mountain_pass |
 | defeat_dark_lord | 300 | 200 | dragon_key |
 
-### 6.2 Progresión de Misiones (Questline)
+### 6.2 Progresiï¿½n de Misiones (Questline)
 ```
 Elara (Town) ? Valdris (Tower) ? Brennan (Port) ? Eryndel (Garden) ? Theron (Mountain) ? Pyrax (Volcano)
      ?              ?                ?                  ?                  ?                ?
@@ -860,13 +860,13 @@ Elara (Town) ? Valdris (Tower) ? Brennan (Port) ? Eryndel (Garden) ? Theron (Mou
 
 ## 7. Sistema de Logros
 
-### 7.1 Categorías
-| Categoría | Cantidad | Ejemplos |
+### 7.1 Categorï¿½as
+| Categorï¿½a | Cantidad | Ejemplos |
 |-----------|----------|----------|
 | Combate | 5 | first_kill, hunter_50, veteran_200, first_boss, boss_slayer |
-| Exploración | 4 | explorer_10, explorer_30, cartographer |
-| Progresión | 3 | level_5, level_15, level_25 |
-| Economía | 1 | rich (500g) |
+| Exploraciï¿½n | 4 | explorer_10, explorer_30, cartographer |
+| Progresiï¿½n | 3 | level_5, level_15, level_25 |
+| Economï¿½a | 1 | rich (500g) |
 | Misiones | 2 | first_quest, all_quests |
 | Bestiario | 2 | bestiary_5, bestiary_all |
 
@@ -876,22 +876,22 @@ Elara (Town) ? Valdris (Tower) ? Brennan (Port) ? Eryndel (Garden) ? Theron (Mou
 | Common | Gris | 5 |
 | Uncommon | Verde | 5 |
 | Rare | Azul | 3 |
-| Epic | Púrpura | 2 |
+| Epic | Pï¿½rpura | 2 |
 | Legendary | Dorado | 1 |
 
 ## 8. Problemas de Balance
 
 ### 8.1 Identificados
 1. **Excalibur**: Requiere 10 de cada material (grind excesivo)
-2. **Economía estancada**: Sin gastos recurrentes, oro pierde valor
-3. **Progresión lineal**: Sin ramificaciones de build
+2. **Economï¿½a estancada**: Sin gastos recurrentes, oro pierde valor
+3. **Progresiï¿½n lineal**: Sin ramificaciones de build
 4. **Respec ausente**: No se pueden redistribuir puntos
 
 ### 8.2 Soluciones Propuestas
-- [ ] **Transmutación**: Convertir materiales comunes en raros (ratio 5:1)
+- [ ] **Transmutaciï¿½n**: Convertir materiales comunes en raros (ratio 5:1)
 - [ ] **Enchanting**: Mejorar equipo existente con materiales
-- [ ] **Durabilidad**: Equipo se desgasta, requiere reparación
-- [ ] **Respec**: Poción de olvido (costosa) para redistribuir stats
+- [ ] **Durabilidad**: Equipo se desgasta, requiere reparaciï¿½n
+- [ ] **Respec**: Pociï¿½n de olvido (costosa) para redistribuir stats
 - [ ] **Prestige**: Reset a nivel 1 con bonus permanente al completar juego
 
 ## 9. Persistencia
@@ -916,13 +916,13 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 ### 9.3 Auto-save Triggers
 - Subir de nivel
 - Derrotar jefe
-- Completar misión
-- Manual (botón Save)
+- Completar misiï¿½n
+- Manual (botï¿½n Save)
 
 ===== spec\SPEC-004-UX-UI-Responsive.md =====
 # SPEC-004: UX/UI y Responsive Design (Material Design 3)
 
-## 1. Sistema de Diseño
+## 1. Sistema de Diseï¿½o
 
 ### 1.1 Tokens MD3 Implementados
 ```css
@@ -944,7 +944,7 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
   --md-outline: #938f99;
   --md-outline-variant: #49454f;
 
-  /* Semánticos de juego */
+  /* Semï¿½nticos de juego */
   --c-heal: #4ade80;
   --c-damage: #ef4444;
   --c-magic: #818cf8;
@@ -955,11 +955,11 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 }
 ```
 
-### 1.2 Tipografía
-| Uso | Fuente | Tamaño | Peso |
+### 1.2 Tipografï¿½a
+| Uso | Fuente | Tamaï¿½o | Peso |
 |-----|--------|--------|------|
-| Títulos | Cinzel Decorative | 1.5-2rem | 700 |
-| Subtítulos | Cinzel | 1.1-1.3rem | 600 |
+| Tï¿½tulos | Cinzel Decorative | 1.5-2rem | 700 |
+| Subtï¿½tulos | Cinzel | 1.1-1.3rem | 600 |
 | Body | EB Garamond | 0.9-1rem | 400/500 |
 | UI/Stats | Press Start 2P | 0.75-0.85rem | 400 |
 | Pixel art | Press Start 2P | Variable | 400 |
@@ -969,20 +969,20 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 ### 2.1 Grid System (Desktop > 960px)
 ```
 +-------------------------------------------------------------+
-¦                      TOPBAR (header)                         ¦
-¦  [Brand] [Nav Tabs]                    [Lang] [Theme] [Menu]¦
-+-------------------------------------------------------------¦
-¦          ¦                              ¦                   ¦
-¦  LEFT    ¦         CENTER               ¦     RIGHT         ¦
-¦  SIDEBAR ¦         SCREEN               ¦     SIDEBAR       ¦
-¦          ¦                              ¦                   ¦
-¦  Portrait¦  Location Hero               ¦  Quick Actions    ¦
-¦  Vitals  ¦  Enemy Panel                 ¦  Combat/Nav       ¦
-¦  Stats   ¦  Buff Bar                    ¦  Local Minimap    ¦
-¦          ¦  Story Log (scroll inverted) ¦                   ¦
-¦          ¦                              ¦                   ¦
-+-------------------------------------------------------------¦
-¦              MOBILE BOTTOM NAV (=960px)                      ¦
+ï¿½                      TOPBAR (header)                         ï¿½
+ï¿½  [Brand] [Nav Tabs]                    [Lang] [Theme] [Menu]ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½          ï¿½                              ï¿½                   ï¿½
+ï¿½  LEFT    ï¿½         CENTER               ï¿½     RIGHT         ï¿½
+ï¿½  SIDEBAR ï¿½         SCREEN               ï¿½     SIDEBAR       ï¿½
+ï¿½          ï¿½                              ï¿½                   ï¿½
+ï¿½  Portraitï¿½  Location Hero               ï¿½  Quick Actions    ï¿½
+ï¿½  Vitals  ï¿½  Enemy Panel                 ï¿½  Combat/Nav       ï¿½
+ï¿½  Stats   ï¿½  Buff Bar                    ï¿½  Local Minimap    ï¿½
+ï¿½          ï¿½  Story Log (scroll inverted) ï¿½                   ï¿½
+ï¿½          ï¿½                              ï¿½                   ï¿½
++-------------------------------------------------------------ï¿½
+ï¿½              MOBILE BOTTOM NAV (=960px)                      ï¿½
 +-------------------------------------------------------------+
 ```
 
@@ -1000,12 +1000,12 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 ### 3.1 Modales (Modal System)
 | Modal | ID | Contenido | Max Width |
 |-------|-----|-----------|-----------|
-| Panel genérico | `panelModal` | Atributos/Equip/Spellbook/Journal/Bestiary/Map/Craft | 640px |
+| Panel genï¿½rico | `panelModal` | Atributos/Equip/Spellbook/Journal/Bestiary/Map/Craft | 640px |
 | Inventario | `inventoryModal` | Grid de items + detalle | 720px |
-| Stats | `statsModal` | Distribución de puntos | 440px |
+| Stats | `statsModal` | Distribuciï¿½n de puntos | 440px |
 | Tienda | `shopModal` | Compra/Venta | 600px |
-| Menú principal | `mainMenuModal` | Save/Load/Audio | 480px |
-| NPC | `npcModal` | Diálogo + Quest | 520px |
+| Menï¿½ principal | `mainMenuModal` | Save/Load/Audio | 480px |
+| NPC | `npcModal` | Diï¿½logo + Quest | 520px |
 | Quest Log | `questLogModal` | Tabs de misiones | 560px |
 | Game Over | `gameOverModal` | Restart | 380px |
 | Ending | `endingModal` | Stats finales | 440px |
@@ -1014,13 +1014,13 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 ### 3.2 Mobile Sheets
 ```
 +-------------------------+
-¦    ??? (drag handle)    ¦
-¦  [Close]  Título        ¦
-¦  +-----------------+    ¦
-¦  ¦ Grid de botones ¦    ¦
-¦  ¦ (movimientos/   ¦    ¦
-¦  ¦  paneles)        ¦    ¦
-¦  +-----------------+    ¦
+ï¿½    ??? (drag handle)    ï¿½
+ï¿½  [Close]  Tï¿½tulo        ï¿½
+ï¿½  +-----------------+    ï¿½
+ï¿½  ï¿½ Grid de botones ï¿½    ï¿½
+ï¿½  ï¿½ (movimientos/   ï¿½    ï¿½
+ï¿½  ï¿½  paneles)        ï¿½    ï¿½
+ï¿½  +-----------------+    ï¿½
 +-------------------------+
 ```
 - **Trigger**: Swipe up desde bottom nav
@@ -1045,17 +1045,17 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 </div>
 ```
 
-## 4. Sistema de Navegación
+## 4. Sistema de Navegaciï¿½n
 
 ### 4.1 Desktop
 - **Topbar tabs**: Attributes, Equipment, Spellbook, Journal, Bestiary, Map, Achievements, Crafting
 - **Right sidebar**: Quick Actions + Combat/Nav toggle + Minimap
-- **Keyboard**: WASD movimiento, 1234 combate, ESC cerrar modal, M menú
+- **Keyboard**: WASD movimiento, 1234 combate, ESC cerrar modal, M menï¿½
 
 ### 4.2 Mobile
 - **Bottom nav**: 
-  - Modo combate: Atacar, Magia, Ítem, Huir
-  - Modo navegación: Direcciones + Menús
+  - Modo combate: Atacar, Magia, ï¿½tem, Huir
+  - Modo navegaciï¿½n: Direcciones + Menï¿½s
 - **Swipe gestures**: 
   - Swipe up: Abrir mobile sheet
   - Swipe left/right: Cambiar tab en modales
@@ -1078,7 +1078,7 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 ## 5. Feedback Visual
 
 ### 5.1 Estados de Carga
-| Estado | Indicador | Ubicación |
+| Estado | Indicador | Ubicaciï¿½n |
 |--------|-----------|-----------|
 | `isProcessingMove` | Spinner sutil | Centro de pantalla |
 | Guardando | Toast "?? Partida guardada" | Bottom-right |
@@ -1089,18 +1089,18 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 // Tipos de toast
 showToast(msg)           // Info general
 showAchievementToast(ach) // Logro desbloqueado (con icono y rareza)
-showFloatingText(text, x, y, color, size, anim) // Daño/curación flotante
+showFloatingText(text, x, y, color, size, anim) // Daï¿½o/curaciï¿½n flotante
 ```
 
 ### 5.3 Efectos Comentados (Pendientes de Activar)
 ```javascript
-// En combat.js, múltiples efectos están comentados:
-// - showFloatingText(): Números flotantes de daño
-// - shakeScreen(): Vibración de pantalla al impacto
-// - Animaciones de crítico (scale + color)
+// En combat.js, mï¿½ltiples efectos estï¿½n comentados:
+// - showFloatingText(): Nï¿½meros flotantes de daï¿½o
+// - shakeScreen(): Vibraciï¿½n de pantalla al impacto
+// - Animaciones de crï¿½tico (scale + color)
 ```
 
-## 6. Internacionalización (i18n)
+## 6. Internacionalizaciï¿½n (i18n)
 
 ### 6.1 Arquitectura
 ```javascript
@@ -1112,21 +1112,21 @@ const dictionaries = {
 
 // Funciones
 setLocale(locale)      // Cambia idioma y persiste en localStorage
-t(key)                 // Traducción simple
-formatText(key, vars)  // Traducción con interpolación {{var}}
+t(key)                 // Traducciï¿½n simple
+formatText(key, vars)  // Traducciï¿½n con interpolaciï¿½n {{var}}
 localizeText(source)   // Soporte para objetos {en, es}
 translatePage(root)    // Traduce DOM por data-i18n
 ```
 
-### 6.2 Strings Hardcodeados (Deuda Técnica)
-- `journal.js`: Textos en español sin traducción
-- `bestiary.js`: "Criaturas descubiertas", lore en español
+### 6.2 Strings Hardcodeados (Deuda Tï¿½cnica)
+- `journal.js`: Textos en espaï¿½ol sin traducciï¿½n
+- `bestiary.js`: "Criaturas descubiertas", lore en espaï¿½ol
 - `crafting.js`: "Materiales necesarios", "Fabricar"
-- `ENEMY_LORE` en `bestiary.js`: Todo en español
+- `ENEMY_LORE` en `bestiary.js`: Todo en espaï¿½ol
 
 ## 7. Temas
 
-### 7.1 Implementación Actual
+### 7.1 Implementaciï¿½n Actual
 ```javascript
 // Toggle dark/light
 const stored = localStorage.getItem('pqe-theme') || 'dark';
@@ -1143,20 +1143,20 @@ document.documentElement.dataset.theme = stored;
 
 ## 8. Problemas UX/UI Identificados
 
-### 8.1 Críticos
+### 8.1 Crï¿½ticos
 1. **Scroll invertido**: Confuso para usuarios nuevos (nuevos mensajes arriba)
 2. **Modales apilados**: Sin z-index management, pueden superponerse mal
 3. **Falta de tutorial**: No hay onboarding para nuevos jugadores
-4. **Tooltips ausentes**: Enemigos, buffs, y stats sin explicación hover
+4. **Tooltips ausentes**: Enemigos, buffs, y stats sin explicaciï¿½n hover
 
 ### 8.2 Mayores
-1. **Inventario**: Sin categorización ni búsqueda (300+ items)
+1. **Inventario**: Sin categorizaciï¿½n ni bï¿½squeda (300+ items)
 2. **Crafting**: Sin preview de resultado ni comparativa con equipo actual
-3. **Mapa**: Sin pathfinding ni indicación de zonas peligrosas
-4. **Diálogo NPC**: Sin historial de conversación
+3. **Mapa**: Sin pathfinding ni indicaciï¿½n de zonas peligrosas
+4. **Diï¿½logo NPC**: Sin historial de conversaciï¿½n
 
 ### 8.3 Menores
-1. **Animaciones**: CSS transitions mínimas, sin micro-interacciones
+1. **Animaciones**: CSS transitions mï¿½nimas, sin micro-interacciones
 2. **Sonido**: Sin indicador visual de volumen actual
 3. **Font loading**: FOUT potencial con Google Fonts
 4. **Focus states**: Inconsistentes en botones MD3
@@ -1167,7 +1167,7 @@ document.documentElement.dataset.theme = stored;
 - [ ] **Tutorial interactivo**: Primeros 5 minutos guiados
 - [ ] **Tooltips everywhere**: Hover/long-press en todos los elementos interactivos
 - [ ] **Quick actions**: Atajos de teclado visibles (badges en botones)
-- [ ] **Undo**: Deshacer última acción de combate (1 vez/encuentro)
+- [ ] **Undo**: Deshacer ï¿½ltima acciï¿½n de combate (1 vez/encuentro)
 
 ### 9.2 UI de Alto Impacto
 - [ ] **Character sheet redesign**: Vista unificada de stats + equipo + skills
@@ -1177,9 +1177,9 @@ document.documentElement.dataset.theme = stored;
 
 ### 9.3 Responsive Avanzado
 - [ ] **PWA**: Service worker para offline play
-- [ ] **Touch gestures**: Pinch para zoom en mapa, swipe para navegación
-- [ ] **Vibration API**: Haptic feedback en combate (móvil)
-- [ ] **Orientation**: Layout alternativo en landscape móvil
+- [ ] **Touch gestures**: Pinch para zoom en mapa, swipe para navegaciï¿½n
+- [ ] **Vibration API**: Haptic feedback en combate (mï¿½vil)
+- [ ] **Orientation**: Layout alternativo en landscape mï¿½vil
 
 ===== spec\SPEC-005-Mundo-Contenido.md =====
 # SPEC-005: Mundo y Contenido Procedural
@@ -1188,7 +1188,7 @@ document.documentElement.dataset.theme = stored;
 
 ### 1.1 Grafo de Localizaciones
 ```javascript
-// worldMap es un grafo dirigido con pesos implícitos
+// worldMap es un grafo dirigido con pesos implï¿½citos
 worldMap = {
   [locationId]: {
     id, name, description, biome,
@@ -1214,7 +1214,7 @@ const DIRECTIONS = {
 
 ## 2. Biomas
 
-### 2.1 Definición
+### 2.1 Definiciï¿½n
 ```javascript
 biomes = {
   [biomeId]: {
@@ -1223,11 +1223,11 @@ biomes = {
     description: string[],     // Array de descripciones random
     modifiers: {
       visibility: number,     // Modificador de encounterRate
-      magicBonus: number,     // Bonus a daño mágico
+      magicBonus: number,     // Bonus a daï¿½o mï¿½gico
       defenseBonus: number,   // Bonus a DEF
       poisonChance?: number,  // Chance de veneno ambiental
-      fireDamage?: number,    // Daño de fuego por turno
-      coldDamage?: number     // Daño de frío por turno
+      fireDamage?: number,    // Daï¿½o de fuego por turno
+      coldDamage?: number     // Daï¿½o de frï¿½o por turno
     }
   }
 }
@@ -1259,25 +1259,25 @@ const desc = Array.isArray(loc.description)
   : loc.description;
 ```
 
-## 3. Generación Procedural de Zonas
+## 3. Generaciï¿½n Procedural de Zonas
 
-### 3.1 Parámetros
+### 3.1 Parï¿½metros
 ```javascript
 generateZone({
   biome: "forest",      // Bioma base
   idPrefix: "forest",   // Prefijo de IDs
-  rooms: 4,             // Número de salas
+  rooms: 4,             // Nï¿½mero de salas
   level: undefined      // Nivel (default: biome.minLevel)
 });
 ```
 
 ### 3.2 Algoritmo
 1. Crear N rooms con IDs secuenciales (`forest_1`, `forest_2`, ...)
-2. Asignar bioma, descripción random, encounterRate base
+2. Asignar bioma, descripciï¿½n random, encounterRate base
 3. Seleccionar enemigos del pool del bioma filtrados por levelRequirement
 4. Conectar rooms linealmente (este-oeste por defecto)
 
-### 3.3 Conexión de Zonas
+### 3.3 Conexiï¿½n de Zonas
 ```javascript
 connectZones(world, fromId, toId, direction, reverseDirection);
 // Ejemplo:
@@ -1286,7 +1286,7 @@ connectZones(world, 'town', 'forest_1', 'north', 'south');
 
 ## 4. Sistema de Jefes por Bioma
 
-### 4.1 Definición
+### 4.1 Definiciï¿½n
 ```javascript
 biomeBosses = {
   forest: {
@@ -1298,7 +1298,7 @@ biomeBosses = {
 };
 ```
 
-### 4.2 Lógica de Aparición
+### 4.2 Lï¿½gica de Apariciï¿½n
 ```javascript
 // trySpawnBoss(biomeId)
 if (Math.random() > biome.spawnChance) return null;
@@ -1308,7 +1308,7 @@ return isBoss ? biome.boss : random(miniBosses);
 
 ### 4.3 Cooldown
 ```javascript
-const BOSS_COOLDOWN = 8;  // Mínimo 8 movimientos entre apariciones
+const BOSS_COOLDOWN = 8;  // Mï¿½nimo 8 movimientos entre apariciones
 _movesSinceLastBoss++;    // Incrementa en cada movimiento
 ```
 
@@ -1319,22 +1319,22 @@ _movesSinceLastBoss++;    // Incrementa en cada movimiento
 NPC_DATA = {
   [npcId]: {
     id, name, emoji, locationId, role, color, questId,
-    lore: string  // Descripción narrativa
+    lore: string  // Descripciï¿½n narrativa
   }
 };
 ```
 
 ### 5.2 NPCs Implementados (6)
-| ID | Nombre | Ubicación | Quest | Rol |
+| ID | Nombre | Ubicaciï¿½n | Quest | Rol |
 |----|--------|-----------|-------|-----|
 | elara | Elara la Vidente | town | explore_forest | Guardiana de Oakhaven |
 | valdris | Archimago Valdris | tower | collect_crystal | Archimago del Castillo |
-| brennan | Capitán Brennan | port | kill_pirates | Capitán de Saltwind Port |
-| eryndel | Guardiana Eryndel | garden_1 | collect_fairy_dust | Guardiana del Jardín |
+| brennan | Capitï¿½n Brennan | port | kill_pirates | Capitï¿½n de Saltwind Port |
+| eryndel | Guardiana Eryndel | garden_1 | collect_fairy_dust | Guardiana del Jardï¿½n |
 | theron | Theron el Explorador | mountain_1 | collect_ice_crystal | Explorador de Crestas |
-| pyrax | Pyrax, Guardián del Volcán | volcano_4 | defeat_dark_lord | Centinela del Volcán |
+| pyrax | Pyrax, Guardiï¿½n del Volcï¿½n | volcano_4 | defeat_dark_lord | Centinela del Volcï¿½n |
 
-### 5.3 Tipos de Misión
+### 5.3 Tipos de Misiï¿½n
 ```javascript
 QUEST_DATA = {
   [questId]: {
@@ -1378,7 +1378,7 @@ ZONE_GATES = {
 ### 6.1 Sistema
 ```javascript
 // getTravelEvent(biome) ? event object | null
-// showTravelEvent(event) ? Modal con elección
+// showTravelEvent(event) ? Modal con elecciï¿½n
 ```
 
 ### 6.2 Tipos de Eventos (Implementados)
@@ -1389,10 +1389,10 @@ ZONE_GATES = {
 
 ## 7. Contenido Actual
 
-### 7.1 Métricas
-| Categoría | Cantidad |
+### 7.1 Mï¿½tricas
+| Categorï¿½a | Cantidad |
 |-----------|----------|
-| Localizaciones (estáticas) | 20+ |
+| Localizaciones (estï¿½ticas) | 20+ |
 | Localizaciones (generadas) | Ilimitadas (procedural) |
 | Enemigos base | 45+ |
 | Jefes de bioma | 7 principales + 14 mini |
@@ -1404,13 +1404,13 @@ ZONE_GATES = {
 | Logros | 16 |
 | Entradas de journal | 9 |
 
-### 7.2 Progresión de Contenido
+### 7.2 Progresiï¿½n de Contenido
 | Horas | Contenido Desbloqueado |
 |-------|----------------------|
 | 0-1 | Town, Forest, Garden, primeros combates |
-| 1-3 | Cave, Swamp, primer jefe, crafting básico |
+| 1-3 | Cave, Swamp, primer jefe, crafting bï¿½sico |
 | 3-6 | Mountain, Beach, Ruins, misiones intermedias |
-| 6-10 | Dungeon, Jungle, Volcano, jefes de área |
+| 6-10 | Dungeon, Jungle, Volcano, jefes de ï¿½rea |
 | 10-15 | Tundra, Catacombs, Treasure Keep |
 | 15+ | Inferno, Dragon King, endgame |
 
@@ -1418,8 +1418,8 @@ ZONE_GATES = {
 
 ### 8.1 Identificados
 1. **Misiones insuficientes**: Solo 6 para ~20 horas de juego
-2. **Endgame vacío**: Tras Dragon King no hay contenido
-3. **Procedural repetitivo**: generateZone() crea rooms idénticas
+2. **Endgame vacï¿½o**: Tras Dragon King no hay contenido
+3. **Procedural repetitivo**: generateZone() crea rooms idï¿½nticas
 4. **Lore disperso**: ENEMY_LORE, JOURNAL_ENTRIES, NPC lore no conectados
 5. **Falta de branching**: Questline es completamente lineal
 
@@ -1428,8 +1428,8 @@ ZONE_GATES = {
 - [ ] **Procedural quests**: Generadas con templates
 - [ ] **Endless mode**: Dungeon infinito con dificultad escalante
 - [ ] **New Game+**: Reinicio con items/levels preservados
-- [ ] **Factions**: Sistema de reputación con NPCs
-- [ ] **Housing**: Base personalizable (decoración, storage)
-- [ ] **Pet system**: Compañeros con habilidades
+- [ ] **Factions**: Sistema de reputaciï¿½n con NPCs
+- [ ] **Housing**: Base personalizable (decoraciï¿½n, storage)
+- [ ] **Pet system**: Compaï¿½eros con habilidades
 - [ ] **Seasonal events**: Contenido temporal
 
