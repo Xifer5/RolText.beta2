@@ -20,7 +20,7 @@ import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import { consumeEchoReward } from "./echoIntro.js";
 import {
-  applyResistance, getWeaponDamageType, getResistanceLabel,
+  applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
 } from "./damageTypes.js";
 
@@ -42,6 +42,28 @@ function resistanceNote(enemyId, damageType) {
   const res = ENEMY_COMBAT_DATA[enemyId]?.resistances?.[damageType] ?? 0;
   if (!res) return "";
   return ` (${DAMAGE_TYPE_EMOJI[damageType] || ""} ${getResistanceLabel(res)})`;
+}
+
+// SPEC-0904 — recomendación táctica cuando el golpe fue resistido (≥20%).
+// Pura: decide QUÉ aconsejar; null si no procede.
+export function resistanceAdviceFor(enemyId, damageType) {
+  const res = ENEMY_COMBAT_DATA[enemyId]?.resistances;
+  if (!res || (res[damageType] ?? 0) < 20) return null;
+  const bad = DAMAGE_TYPES[damageType] || damageType;
+  const weakest = getWeakestResistance(res);
+  if (weakest && weakest.value < 0) {
+    return { key: "combatResistAdviceVuln", params: { bad, good: DAMAGE_TYPES[weakest.type] || weakest.type } };
+  }
+  return { key: "combatResistAdvice", params: { bad } };
+}
+
+// Una sola vez por combate, para no llenar el log
+function maybeResistanceAdvice(enemy, damageType) {
+  if (!enemy || enemy._resAdviceShown) return;
+  const advice = resistanceAdviceFor(enemy.id, damageType);
+  if (!advice) return;
+  enemy._resAdviceShown = true;
+  addMessage(formatText(advice.key, advice.params), "system");
 }
 
 function grantMasteryXP(damageType, amount = 5) {
@@ -212,6 +234,7 @@ async function playerAttack() {
     extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
     crit: critLabel
   }) + resistanceNote(enemy.id, weaponType), "combat");
+  maybeResistanceAdvice(enemy, weaponType);
 
   grantMasteryXP(weaponType);
 
@@ -257,6 +280,7 @@ async function playerMagic() {
   applyDamageToEnemy(dmg);
   playSound("hit");
   addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType), "combat");
+  maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
   showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em");
   shakeScreen();
@@ -293,6 +317,7 @@ async function useSkill(skillId) {
       const specBonus = spec?.bonuses?.dmgType === skillType ? (spec.bonuses.dmgBonus || 0) : 0;
       dmg = Math.max(1, Math.floor(dmg * (1 + getMasteryBonus(skillType) + specBonus)));
       dmg = applyResistance(dmg, skillType, ENEMY_COMBAT_DATA[gameState.currentEnemy?.id]?.resistances);
+      maybeResistanceAdvice(gameState.currentEnemy, skillType);
       grantMasteryXP(skillType);
     }
     applyDamageToEnemy(dmg);

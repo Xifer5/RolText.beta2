@@ -186,6 +186,15 @@ export function applyResistance(damage, damageType, resistances) {
   return Math.max(1, Math.floor(damage * (1 - res / 100)));
 }
 
+// Tipo con la resistencia más baja del mapa (las vulnerabilidades ganan); null si está vacío
+export function getWeakestResistance(resistances = {}) {
+  let best = null;
+  for (const [type, value] of Object.entries(resistances)) {
+    if (!best || value < best.value) best = { type, value };
+  }
+  return best;
+}
+
 // Devuelve etiqueta legible de la resistencia
 export function getResistanceLabel(value) {
   if (value >= 100) return "Inmune";

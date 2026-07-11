@@ -15,12 +15,21 @@ import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
+
+// SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
+export const INTENT_ADVICE_KEYS = {
+  power_attack: "advicePowerAttack",
+  magic:        "adviceMagic",
+  regen:        "adviceRegen",
+  enrage:       "adviceEnrage",
+  defend:       "adviceDefend"
+};
 import { showSpecializationModal } from "./specModal.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
 // El sistema busca en este orden:
 //   1. LOCATION_IMAGES[locationId]  → override específico de zona
-//   2. img/locations/<biome>.png    → imagen genérica del bioma
+//   2. img/locations/<biome>.webp    → imagen genérica del bioma
 // Si ninguna carga, el espacio se oculta automáticamente.
 //
 // Biomas disponibles: town, forest, dungeon, mountain, cave, swamp,
@@ -28,32 +37,32 @@ import { showSpecializationModal } from "./specModal.js";
 //
 // Para agregar un override específico descomenta y edita una línea:
 const LOCATION_IMAGES = {
-  // "tower":      "img/locations/castle_tower.png",
-  // "inferno_1":  "img/locations/dragon_throne.png",
-   "town":       "img/locations/town.jpg",
-   "shop":       "img/locations/shop1.png",
-   "tavern":      "img/locations/The Drunken Dragon.png",
-   "cellar":      "img/locations/old cellar.png",
-   "castle":     "img/locations/castle.png",
-   "tower":      "img/locations/tower.png",
-   "castle_shop": "img/locations/castle_shop.png",
-   "armory":     "img/locations/armory.png",
-   "port":       "img/locations/port.png",
-   "beach":      "img/locations/beach.png",
-   "forest":     "img/locations/forest.png",
-   "cave":       "img/locations/cave.png",
-   "swamp":      "img/locations/swamp.png",
-   "mountain":   "img/locations/mountain.png",
-   "sea":        "img/locations/sea.png",
-   "desert":     "img/locations/desert.png",
-   "dungeon":    "img/locations/dungeon.png",
-   "jungle":     "img/locations/jungle.png",
-   "tundra":     "img/locations/tundra.png",
-   "volcano":    "img/locations/volcano.png",
-   "garden":     "img/locations/garden.png",
-   "ruins":      "img/locations/ruin.png",
-   "catacomb":   "img/locations/catacomb.png",
-   "treasure_keep": "img/locations/treasure_keep.png",
+  // "tower":      "img/locations/tower.webp",
+  // "inferno_1":  "img/locations/inferno.webp",
+   "town":       "img/locations/town.webp",
+   "shop":       "img/locations/shop1.webp",
+   "tavern":      "img/locations/The Drunken Dragon.webp",
+   "cellar":      "img/locations/old cellar.webp",
+   "castle":     "img/locations/castle.webp",
+   "tower":      "img/locations/tower.webp",
+   "castle_shop": "img/locations/castleShop.webp",
+   "armory":     "img/locations/armory.webp",
+   "port":       "img/locations/port.webp",
+   "beach":      "img/locations/beach.webp",
+   "forest":     "img/locations/forest.webp",
+   "cave":       "img/locations/cave.webp",
+   "swamp":      "img/locations/swamp.webp",
+   "mountain":   "img/locations/mountain.webp",
+   "sea":        "img/locations/sea.webp",
+   "desert":     "img/locations/desert.webp",
+   "dungeon":    "img/locations/dungeon.webp",
+   "jungle":     "img/locations/jungle.webp",
+   "tundra":     "img/locations/tundra.webp",
+   "volcano":    "img/locations/volcano.webp",
+   "garden":     "img/locations/garden.webp",
+   "ruins":      "img/locations/ruin.webp",
+   "catacomb":   "img/locations/catacomb.webp",
+   "treasure_keep": "img/locations/treasure_keep.webp",
 };
 const LOCATION_IMG_PATH = "img/locations/";
 
@@ -61,14 +70,14 @@ const LOCATION_IMG_PATH = "img/locations/";
 // Coloca tus imágenes en img/ y edita las rutas aquí.
 // Si el archivo no existe, se muestra el emoji de clase como fallback.
 const CLASS_AVATARS = {
-  warrior: "img/avatar_warrior.png",
-  mage:    "img/avatar_mage.png",
-  rogue:   "img/avatar_rogue.png",
+  warrior: "img/avatar_warrior.webp",
+  mage:    "img/avatar_mage.webp",
+  rogue:   "img/avatar_rogue.webp",
 };
 
 // ── RETRATOS DE ENEMIGOS — EDITABLE ──────────────────────────────────
-// Convención: img/enemies/<enemyId>.png
-// Crea PNGs con el nombre exacto del ID del enemigo (slime.png, goblin.png…)
+// Convención: img/enemies/<enemyId>.webp
+// Crea PNGs con el nombre exacto del ID del enemigo (slime.webp, goblin.webp…)
 // Si el archivo no existe, el retrato se oculta automáticamente.
 const ENEMY_PORTRAIT_PATH = "img/enemies/";
 
@@ -370,16 +379,19 @@ export function updateUI() {
       const enemyDef = gameState.currentEnemy.defense || 0;
       // SPEC-0802: chip de intent — próxima acción telegrafiada (❓ si el jefe la oculta)
       let intentChip = "";
+      let intentAdvice = "";
       const nextAction = gameState.currentEnemy.nextAction;
       if (nextAction) {
-        const meta = gameState.currentEnemy.intentHidden
-          ? ACTION_META.unknown
-          : (ACTION_META[nextAction] || ACTION_META.attack);
+        const hidden = gameState.currentEnemy.intentHidden;
+        const meta = hidden ? ACTION_META.unknown : (ACTION_META[nextAction] || ACTION_META.attack);
         const label = t(meta.labelKey);
         intentChip =
           `<span class="enemy-intent-chip" role="img" ` +
           `aria-label="${t("intentChipAria")}: ${label}" ` +
           `data-tooltip="${t("intentChipAria")}">${meta.icon} ${label}</span>`;
+        // SPEC-0904: recomendación contextual según lo telegrafiado
+        const adviceKey = hidden ? null : INTENT_ADVICE_KEYS[nextAction];
+        if (adviceKey) intentAdvice = `<span class="enemy-intent-advice">💡 ${t(adviceKey)}</span>`;
       }
       ui["enemy-name"].innerHTML =
         badge + gameState.currentEnemy.type +
@@ -387,7 +399,8 @@ export function updateUI() {
         `<span class="enemy-stat-badge">⚔ <b>${enemyAtk}</b></span>` +
         `<span class="enemy-stat-badge">🛡 <b>${enemyDef}</b></span>` +
         intentChip +
-        `</span>`;
+        `</span>` +
+        intentAdvice;
     }
     const ePct = Math.max(0, Math.round((gameState.currentEnemy.hp / gameState.currentEnemy.maxHp) * 100));
     if (ui["enemy-hp"]) ui["enemy-hp"].textContent = `${gameState.currentEnemy.hp}/${gameState.currentEnemy.maxHp}`;
@@ -413,7 +426,7 @@ export function updateUI() {
   const enemyPortrait = document.getElementById("enemy-portrait");
   if (enemyPortrait) {
     if (gameState.currentEnemy) {
-      const src = gameState.currentEnemy.img || `${ENEMY_PORTRAIT_PATH}${gameState.currentEnemy.id}.png`;
+      const src = gameState.currentEnemy.img || `${ENEMY_PORTRAIT_PATH}${gameState.currentEnemy.id}.webp`;
       if (enemyPortrait.dataset.src !== src) {
         enemyPortrait.dataset.src = src;
         enemyPortrait.src = src;
@@ -509,7 +522,7 @@ function updateLocationSubtitle(loc) {
   // Imagen de ubicación: override específico → fallback por bioma
   const locImg = document.getElementById("location-img");
   if (locImg && loc) {
-    const src = LOCATION_IMAGES[loc.id] || `${LOCATION_IMG_PATH}${loc.biome || "none"}.png`;
+    const src = LOCATION_IMAGES[loc.id] || `${LOCATION_IMG_PATH}${loc.biome || "none"}.webp`;
     if (locImg.dataset.src !== src) {
       locImg.dataset.src = src;
       locImg.src = src;
