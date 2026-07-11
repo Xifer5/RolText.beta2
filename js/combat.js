@@ -18,6 +18,7 @@ import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { showSpecializationModal } from "./specModal.js";
 import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
+import { consumeEchoReward } from "./echoIntro.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
@@ -613,6 +614,9 @@ function endCombat(victory, fled = false) {
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
     addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
+
+    // SPEC-0902: recompensa del eco tras el combate guionizado del bosque
+    consumeEchoReward();
 
     // Boss death message (narrative payoff from enemies.js deathMessage field)
     if (enemy.isBoss && enemy.deathMessage) {

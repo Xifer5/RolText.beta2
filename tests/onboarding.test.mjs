@@ -6,10 +6,10 @@ const {
   STEP_IDS, defaultState, parseState, shouldShow, markSeen, resetSeen
 } = await import("../js/onboarding.js");
 
-test("hay 6 pasos que cubren los 5 puntos del onboarding", () => {
+test("hay 7 pasos: los 5 puntos del onboarding + intent enemigo (SPEC-0902)", () => {
   assert.deepEqual(STEP_IDS, [
     "welcome_move", "talk_elara", "quest_tracker",
-    "first_combat", "first_loot", "rest_save"
+    "first_combat", "enemy_intent", "first_loot", "rest_save"
   ]);
 });
 

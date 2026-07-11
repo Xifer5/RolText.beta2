@@ -822,6 +822,66 @@ export const TRAVEL_EVENTS = [
   },
 
   {
+    id: "echo_grateful",
+    icon: "🍃",
+    followUp: true,
+    condition: () => hasFlag("echo_freed") && !hasFlag("echo_resolved"),
+    title: { en: "The Forest Remembers", es: "El bosque recuerda" },
+    text: { en: "A familiar glow weaves between the trees: the echo you freed, whole again. It circles you once, joyful, and lets something fall at your feet.", es: "Un brillo familiar serpentea entre los árboles: el eco que liberaste, entero de nuevo. Te rodea una vez, jubiloso, y deja caer algo a tus pies." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Pick it up", es: "Recogerlo" },
+        icon: "🎁",
+        apply() {
+          setFlag("echo_resolved");
+          gameState.inventory.health_potion = (gameState.inventory.health_potion ?? 0) + 1;
+          gameState.player.experience = (gameState.player.experience ?? 0) + 30;
+          return { en: "Dew condensed into a potion, still warm with dream-light. +1 Health Potion, +30 XP", es: "Rocío condensado en una poción, aún tibia de luz de sueño. +1 Poción de Salud, +30 XP" };
+        }
+      },
+      {
+        label: { en: "Just watch it go", es: "Solo verlo partir" },
+        icon: "👋",
+        apply() {
+          setFlag("echo_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 40;
+          return { en: "Some debts are paid in understanding. The forest feels less foreign now. +40 XP", es: "Algunas deudas se pagan en comprensión. El bosque se siente menos ajeno ahora. +40 XP" };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "echo_silence",
+    icon: "🕳️",
+    followUp: true,
+    condition: () => hasFlag("echo_absorbed") && !hasFlag("echo_resolved"),
+    title: { en: "A Silence in the Woods", es: "Un silencio en el bosque" },
+    text: { en: "You pass a clearing that should be humming with dream-light. It isn't. The birds skirt around it. You know exactly why.", es: "Pasas junto a un claro que debería vibrar con luz de sueño. No lo hace. Los pájaros lo rodean sin entrar. Sabes exactamente por qué." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Stop and reflect", es: "Detenerte a reflexionar" },
+        icon: "🤔",
+        apply() {
+          setFlag("echo_resolved");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: "Power has a price; today you can name it. You won't forget this clearing. +25 XP", es: "El poder tiene un precio; hoy puedes ponerle nombre. No olvidarás este claro. +25 XP" };
+        }
+      },
+      {
+        label: { en: "Walk on without looking", es: "Seguir sin mirar" },
+        icon: "🚶",
+        apply() {
+          setFlag("echo_resolved");
+          return { en: "You quicken your pace. The silence follows you a while longer than it should.", es: "Aprietas el paso. El silencio te sigue un rato más de lo que debería." };
+        }
+      }
+    ]
+  },
+
+  {
     id: "shrine_gratitude",
     icon: "🏛️",
     followUp: true,
@@ -927,16 +987,14 @@ export function setupTravelEventModal() {
   const modal       = document.getElementById("travelEventModal");
   const continueBtn = document.getElementById("teContinueBtn");
   if (!modal || !continueBtn) return;
-  continueBtn.addEventListener("click", () => {
+  const close = () => {
     modal.classList.add("hidden");
     gameState.isProcessingMove = false;
     updateUI();
-  });
+    window.dispatchEvent(new Event("pixel:travelEventClosed"));
+  };
+  continueBtn.addEventListener("click", close);
   modal.addEventListener("click", e => {
-    if (e.target === modal) {
-      modal.classList.add("hidden");
-      gameState.isProcessingMove = false;
-      updateUI();
-    }
+    if (e.target === modal) close();
   });
 }

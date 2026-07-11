@@ -10,6 +10,7 @@ import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
 import { trySpawnBoss } from "./biomeBosses.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
+import { maybeStartEchoIntro } from "./echoIntro.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
@@ -119,6 +120,12 @@ export function handleMove(direction) {
   if (newLoc.id === "town") maybeShowHint("talk_elara");
   if (newLoc.id === "shop" || newLoc.id === "castle_shop" || newLoc.id === "port") {
     addMessage(t("shopHint"), "system");
+  }
+
+  // ── Escena guionizada del eco (SPEC-0902): primera llegada a forest_1 ──
+  if (maybeStartEchoIntro(nextId)) {
+    updateUI();
+    return; // la escena gestiona isProcessingMove vía el modal de evento
   }
 
   // ── Intentar aparición de jefe primero ────────────────────────────

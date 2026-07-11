@@ -21,6 +21,7 @@ export const STEP_IDS = [
   "talk_elara",
   "quest_tracker",
   "first_combat",
+  "enemy_intent",
   "first_loot",
   "rest_save"
 ];
@@ -30,6 +31,7 @@ const STEP_META = {
   talk_elara:    { icon: "💬", key: "onbTalkElara",    anchor: "#npc-talk-btn" },
   quest_tracker: { icon: "📜", key: "onbQuestTracker", anchor: "#questTracker" },
   first_combat:  { icon: "⚔️", key: "onbFirstCombat",  anchor: "#combat-menu" },
+  enemy_intent:  { icon: "👁️", key: "onbEnemyIntent",  anchor: "#enemy-panel" },
   first_loot:    { icon: "🎒", key: "onbFirstLoot",    anchor: null },
   rest_save:     { icon: "🛏️", key: "onbRestSave",     anchor: null }
 };
