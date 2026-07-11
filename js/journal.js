@@ -14,7 +14,7 @@ const JOURNAL_ENTRIES = [
     alwaysVisible: true,
     text: {
       en: "I chose to leave my hometown and embark on an adventure. Stories of the Dragon King haunting these lands follow me. Perhaps I can make a difference. The road is full of danger, but also opportunity.",
-      es: "He decidido abandonar mi pueblo natal y embarcarme en una aventura. Las historias del Dragon King que amenaza estas tierras me persiguen. Quizás yo pueda marcar la diferencia. El camino está lleno de peligros, pero también de oportunidades."
+      es: "He decidido abandonar mi pueblo natal y embarcarme en una aventura. Las historias del Rey Dragón que amenaza estas tierras me persiguen. Quizás yo pueda marcar la diferencia. El camino está lleno de peligros, pero también de oportunidades."
     }
   },
   {
@@ -44,7 +44,7 @@ const JOURNAL_ENTRIES = [
     requirement: (gs) => gs.player.level >= 10,
     text: {
       en: "Level 10. I've traveled many lands and defeated creatures that would have terrified me before. The Dragon King still waits. I must prepare.",
-      es: "Nivel 10. He recorrido muchas tierras y derrotado a criaturas que antes me habrían aterrorizado. El Dragon King sigue ahí, esperando. Debo prepararme."
+      es: "Nivel 10. He recorrido muchas tierras y derrotado a criaturas que antes me habrían aterrorizado. El Rey Dragón sigue ahí, esperando. Debo prepararme."
     }
   },
   {

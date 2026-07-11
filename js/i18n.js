@@ -1,4 +1,4 @@
-const dictionaries = {
+export const dictionaries = {
   en: {
     brandSubtitle: "Explore · Fight · Forge your destiny",
     navAttributes: "Attributes",
@@ -237,6 +237,7 @@ const dictionaries = {
     missionTag: "📌 Quest",
     missionTagTooltip: "Quest item — cannot use or sell",
     confirmDeleteSave: "Delete saved game?",
+    localMapLabel: "Local map",
     saveSlotsTitle: "💾 Saved Games",
     saveSlotsSaveHint: "Choose a slot to save your game.",
     saveSlotsLoadHint: "Choose a saved game to load.",
@@ -629,7 +630,7 @@ const dictionaries = {
     gameOverTitle: "💀 GAME OVER 💀",
     gameOverText: "Has caído en tu aventura.",
     retryButton: "🔄 Intentar de nuevo",
-    endingMessage: "Has derrotado al Dragon King.",
+    endingMessage: "Has derrotado al Rey Dragón.",
     endingLevelLabel: "Nivel",
     endingGoldLabel: "Oro",
     endingXpLabel: "XP",
@@ -652,6 +653,7 @@ const dictionaries = {
     missionTag: "📌 Misión",
     missionTagTooltip: "Objeto de misión — no se puede usar ni vender",
     confirmDeleteSave: "¿Borrar la partida guardada?",
+    localMapLabel: "Mapa local",
     saveSlotsTitle: "💾 Partidas guardadas",
     saveSlotsSaveHint: "Elige una ranura donde guardar tu partida.",
     saveSlotsLoadHint: "Elige qué partida cargar.",

@@ -1,5 +1,5 @@
 /**
- * npcs.js — Definiciones de NPCs del mundo de Aethoria
+ * npcs.js — Definiciones de NPCs del mundo de Aetheria
  *
  * Cada NPC habita en una zona fija, tiene un rol narrativo
  * y una misión asociada que el jugador puede aceptar/entregar.
@@ -81,7 +81,7 @@ export const NPC_DATA = {
     locationId: "tavern",
     role: "Mentor de la Taberna del Dragón Ebrio",
     color: "#a78bfa",
-    lore: "Un aventurero retirado que pasó décadas viajando por Aethoria y recogiendo el conocimiento de cien batallas. Por unas monedas comparte lo que aprendió.",
+    lore: "Un aventurero retirado que pasó décadas viajando por Aetheria y recogiendo el conocimiento de cien batallas. Por unas monedas comparte lo que aprendió.",
     trainerSkills: [
       { skillId: "rally",        gold: 150 },
       { skillId: "power_strike", gold: 200 },

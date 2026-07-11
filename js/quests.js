@@ -149,7 +149,7 @@ export const QUEST_DATA = {
       completed: [
         { en: "Impressive. Few souls survive Ironcroft's dungeons.", es: "Impresionante. Pocas almas sobreviven a las Mazmorras de Ironcroft." },
         { en: "Take the Dragon Key. The Dragon King's Throne awaits you.", es: "Toma la Llave del Dragón. El Trono del Rey Dragón te espera." },
-        { en: "The fate of Aethoria is in your hands.", es: "El destino de Aethoria está en tus manos." }
+        { en: "The fate of Aetheria is in your hands.", es: "El destino de Aetheria está en tus manos." }
       ]
     }
   },

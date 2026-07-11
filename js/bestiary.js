@@ -25,7 +25,7 @@ const ENEMY_LORE = {
   wolf: {
     lore: {
       en: "Wolves corrupted by the darkness of the Dragon King. Larger and more aggressive than their wild kin.",
-      es: "Lobos corrompidos por la oscuridad del Dragon King. Más grandes y agresivos que sus primos salvajes."
+      es: "Lobos corrompidos por la oscuridad del Rey Dragón. Más grandes y agresivos que sus primos salvajes."
     },
     weakness: { en: "Fire", es: "Fuego" },
     reward: { en: "Wolf pelt", es: "Piel de lobo" }
@@ -33,7 +33,7 @@ const ENEMY_LORE = {
   orc: {
     lore: {
       en: "Brutal warriors in service to the Dragon King. Their physical resilience is legendary among the realm's soldiers.",
-      es: "Guerreros brutales al servicio del Dragon King. Su resistencia física es legendaria entre los soldados del reino."
+      es: "Guerreros brutales al servicio del Rey Dragón. Su resistencia física es legendaria entre los soldados del reino."
     },
     weakness: { en: "Magic", es: "Magia" },
     reward: { en: "Axe and iron ore", es: "Hacha, mineral de hierro" }
