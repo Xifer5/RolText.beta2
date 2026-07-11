@@ -4750,6 +4750,11 @@ kbd {
   margin-top: var(--sp-2); font-size: .78rem; font-style: italic;
   color: var(--c-muted); min-height: 1.2em;
 }
+.diff-effects {
+  margin-top: 4px; font-size: .74rem;
+  font-family: var(--font-ui);
+  color: var(--md-on-surface-variant); min-height: 1.2em;
+}
 
 /* ── Maestría de armas (stats modal) ── */
 .mastery-section { margin-top: var(--sp-5); text-align: left; }

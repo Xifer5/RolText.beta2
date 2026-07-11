@@ -1,10 +1,10 @@
 export const DIFFICULTY_CONFIG = {
   easy: {
     id: "easy",
-    name: "Fácil",
+    name: { en: "Easy", es: "Fácil" },
     emoji: "🌿",
     color: "#4caf7d",
-    description: "Para explorar la historia sin frustración.",
+    description: { en: "Explore the story without frustration.", es: "Para explorar la historia sin frustración." },
     hp:   1.0,
     atk:  1.0,
     def:  1.0,
@@ -14,10 +14,10 @@ export const DIFFICULTY_CONFIG = {
   },
   adventure: {
     id: "adventure",
-    name: "Aventura",
+    name: { en: "Adventure", es: "Aventura" },
     emoji: "⚔️",
     color: "#5b9bd5",
-    description: "El equilibrio ideal. Combates desafiantes.",
+    description: { en: "The ideal balance. Challenging fights.", es: "El equilibrio ideal. Combates desafiantes." },
     hp:   1.4,
     atk:  1.3,
     def:  1.2,
@@ -27,10 +27,10 @@ export const DIFFICULTY_CONFIG = {
   },
   hard: {
     id: "hard",
-    name: "Difícil",
+    name: { en: "Hard", es: "Difícil" },
     emoji: "🔥",
     color: "#e07b39",
-    description: "Enemigos agresivos. Cada batalla importa.",
+    description: { en: "Aggressive enemies. Resistances and potions matter.", es: "Enemigos agresivos. Las resistencias y pociones importan." },
     hp:   2.0,
     atk:  1.7,
     def:  1.5,
@@ -40,10 +40,10 @@ export const DIFFICULTY_CONFIG = {
   },
   impossible: {
     id: "impossible",
-    name: "Imposible",
+    name: { en: "Impossible", es: "Imposible" },
     emoji: "💀",
     color: "#c94040",
-    description: "Sin piedad. Solo para los más valientes.",
+    description: { en: "No mercy. Challenge mode for the brave.", es: "Sin piedad. Modo reto para los más valientes." },
     hp:   3.0,
     atk:  2.5,
     def:  2.0,
@@ -55,4 +55,22 @@ export const DIFFICULTY_CONFIG = {
 
 export function getDifficultyConfig(key) {
   return DIFFICULTY_CONFIG[key] ?? DIFFICULTY_CONFIG.easy;
+}
+
+const pct = m => `${m > 1 ? "+" : ""}${Math.round((m - 1) * 100)}%`;
+
+/**
+ * Efectos concretos de una dificultad, derivados de sus multiplicadores
+ * (única fuente de verdad — el copy de la UI no puede desincronizarse).
+ */
+export function getDifficultyEffects(cfg) {
+  const standard = [cfg.hp, cfg.atk, cfg.def, cfg.xpMult, cfg.goldMult].every(m => m === 1);
+  return {
+    standard,
+    hp:   pct(cfg.hp),
+    atk:  pct(cfg.atk),
+    def:  pct(cfg.def),
+    xp:   pct(cfg.xpMult),
+    gold: pct(cfg.goldMult)
+  };
 }

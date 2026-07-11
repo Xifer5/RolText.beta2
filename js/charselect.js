@@ -2,12 +2,12 @@
 //  CHARACTER SELECTION — Pantalla de inicio de juego
 // ══════════════════════════════════════════════════════
 import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
-import { DIFFICULTY_CONFIG } from "./difficulty.js";
+import { DIFFICULTY_CONFIG, getDifficultyEffects } from "./difficulty.js";
 import { gameState, resetState } from "./state.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 export function showCharacterSelect(onComplete) {
   // Remove existing if any
@@ -57,11 +57,12 @@ export function showCharacterSelect(onComplete) {
           ${Object.values(DIFFICULTY_CONFIG).map(d => `
             <button type="button" class="diff-chip${d.id === 'easy' ? ' selected' : ''}" data-diff="${d.id}"
                     style="--diff-color:${d.color}" role="radio" aria-checked="${d.id === 'easy'}">
-              ${d.emoji} ${d.name}
+              ${d.emoji} ${localizeText(d.name)}
             </button>
           `).join("")}
         </div>
-        <p class="diff-desc" id="diffDesc">${DIFFICULTY_CONFIG.easy.description}</p>
+        <p class="diff-desc" id="diffDesc"></p>
+        <p class="diff-effects" id="diffEffects"></p>
       </div>
 
       <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
@@ -78,7 +79,21 @@ export function showCharacterSelect(onComplete) {
   let selectedClass = null;
   let selectedDifficulty = "easy";
 
-  // Difficulty selection
+  // Difficulty selection — descripción + efectos concretos derivados de los multiplicadores
+  const updateDiffInfo = (id) => {
+    const cfg = DIFFICULTY_CONFIG[id];
+    if (!cfg) return;
+    const desc = modal.querySelector("#diffDesc");
+    const eff  = modal.querySelector("#diffEffects");
+    if (desc) desc.textContent = localizeText(cfg.description);
+    if (eff) {
+      const e = getDifficultyEffects(cfg);
+      eff.textContent = e.standard
+        ? t("diffStandardLine")
+        : formatText("diffEffectsLine", { hp: e.hp, atk: e.atk, def: e.def, xp: e.xp, gold: e.gold });
+    }
+  };
+  updateDiffInfo("easy");
   modal.querySelectorAll(".diff-chip").forEach(chip => {
     chip.addEventListener("click", () => {
       modal.querySelectorAll(".diff-chip").forEach(c => {
@@ -88,8 +103,7 @@ export function showCharacterSelect(onComplete) {
       chip.classList.add("selected");
       chip.setAttribute("aria-checked", "true");
       selectedDifficulty = chip.dataset.diff;
-      const desc = modal.querySelector("#diffDesc");
-      if (desc) desc.textContent = DIFFICULTY_CONFIG[selectedDifficulty]?.description || "";
+      updateDiffInfo(selectedDifficulty);
     });
   });
 
@@ -155,7 +169,7 @@ export function showCharacterSelect(onComplete) {
       intl: gameState.player.intelligence
     }), "stat");
     const diffCfg = DIFFICULTY_CONFIG[selectedDifficulty];
-    addMessage(formatText(t('difficultyChosenMsg'), { emoji: diffCfg.emoji, name: diffCfg.name }), "system");
+    addMessage(formatText(t('difficultyChosenMsg'), { emoji: diffCfg.emoji, name: localizeText(diffCfg.name) }), "system");
 
     updateUI();
 
