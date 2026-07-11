@@ -3010,13 +3010,52 @@ button:focus-visible,
 .muted { color: var(--md-on-surface-variant); font-size: 13px; font-style: italic; }
 
 /* ═══════════════════════════════════════════════════════════
-   ACHIEVEMENT TOAST
+   TOASTS — contenedor compartido (logros + simples, js/toast.js)
    ═══════════════════════════════════════════════════════════ */
-.ach-toast {
+.toast-container {
   position: fixed;
   top: 80px;
   right: 20px;
   z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+  max-width: min(380px, calc(100vw - 32px));
+}
+/* entrada/salida: toast.js alterna .visible y .hiding */
+.ach-toast, .simple-toast {
+  pointer-events: auto;
+  transform: translateX(calc(100% + 24px));
+  opacity: 0;
+  transition: transform .35s var(--ease-spring), opacity .25s var(--ease);
+}
+.ach-toast.visible, .simple-toast.visible { transform: none; opacity: 1; }
+.ach-toast.hiding, .simple-toast.hiding {
+  transform: translateX(calc(100% + 24px));
+  opacity: 0;
+}
+
+.simple-toast {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 12px 16px;
+  border-radius: var(--r-lg);
+  background: var(--md-surface-c-high);
+  color: var(--md-on-surface);
+  border: 1px solid var(--md-outline-variant);
+  border-left: 3px solid var(--md-primary);
+  box-shadow: var(--elev-3);
+  max-width: 100%;
+}
+.simple-toast-success { border-left-color: #4ade80; }
+.simple-toast-error   { border-left-color: #ef4444; }
+.simple-toast-warn    { border-left-color: #f59e0b; }
+
+.ach-toast {
   min-width: 300px;
   max-width: 380px;
   padding: 14px 16px;
@@ -3026,20 +3065,17 @@ button:focus-visible,
   color: var(--md-on-surface);
   box-shadow: var(--elev-3);
   font-family: var(--font-body);
-  animation: achSlideIn .35s var(--ease-spring);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-@keyframes achSlideIn {
-  from { transform: translateX(120%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-.ach-toast.fadeOut {
-  animation: achSlideOut .3s var(--ease) forwards;
-}
-@keyframes achSlideOut {
-  to { transform: translateX(120%); opacity: 0; }
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: calc(64px + env(safe-area-inset-top, 0px));
+    right: 16px;
+  }
+  .ach-toast { min-width: 0; }
 }
 .ach-toast-header {
   font-family: var(--font-ui);

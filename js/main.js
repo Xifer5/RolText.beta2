@@ -74,12 +74,3 @@ window.addEventListener("pixel:newGame", () => {
     });
   });
 });
-
-// Auto-save toast helper
-export function showToast(msg) {
-  const t = document.createElement("div");
-  t.className = "toast";
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
