@@ -12,7 +12,7 @@ export const enemyData = {
     experience: 10,
     gold: 5,
     drops: ["mana_potion"],
-    img: "img/enemies/slime.png",
+    img: "img/enemies/slime.webp",
   },
   fungedBeast: {
     type: "Funged Beast",
@@ -24,7 +24,7 @@ export const enemyData = {
     experience: 15,
     gold: 5,
     drops: ["health_potion"],
-    img: "img/enemies/fungedBeast.png",
+    img: "img/enemies/fungedBeast.webp",
   },
   goblin: {
     type: "Goblin",
@@ -36,7 +36,7 @@ export const enemyData = {
     experience: 20,
     gold: 8,
     drops: ["sword"],
-    img: "img/enemies/goblin.png",
+    img: "img/enemies/goblin.webp",
   },
   wolf: {
     type: "Wolf",
@@ -48,7 +48,7 @@ export const enemyData = {
     experience: 30,
     gold: 10,
     drops: ["health_potion"],
-    img: "img/enemies/wolf.png",
+    img: "img/enemies/wolf.webp",
   },
   thief: {
     type: "Thief",
@@ -60,7 +60,7 @@ export const enemyData = {
     experience: 22,
     gold: 12,
     drops: ["ring_agility"],
-    img: "img/enemies/thief.png",
+    img: "img/enemies/thief.webp",
   },
   guard: {
     type: "Royal Guard",
@@ -72,7 +72,7 @@ export const enemyData = {
     experience: 60,
     gold: 15,
     drops: ["armor"],
-    img: "img/enemies/guard.png",
+    img: "img/enemies/guard.webp",
   },
   orc: {
     type: "Orc",
@@ -84,7 +84,7 @@ export const enemyData = {
     experience: 100,
     gold: 20,
     drops: ["axe"],
-    img: "img/enemies/orc.png",
+    img: "img/enemies/orc.webp",
   },
   goblin_shaman: {
     type: "Goblin Shaman",
@@ -97,7 +97,7 @@ export const enemyData = {
     experience: 60,
     gold: 18,
     drops: ["staff"],
-    img: "img/enemies/goblin_shaman.png",
+    img: "img/enemies/goblin_shaman.webp",
   },
   elf: {
     type: "elf",
@@ -110,7 +110,7 @@ export const enemyData = {
     experience: 80,
     gold: 60,
     drops: ["staff"],
-    img: "img/enemies/elf.png",
+    img: "img/enemies/elf.webp",
   },
   cave_bat: {
     type: "Cave Bat",
@@ -122,7 +122,7 @@ export const enemyData = {
     experience: 15,
     gold: 5,
     drops: ["mana_potion"],
-    img: "img/enemies/cave_bat.png",
+    img: "img/enemies/cave_bat.webp",
   },
   cave_bear: {
     type: "Cave Bear",
@@ -134,7 +134,7 @@ export const enemyData = {
     experience: 100,
     gold: 25,
     drops: ["health_potion"],
-    img: "img/enemies/cave_bear.png",
+    img: "img/enemies/cave_bear.webp",
   },
   giant_spider: {
     type: "Giant Spider",
@@ -146,7 +146,7 @@ export const enemyData = {
     experience: 150,
     gold: 22,
     drops: ["ring_strength"],
-    img: "img/enemies/giant_spider.png",
+    img: "img/enemies/giant_spider.webp",
   },
   cave_troll: {
     type: "Cave Troll",
@@ -158,7 +158,7 @@ export const enemyData = {
     experience: 180,
     gold: 30,
     drops: ["chainmail"],
-    img: "img/enemies/cave_troll.png",
+    img: "img/enemies/cave_troll.webp",
   },
   stone_golem: {
     type: "Stone Golem",
@@ -170,7 +170,7 @@ export const enemyData = {
     experience: 200,
     gold: 40,
     drops: ["ring_strength"],
-    img: "img/enemies/stone_golem.png",
+    img: "img/enemies/stone_golem.webp",
   },
   ancient_guardian: {
     type: "Ancient Guardian",
@@ -183,7 +183,7 @@ export const enemyData = {
     experience: 100,
     gold: 35,
     drops: ["chainmail"],
-    img: "img/enemies/ancient_guardian.png",
+    img: "img/enemies/ancient_guardian.webp",
   },
   mountain_giant: {
     type: "Mountain Giant",
@@ -195,7 +195,7 @@ export const enemyData = {
     experience: 400,
     gold: 100,
     drops: ["axe"],
-    img: "img/enemies/mountain_giant.png",
+    img: "img/enemies/mountain_giant.webp",
   },
   wyvern: {
     type: "Wyvern",
@@ -207,7 +207,7 @@ export const enemyData = {
     experience: 220,
     gold: 100,
     drops: ["robe"],
-    img: "img/enemies/wyvern.png",
+    img: "img/enemies/wyvern.webp",
   },
   treasure_guardian: {
     type: "Treasure Guardian",
@@ -220,7 +220,7 @@ export const enemyData = {
     experience: 350,
     gold: 100,
     drops: ["chainmail", "divine_sword", "plate_armor"],
-    img: "img/enemies/treasure_guardian.png",
+    img: "img/enemies/treasure_guardian.webp",
   },
   beholder: {
     type: "Beholder",
@@ -232,7 +232,7 @@ export const enemyData = {
     experience: 100,
     gold: 70,
     drops: ["katana"],
-    img: "img/enemies/beholder.png",
+    img: "img/enemies/beholder.webp",
   },
 
   zombie: {
@@ -245,7 +245,7 @@ export const enemyData = {
     experience: 40,
     gold: 20,
     drops: ["big_health_potion"],
-    img: "img/enemies/zombie.png",
+    img: "img/enemies/zombie.webp",
   },
   vampire: {
     type: "Vampire",
@@ -257,7 +257,7 @@ export const enemyData = {
     experience: 150,
     gold: 30,
     drops: ["elixir_potion"],
-    img: "img/enemies/vampire.png",
+    img: "img/enemies/vampire.webp",
   },
   squeletor: {
     type: "Squeletor",
@@ -269,7 +269,7 @@ export const enemyData = {
     experience: 55,
     gold: 25,
     drops: ["hammer"],
-    img: "img/enemies/squeletor.png",
+    img: "img/enemies/squeletor.webp",
   },
   warlock: {
     type: "Warlock",
@@ -282,7 +282,7 @@ export const enemyData = {
     experience: 70,
     gold: 35,
     drops: ["wand"],
-    img: "img/enemies/warlock.png",
+    img: "img/enemies/warlock.webp",
 
   },
   imp: {
@@ -295,7 +295,7 @@ export const enemyData = {
     experience: 30,
     gold: 15,
     drops: ["gown"],
-    img: "img/enemies/imp.png",
+    img: "img/enemies/imp.webp",
   },
   linchorn: {
     type: "Linchorn",
@@ -307,7 +307,7 @@ export const enemyData = {
     experience: 210,
     gold: 45,
     drops: ["katana"],
-    img: "img/enemies/linchorn.png",
+    img: "img/enemies/linchorn.webp",
   },
   hydra: {
     type: "Hydra",
@@ -319,7 +319,7 @@ export const enemyData = {
     experience: 550,
     gold: 200,
     drops: ["plate_armor"],
-    img: "img/enemies/hydra.png",
+    img: "img/enemies/hydra.webp",
   },
   centaurus: {
     type: "Centaurus",
@@ -331,7 +331,7 @@ export const enemyData = {
     experience: 100,
     gold: 55,
     drops: ["elemental_wand"],
-    img: "img/enemies/centaurus.png",
+    img: "img/enemies/centaurus.webp",
   },
   chimera: {
     type: "Chimera",
@@ -343,7 +343,7 @@ export const enemyData = {
     experience: 440,
     gold: 158,
     drops: ["divine_sword"],
-    img: "img/enemies/chimera.png",
+    img: "img/enemies/chimera.webp",
   },
   cultist: {
     type: "Cultist",
@@ -356,7 +356,7 @@ export const enemyData = {
     experience: 75,
     gold: 38,
     drops: ["bless_staff"],
-    img: "img/enemies/cultist.png",
+    img: "img/enemies/cultist.webp",
   },
   drider: {
     type: "Drider",
@@ -368,7 +368,7 @@ export const enemyData = {
     experience: 300,
     gold: 142,
     drops: ["arcane_robe"],
-    img: "img/enemies/drider.png",
+    img: "img/enemies/drider.webp",
   },
   kraken: {
     type: "Kraken",
@@ -381,7 +381,7 @@ export const enemyData = {
     experience: 550,
     gold: 220,
     drops: ["trident", "sea_armor"],
-    img: "img/enemies/kraken.png",
+    img: "img/enemies/kraken.webp",
   },
   sea_serpent: {
     type: "Sea Serpent",
@@ -394,7 +394,7 @@ export const enemyData = {
     experience: 390,
     gold: 200,
     drops: ["water_staff", "aqua_robe"],
-    img: "img/enemies/sea_serpent.png",
+    img: "img/enemies/sea_serpent.webp",
   },
   medusa: {
     type: "Medusa",
@@ -407,7 +407,7 @@ export const enemyData = {
     experience: 360,
     gold: 280,
     drops: ["serpent_sword", "stone_armor"],
-    img: "img/enemies/medusa.png",
+    img: "img/enemies/medusa.webp",
   },
   mermaid: {
     type: "Mermaid",
@@ -420,7 +420,7 @@ export const enemyData = {
     experience: 440,
     gold: 170,
     drops: ["ocean_staff", "coral_robe"],
-    img: "img/enemies/mermaid.png",
+    img: "img/enemies/mermaid.webp",
   },
   pirate: {
     type: "Pirate",
@@ -432,7 +432,7 @@ export const enemyData = {
     experience: 220,
     gold: 150,
     drops: ["cutlass", "leather_armor"],
-    img: "img/enemies/pirate.png",
+    img: "img/enemies/pirate.webp",
   },
   pirate_captain: {
     type: "Pirate Captain",
@@ -444,7 +444,7 @@ export const enemyData = {
     experience: 300,
     gold: 190,
     drops: ["captain_sword", "captain_coat"],
-    img: "img/enemies/pirate_captain.png",
+    img: "img/enemies/pirate_captain.webp",
   },
   Inferno_elemental: {
     type: "Inferno Elemental",
@@ -457,7 +457,7 @@ export const enemyData = {
     experience: 320,
     gold: 210,
     drops: ["flame_staff", "fire_robe"],
-    img: "img/enemies/inferno_elemental.png",
+    img: "img/enemies/inferno_elemental.webp",
   },
   gorilla_warrior: {
     type: "Gorilla Warrior",
@@ -469,7 +469,7 @@ export const enemyData = {
     experience: 240,
     gold: 160,
     drops: ["giant_club", "jungle_armor"],
-    img: "img/enemies/gorilla_warrior.png",
+    img: "img/enemies/gorilla_warrior.webp",
   },
   jungle_tiger: {
     type: "Jungle Tiger",
@@ -481,7 +481,7 @@ export const enemyData = {
     experience: 230,
     gold: 155,
     drops: ["tiger_blade", "leather_armor"],
-    img: "img/enemies/jungle_tiger.png",
+    img: "img/enemies/jungle_tiger.webp",
   },
   vine_serpent: {
     type: "Vine Serpent",
@@ -494,7 +494,7 @@ export const enemyData = {
     experience: 270,
     gold: 175,
     drops: ["vine_whip", "nature_robe"],
-    img: "img/enemies/vine_serpent.png",
+    img: "img/enemies/vine_serpent.webp",
   },
   jungle_spirit: {
     type: "Jungle Spirit",
@@ -507,7 +507,7 @@ export const enemyData = {
     experience: 330,
     gold: 215,
     drops: ["spirit_staff", "ethereal_robe"],
-    img: "img/enemies/jungle_spirit.png",
+    img: "img/enemies/jungle_spirit.webp",
   },
   diablo: {
     type: "Diablo",
@@ -520,7 +520,7 @@ export const enemyData = {
     experience: 700,
     gold: 350,
     drops: ["demon_blade", "dark_armor"],
-    img: "img/enemies/diablo.png",
+    img: "img/enemies/diablo.webp",
   },
   dragon: {
     type: "Dragon",
@@ -533,7 +533,7 @@ export const enemyData = {
     experience: 800,
     gold: 400,
     drops: ["ring_of_knowledge", "staff", "robe"],
-    img: "img/enemies/dragon.png",
+    img: "img/enemies/dragon.webp",
   },
 
   dragon_king: {
@@ -549,7 +549,7 @@ export const enemyData = {
     gold: 1000,
     drops: ["saint_grail", "excalibur", "dragon_heart"],
     deathMessage: "Gracias... por recordarme.",
-    img: "img/enemies/dragon_king.png",
+    img: "img/enemies/dragon_king.webp",
   },
 
   genie: {
@@ -563,7 +563,7 @@ export const enemyData = {
     experience: 300,
     gold: 200,
     drops: ["ring_of_wisdom", "magic_lamp"],
-    img: "img/enemies/genie.png",
+    img: "img/enemies/genie.webp",
   },
 
   gremlin: {
@@ -576,7 +576,7 @@ export const enemyData = {
     experience: 65,
     gold: 28,
     drops: ["dagger"],
-    img: "img/enemies/gremlin.png",
+    img: "img/enemies/gremlin.webp",
   },
 
   dwarf_warrior: {
@@ -589,7 +589,7 @@ export const enemyData = {
     experience: 70,
     gold: 32,
     drops: ["war_hammer"],
-    img: "img/enemies/dwarf_warrior.png",
+    img: "img/enemies/dwarf_warrior.webp",
   },
 
   pegasus: {
@@ -602,7 +602,7 @@ export const enemyData = {
     experience: 100,
     gold: 50,
     drops: ["light_armor"],
-    img: "img/enemies/pegasus.png",
+    img: "img/enemies/pegasus.webp",
   },
 
   tent: {
@@ -615,7 +615,7 @@ export const enemyData = {
     experience: 200,
     gold: 100,
     drops: ["healing_staff"],
-    img: "img/enemies/tent.png",
+    img: "img/enemies/tent.webp",
   },
 
   dark_knight: {
@@ -628,7 +628,7 @@ export const enemyData = {
     experience: 300,
     gold: 60,
     drops: ["dark_sword", "dark_shield"],
-    img: "img/enemies/dark_knight.png",
+    img: "img/enemies/dark_knight.webp",
   },
 
   sand_worm: {
@@ -641,7 +641,7 @@ export const enemyData = {
     experience: 200,
     gold: 70,
     drops: ["desert_armor"],
-    img: "img/enemies/sand_worm.png",
+    img: "img/enemies/sand_worm.webp",
   },
 
   lava_golem: {
@@ -654,7 +654,7 @@ export const enemyData = {
     experience: 220,
     gold: 80,
     drops: ["lava_sword", "fire_shield"],
-    img: "img/enemies/lava_golem.png",
+    img: "img/enemies/lava_golem.webp",
   },
 
   pyro_elemental: {
@@ -668,7 +668,7 @@ export const enemyData = {
     experience: 350,
     gold: 90,
     drops: ["pyro_staff", "flame_robe"],
-    img: "img/enemies/pyro_elemental.png",
+    img: "img/enemies/pyro_elemental.webp",
 
   },
 
@@ -685,7 +685,7 @@ export const enemyData = {
     gold: 800,
     drops: ["inferno_blade", "dragon_scale_armor"],
     deathMessage: "Mi... ira... se apaga...",
-    img: "img/enemies/inferno_dragon.png",
+    img: "img/enemies/inferno_dragon.webp",
   },
 
 
@@ -703,7 +703,7 @@ export const enemyData = {
     gold: 120,
     drops: ["titan_branch", "inferno_blade"],
     deathMessage: "El dragón... está llorando...",
-    img: "img/enemies/forest_titan.png",
+    img: "img/enemies/forest_titan.webp",
   },
   cave_devourer: {
     isBoss: true,
@@ -718,7 +718,7 @@ export const enemyData = {
     gold: 120,
     drops: ["devourer_fang", "inferno_blade"],
     deathMessage: "No... quería... que me olvidaran...",
-    img: "img/enemies/cave_devourer.png",
+    img: "img/enemies/cave_devourer.webp",
   },
   mountain_colossus: {
     isBoss: true,
@@ -733,7 +733,7 @@ export const enemyData = {
     gold: 120,
     drops: ["earthbreaker_core", "inferno_blade"],
     deathMessage: "Seguí... de pie... hasta el final...",
-    img: "img/enemies/mountain_colossus.png",
+    img: "img/enemies/mountain_colossus.webp",
   },
   ancient_construct: {
     isBoss: true,
@@ -748,7 +748,7 @@ export const enemyData = {
     gold: 120,
     drops: ["construct_eye", "ancient_relic"],
     deathMessage: "Asterion no destruye el mundo. El mundo lo está matando. Busca... la Puerta del Dragón...",
-    img: "img/enemies/ancient_construct.png",
+    img: "img/enemies/ancient_construct.webp",
   },
   swamp_abominatinon: {
     isBoss: true,
@@ -763,7 +763,7 @@ export const enemyData = {
     gold: 120,
     drops: ["abomination_core", "inferno_blade"],
     deathMessage: "Ya no hay... esperanza... para mí...",
-    img: "img/enemies/swamp_abomination.png",
+    img: "img/enemies/swamp_abomination.webp",
   },
 
   frost_wyrm: {
@@ -779,7 +779,7 @@ export const enemyData = {
     gold: 120,
     drops: ["wyrm_tail", "glacial_core"],
     deathMessage: "Mil años... esperando... que alguien volviera...",
-    img: "img/enemies/frost_wyrm.png",
+    img: "img/enemies/frost_wyrm.webp",
   },
 
 };

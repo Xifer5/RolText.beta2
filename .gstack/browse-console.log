@@ -1,0 +1,12 @@
+[2026-07-03T22:05:49.035Z] [log] LAST-MSG: ¡Que comience la aventura!
+[2026-07-03T22:05:53.197Z] [log] SPEC: sword_master | SPECMSG: 🗡️ Ahora eres Maestro de Espadas. +15% daño cortante. Dominas las técnicas de esgrima avanzada.
+[2026-07-03T22:06:02.438Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET
+[2026-07-03T22:06:02.439Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET
+[2026-07-03T22:06:02.454Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET
+[2026-07-03T22:06:06.483Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET
+[2026-07-03T22:06:09.877Z] [log] DIFFMSG: 🔥 Dificultad: Difícil
+[2026-07-03T22:06:11.137Z] [log] REWARDS: xp +14 gold +6
+[2026-07-03T22:06:11.137Z] [log] VICTORY-MSG: ¡Victoria! +14 XP, +6 de oro.
+[2026-07-03T22:06:13.641Z] [log] SLIME-BASE-REWARDS: 10 5
+[2026-07-03T22:06:29.352Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET
+[2026-07-03T22:11:32.099Z] [error] Failed to load resource: net::ERR_CONNECTION_RESET

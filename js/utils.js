@@ -6,8 +6,8 @@ export function deepClone(obj) { return structuredClone ? structuredClone(obj) :
  * Resolve an icon field into a usable src URL.
  * Accepts:
  * - string emoji or full URL
- * - filename (e.g. "sword.png") which will be prefixed by window.ASSET_BASE or default './img/items/'
- * - object { type: 'img', src: 'sword.png' }
+ * - filename (e.g. "sword.webp") which will be prefixed by window.ASSET_BASE or default './img/items/'
+ * - object { type: 'img', src: 'sword.webp' }
  */
 export function resolveIconSrc(icon) {
 	if (!icon) return null;

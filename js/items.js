@@ -1,6 +1,6 @@
 // items.js
 // Item icons
-// - You can set `icon` to an emoji/text OR to a filename like 'sword.png'.
+// - You can set `icon` to an emoji/text OR to a filename like 'sword.webp'.
 // - Filenames are resolved with a base path defined by `window.ASSET_BASE` or the default './img/items/'.
 // - Avoid hard-coded absolute paths containing local folder names (e.g. 'pruebas/6.1/img/...') so the game can be hosted elsewhere.
 export const allItems = {
@@ -10,7 +10,7 @@ export const allItems = {
     name: { en: "Health Potion", es: "Poción de Salud" },
     description: { en: "Restores 25 HP.", es: "Restaura 25 HP." },
     restoreHp: 25,
-    icon: "./img/potionRed.png",
+    icon: "./img/potionRed.webp",
     type: "consumable",
     price: 10
   },
@@ -19,7 +19,7 @@ export const allItems = {
     name: { en: "Mana Potion", es: "Poción de Maná" },
     description: { en: "Restores 10 MP.", es: "Restaura 10 MP." },
     restoreMp: 20,
-    icon: "./img/potionBlue.png",
+    icon: "./img/potionBlue.webp",
     type: "consumable",
     price: 12
   },
@@ -90,7 +90,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 3,
     price: 20,
-    icon: "./img/dagger.png",
+    icon: "./img/dagger.webp",
   },
   sword: {
     id: "sword",
@@ -100,7 +100,7 @@ export const allItems = {
     type: "weapon",
     attack: 4,
     price: 30,
-    icon: "./img/swordWood.png"
+    icon: "./img/swordWood.webp"
   },
   axe: {
     id: "axe",
@@ -110,7 +110,7 @@ export const allItems = {
     type: "weapon",
     attack: 5,
     price: 35,
-    icon: "./img/axe.png"
+    icon: "./img/axe.webp"
   },
   hammer: {
     id: "hammer",
@@ -120,7 +120,7 @@ export const allItems = {
     type: "weapon",
     attack: 6,
     price: 45,
-    icon: "./img/hammer.png"
+    icon: "./img/hammer.webp"
   },
   vine_whip: {
     id: "vine_whip",
@@ -139,7 +139,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 8,
     price: 125,
-    icon: "./img/giantClub.png",
+    icon: "./img/giantClub.webp",
   },
   cutlass: {
     id: "cutlass",
@@ -158,7 +158,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 10,
     price: 100,
-    icon: "./img/trident.png",
+    icon: "./img/trident.webp",
   },
   tiger_blade: {
     id: "tiger_blade",
@@ -168,7 +168,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 12,
     price: 90,
-    icon: "./img/tiguerBlade.png",
+    icon: "./img/tiguerBlade.webp",
   },
 
   captain_sword: {
@@ -179,7 +179,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 13,
     price: 130,
-    icon: "./img/sword2.png",
+    icon: "./img/sword2.webp",
   },
   serpent_sword: {
     id: "serpent_sword",
@@ -189,7 +189,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 14,
     price: 120,
-    icon: "./img/swordSerpent.png",
+    icon: "./img/swordSerpent.webp",
   },
   crystal_blade: {
     id: "crystal_blade",
@@ -199,7 +199,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 15,
     magic: 3,
-    icon: "./img/swordCrystal.png",
+    icon: "./img/swordCrystal.webp",
     price: 200
   },
 
@@ -212,7 +212,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 25,
     price: 300,
-    icon: "./img/upg_sword.png",
+    icon: "./img/upg_sword.webp",
   },
   katana: {
     id: "katana",
@@ -222,7 +222,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 20,
     price: 200,
-    icon: "./img/katana1.png",
+    icon: "./img/katana1.webp",
   },
   demon_blade: {
     id: "demon_blade",
@@ -232,7 +232,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 25,
     price: 300,
-    icon: "./img/swordDark.png",
+    icon: "./img/swordDark.webp",
   },
 
   divine_sword: {
@@ -243,7 +243,7 @@ export const allItems = {
     type: "weapon",
     attack: 30,
     price: 150,
-    icon: "./img/swordDivine.png",
+    icon: "./img/swordDivine.webp",
   },
   excalibur: {
     id: "excalibur",
@@ -258,7 +258,7 @@ export const allItems = {
     price: 1000,
     hpBonus: 50,
     defense: 20,
-    icon: "./img/escalibur.png",
+    icon: "./img/escalibur.webp",
   },
   // Crafting Results
   iron_sword: {
@@ -269,7 +269,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 6,
     price: 40,
-    icon: "./img/swordIron.png",
+    icon: "./img/swordIron.webp",
   },
 
 
@@ -281,7 +281,7 @@ export const allItems = {
     slot: "rightHand",
     attack: 50,
     price: 500,
-    icon: "./img/swordOgre.png",
+    icon: "./img/swordOgre.webp",
   },
   //magic weapons
   staff: {
@@ -294,7 +294,7 @@ export const allItems = {
     magic: 5,
     mp: 5,
     price: 45,
-    icon: "./img/staff2.png",
+    icon: "./img/staff2.webp",
   },
   wand: {
     id: "wand",
@@ -306,7 +306,7 @@ export const allItems = {
     magic: 8,
     mp: 8,
     price: 65,
-    icon: "./img/wand.png"
+    icon: "./img/wand.webp"
   },
   elemental_wand: {
     id: "elemental_wand",
@@ -318,7 +318,7 @@ export const allItems = {
     magic: 10,
     mp: 10,
     price: 85,
-    icon: "./img/upg_wand.png",
+    icon: "./img/upg_wand.webp",
   },
   bless_staff: {
     id: "bless_staff",
@@ -330,7 +330,7 @@ export const allItems = {
     magic: 15,
     mp: 15,
     price: 120,
-    icon: "./img/staff3.png",
+    icon: "./img/staff3.webp",
   },
   water_staff: {
     id: "water_staff",
@@ -342,7 +342,7 @@ export const allItems = {
     magic: 14,
     mp: 14,
     price: 90,
-    icon: "./img/staff3.png",
+    icon: "./img/staff3.webp",
   },
   ocean_staff: {
     id: "ocean_staff",
@@ -354,7 +354,7 @@ export const allItems = {
     magic: 20,
     mp: 20,
     price: 140,
-    icon: "./img/staffWater.png",
+    icon: "./img/staffWater.webp",
   },
   flame_staff: {
     id: "flame_staff",
@@ -366,7 +366,7 @@ export const allItems = {
     magic: 30,
     mp: 30,
     price: 160,
-    icon: "./img/flameStaff.png",
+    icon: "./img/flameStaff.webp",
   },
   spirit_staff: {
     id: "spirit_staff",
@@ -378,7 +378,7 @@ export const allItems = {
     magic: 10,
     mp: 10,
     price: 140,
-    icon: "./img/staffAnima.png",
+    icon: "./img/staffAnima.webp",
   },
 
   //shields
@@ -390,7 +390,7 @@ export const allItems = {
     type: "shield",
     defense: 1,
     price: 15,
-    icon: "./img/shieldWood.png"
+    icon: "./img/shieldWood.webp"
   },
   shield: {
     id: "shield",
@@ -400,7 +400,7 @@ export const allItems = {
     type: "shield",
     defense: 2,
     price: 20,
-    icon: "./img/shieldWood.png"
+    icon: "./img/shieldWood.webp"
   },
   shield_of_elves: {
     id: "shield_of_elves",
@@ -410,7 +410,7 @@ export const allItems = {
     type: "shield",
     defense: 3,
     price: 80,
-    icon: "./img/shieldElven1.png"
+    icon: "./img/shieldElven1.webp"
   },
   iron_shield: {
     id: "iron_shield",
@@ -420,7 +420,7 @@ export const allItems = {
     type: "shield",
     defense: 4,
     price: 80,
-    icon: "./img/shield5.png"
+    icon: "./img/shield5.webp"
   },
   strong_shield: {
     id: "strong_shield",
@@ -430,7 +430,7 @@ export const allItems = {
     type: "shield",
     defense: 5,
     price: 100,
-    icon: "./img/shieldPlate2.png"
+    icon: "./img/shieldPlate2.webp"
   },
   tower_shield: {
     id: "tower_shield",
@@ -440,7 +440,7 @@ export const allItems = {
     type: "shield",
     defense: 10,
     price: 150,
-    icon: "./img/shieldTower.png"
+    icon: "./img/shieldTower.webp"
   },
   //boots
   boots_leather: {
@@ -451,7 +451,7 @@ export const allItems = {
     type: "boots",
     agility: 2,
     price: 18,
-    icon: "./img/bootsLeather.png"
+    icon: "./img/bootsLeather.webp"
   },
   boots: {
     id: "boots",
@@ -462,7 +462,7 @@ export const allItems = {
     rarity: "common",
     defense: 1,
     price: 40,
-    icon: "./img/boots7.png"
+    icon: "./img/boots7.webp"
   },
   leather_boots: {
     id: "leather_boots",
@@ -473,7 +473,7 @@ export const allItems = {
     rarity: "common",
     defense: 2,
     price: 40,
-    icon: "./img/bootsLeather.png"
+    icon: "./img/bootsLeather.webp"
   },
   iron_boots: {
     id: "iron_boots",
@@ -484,7 +484,7 @@ export const allItems = {
     rarity: "common",
     defense: 3,
     price: 90,
-    icon: "./img/boots1.png"
+    icon: "./img/boots1.webp"
   },
   plate_boots: {
     id: "plate_boots",
@@ -495,7 +495,7 @@ export const allItems = {
     rarity: "common",
     defense: 5,
     price: 100,
-    icon: "./img/boots3.png"
+    icon: "./img/boots3.webp"
   },
   magic_boots: {
     id: "magic_boots",
@@ -507,7 +507,7 @@ export const allItems = {
     defense: 5,
     intelligence: 5,
     price: 420,
-    icon: "./img/bootsMagic.png"
+    icon: "./img/bootsMagic.webp"
   },
   strength_boots: {
     id: "strength_boots",
@@ -519,7 +519,7 @@ export const allItems = {
     defense: 5,
     strength: 5,
     price: 420,
-    icon: "./img/bootsMagic.png"
+    icon: "./img/bootsMagic.webp"
   },
   black_boots: {
     id: "black_boots",
@@ -530,7 +530,7 @@ export const allItems = {
     rarity: "rare",
     defense: 8,
     price: 400,
-    icon: "./img/bootsBlack.png"
+    icon: "./img/bootsBlack.webp"
   },
   divine_boots: {
     id: "divine_boots",
@@ -541,7 +541,7 @@ export const allItems = {
     rarity: "epic",
     defense: 10,
     price: 500,
-    icon: "./img/bootsBlack.png"
+    icon: "./img/bootsBlack.webp"
   },
   //arms
   gloves: {
@@ -553,7 +553,7 @@ export const allItems = {
     rarity: "common",
     defense: 1,
     price: 30,
-    icon: "./img/arm2.png"
+    icon: "./img/arm2.webp"
   },
   leather_gloves: {
     id: "leather_gloves",
@@ -564,7 +564,7 @@ export const allItems = {
     rarity: "common",
     defense: 2,
     price: 40,
-    icon: "./img/arm1.png"
+    icon: "./img/arm1.webp"
   },
 
   bracers: {
@@ -576,7 +576,7 @@ export const allItems = {
     rarity: "common",
     defense: 3,
     price: 50,
-    icon: "./img/arm4.png"
+    icon: "./img/arm4.webp"
   },
 
   iron_bracers: {
@@ -588,7 +588,7 @@ export const allItems = {
     rarity: "common",
     defense: 4,
     price: 60,
-    icon: "./img/arm5.png"
+    icon: "./img/arm5.webp"
   },
 
   plate_bracers: {
@@ -600,7 +600,7 @@ export const allItems = {
     rarity: "uncommon",
     defense: 5,
     price: 100,
-    icon: "./img/armBattle.png"
+    icon: "./img/armBattle.webp"
   },
 
   magic_bracers: {
@@ -613,7 +613,7 @@ export const allItems = {
     defense: 5,
     intelligence: 5,
     price: 300,
-    icon: "./img/armGem.png",
+    icon: "./img/armGem.webp",
   },
   strength_bracers: {
     id: "strength_bracers",
@@ -625,7 +625,7 @@ export const allItems = {
     defense: 5,
     strength: 5,
     price: 400,
-    icon: "./img/armBronce.png",
+    icon: "./img/armBronce.webp",
   },
   black_bracers: {
     id: "black_bracers",
@@ -637,7 +637,7 @@ export const allItems = {
     defense: 8,
     strength: 6,
     price: 500,
-    icon: "./img/armBronc2.png",
+    icon: "./img/armBronc2.webp",
   },
   divine_bracers: {
     id: "divine_bracers",
@@ -649,7 +649,7 @@ export const allItems = {
     defense: 10,
     strength: 10,
     price: 1000,
-    icon: "./img/armAngel.png",
+    icon: "./img/armAngel.webp",
   },
   arms_bracelet: {
     id: "arms_bracelet",
@@ -659,7 +659,7 @@ export const allItems = {
     type: "arms",
     defense: 2,
     price: 15,
-    icon: "./img/braceletIron.png"
+    icon: "./img/ringIron.webp"
   },
   //ring
   ring_silver: {
@@ -671,7 +671,7 @@ export const allItems = {
     magic: 10,
     mp: 10,
     price: 25,
-    icon: "./img/ringSilver.png"
+    icon: "./img/ring4silver.webp"
   },
   ring_strength: {
     id: "ring_strength",
@@ -681,7 +681,7 @@ export const allItems = {
     type: "ring",
     strength: 2,
     price: 60,
-    icon: "./img/ringRedGem.png",
+    icon: "./img/ringRedGem.webp",
   },
   ring_agility: {
     id: "ring_agility",
@@ -691,7 +691,7 @@ export const allItems = {
     type: "ring",
     agility: 2,
     price: 60,
-    icon: "./img/ringIron.png",
+    icon: "./img/ringIron.webp",
   },
   ring_intelligence: {
     id: "ring_intelligence",
@@ -701,7 +701,7 @@ export const allItems = {
     type: "ring",
     intelligence: 2,
     price: 60,
-    icon: "./img/ringGemBlue.png",
+    icon: "./img/ringGemBlue.webp",
   },
   ring_of_knowledge: {
     id: "ring_of_knowledge",
@@ -711,7 +711,7 @@ export const allItems = {
     type: "ring",
     intelligence: 10,
     price: 600,
-    icon: "./img/ring4silver.png",
+    icon: "./img/ring4silver.webp",
   },
   ring_of_power: {
     id: "ring_of_power",
@@ -721,7 +721,7 @@ export const allItems = {
     type: "ring",
     strength: 10,
     price: 600,
-    icon: "./img/ringLord.png",
+    icon: "./img/ringLord.webp",
   },
   ring_of_elven: {
     id: "ring_of_elven",
@@ -731,7 +731,7 @@ export const allItems = {
     type: "ring",
     agility: 10,
     price: 600,
-    icon: "./img/ringStar.png",
+    icon: "./img/ringStar.webp",
   },
   ring_of_inferno: {
     id: "ring_of_inferno",
@@ -747,7 +747,7 @@ export const allItems = {
     mp: 15,
     hp: 15,
     price: 350,
-    icon: "./img/ringMagma.png"
+    icon: "./img/ringMagma.webp"
   },
 
   //helmet
@@ -759,7 +759,7 @@ export const allItems = {
     type: "helmet",
     defense: 1,
     price: 22,
-    icon: "./img/helmetLeather.png"
+    icon: "./img/helmet.webp"
   },
   helmet: {
     id: "helmet",
@@ -770,7 +770,7 @@ export const allItems = {
     rarity: "common",
     defense: 2,
     price: 70,
-    icon: "./img/helmet.png"
+    icon: "./img/helmet.webp"
   },
   iron_helmet: {
     id: "iron_helmet",
@@ -781,7 +781,7 @@ export const allItems = {
     rarity: "common",
     defense: 3,
     price: 80,
-    icon: "./img/helmet3.png"
+    icon: "./img/helmet3.webp"
   },
   plate_helmet: {
     id: "plate_helmet",
@@ -792,7 +792,7 @@ export const allItems = {
     rarity: "uncommon",
     defense: 5,
     price: 90,
-    icon: "./img/helmet2.png"
+    icon: "./img/helmet2.webp"
   },
 
   viking_helmet: {
@@ -805,7 +805,7 @@ export const allItems = {
     defense: 6,
     attack: 5,
     price: 600,
-    icon: "./img/helmetViking.png"
+    icon: "./img/helmetViking.webp"
   },
   spartan_helmet: {
     id: "spartan_helmet",
@@ -817,7 +817,7 @@ export const allItems = {
     defense: 7,
     attack: 7,
     price: 800,
-    icon: "./img/helmetSpartan.png"
+    icon: "./img/helmetSpartan.webp"
   },
   giant_orc_helmet: {
     id: "giant_orc_helmet",
@@ -829,7 +829,7 @@ export const allItems = {
     defense: 10,
     attack: 10,
     price: 800,
-    icon: "./img/helmetOrc.png"
+    icon: "./img/helmetOrc.webp"
   },
   divine_helmet: {
     id: "divine_helmet",
@@ -841,7 +841,7 @@ export const allItems = {
     defense: 12,
     attack: 15,
     price: 2000,
-    icon: "./img/helmetBless.png"
+    icon: "./img/helmetBless.webp"
   },
 
   //helmets MAGIC
@@ -854,7 +854,7 @@ export const allItems = {
     rarity: "common",
     defense: 1,
     price: 40,
-    icon: "./img/hat1.png"
+    icon: "./img/hat1.webp"
   },
   leather_hat: {
     id: "leather_hat",
@@ -865,7 +865,7 @@ export const allItems = {
     rarity: "common",
     defense: 2,
     price: 60,
-    icon: "./img/hat2.png"
+    icon: "./img/hat2.webp"
   },
 
   Magic_hat: {
@@ -878,7 +878,7 @@ export const allItems = {
     defense: 2,
     intelligence: 5,
     price: 200,
-    icon: "./img/hatMage.png"
+    icon: "./img/hatMage.webp"
   },
   acolyte_hat: {
     id: "acolyte_hat",
@@ -890,7 +890,7 @@ export const allItems = {
     defense: 3,
     intelligence: 8,
     price: 600,
-    icon: "./img/hatMage2.png"
+    icon: "./img/hatMage2.webp"
   },
   dark_mage_hat: {
     id: "dark_mage_hat",
@@ -902,7 +902,7 @@ export const allItems = {
     defense: 4,
     intelligence: 10,
     price: 1000,
-    icon: "./img/helmetBlackMage.png"
+    icon: "./img/helmetBlackMage.webp"
   },
 
   //accessory
@@ -914,7 +914,7 @@ export const allItems = {
     type: "accessory",
     strength: 2,
     price: 40,
-    icon: "./img/emblemHero.png"
+    icon: "./img/saintGrial.webp"
   },
   // Armaduras
   leather_armor: {
@@ -925,7 +925,7 @@ export const allItems = {
     slot: "armor",
     defense: 2,
     price: 70,
-    icon: "./img/armorLeather.png",
+    icon: "./img/armorLeather.webp",
   },
   armor: {
     id: "armor",
@@ -935,7 +935,7 @@ export const allItems = {
     type: "armor",
     defense: 4,
     price: 40,
-    icon: "./img/armorLeather4.png",
+    icon: "./img/armorLeather4.webp",
   },
   dark_armor: {
     id: "dark_armor",
@@ -945,7 +945,7 @@ export const allItems = {
     slot: "armor",
     defense: 20,
     price: 220,
-    icon: "./img/armorDark2.png",
+    icon: "./img/armorDark2.webp",
   },
   jungle_armor: {
     id: "jungle_armor",
@@ -955,7 +955,7 @@ export const allItems = {
     slot: "armor",
     defense: 8,
     price: 135,
-    icon: "./img/armorBarbarian.png",
+    icon: "./img/armorBarbarian.webp",
   },
   chainmail: {
     id: "chainmail",
@@ -965,7 +965,7 @@ export const allItems = {
     type: "armor",
     defense: 10,
     price: 80,
-    icon: "./img/armor2.png",
+    icon: "./img/armor2.webp",
   },
   sea_armor: {
     id: "sea_armor",
@@ -975,7 +975,7 @@ export const allItems = {
     slot: "armor",
     defense: 12,
     price: 150,
-    icon: "./img/armorSea.png",
+    icon: "./img/armorSea.webp",
   },
   captain_coat: {
     id: "captain_coat",
@@ -985,7 +985,7 @@ export const allItems = {
     slot: "armor",
     defense: 13,
     price: 140,
-    icon: "./img/robeDarkBattle.png",
+    icon: "./img/robeDarkBattle.webp",
   },
   royal_armor: {
     id: "royal_armor",
@@ -995,7 +995,7 @@ export const allItems = {
     slot: "armor",
     defense: 18,
     price: 350,
-    icon: "./img/armor8.png",
+    icon: "./img/armor8.webp",
   },
   plate_armor: {
     id: "plate_armor",
@@ -1005,7 +1005,7 @@ export const allItems = {
     type: "armor",
     defense: 20,
     price: 300,
-    icon: "./img/armor8.png",
+    icon: "./img/armor8.webp",
   },
   stone_armor: {
     id: "stone_armor",
@@ -1015,7 +1015,7 @@ export const allItems = {
     slot: "armor",
     defense: 14,
     price: 160,
-    icon: "./img/armorStone.png",
+    icon: "./img/armorStone.webp",
   },
 
   dragon_king_armor: {
@@ -1026,7 +1026,7 @@ export const allItems = {
     slot: "armor",
     defense: 50,
     price: 500,
-    icon: "./img/dragonKingArmor.png",
+    icon: "./img/dragonKingArmor.webp",
   },
   //armor magic
   robe: {
@@ -1038,7 +1038,7 @@ export const allItems = {
     intelligence: 2,
     defense: 1,
     price: 35,
-    icon: "./img/robe.png",
+    icon: "./img/robe.webp",
   },
   gown: {
     id: "gown",
@@ -1049,7 +1049,7 @@ export const allItems = {
     intelligence: 5,
     defense: 3,
     price: 50,
-    icon: "./img/robe2.png",
+    icon: "./img/robe2.webp",
   },
   arcane_robe: {
     id: "arcane_robe",
@@ -1060,7 +1060,7 @@ export const allItems = {
     intelligence: 8,
     defense: 5,
     price: 80,
-    icon: "./img/robeGreen.png",
+    icon: "./img/robeGreen.webp",
   },
   aqua_robe: {
     id: "aqua_robe",
@@ -1071,7 +1071,7 @@ export const allItems = {
     intelligence: 12,
     defense: 6,
     price: 130,
-    icon: "./img/aquaRobe.png",
+    icon: "./img/aquaRobe.webp",
   },
   coral_robe: {
     id: "coral_robe",
@@ -1082,7 +1082,7 @@ export const allItems = {
     intelligence: 10,
     defense: 8,
     price: 150,
-    icon: "./img/coralRobe.png",
+    icon: "./img/coralRobe.webp",
   },
   fire_robe: {
     id: "fire_robe",
@@ -1093,7 +1093,7 @@ export const allItems = {
     intelligence: 14,
     defense: 9,
     price: 170,
-    icon: "./img/coralRobe.png",
+    icon: "./img/coralRobe.webp",
   },
   nature_robe: {
     id: "nature_robe",
@@ -1104,7 +1104,7 @@ export const allItems = {
     intelligence: 12,
     defense: 6,
     price: 130,
-    icon: "./img/robeGreen2.png",
+    icon: "./img/robeGreen2.webp",
   },
 
   ethereal_robe: {
@@ -1116,7 +1116,7 @@ export const allItems = {
     intelligence: 14,
     defense: 8,
     price: 150,
-    icon: "./img/robeMerlin2.png",
+    icon: "./img/robeMerlin2.webp",
   },
 
   // Accesorios
@@ -1131,7 +1131,7 @@ export const allItems = {
     strength: 30,
     hpBonus: 80,
     price: 60,
-    icon: "./img/saintGrial.png",
+    icon: "./img/saintGrial.webp",
   },
   dragon_king_crown: {
     id: "dragon_king_crown",
@@ -1143,7 +1143,7 @@ export const allItems = {
     strength: 25,
     agility: 25,
     price: 4000,
-    icon: "./img/dragonKingCrow.png",
+    icon: "./img/dragonKingCrow.webp",
   },
 
 
@@ -1158,7 +1158,7 @@ export const allItems = {
     type: "material",
     rarity: "common",
     price: 5,
-    icon: "./img/herbs.png",
+    icon: "./img/herbs.webp",
   },
 
   wolf_pelt: {
@@ -1167,7 +1167,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 8,
-    icon: "./img/wolfPelt.png",
+    icon: "./img/wolfPelt.webp",
   },
 
   fungus_core: {
@@ -1176,7 +1176,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 18,
-    icon: "./img/fungusCore.png",
+    icon: "./img/fungusCore.webp",
   },
 
   iron_ore: {
@@ -1186,7 +1186,7 @@ export const allItems = {
     type: "material",
     rarity: "common",
     price: 5,
-    icon: "./img/ironOre.png",
+    icon: "./img/ironOre.webp",
   },
 
   bat_wing: {
@@ -1195,7 +1195,7 @@ export const allItems = {
     type: "material",
     rarity: "common",
     price: 8,
-    icon: "./img/batWing.png",
+    icon: "./img/batWing.webp",
   },
 
   crystal_shard: {
@@ -1204,7 +1204,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 20,
-    icon: "./img/cristalShard.png",
+    icon: "./img/cristalShard.webp",
   },
 
   golem_fragment: {
@@ -1213,7 +1213,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 35,
-    icon: "./img/golemFragment.png"
+    icon: "./img/golemFragment.webp"
   },
 
   ice_crystal: {
@@ -1222,7 +1222,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 15,
-    icon: "./img/iceCristal.png",
+    icon: "./img/iceCristal.webp",
   },
 
   wyvern_scale: {
@@ -1231,7 +1231,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 35,
-    icon: "./img/wyvernScale.png",
+    icon: "./img/wyvernScale.webp",
   },
 
   giant_bone: {
@@ -1240,7 +1240,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 25,
-    icon: "./img/giantBone.png",
+    icon: "./img/giantBone.webp",
   },
 
   ancient_relic: {
@@ -1249,7 +1249,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 50,
-    icon: "./img/ancientRelic.png",
+    icon: "./img/ancientRelic.webp",
   },
 
   enchanted_dust: {
@@ -1258,7 +1258,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 12,
-    icon: "./img/enchantedDust.png",
+    icon: "./img/enchantedDust.webp",
   },
 
   runestone: {
@@ -1267,7 +1267,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 30,
-    icon: "./img/runeBlack.png",
+    icon: "./img/runeBlack.webp",
   },
 
   ancient_core: {
@@ -1276,7 +1276,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 40,
-    icon: "./img/runeSpirit.png",
+    icon: "./img/runeSpirit.webp",
   },
 
   arcane_relic: {
@@ -1285,7 +1285,7 @@ export const allItems = {
     type: "material",
     rarity: "legendary",
     price: 100,
-    icon: "./img/rune1.png",
+    icon: "./img/rune1.webp",
   },
 
   poison_gland: {
@@ -1294,7 +1294,7 @@ export const allItems = {
     type: "material",
     rarity: "common",
     price: 6,
-    icon: "./img/poisonGland.png"
+    icon: "./img/poisonGland.webp"
   },
 
   acid_sac: {
@@ -1303,7 +1303,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 10,
-    icon: "./img/acidSac.png"
+    icon: "./img/acidSac.webp"
   },
 
   necrotic_bone: {
@@ -1312,7 +1312,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 22,
-    icon: "./img/necroticBone.png",
+    icon: "./img/necroticBone.webp",
   },
 
   toxic_heart: {
@@ -1321,7 +1321,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 45,
-    icon: "./img/toxicHeart.png",
+    icon: "./img/toxicHeart.webp",
   },
 
   magma_fragment: {
@@ -1330,7 +1330,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 18,
-    icon: "./img/magmaFragment.png",
+    icon: "./img/magmaFragment.webp",
   },
 
   pyro_core: {
@@ -1339,7 +1339,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 28,
-    icon: "./img/pyroCore.png",
+    icon: "./img/pyroCore.webp",
   },
 
   dragon_scale: {
@@ -1348,7 +1348,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 75,
-    icon: "./img/dragonScale.png",
+    icon: "./img/dragonScale.webp",
   },
 
   heart_of_inferno: {
@@ -1357,7 +1357,7 @@ export const allItems = {
     type: "material",
     rarity: "legendary",
     price: 150,
-    icon: "./img/heartOfInferno.png",
+    icon: "./img/heartOfInferno.webp",
   },
 
   frost_shard: {
@@ -1366,7 +1366,7 @@ export const allItems = {
     type: "material",
     rarity: "uncommon",
     price: 14,
-    icon: "./img/frostShard.png",
+    icon: "./img/frostShard.webp",
   },
 
   ice_essence: {
@@ -1375,7 +1375,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 24,
-    icon: "./img/iceEssence.png",
+    icon: "./img/iceEssence.webp",
   },
 
   glacial_core: {
@@ -1384,7 +1384,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 60,
-    icon: "./img/frostShard.png",
+    icon: "./img/frostShard.webp",
   },
 
 
@@ -1398,7 +1398,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 40,
-    icon: "./img/titanBranch.png",
+    icon: "./img/titanBranch.webp",
   },
 
   forest_emblem: {
@@ -1412,7 +1412,7 @@ export const allItems = {
     defense: 2,
     hpBonus: 20,
     price: 90,
-    icon: "./img/runeGreen.png",
+    icon: "./img/runeGreen.webp",
   },
 
   devourer_fang: {
@@ -1421,7 +1421,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 45,
-    icon: "./img/devourerFang.png",
+    icon: "./img/devourerFang.webp",
   },
 
   earthbreaker_core: {
@@ -1430,7 +1430,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 100,
-    icon: "./img/earthbreakerCore.png"
+    icon: "./img/earthbreakerCore.webp"
   },
 
   colossus_heart: {
@@ -1439,7 +1439,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 55,
-    icon: "./img/colossusHeart.png",
+    icon: "./img/colossusHeart.webp",
   },
 
   mountain_emblem: {
@@ -1452,7 +1452,7 @@ export const allItems = {
     hpBonus: 30,
     price: 120,
     description: { en: "The Mountain Emblem. +4 DEF", es: "El Emblema de la Montaña. +4 DEF" },
-    icon: "./img/runeKey.png"
+    icon: "./img/runeKey.webp"
   },
 
   construct_eye: {
@@ -1473,7 +1473,7 @@ export const allItems = {
     defense: 3,
     price: 150,
     description: { en: "The Arcane Emblem. +3 DEF, +8 Magic", es: "El Emblema Arcano. +3 DEF, +8 Magia" },
-    icon: "./img/runeMagic.png"
+    icon: "./img/runeMagic.webp"
   },
 
   abomination_core: {
@@ -1494,7 +1494,7 @@ export const allItems = {
     magic: 3,
     price: 120,
     description: { en: "The Plague Emblem. +3 STR, +3 Magic", es: "El Emblema de la Plaga. +3 FUE, +3 Magia" },
-    icon: "./img/runeRed.png"
+    icon: "./img/runeRed.webp"
   },
 
   inferno_eye: {
@@ -1515,7 +1515,7 @@ export const allItems = {
     magic: 5,
     price: 200,
     description: { en: "The Inferno Emblem. +5 ATK, +5 Magic", es: "El Emblema del Infierno. +5 ATK, +5 Magia" },
-    icon: "./img/runeRed2.png"
+    icon: "./img/runeRed2.webp"
   },
 
   wyrm_tail: {
@@ -1536,7 +1536,7 @@ export const allItems = {
     magic: 4,
     price: 180,
     description: { en: "The Tundra Emblem. +5 DEF, +4 Magic", es: "El Emblema de la Tundra. +5 DEF, +4 Magia" },
-    icon: "./img/runePurple.png"
+    icon: "./img/runePurple.webp"
   },
 
   forest_emblem_upgraded: {
@@ -1549,7 +1549,7 @@ export const allItems = {
     defense: 5,
     price: 180,
     description: { en: "The Forest Emblem+. +5 DEF, +10 Magic", es: "El Emblema del Bosque+. +5 DEF, +10 Magia" },
-    icon: "./img/runeGreen2.png"
+    icon: "./img/runeGreen2.webp"
   },
 
   inferno_emblem_upgraded: {
@@ -1565,7 +1565,7 @@ export const allItems = {
     magic: 10,
     price: 300,
     description: { en: "The Inferno Emblem+. +10 STR, +10 AGI, +10 INT, +10 ATK, +10 Magic", es: "El Emblema del Infierno+. +10 FUE, +10 AGI, +10 INT, +10 ATK, +10 Magia" },
-    icon: "./img/runeFire.png"
+    icon: "./img/runeFire.webp"
   },
 
   rusty_coin: {
@@ -1590,7 +1590,7 @@ export const allItems = {
     type: "key_item",
     rarity: "rare",
     price: 100,
-    icon: "./img/goldenKey.png",
+    icon: "./img/goldenKey.webp",
   },
   garden_key: {
     id: "garden_key",
@@ -1607,7 +1607,7 @@ export const allItems = {
     type: "key_item",
     rarity: "uncommon",
     price: 50,
-    icon: "./img/map.png",
+    icon: "./img/map.webp",
   },
   world_map: {
     id: "world_map",
@@ -1616,7 +1616,7 @@ export const allItems = {
     rarity: "epic",
     price: 150,
     description: { en: "A map that shows the entire world.", es: "Un mapa que muestra el mundo entero." },
-    icon: "./img/Map.png",
+    icon: "./img/Map.webp",
   },
 
   ancient_guardian_core: {
@@ -1625,7 +1625,7 @@ export const allItems = {
     type: "material",
     rarity: "legendary",
     price: 200,
-    icon: "./img/ancientGuardianCore.png",
+    icon: "./img/ancientGuardianCore.webp",
   },
   treasure_guardian_core: {
     id: "treasure_guardian_core",
@@ -1633,7 +1633,7 @@ export const allItems = {
     type: "material",
     rarity: "epic",
     price: 120,
-    icon: "./img/ancientGuardianCore.png",
+    icon: "./img/ancientGuardianCore.webp",
   },
   treasure_guardian_heart: {
     id: "treasure_guardian_heart",
@@ -1641,7 +1641,7 @@ export const allItems = {
     type: "material",
     rarity: "rare",
     price: 80,
-    icon: "./img/heart.png",
+    icon: "./img/heart.webp",
   },
   dragon_heart: {
     id: "dragon_heart",
@@ -1649,7 +1649,7 @@ export const allItems = {
     type: "material",
     rarity: "legendary",
     price: 250,
-    icon: "./img/heartOfInferno.png",
+    icon: "./img/heartOfInferno.webp",
   },
   inferno_gem: {
     id: "inferno_gem",
@@ -1657,7 +1657,7 @@ export const allItems = {
     type: "material",
     rarity: "legendary",
     price: 220,
-    icon: "./img/infernoGem.png",
+    icon: "./img/infernoGem.webp",
   },
 
   // ── Pergaminos de habilidad (SPEC-0607) ──────────────

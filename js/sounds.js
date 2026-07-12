@@ -5,7 +5,7 @@
  * Efectos: coloca archivos en sounds/ y edita SOUND_MAP
  * Música:  coloca archivos en music/  y edita MUSIC_MAP
  *   - null deshabilita ese evento
- *   - Formatos: .ogg (recomendado), .mp3, .wav
+ *   - Formatos: .ogg (recomendado), .wav
  *
  * ── FUENTES CC0 GRATUITAS ────────────────────────────────────────────
  *   freesound.org          → filtro "Creative Commons 0"
@@ -17,23 +17,23 @@
 // ── MAPA DE EFECTOS DE SONIDO — EDITABLE ─────────────────────────────
 export const SOUND_MAP = {
   // Combate
-  combat_start: "sounds/combat_start.mp3",
-  attack:       "sounds/attack.mp3",
-  magic:        "sounds/magic.mp3",
-  skill:        "sounds/skill.mp3",
-  hit:          "sounds/hit.mp3",
-  player_hurt:  "sounds/player_hurt.mp3",
-  enemy_die:    "sounds/enemy_die.mp3",
-  player_die:   "sounds/player_die.mp3",
-  flee:         "sounds/flee.mp3",
+  combat_start: "sounds/combat_start.ogg",
+  attack:       "sounds/attack.ogg",
+  magic:        "sounds/magic.ogg",
+  skill:        "sounds/skill.ogg",
+  hit:          "sounds/hit.ogg",
+  player_hurt:  "sounds/player_hurt.ogg",
+  enemy_die:    "sounds/enemy_die.ogg",
+  player_die:   "sounds/player_die.ogg",
+  flee:         "sounds/flee.ogg",
   // Progresión
-  level_up:     "sounds/level_up.mp3",
-  loot:         "sounds/loot.mp3",
-  quest_done:   "sounds/quest_done.mp3",
+  level_up:     "sounds/level_up.ogg",
+  loot:         "sounds/loot.ogg",
+  quest_done:   "sounds/quest_done.ogg",
   // Exploración / UI
-  move:         "sounds/move.mp3",
-  /*rest:         "sounds/rest.ogg",
-  npc_talk:     "sounds/npc_talk.ogg",*/
+  move:         "sounds/move.ogg",
+  rest:         "sounds/rest.ogg",
+  npc_talk:     "sounds/quest_done.ogg",
 };
 
 // ── MAPA DE MÚSICA — EDITABLE ─────────────────────────────────────────
@@ -41,23 +41,23 @@ export const SOUND_MAP = {
 // Alias: puedes apuntar varios biomas al mismo archivo.
 // null = sin música en esa zona.
 export const MUSIC_MAP = {
-  town:     "music/town.mp3",
-  forest:   "music/forest.mp3",
-  dungeon:  "music/cave.mp3",
-  mountain: "music/forest.mp3",
-  cave:     "music/cave.mp3",
-  swamp:    "music/swamp.mp3",
-  desert:   "music/swamp.mp3",
-  sea:      "music/forest.mp3",
-  beach:    "music/forest.mp3",
-  jungle:   "music/cave.mp3",
-  tundra:   "music/inferno.mp3",
-  volcano:  "music/forest.mp3",
-  garden:   "music/inferno.mp3",
-  /*combat:   "music/combat.mp3",*/
-  inferno:   "music/inferno.mp3",
-  castle:   "music/forest.mp3",
-  port:     "music/forest.mp3",
+  town:     "music/town.ogg",
+  forest:   "music/forest.ogg",
+  dungeon:  "music/cave.ogg",
+  mountain: "music/forest.ogg",
+  cave:     "music/cave.ogg",
+  swamp:    "music/swamp.ogg",
+  desert:   "music/swamp.ogg",
+  sea:      "music/forest.ogg",
+  beach:    "music/forest.ogg",
+  jungle:   "music/cave.ogg",
+  tundra:   "music/inferno.ogg",
+  volcano:  "music/forest.ogg",
+  garden:   "music/inferno.ogg",
+  combat:   "music/inferno.ogg",
+  inferno:   "music/inferno.ogg",
+  castle:   "music/forest.ogg",
+  port:     "music/forest.ogg",
   none:     null,
 };
 

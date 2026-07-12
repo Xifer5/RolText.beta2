@@ -11,9 +11,9 @@ import { renderBestiary } from "./bestiary.js";
 import { t, formatText, localizeText } from "./i18n.js";
 
 const CLASS_AVATARS = {
-  warrior: "img/avatar_warrior.png",
-  mage:    "img/avatar_mage.png",
-  rogue:   "img/avatar_rogue.png",
+  warrior: "img/avatar_warrior.webp",
+  mage:    "img/avatar_mage.webp",
+  rogue:   "img/avatar_rogue.webp",
 };
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";

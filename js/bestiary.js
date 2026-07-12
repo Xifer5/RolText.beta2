@@ -101,7 +101,7 @@ export function renderBestiary() {
       <div class="bestiary-entry ${isDiscovered ? 'discovered' : 'undiscovered'}">
         <div class="bestiary-portrait-wrap">
           ${isDiscovered
-            ? `<img class="bestiary-portrait" src="img/enemies/${id}.png" alt="${enemy.type}" onerror="this.style.display='none'">`
+            ? `<img class="bestiary-portrait" src="${enemy.img || `img/enemies/${id}.webp`}" alt="${enemy.type}" onerror="this.style.display='none'">`
             : `<span class="bestiary-portrait-unk">?</span>`}
         </div>
         <div class="bestiary-body">
