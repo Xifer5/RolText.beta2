@@ -4756,6 +4756,26 @@ kbd {
   color: var(--md-on-surface-variant); min-height: 1.2em;
 }
 
+/* SPEC-1001 — recap de decisiones en el modal de final */
+.ending-decisions-block {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-c);
+  text-align: left;
+}
+.ending-decisions {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--md-on-surface);
+}
+
 /* SPEC-0904 — consejo táctico bajo el chip de intent */
 .enemy-intent-advice {
   display: block;

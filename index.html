@@ -633,12 +633,16 @@
 
 <div id="endingModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ending-title">
   <div class="modal-content modal-content-sm modal-text-center">
-    <h2 id="ending-title" data-i18n="endingTitle">🏆 ¡Victoria! 🏆</h2>
-    <p id="endingMessage" class="modal-body-text" data-i18n="endingMessage">Has derrotado al Dragon King.</p>
+    <h2 id="ending-title">🏆 ¡Victoria! 🏆</h2>
+    <p id="endingMessage" class="modal-body-text">Has derrotado al Rey Dragón.</p>
     <div class="ending-stats-grid">
       <div><div class="es-label" data-i18n="endingLevelLabel">Nivel</div><div class="es-val" id="ending-level">0</div></div>
       <div><div class="es-label" data-i18n="endingGoldLabel">Oro</div><div class="es-val gold-accent" id="ending-gold">0</div></div>
       <div><div class="es-label" data-i18n="endingXpLabel">XP</div><div class="es-val" id="ending-xp">0</div></div>
+    </div>
+    <div class="ending-decisions-block">
+      <div class="es-label" data-i18n="endingDecisionsLabel">El mundo recuerda</div>
+      <ul id="ending-decisions" class="ending-decisions"></ul>
     </div>
     <div class="modal-actions-row">
       <button id="endingRestartBtn" class="btn-action" data-i18n="endingRestartButton">🔄 Reiniciar</button>

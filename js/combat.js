@@ -19,6 +19,7 @@ import { showSpecializationModal } from "./specModal.js";
 import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import { consumeEchoReward } from "./echoIntro.js";
+import { showEnding } from "./endings.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
@@ -650,10 +651,13 @@ function endCombat(victory, fled = false) {
 
     // Dragon King epilogue — climax of the main story
     if (enemy.id === "dragon_king") {
+      gameState.mainQuestCompleted = true;
       setTimeout(() => addMessage(t("dragonKingThanks"),  "system"), 1200);
       setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 2800);
       setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
       setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 6200);
+      // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
+      setTimeout(() => showEnding(), 7800);
     }
 
     // Record kill for bestiary
