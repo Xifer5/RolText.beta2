@@ -20,6 +20,7 @@ import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import { consumeEchoReward } from "./echoIntro.js";
 import { showEnding } from "./endings.js";
+import { recordRun } from "./runLog.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
@@ -528,6 +529,7 @@ async function enemyTurn() {
     gameState.isInCombat = false;
     playSound("player_die");
     addMessage(t('combatGameOverDefeated'), "combat");
+    recordRun("defeat");
     updateUI();
     setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
     return;
@@ -594,6 +596,7 @@ function processPlayerDebuffs() {
     gameState.playerDebuffs = {};
     playSound("player_die");
     addMessage(t('combatStatusEffectsDefeat'), "combat");
+    recordRun("defeat");
     updateUI();
     setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
     return true;
@@ -657,6 +660,8 @@ function endCombat(victory, fled = false) {
       setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
       setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 6200);
       // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
+      // SPEC-1003: la crónica se escribe tras cerrar el resto de endCombat (kills ya contadas)
+      setTimeout(() => recordRun("victory"), 100);
       setTimeout(() => showEnding(), 7800);
     }
 

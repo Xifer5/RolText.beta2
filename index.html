@@ -521,6 +521,7 @@
       <button id="continueBtn" class="menu-option" data-i18n="continueButton">▶️ Continuar</button>
       <button id="saveGameBtn" class="menu-option" data-i18n="saveGameButton">💾 Guardar</button>
       <button id="loadGameBtn" class="menu-option" data-i18n="loadGameButton">📂 Cargar</button>
+      <button id="runLogBtn" class="menu-option" data-i18n="runLogButton">📜 Crónica</button>
       <button id="onboardingToggleBtn" class="menu-option">💡 Consejos de novato: ON</button>
       <button id="closeMenuBtn" class="menu-option ghost" data-i18n="closeButton">✕ Cerrar</button>
     </div>
@@ -538,6 +539,17 @@
       </div>
     </div>
     <div class="save-info" id="saveInfo"></div>
+  </div>
+</div>
+
+<!-- RUN LOG / CRÓNICA (SPEC-1003) -->
+<div id="runLogModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="run-log-title">
+  <div class="modal-content save-slots-content">
+    <div class="modal-header">
+      <h2 id="run-log-title" data-i18n="runLogTitle">📜 Crónica de aventureros</h2>
+      <button class="modal-close" id="closeRunLogBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
+    </div>
+    <div id="runLogList" class="save-slots-list"></div>
   </div>
 </div>
 

@@ -2,6 +2,7 @@ import { gameState, initializeGame } from "./state.js";
 import { updateUI, toggleMainMenu } from "./ui.js";
 import { loadGame } from "./saveSystem.js";
 import { openSaveSlotsModal, setupSaveSlotsModal } from "./saveSlotsModal.js";
+import { setupRunLog } from "./runLog.js";
 import { t } from "./i18n.js";
 import { isOnboardingEnabled, toggleOnboarding } from "./onboarding.js";
 import { showToast } from "./toast.js";
@@ -43,6 +44,7 @@ export function setupMainMenuListeners() {
   });
 
   setupSaveSlotsModal();
+  setupRunLog();
 
   document.getElementById("closeMenuBtn")?.addEventListener("click", () => {
     toggleMainMenu(false);
