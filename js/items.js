@@ -975,7 +975,7 @@ export const allItems = {
     slot: "armor",
     defense: 12,
     price: 150,
-    icon: "./img/armorSea.webp",
+    icon: "./img/ArmorSea.webp",
   },
   captain_coat: {
     id: "captain_coat",
@@ -1616,7 +1616,7 @@ export const allItems = {
     rarity: "epic",
     price: 150,
     description: { en: "A map that shows the entire world.", es: "Un mapa que muestra el mundo entero." },
-    icon: "./img/Map.webp",
+    icon: "./img/map.webp",
   },
 
   ancient_guardian_core: {

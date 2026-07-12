@@ -1,0 +1,19 @@
+# Pixel Quest Echoes — sitio estático puro, sin build
+[build]
+  publish = "."
+
+# Cache agresiva para assets (immutables en la práctica); el HTML/JS se revalida
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/sounds/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/music/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
