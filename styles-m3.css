@@ -4732,7 +4732,7 @@ kbd {
   margin-bottom: var(--sp-2);
 }
 .difficulty-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; }
-.diff-chip {
+.diff-chip, .origin-chip {
   display: inline-flex; align-items: center; gap: 6px;
   min-height: 44px; padding: 8px 16px;
   border: 1.5px solid var(--md-outline, #49454f); border-radius: 20px;
@@ -4740,8 +4740,8 @@ kbd {
   font-family: inherit; font-size: .85rem; cursor: pointer;
   transition: background .15s, border-color .15s, transform .1s;
 }
-.diff-chip:hover { border-color: var(--diff-color); transform: translateY(-1px); }
-.diff-chip.selected {
+.diff-chip:hover, .origin-chip:hover { border-color: var(--diff-color); transform: translateY(-1px); }
+.diff-chip.selected, .origin-chip.selected {
   border-color: var(--diff-color);
   background: color-mix(in srgb, var(--diff-color) 22%, transparent);
   font-weight: 700;

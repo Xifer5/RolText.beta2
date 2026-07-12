@@ -663,6 +663,98 @@ export const TRAVEL_EVENTS = [
     ]
   },
 
+  // ── Origen (SPEC-1002) — tu pasado te alcanza una vez por partida ─
+  {
+    id: "origin_exile_tracks",
+    icon: "🏜️",
+    condition: () => hasFlag("origin_exile") && !hasFlag("origin_exile_seen"),
+    title: { en: "Familiar Tracks", es: "Huellas conocidas" },
+    text: { en: "Broken branches, ash buried the old way. Someone camped here like the exiles do — like you did, all those nights.", es: "Ramas quebradas, ceniza enterrada a la vieja usanza. Alguien acampó aquí como lo hacen los exiliados — como lo hiciste tú tantas noches." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Scavenge the camp", es: "Rebuscar en el campamento" },
+        icon: "🔍",
+        apply() {
+          setFlag("origin_exile_seen");
+          const hp = 12;
+          gameState.player.hp = Math.min(gameState.player.maxHp, (gameState.player.hp ?? 0) + hp);
+          gameState.player.experience = (gameState.player.experience ?? 0) + 20;
+          return { en: `Dried meat and a windbreak. Old habits keep you alive. +${hp} HP, +20 XP`, es: `Carne seca y un cortavientos. Los viejos hábitos te mantienen vivo. +${hp} HP, +20 XP` };
+        }
+      },
+      {
+        label: { en: "Leave it for the next exile", es: "Dejarlo para el siguiente exiliado" },
+        icon: "🤝",
+        apply() {
+          setFlag("origin_exile_seen");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 30;
+          return { en: "You add your own supplies to the cache. The road code lives on. +30 XP", es: "Añades provisiones propias al escondite. El código del camino sigue vivo. +30 XP" };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "origin_apprentice_notes",
+    icon: "📜",
+    condition: () => hasFlag("origin_apprentice") && !hasFlag("origin_apprentice_seen"),
+    title: { en: "Margin Notes", es: "Notas al margen" },
+    text: { en: "A weathered waystone bears a rune you copied a hundred times in the tower. Your old master's hand wrote the margin note beside it.", es: "Un mojón desgastado luce una runa que copiaste cien veces en la torre. La nota al margen es de puño y letra de tu viejo maestro." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Decipher the full inscription", es: "Descifrar la inscripción completa" },
+        icon: "📖",
+        apply() {
+          setFlag("origin_apprentice_seen");
+          const mp = 12;
+          gameState.player.mp = Math.min(gameState.player.maxMp, (gameState.player.mp ?? 0) + mp);
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: `The words rearrange themselves for a trained eye. +${mp} MP, +25 XP`, es: `Las palabras se reordenan ante un ojo entrenado. +${mp} MP, +25 XP` };
+        }
+      },
+      {
+        label: { en: "Trace the rune and move on", es: "Calcar la runa y seguir" },
+        icon: "✍️",
+        apply() {
+          setFlag("origin_apprentice_seen");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 20;
+          return { en: "For later study, like the tower taught you. +20 XP", es: "Para estudiarla después, como enseñaba la torre. +20 XP" };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "origin_mercenary_debt",
+    icon: "🪙",
+    condition: () => hasFlag("origin_mercenary") && !hasFlag("origin_mercenary_seen"),
+    title: { en: "An Old Contract", es: "Un viejo contrato" },
+    text: { en: "A scarred veteran squints at you. \"Guild colors, eh? I owe your company from the border war. Never paid my share.\"", es: "Un veterano lleno de cicatrices te escruta. «Colores del gremio, ¿eh? Le debo a tu compañía desde la guerra de la frontera. Nunca pagué mi parte.»" },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Collect the debt", es: "Cobrar la deuda" },
+        icon: "💰",
+        apply() {
+          setFlag("origin_mercenary_seen");
+          gameState.player.gold = (gameState.player.gold ?? 0) + 25;
+          return { en: "\"A debt's a debt.\" He counts out the coins without complaint. +25 gold", es: "«Una deuda es una deuda.» Cuenta las monedas sin rechistar. +25 oro" };
+        }
+      },
+      {
+        label: { en: "Cancel it for a war story", es: "Perdonarla a cambio de una historia" },
+        icon: "🍺",
+        apply() {
+          setFlag("origin_mercenary_seen");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 30;
+          return { en: "His tale of the border war is worth more than coin. +30 XP", es: "Su historia de la guerra de la frontera vale más que el oro. +30 XP" };
+        }
+      }
+    ]
+  },
+
   // ── Follow-ups (SPEC-0803) — el mundo recuerda tus decisiones ────
   {
     id: "traveler_grateful",

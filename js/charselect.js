@@ -3,6 +3,7 @@
 // ══════════════════════════════════════════════════════
 import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
 import { DIFFICULTY_CONFIG, getDifficultyEffects } from "./difficulty.js";
+import { ORIGINS, applyOrigin } from "./origins.js";
 import { gameState, resetState } from "./state.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
@@ -52,6 +53,19 @@ export function showCharacterSelect(onComplete) {
       </div>
 
       <div class="difficulty-row">
+        <label class="difficulty-label">${t('originLabel')}</label>
+        <div class="difficulty-chips" role="radiogroup" aria-label="${t('originLabel')}">
+          ${Object.values(ORIGINS).map(o => `
+            <button type="button" class="origin-chip${o.id === 'exile' ? ' selected' : ''}" data-origin="${o.id}"
+                    style="--diff-color:${o.color}" role="radio" aria-checked="${o.id === 'exile'}">
+              ${o.emoji} ${localizeText(o.name)}
+            </button>
+          `).join("")}
+        </div>
+        <p class="diff-desc" id="originDesc"></p>
+      </div>
+
+      <div class="difficulty-row">
         <label class="difficulty-label">${t('difficultyLabel')}</label>
         <div class="difficulty-chips" role="radiogroup" aria-label="${t('difficultyLabel')}">
           ${Object.values(DIFFICULTY_CONFIG).map(d => `
@@ -78,6 +92,26 @@ export function showCharacterSelect(onComplete) {
 
   let selectedClass = null;
   let selectedDifficulty = "easy";
+  let selectedOrigin = "exile";
+
+  // Origin selection (SPEC-1002)
+  const updateOriginInfo = (id) => {
+    const el = modal.querySelector("#originDesc");
+    if (el) el.textContent = localizeText(ORIGINS[id]?.description) || "";
+  };
+  updateOriginInfo("exile");
+  modal.querySelectorAll(".origin-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      modal.querySelectorAll(".origin-chip").forEach(c => {
+        c.classList.remove("selected");
+        c.setAttribute("aria-checked", "false");
+      });
+      chip.classList.add("selected");
+      chip.setAttribute("aria-checked", "true");
+      selectedOrigin = chip.dataset.origin;
+      updateOriginInfo(selectedOrigin);
+    });
+  });
 
   // Difficulty selection — descripción + efectos concretos derivados de los multiplicadores
   const updateDiffInfo = (id) => {
@@ -140,6 +174,7 @@ export function showCharacterSelect(onComplete) {
     gameState.difficulty = selectedDifficulty;
     gameState.player.name = name;
     applyClassBonuses(gameState.player, selectedClass);
+    applyOrigin(gameState, selectedOrigin); // antes de recalcular máximos: sus stats cuentan
     // Sync hp/mp to the recalculated maximums for the chosen class
     const s = calculateTotalStats(gameState.player, gameState.equipment);
     gameState.player.maxHp = s.maxHp;
@@ -168,6 +203,8 @@ export function showCharacterSelect(onComplete) {
       agi: gameState.player.agility,
       intl: gameState.player.intelligence
     }), "stat");
+    const originCfg = ORIGINS[selectedOrigin];
+    addMessage(formatText(t('originChosenMsg'), { emoji: originCfg.emoji, name: localizeText(originCfg.name) }), "system");
     const diffCfg = DIFFICULTY_CONFIG[selectedDifficulty];
     addMessage(formatText(t('difficultyChosenMsg'), { emoji: diffCfg.emoji, name: localizeText(diffCfg.name) }), "system");
 
