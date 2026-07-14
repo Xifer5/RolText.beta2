@@ -10,6 +10,9 @@ import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { setupRadioGroupArrowNav } from "./a11yRadioNav.js";
+
+const STEP_COUNT = 5; // SPEC-1006: 0=Clase+Nombre 1=Origen 2=Dificultad 3=Modificadores 4=Confirmar
 
 export function showCharacterSelect(onComplete) {
   // Remove existing if any
@@ -19,90 +22,145 @@ export function showCharacterSelect(onComplete) {
   modal.id = "charSelectModal";
   modal.className = "modal";
   modal.style.cssText = "opacity:1;pointer-events:auto;z-index:300";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "charSelectTitle");
 
   modal.innerHTML = `
     <div class="modal-content" style="max-width:680px">
       <div class="modal-header">
-        <h2>${t('characterSelectTitle')}</h2>
+        <h2 id="charSelectTitle">${t('characterSelectTitle')}</h2>
       </div>
       <p style="text-align:center;color:var(--c-muted);margin-bottom:20px;font-style:italic">
         ${t('characterSelectDescription')}
       </p>
 
-      <div class="name-row">
-        <label for="playerNameInput">${t('heroNameLabel')}</label>
-        <input type="text" id="playerNameInput" placeholder="${t('heroNamePlaceholder')}" maxlength="20" />
+      <div class="cs-progress" aria-hidden="true">
+        ${Array.from({ length: STEP_COUNT }, (_, i) => `<span class="cs-dot" data-dot="${i}"></span>`).join("")}
       </div>
 
-      <div class="class-select-grid" role="radiogroup" aria-label="${t('characterSelectTitle')}" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin:var(--sp-5) 0">
-        ${Object.values(CLASS_DEFINITIONS).map(cls => `
-          <div class="class-card" data-class="${cls.id}" style="--cls-color:${cls.color}"
-               role="radio" aria-checked="false" tabindex="0" aria-label="${cls.name}">
-            <div class="class-card-emoji">${cls.emoji}</div>
-            <div class="class-card-name" style="color:${cls.color}">${cls.name}</div>
-            <p class="class-card-desc">${cls.description}</p>
-            <div class="class-base-stats">
-              <div class="cbs-row"><span>💪 STR</span><div class="cbs-bar"><div style="width:${cls.baseStats.strength/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.strength}</span></div>
-              <div class="cbs-row"><span>🏃 AGI</span><div class="cbs-bar"><div style="width:${cls.baseStats.agility/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.agility}</span></div>
-              <div class="cbs-row"><span>🔮 INT</span><div class="cbs-bar"><div style="width:${cls.baseStats.intelligence/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.intelligence}</span></div>
+      <div class="cs-step" data-step="0">
+        <div class="name-row">
+          <label for="playerNameInput">${t('heroNameLabel')}</label>
+          <input type="text" id="playerNameInput" placeholder="${t('heroNamePlaceholder')}" maxlength="20" />
+        </div>
+
+        <div class="class-select-grid" role="radiogroup" aria-label="${t('characterSelectTitle')}" style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin:var(--sp-5) 0">
+          ${Object.values(CLASS_DEFINITIONS).map(cls => `
+            <div class="class-card" data-class="${cls.id}" style="--cls-color:${cls.color}"
+                 role="radio" aria-checked="false" tabindex="0" aria-label="${cls.name}">
+              <div class="class-card-emoji">${cls.emoji}</div>
+              <div class="class-card-name" style="color:${cls.color}">${cls.name}</div>
+              <p class="class-card-desc">${cls.description}</p>
+              <div class="class-base-stats">
+                <div class="cbs-row"><span>💪 STR</span><div class="cbs-bar"><div style="width:${cls.baseStats.strength/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.strength}</span></div>
+                <div class="cbs-row"><span>🏃 AGI</span><div class="cbs-bar"><div style="width:${cls.baseStats.agility/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.agility}</span></div>
+                <div class="cbs-row"><span>🔮 INT</span><div class="cbs-bar"><div style="width:${cls.baseStats.intelligence/20*100}%;background:${cls.color}"></div></div><span>${cls.baseStats.intelligence}</span></div>
+              </div>
+              <div class="class-perks">
+                ${cls.perks.map(p => `<span class="perk-chip">${p}</span>`).join("")}
+              </div>
             </div>
-            <div class="class-perks">
-              ${cls.perks.map(p => `<span class="perk-chip">${p}</span>`).join("")}
-            </div>
+          `).join("")}
+        </div>
+        <p style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--c-muted);font-style:italic" id="classSelectHint">
+          ${t('selectClassHint')}
+        </p>
+      </div>
+
+      <div class="cs-step" data-step="1">
+        <div class="difficulty-row">
+          <label class="difficulty-label">${t('originLabel')}</label>
+          <div class="difficulty-chips" role="radiogroup" aria-label="${t('originLabel')}">
+            ${Object.values(ORIGINS).map(o => `
+              <button type="button" class="origin-chip${o.id === 'exile' ? ' selected' : ''}" data-origin="${o.id}"
+                      style="--diff-color:${o.color}" role="radio" aria-checked="${o.id === 'exile'}">
+                ${o.emoji} ${localizeText(o.name)}
+              </button>
+            `).join("")}
           </div>
-        `).join("")}
-      </div>
-
-      <div class="difficulty-row">
-        <label class="difficulty-label">${t('originLabel')}</label>
-        <div class="difficulty-chips" role="radiogroup" aria-label="${t('originLabel')}">
-          ${Object.values(ORIGINS).map(o => `
-            <button type="button" class="origin-chip${o.id === 'exile' ? ' selected' : ''}" data-origin="${o.id}"
-                    style="--diff-color:${o.color}" role="radio" aria-checked="${o.id === 'exile'}">
-              ${o.emoji} ${localizeText(o.name)}
-            </button>
-          `).join("")}
+          <p class="diff-desc" id="originDesc"></p>
         </div>
-        <p class="diff-desc" id="originDesc"></p>
       </div>
 
-      <div class="difficulty-row">
-        <label class="difficulty-label">${t('difficultyLabel')}</label>
-        <div class="difficulty-chips" role="radiogroup" aria-label="${t('difficultyLabel')}">
-          ${Object.values(DIFFICULTY_CONFIG).map(d => `
-            <button type="button" class="diff-chip${d.id === 'easy' ? ' selected' : ''}" data-diff="${d.id}"
-                    style="--diff-color:${d.color}" role="radio" aria-checked="${d.id === 'easy'}">
-              ${d.emoji} ${localizeText(d.name)}
-            </button>
-          `).join("")}
+      <div class="cs-step" data-step="2">
+        <div class="difficulty-row">
+          <label class="difficulty-label">${t('difficultyLabel')}</label>
+          <div class="difficulty-chips" role="radiogroup" aria-label="${t('difficultyLabel')}">
+            ${Object.values(DIFFICULTY_CONFIG).map(d => `
+              <button type="button" class="diff-chip${d.id === 'easy' ? ' selected' : ''}" data-diff="${d.id}"
+                      style="--diff-color:${d.color}" role="radio" aria-checked="${d.id === 'easy'}">
+                ${d.emoji} ${localizeText(d.name)}
+              </button>
+            `).join("")}
+          </div>
+          <p class="diff-desc" id="diffDesc"></p>
+          <p class="diff-effects" id="diffEffects"></p>
         </div>
-        <p class="diff-desc" id="diffDesc"></p>
-        <p class="diff-effects" id="diffEffects"></p>
       </div>
 
-      <div class="difficulty-row">
-        <label class="difficulty-label">${t('modLabel')}</label>
-        <div class="difficulty-chips" role="group" aria-label="${t('modLabel')}">
-          ${Object.values(MODIFIERS).map(m => `
-            <button type="button" class="mod-chip" data-mod="${m.id}"
-                    style="--diff-color:${m.color}" aria-pressed="false">
-              ${m.emoji} ${localizeText(m.name)}
-            </button>
-          `).join("")}
+      <div class="cs-step" data-step="3">
+        <div class="difficulty-row">
+          <label class="difficulty-label">${t('modLabel')}</label>
+          <div class="difficulty-chips" role="group" aria-label="${t('modLabel')}">
+            ${Object.values(MODIFIERS).map(m => `
+              <button type="button" class="mod-chip" data-mod="${m.id}"
+                      style="--diff-color:${m.color}" aria-pressed="false">
+                ${m.emoji} ${localizeText(m.name)}
+              </button>
+            `).join("")}
+          </div>
+          <p class="diff-desc" id="modDesc"></p>
         </div>
-        <p class="diff-desc" id="modDesc"></p>
       </div>
 
-      <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
-        ${t('startAdventureButton')} →
-      </button>
-      <p style="text-align:center;margin-top:12px;font-size:.78rem;color:var(--c-muted);font-style:italic" id="classSelectHint">
-        ${t('selectClassHint')}
-      </p>
+      <div class="cs-step" data-step="4">
+        <p class="cs-summary" id="csSummary"></p>
+        <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
+          ${t('startAdventureButton')} →
+        </button>
+      </div>
+
+      <div class="cs-nav">
+        <button type="button" id="csBackBtn" class="btn-action secondary">${t('csBackButton')}</button>
+        <button type="button" id="csNextBtn" class="btn-action" disabled>${t('csNextButton')}</button>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
+
+  // SPEC-1006: flujo por pasos — solo visible ≤767px vía CSS (@media),
+  // en desktop todos los .cs-step quedan visibles y esto es un no-op inerte.
+  let currentStep = 0;
+  const steps = Array.from(modal.querySelectorAll(".cs-step"));
+  const dots = Array.from(modal.querySelectorAll(".cs-dot"));
+  const backBtn = modal.querySelector("#csBackBtn");
+  const nextBtn = modal.querySelector("#csNextBtn");
+
+  const renderSummary = () => {
+    const el = modal.querySelector("#csSummary");
+    if (!el) return;
+    const clsName = selectedClass ? CLASS_DEFINITIONS[selectedClass]?.name : "—";
+    const originName = localizeText(ORIGINS[selectedOrigin]?.name);
+    const diffName = localizeText(DIFFICULTY_CONFIG[selectedDifficulty]?.name);
+    const modsText = selectedModifiers.size
+      ? [...selectedModifiers].map(id => localizeText(MODIFIERS[id]?.name)).join(", ")
+      : t('modNoneLine');
+    el.textContent = `${clsName} · ${originName} · ${diffName} · ${modsText}`;
+  };
+
+  const goToStep = (n) => {
+    currentStep = Math.max(0, Math.min(STEP_COUNT - 1, n));
+    steps.forEach(s => s.classList.toggle("active", Number(s.dataset.step) === currentStep));
+    dots.forEach(d => d.classList.toggle("cs-dot-active", Number(d.dataset.dot) === currentStep));
+    backBtn.style.visibility = currentStep === 0 ? "hidden" : "visible";
+    nextBtn.style.display = currentStep === STEP_COUNT - 1 ? "none" : "";
+    nextBtn.disabled = currentStep === 0 && !selectedClass;
+    if (currentStep === STEP_COUNT - 1) renderSummary();
+  };
+  backBtn.addEventListener("click", () => goToStep(currentStep - 1));
+  nextBtn.addEventListener("click", () => goToStep(currentStep + 1));
 
   let selectedClass = null;
   let selectedDifficulty = "easy";
@@ -191,6 +249,7 @@ export function showCharacterSelect(onComplete) {
     selectedClass = card.dataset.class;
     const startBtn = document.getElementById("startAdventureBtn");
     startBtn.disabled = false;
+    if (currentStep === 0) nextBtn.disabled = false; // SPEC-1006
     document.getElementById("classSelectHint").textContent =
       `${t('classSelectedPrefix')} ${CLASS_DEFINITIONS[selectedClass].name} ${t('classSelectedSuffix')}`;
   };
@@ -203,6 +262,14 @@ export function showCharacterSelect(onComplete) {
       }
     });
   });
+
+  // SPEC-1006: navegación por flechas en los 3 radiogroups reales
+  // (.mod-chip es aria-pressed/multi-select, no aplica — Tab normal)
+  setupRadioGroupArrowNav(modal.querySelector(".class-select-grid"), ".class-card", selectCard);
+  setupRadioGroupArrowNav(modal.querySelectorAll(".difficulty-chips")[0], ".origin-chip", chip => chip.click());
+  setupRadioGroupArrowNav(modal.querySelectorAll(".difficulty-chips")[1], ".diff-chip", chip => chip.click());
+
+  goToStep(0);
 
   // Start button
   document.getElementById("startAdventureBtn").addEventListener("click", () => {
