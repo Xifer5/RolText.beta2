@@ -1,3 +1,5 @@
+import { localizeText } from "./i18n.js";
+
 const RARITY_COLORS = {
   common:    { bg: "rgba(148,163,184,.12)", border: "rgba(148,163,184,.4)", accent: "#94a3b8" },
   uncommon:  { bg: "rgba(74,222,128,.10)",  border: "rgba(74,222,128,.45)",  accent: "#4ade80" },
@@ -57,23 +59,33 @@ function _mount(el, duration = 3600) {
   }, duration);
 }
 
-function _showAch(ach) {
+/** Puro — testeable sin DOM. Construye className/estilo/HTML del toast de logro. */
+export function achToastMarkup(ach) {
   const c = RARITY_COLORS[ach.rarity] ?? RARITY_COLORS.common;
-  const el = document.createElement("div");
-  el.className = `ach-toast ach-toast-rarity-${ach.rarity}`;
-  el.style.cssText = `background:${c.bg};border-color:${c.border}`;
-  el.innerHTML = `
+  return {
+    className: `ach-toast ach-toast-rarity-${ach.rarity}`,
+    cssText: `background:${c.bg};border-color:${c.border}`,
+    html: `
     <div class="ach-toast-header">🏆 ¡Logro Desbloqueado!</div>
     <div class="ach-toast-body">
       <span class="ach-toast-icon">${ach.icon}</span>
       <div class="ach-toast-info">
-        <div class="ach-toast-title" style="color:${c.accent}">${ach.title}</div>
-        <div class="ach-toast-desc">${ach.desc}</div>
+        <div class="ach-toast-title" style="color:${c.accent}">${localizeText(ach.title)}</div>
+        <div class="ach-toast-desc">${localizeText(ach.desc)}</div>
       </div>
     </div>
     <div class="ach-toast-rarity" style="color:${c.accent}">
       ${RARITY_LABEL[ach.rarity] ?? ach.rarity}
-    </div>`;
+    </div>`
+  };
+}
+
+function _showAch(ach) {
+  const { className, cssText, html } = achToastMarkup(ach);
+  const el = document.createElement("div");
+  el.className = className;
+  el.style.cssText = cssText;
+  el.innerHTML = html;
   _mount(el, 3600);
 }
 
