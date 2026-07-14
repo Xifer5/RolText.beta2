@@ -4,6 +4,7 @@ import { gameState } from "./state.js";
 import { getEndingContent } from "./endings.js";
 import { ORIGINS } from "./origins.js";
 import { DIFFICULTY_CONFIG } from "./difficulty.js";
+import { MODIFIERS, activeModifiers } from "./modifiers.js";
 import { t, localizeText } from "./i18n.js";
 
 const LOG_KEY = "pqe.runlog.v1";
@@ -21,6 +22,7 @@ export function buildRunRecord(state, outcome) {
     classEmoji: p.classEmoji ?? "⚔️",
     origin: p.origin ?? null,
     difficulty: state.difficulty ?? "easy",
+    modifiers: activeModifiers(state),      // SPEC-1004: la crónica recuerda el reto
     level: p.level ?? 1,
     gold: p.gold ?? 0,
     kills: state.stats?.kills ?? 0,
@@ -57,9 +59,11 @@ function runRow(rec) {
   const headline = rec.outcome === "victory"
     ? t(rec.endingTitleKey || "endingTitle")
     : t("runDefeatLabel");
+  const mods = (rec.modifiers ?? []).map(id => MODIFIERS[id]?.emoji).filter(Boolean).join("");
   const bits = [
     `${diff?.emoji ?? ""} ${localizeText(diff?.name) || rec.difficulty}`,
     origin ? `${origin.emoji} ${localizeText(origin.name)}` : null,
+    mods || null,
     `${t("levelAbbr")} ${rec.level}`,
     `⚔️ ${rec.kills}`,
     isNaN(date) ? null : date.toLocaleDateString()

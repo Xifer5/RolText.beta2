@@ -1,4 +1,6 @@
 import { gameState } from "./state.js";
+import { areMapsHidden } from "./modifiers.js";
+import { t } from "./i18n.js";
 
 const DIR_DELTA = {
   north:[0,-1], south:[0,1], east:[1,0], west:[-1,0],
@@ -30,6 +32,10 @@ function buildCoords() {
 }
 
 export function renderMinimap() {
+  // SPEC-1004: con Niebla densa el mapa del mundo queda oculto
+  if (areMapsHidden(gameState)) {
+    return `<div class="mm-empty">${t('fogMapMsg')}</div>`;
+  }
   const wm       = window.worldMap ?? {};
   const visited  = gameState.visitedLocations ?? {};
   const current  = gameState.currentLocationId;

@@ -5,6 +5,8 @@
 //  como chips inferiores. Adaptado a worldMap basado en exits.
 // ══════════════════════════════════════════════════════════
 import { gameState } from "./state.js";
+import { areMapsHidden } from "./modifiers.js";
+import { t } from "./i18n.js";
 
 const DIR_POS = {
   north: { row: 1, col: 2 },
@@ -35,6 +37,14 @@ export function renderLocalMinimap() {
   if (!current) { grid.innerHTML = ""; return; }
 
   if (coords) coords.textContent = current.name || currentId;
+
+  // SPEC-1004: con Niebla densa el mapa local no revela nada
+  if (areMapsHidden(gameState)) {
+    grid.style.gridTemplateColumns = "1fr";
+    grid.style.gridTemplateRows = "1fr";
+    grid.innerHTML = `<div class="lmm-cell lmm-fog" title="${t('fogMapMsg')}">🌫️</div>`;
+    return;
+  }
 
   const exits = current.exits || {};
   const visited = gameState.visitedLocations;

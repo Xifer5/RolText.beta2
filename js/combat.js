@@ -19,6 +19,7 @@ import { showSpecializationModal } from "./specModal.js";
 import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import { consumeEchoReward } from "./echoIntro.js";
+import { cruelAtkMult, isIntentAlwaysHidden, modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
 import { showEnding } from "./endings.js";
 import { recordRun } from "./runLog.js";
 import {
@@ -147,7 +148,7 @@ function rollEnemyIntent() {
     lastAction: enemy.lastAction,
     enraged: enemy.enraged
   });
-  enemy.intentHidden = isIntentHidden(enemy);
+  enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
 }
 
 export function startCombat(enemyType, isBoss = false) {
@@ -160,7 +161,7 @@ export function startCombat(enemyType, isBoss = false) {
     : 1   + lvl * 0.05;
   const diff = getDifficultyConfig(gameState.difficulty);
   const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult * diff.hp);
-  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk);
+  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk * cruelAtkMult(gameState));
   const scaledDef = Math.floor((base.defense ?? 0) * diff.def);
 
   gameState.currentEnemy = {
@@ -634,8 +635,8 @@ function endCombat(victory, fled = false) {
   if (victory && enemy) {
     playSound("enemy_die");
     const diff = getDifficultyConfig(gameState.difficulty);
-    const xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult));
-    let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult));
+    const xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult * modifierXpMult(gameState)));
+    let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult * scarceGoldMult(gameState)));
     // Explorador: +10% oro
     const goldBonus = getActiveSpec()?.bonuses?.goldBonus;
     if (goldBonus) gold = Math.floor(gold * (1 + goldBonus));
@@ -675,7 +676,7 @@ function endCombat(victory, fled = false) {
     // Loot
     try {
       const biomeId = window.worldMap?.[gameState.currentLocationId]?.biome;
-      const loot = getLoot(enemy.id, biomeId);
+      const loot = filterLoot(getLoot(enemy.id, biomeId), gameState);
       if (Array.isArray(loot) && loot.length) {
         loot.forEach(item => {
           gameState.inventory[item] = (gameState.inventory[item] || 0) + 1;

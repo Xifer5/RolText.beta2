@@ -15,6 +15,7 @@ import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
+import { applyRest } from "./modifiers.js";
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
 export const INTENT_ADVICE_KEYS = {
@@ -927,11 +928,11 @@ function restAtCurrentLocation() {
   const loc = window.worldMap?.[gameState.currentLocationId];
   if (loc?.canRest) {
     playSound("rest");
-    const hpGain = gameState.player.maxHp - gameState.player.hp;
-    const mpGain = gameState.player.maxMp - gameState.player.mp;
-    gameState.player.hp = gameState.player.maxHp;
-    gameState.player.mp = gameState.player.maxMp;
-    addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
+    // SPEC-1004: con Mundo cruel el descanso cura la mitad y cuesta oro
+    const { hpGain, mpGain, goldCost, cruel } = applyRest(gameState);
+    addMessage(cruel
+      ? formatText('cruelRestMsg', { hp: hpGain, mp: mpGain, gold: goldCost })
+      : formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
     showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
     updateUI();
   } else {

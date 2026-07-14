@@ -4,6 +4,7 @@
 import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
 import { DIFFICULTY_CONFIG, getDifficultyEffects } from "./difficulty.js";
 import { ORIGINS, applyOrigin } from "./origins.js";
+import { MODIFIERS, MODIFIER_XP_BONUS } from "./modifiers.js";
 import { gameState, resetState } from "./state.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
@@ -79,6 +80,19 @@ export function showCharacterSelect(onComplete) {
         <p class="diff-effects" id="diffEffects"></p>
       </div>
 
+      <div class="difficulty-row">
+        <label class="difficulty-label">${t('modLabel')}</label>
+        <div class="difficulty-chips" role="group" aria-label="${t('modLabel')}">
+          ${Object.values(MODIFIERS).map(m => `
+            <button type="button" class="mod-chip" data-mod="${m.id}"
+                    style="--diff-color:${m.color}" aria-pressed="false">
+              ${m.emoji} ${localizeText(m.name)}
+            </button>
+          `).join("")}
+        </div>
+        <p class="diff-desc" id="modDesc"></p>
+      </div>
+
       <button id="startAdventureBtn" class="btn-action" disabled style="max-width:320px;margin:0 auto;display:block;text-align:center">
         ${t('startAdventureButton')} →
       </button>
@@ -93,6 +107,31 @@ export function showCharacterSelect(onComplete) {
   let selectedClass = null;
   let selectedDifficulty = "easy";
   let selectedOrigin = "exile";
+  const selectedModifiers = new Set(); // SPEC-1004: 0-3 apilables, ninguno por defecto
+
+  // Modifier selection (SPEC-1004) — chips checkbox, no radio
+  const updateModInfo = () => {
+    const el = modal.querySelector("#modDesc");
+    if (!el) return;
+    if (!selectedModifiers.size) {
+      el.textContent = t('modNoneLine');
+      return;
+    }
+    const descs = [...selectedModifiers].map(id => localizeText(MODIFIERS[id]?.description)).join(" ");
+    const xp = Math.round(selectedModifiers.size * MODIFIER_XP_BONUS * 100);
+    el.textContent = `${descs} ${formatText('modXpBonusLine', { xp })}`;
+  };
+  updateModInfo();
+  modal.querySelectorAll(".mod-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const id = chip.dataset.mod;
+      const active = selectedModifiers.has(id);
+      if (active) selectedModifiers.delete(id); else selectedModifiers.add(id);
+      chip.classList.toggle("selected", !active);
+      chip.setAttribute("aria-pressed", String(!active));
+      updateModInfo();
+    });
+  });
 
   // Origin selection (SPEC-1002)
   const updateOriginInfo = (id) => {
@@ -172,6 +211,7 @@ export function showCharacterSelect(onComplete) {
 
     resetState();
     gameState.difficulty = selectedDifficulty;
+    gameState.modifiers = [...selectedModifiers]; // SPEC-1004
     gameState.player.name = name;
     applyClassBonuses(gameState.player, selectedClass);
     applyOrigin(gameState, selectedOrigin); // antes de recalcular máximos: sus stats cuentan
@@ -207,8 +247,16 @@ export function showCharacterSelect(onComplete) {
     addMessage(formatText(t('originChosenMsg'), { emoji: originCfg.emoji, name: localizeText(originCfg.name) }), "system");
     const diffCfg = DIFFICULTY_CONFIG[selectedDifficulty];
     addMessage(formatText(t('difficultyChosenMsg'), { emoji: diffCfg.emoji, name: localizeText(diffCfg.name) }), "system");
+    if (selectedModifiers.size) {
+      const list = [...selectedModifiers].map(id => `${MODIFIERS[id].emoji} ${localizeText(MODIFIERS[id].name)}`).join(", ");
+      const xp = Math.round(selectedModifiers.size * MODIFIER_XP_BONUS * 100);
+      addMessage(formatText('modChosenMsg', { list, xp }), "system");
+    }
 
     updateUI();
+    // El minimapa local solo se re-renderiza con este evento; sin él, una run
+    // con Niebla densa mostraría el mapa normal hasta el primer movimiento
+    window.dispatchEvent(new CustomEvent("pixel:locationChanged"));
 
     // Update profile card
     const profileName = document.getElementById("profile-name");

@@ -5,6 +5,7 @@ import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { calculateTotalStats } from "./stats.js";
+import { buyPriceOf } from "./modifiers.js";
 
 export function renderShop() {
   const buyList  = document.getElementById("shopBuyList");
@@ -30,7 +31,7 @@ export function renderShop() {
     const item = allItems[id];
     if (!item || !item.price) return;
 
-    const li = makeShopItem(item, "buy");
+    const li = makeShopItem(item, "buy", undefined, buyPriceOf(item, gameState));
     li.querySelector(".shop-btn")?.addEventListener("click", () => buyItem(item));
     buyList.appendChild(li);
   });
@@ -85,9 +86,9 @@ function makeShopItem(item, mode, qty, price) {
   btn.className = "btn small shop-btn";
   btn.textContent = mode === "buy" ? t('shopBuyButton') : t('shopSellButton');
   if (mode === "sell") { btn.className += " tonal"; }
-  if (mode === "buy" && (gameState.player.gold || 0) < item.price) {
+  if (mode === "buy" && (gameState.player.gold || 0) < (price ?? item.price)) {
     btn.disabled = true;
-    btn.textContent = "Falta oro";
+    btn.textContent = t('shopNeedGold');
     li.classList.add("is-unaffordable");
   }
 
@@ -137,14 +138,15 @@ function buildAttrString(item) {
 }
 
 export function buyItem(item) {
-  if ((gameState.player.gold||0) < item.price) {
+  const price = buyPriceOf(item, gameState); // SPEC-1004: botín escaso encarece la compra
+  if ((gameState.player.gold||0) < price) {
     addMessage(t('shopNoGold'), "system");
     showFloatingText(t('shopNoGoldFloat'), window.innerWidth/2, window.innerHeight/2, "#fbbf24");
     return false;
   }
-  gameState.player.gold -= item.price;
+  gameState.player.gold -= price;
   addItemToInventory(gameState.inventory, item.id, 1);
-  addMessage(formatText(t('shopBuyMessage'), { item: localizeText(item.name), price: item.price }), "shop");
+  addMessage(formatText(t('shopBuyMessage'), { item: localizeText(item.name), price }), "shop");
   renderShop();
   updateUI();
   return true;
