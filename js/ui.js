@@ -539,7 +539,7 @@ function updateLocationSubtitle(loc) {
   const risk = getLocationRisk(loc);
   const dirLabels = { north:"N", south:"S", east:"E", west:"O", up:"↑", down:"↓", enter:"⬤", out:"↩" };
   const exitChips = exits.map(d => `<span class="exit-chip">${dirLabels[d]||d}</span>`).join("");
-  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ' <span class="exit-chip">💤 Descanso</span>' : ""}<span class="flex-spacer"></span>${exitChips}`;
+  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ` <span class="exit-chip">${t('restChipLabel')}</span>` : ""}<span class="flex-spacer"></span>${exitChips}`;
 }
 
 function updateProfileCard() {
@@ -931,11 +931,11 @@ function restAtCurrentLocation() {
     const mpGain = gameState.player.maxMp - gameState.player.mp;
     gameState.player.hp = gameState.player.maxHp;
     gameState.player.mp = gameState.player.maxMp;
-    addMessage(`Descansas y recuperas ${hpGain} HP y ${mpGain} MP.`, "stat");
-    showFloatingText("¡Restaurado!", window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
+    addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
+    showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
     updateUI();
   } else {
-    addMessage("No puedes descansar aquí.", "system");
+    addMessage(t('noRestHere'), "system");
   }
 }
 
@@ -977,19 +977,7 @@ export function setupUIListeners() {
   document.getElementById("closeStatsBtn")?.addEventListener("click", () => document.getElementById("statsModal")?.classList.add("hidden"));
 
   // Rest
-  document.getElementById("restBtn")?.addEventListener("click", () => {
-    const loc = window.worldMap?.[gameState.currentLocationId];
-    if (loc?.canRest) {
-      playSound("rest");
-      const hpGain = gameState.player.maxHp - gameState.player.hp;
-      const mpGain = gameState.player.maxMp - gameState.player.mp;
-      gameState.player.hp = gameState.player.maxHp;
-      gameState.player.mp = gameState.player.maxMp;
-      addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
-      showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
-      updateUI();
-    } else addMessage(t('noRestHere'), "system");
-  });
+  document.getElementById("restBtn")?.addEventListener("click", restAtCurrentLocation);
 
   document.getElementById("location-rest-btn")?.addEventListener("click", restAtCurrentLocation);
 
@@ -1105,57 +1093,6 @@ export function setupUIListeners() {
     ui["npc-talk-btn"] = npcTalkButton;
     npcTalkButton.addEventListener("click", handleNpcTalk);
   }
-
-  document.getElementById("mobileSheetClose")?.addEventListener("click", _closeMobileSheet);
-  const mobileSheet = document.getElementById("mobileSheet");
-  mobileSheet?.addEventListener("click", (e) => {
-    if (e.target === mobileSheet || e.target.classList.contains("mobile-sheet-backdrop")) {
-      _closeMobileSheet();
-    }
-  });
-
-  document.getElementById("mobActionInventoryBtn")?.addEventListener("click", () => {
-    _closeMobileSheet();
-    renderInventory();
-    document.getElementById("inventoryModal")?.classList.remove("hidden");
-  });
-  document.getElementById("mobActionStatsBtn")?.addEventListener("click", () => {
-    _closeMobileSheet();
-    renderStatsModal();
-    document.getElementById("statsModal")?.classList.remove("hidden");
-  });
-  document.getElementById("mobActionRestBtn")?.addEventListener("click", () => {
-    _closeMobileSheet();
-    const loc = window.worldMap?.[gameState.currentLocationId];
-    if (loc?.canRest) {
-      playSound("rest");
-      const hpGain = gameState.player.maxHp - gameState.player.hp;
-      const mpGain = gameState.player.maxMp - gameState.player.mp;
-      gameState.player.hp = gameState.player.maxHp;
-      gameState.player.mp = gameState.player.maxMp;
-      addMessage(formatText('restReward', { hp: hpGain, mp: mpGain }), "stat");
-      showFloatingText(t('restoredText'), window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.5em");
-      updateUI();
-    } else addMessage(t('noRestHere'), "system");
-  });
-  document.getElementById("mobActionShopBtn")?.addEventListener("click", () => {
-    _closeMobileSheet();
-    const loc = window.worldMap?.[gameState.currentLocationId];
-    if (loc && ["shop","castle_shop","port"].includes(loc.id)) {
-      renderShop();
-      document.getElementById("shopModal")?.classList.remove("hidden");
-    } else addMessage(t('noShopHere'), "system");
-  });
-  document.getElementById("mobActionQuestLogBtn")?.addEventListener("click", () => {
-    _closeMobileSheet();
-    renderQuestLog("active");
-    document.querySelectorAll(".ql-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "active"));
-    document.getElementById("questLogModal")?.classList.remove("hidden");
-  });
-
-  document.querySelectorAll("#mobileSheet [data-panel]").forEach(btn => {
-    btn.addEventListener("click", _closeMobileSheet);
-  });
 
   const closeNpc = () => document.getElementById("npcModal")?.classList.add("hidden");
   document.getElementById("closeNpcBtn")?.addEventListener("click", closeNpc);
