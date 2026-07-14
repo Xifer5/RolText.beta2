@@ -97,6 +97,10 @@ export const ENEMY_COMBAT_DATA = {
   cave_troll: { resistances: { blunt: 40, fire: -30, physical: 20 }, attackDamageType: "blunt", behavior: "regenerate" },
   stone_golem: { resistances: { slash: 50, pierce: 30, blunt: -50, fire: 20, earth: 80, lightning: -50 }, attackDamageType: "blunt", behavior: "defensive" },
   mountain_giant: { resistances: { blunt: 30, slash: 20, fire: -10 }, attackDamageType: "blunt", behavior: "aggressive" },
+  // SPEC-1005 — mini-bosses nuevos
+  stone_charger:  { resistances: { blunt: 20, slash: 10, fire: -10 }, attackDamageType: "blunt", behavior: "aggressive" },
+  ice_giant:      { resistances: { ice: 60, fire: -30 }, attackDamageType: "ice", behavior: "aggressive" },
+  frozen_spirit:  { resistances: { physical: 20, fire: -40, dark: 10 }, attackDamageType: "ice", magicDamageType: "ice", behavior: "mage" },
   wyvern:         { attackDamageType: "slash",  behavior: "aggressive" },
   treasure_guardian: { attackDamageType: "blunt", behavior: "defensive" },
   centaurus:      { attackDamageType: "slash",  behavior: "aggressive" },

@@ -750,7 +750,7 @@ export const enemyData = {
     deathMessage: "Asterion no destruye el mundo. El mundo lo está matando. Busca... la Puerta del Dragón...",
     img: "img/enemies/ancient_construct.webp",
   },
-  swamp_abominatinon: {
+  swamp_abomination: {
     isBoss: true,
     type: "Swamp Abomination",
     levelRequirement: 8,
@@ -764,6 +764,45 @@ export const enemyData = {
     drops: ["abomination_core", "inferno_blade"],
     deathMessage: "Ya no hay... esperanza... para mí...",
     img: "img/enemies/swamp_abomination.webp",
+  },
+
+  // SPEC-1005 — mini-bosses nuevos (sin equivalente cercano existente)
+  stone_charger: {
+    type: "Stone Charger",
+    levelRequirement: 6,
+    hp: 350,
+    maxHp: 350,
+    attack: 28,
+    defense: 14,
+    experience: 350,
+    gold: 90,
+    drops: ["axe"],
+    img: "img/enemies/mountain_giant.webp",
+  },
+  ice_giant: {
+    type: "Ice Giant",
+    levelRequirement: 6,
+    hp: 400,
+    maxHp: 400,
+    attack: 26,
+    defense: 16,
+    experience: 400,
+    gold: 95,
+    drops: ["glacial_core"],
+    img: "img/enemies/mountain_giant.webp",
+  },
+  frozen_spirit: {
+    type: "Frozen Spirit",
+    levelRequirement: 6,
+    hp: 280,
+    maxHp: 280,
+    attack: 14,
+    defense: 6,
+    magicAttack: 26,
+    experience: 300,
+    gold: 85,
+    drops: ["arcane_robe"],
+    img: "img/enemies/drider.webp",
   },
 
   frost_wyrm: {

@@ -7,7 +7,7 @@ function capitalize(s){ return String(s || "").replace(/(^|[_-])[a-z]/g, c => c.
 import { enemyData } from "./enemies.js";
 import { getBiome } from "./biomes.js";
 
-const biomeCandidateMap = {
+export const biomeCandidateMap = {
 	forest: ["slime","wolf","goblin","fungedBeast","thief"],
 	cave: ["cave_bat","cave_bear","cave_troll","stone_golem"],
 	mountain: ["guard","mountain_giant","stone_golem", "dark_knight", "dwarf_warrior" ],
@@ -16,10 +16,10 @@ const biomeCandidateMap = {
 	desert: ["beholder","warlock","linchorn","chimera", "genie", "sand_worm"],
 	beach: ["pirate","sea_serpent","mermaid", "pirate_captain", "kraken", "medusa"],
 	jungle: ["jungle_tiger","gorilla_warrior","jungle_spirit", "vine_serpent"],
-	ruins: [ "vampire", "cultist","squeletor","goblin_shaman"],
+	ruin: [ "vampire", "cultist","squeletor","goblin_shaman"],
 	volcano: ["inferno_dragon", "diablo", "lava_golem", "pyro_elemental", "Inferno_elemental","wyvern","beholder"],
 	tundra: ["mountain_giant","stone_golem","drider", "frost_wyrm", "genie"],
-	catacombs: ["squeletor","zombie","vampire","warlock"],
+	catacomb: ["squeletor","zombie","vampire","warlock"],
 	dungeon: ["orc","goblin","cave_bear","cave_troll","goblin_shaman"],
 	treasure_keep: ["ancient_guardian","treasure_guardian"],
     inferno: ["dragon_king"],

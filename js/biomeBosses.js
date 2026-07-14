@@ -5,31 +5,31 @@
 export const biomeBosses = {
   forest: {
     boss: "forest_titan",
-    miniBosses: ["alpha_wolf", "shaman_goblin"],
+    miniBosses: ["wolf", "goblin_shaman"],
     spawnChance: 0.10, // probabilidad de aparición por encuentro
   },
 
   cave: {
     boss: "cave_devourer",
-    miniBosses: ["crystal_golem", "shadow_bat"],
+    miniBosses: ["stone_golem", "cave_bat"],
     spawnChance: 0.12,
   },
 
   mountain: {
     boss: "mountain_colossus",
-    miniBosses: ["wyvern_elder", "stone_charger"],
+    miniBosses: ["wyvern", "stone_charger"],
     spawnChance: 0.08,
   },
 
-  ruins: {
+  ruin: {
     boss: "ancient_construct",
-    miniBosses: ["arcane_beholder", "golem_guardian"],
+    miniBosses: ["beholder", "ancient_guardian"],
     spawnChance: 0.15,
   },
 
   swamp: {
     boss: "swamp_abomination",
-    miniBosses: ["toxic_hydra", "zombie_lord"],
+    miniBosses: ["hydra", "zombie"],
     spawnChance: 0.14,
   },
 
@@ -41,7 +41,7 @@ export const biomeBosses = {
 
   tundra: {
     boss: "frost_wyrm",
-    miniBosses: ["ice_giant", "frozen_spirit"],
+    miniBosses: ["ice_giant", "frozen_spirit"], // nuevos, ver enemies.js
     spawnChance: 0.09,
   }
 };
