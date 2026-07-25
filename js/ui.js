@@ -174,6 +174,7 @@ function _setupMobileNav() {
     ["mob-magicBtn",  () => window.dispatchEvent(new Event("pixel:magic"))],
     ["mob-itemBtn",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
     ["mob-defendBtn", () => window.dispatchEvent(new Event("pixel:defend"))],
+    ["mob-breakGuardBtn", () => window.dispatchEvent(new Event("pixel:breakGuard"))],
     ["mob-fleeBtn",   () => window.dispatchEvent(new Event("pixel:flee"))],
     ["mob-moveMenuBtn", () => _openMobileSheet("mobileMoveMenu")],
     ["mob-inventoryBtn", () => _openMobileSheet("mobileActionMenu")],
@@ -474,6 +475,13 @@ export function updateUI() {
     // SPEC-1101: Frost Wyrm congela la magia — bloquea el botón móvil aunque haya MP
     const mobMagicFrozen = document.getElementById("mob-magicBtn");
     if (mobMagicFrozen && inCombat && gameState.playerDebuffs?.arcaneFreeze) mobMagicFrozen.disabled = true;
+    // SPEC-1101: "Romper Guardia" solo existe contra bosses con guardia (Forest Titan)
+    const mobBreakGuard = document.getElementById("mob-breakGuardBtn");
+    if (mobBreakGuard) {
+      const showGuard = inCombat && !!gameState.currentEnemy?.hasGuard;
+      mobBreakGuard.classList.toggle("hidden", !showGuard);
+      mobBreakGuard.disabled = !showGuard;
+    }
   }
 
   const disabled = !gameState.isInCombat;
@@ -483,6 +491,12 @@ export function updateUI() {
   if (ui.itemBtn)   ui.itemBtn.disabled   = disabled;
   if (ui.defendBtn) ui.defendBtn.disabled = disabled;
   if (ui.fleeBtn)   ui.fleeBtn.disabled   = disabled;
+  // SPEC-1101: "Romper Guardia" solo existe contra bosses con guardia (Forest Titan)
+  if (ui.breakGuardBtn) {
+    const showGuard = !disabled && !!gameState.currentEnemy?.hasGuard;
+    ui.breakGuardBtn.classList.toggle("hidden", !showGuard);
+    ui.breakGuardBtn.disabled = !showGuard;
+  }
 
   if (ui["derived-attack"])  ui["derived-attack"].textContent  = derived.attack ?? 0;
   if (ui["derived-defense"]) ui["derived-defense"].textContent = derived.defense ?? 0;
@@ -1052,6 +1066,7 @@ export function setupUIListeners() {
   document.getElementById("magicBtn")?.addEventListener("click",  () => window.dispatchEvent(new Event("pixel:magic")));
   document.getElementById("itemBtn")?.addEventListener("click",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); });
   document.getElementById("defendBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:defend")));
+  document.getElementById("breakGuardBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:breakGuard")));
   document.getElementById("fleeBtn")?.addEventListener("click",   () => window.dispatchEvent(new Event("pixel:flee")));
 
   // Story log filters

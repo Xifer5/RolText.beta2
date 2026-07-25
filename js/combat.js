@@ -46,6 +46,14 @@ const STUN_ON_CRIT_CHANCE = 0.15;
 // SPEC-1101: veneno acumulativo — tope de stacks (Swamp Abomination y cualquier
 // otro enemigo con status "poison" ya se benefician del mismo sistema).
 const POISON_MAX_STACKS = 5;
+// SPEC-1101: mecánicas de boss — % del maxHp actual del jugador
+const DEVOUR_HP_PCT = 0.35;
+const OVERLOAD_HP_PCT = 0.35;
+// SPEC-1101: Forest Titan — guardia de raíces
+const GUARD_DAMAGE_MULT = 0.4;      // reduce daño físico entrante 60%
+const GUARD_BREAK_CHANCE = 0.75;
+const GUARD_BREAK_DMG_MULT = 0.5;   // "Romper Guardia" pega más flojo que un ataque normal
+const GUARD_BREAK_DURATION = 2;     // turnos sin guardia tras romperla
 function maybeStunEnemy(enemy) {
   if (!enemy || enemy.hp <= 0) return false;
   if (gameState.activeDebuffs?.stunned) return false;
@@ -116,6 +124,7 @@ export function setupCombat() {
   window.addEventListener("pixel:attack", () => handleAction(playerAttack));
   window.addEventListener("pixel:magic",  () => handleAction(playerMagic));
   window.addEventListener("pixel:defend", () => handleAction(playerDefend));
+  window.addEventListener("pixel:breakGuard", () => handleAction(playerBreakGuard));
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
   window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
@@ -150,11 +159,34 @@ export function getRandomEncounter(locationId) {
   return null;
 }
 
+// SPEC-1101: contadores de turno propios (no RNG) para Cave Devourer /
+// Ancient Construct — se telegrafían como cualquier otra acción, así el
+// jugador siempre los ve venir con 1 turno de antelación.
+function rollForcedBossAction(enemy) {
+  if (enemy.id === "cave_devourer") {
+    enemy.turnsSinceDevour = enemy.turnsSinceDevour ?? 0;
+    if (enemy.turnsSinceDevour >= 2) return "devour";
+    enemy.turnsSinceDevour++;
+  }
+  if (enemy.id === "ancient_construct") {
+    enemy.turnsSinceOverload = enemy.turnsSinceOverload ?? 0;
+    if (enemy.turnsSinceOverload >= 3) return "overload";
+    enemy.turnsSinceOverload++;
+  }
+  return null;
+}
+
 // SPEC-0802: pre-decide la próxima acción del enemigo (y si un jefe la oculta)
 // para que el chip de intent siempre anuncie futuro, nunca pasado.
 function rollEnemyIntent() {
   const enemy = gameState.currentEnemy;
   if (!enemy || enemy.hp <= 0) return;
+  const forced = rollForcedBossAction(enemy);
+  if (forced) {
+    enemy.nextAction = forced;
+    enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
+    return;
+  }
   enemy.nextAction = decideNextAction({
     behavior: ENEMY_COMBAT_DATA[enemy.id]?.behavior,
     isBoss: enemy.isBoss,
@@ -188,7 +220,13 @@ export function startCombat(enemyType, isBoss = false) {
     maxHp:   scaledHp,
     attack:  scaledAtk,
     defense: scaledDef,
-    isBoss
+    isBoss,
+    // SPEC-1101: estado propio por-boss, en memoria (no toca el save, mismo
+    // patrón que nextAction/enraged/isDefending)
+    hasGuard: enemyType === "forest_titan",
+    guardBroken: 0,
+    turnsSinceDevour: 0,
+    turnsSinceOverload: 0
   };
   gameState.isInCombat = true;
   gameState.activeDebuffs  = {};
@@ -228,6 +266,39 @@ async function playerDefend() {
   await delay(500); await enemyTurn();
 }
 
+// SPEC-1101 — Forest Titan: golpe especial de daño bajo que puede romper la
+// guardia de raíces. Solo visible/disponible cuando enemy.hasGuard (ver
+// toggleBreakGuardButton en ui.js).
+async function playerBreakGuard() {
+  const enemy = gameState.currentEnemy;
+  if (!enemy?.hasGuard) return;
+  const stats = calculateTotalStats(gameState.player, gameState.equipment);
+  const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
+  const enemyRes = ENEMY_COMBAT_DATA[enemy.id]?.resistances;
+  const rawDmg = Math.max(1, Math.floor(stats.attack * GUARD_BREAK_DMG_MULT) - (enemy.defense || 0));
+  const dmg = applyResistance(Math.max(1, rawDmg), weaponType, enemyRes);
+
+  playSound("attack");
+  // Ataque especial: no pasa por la reducción de guardia (todo su punto es romperla)
+  applyDamageToEnemy(dmg);
+  playSound("hit");
+
+  const broke = !(enemy.guardBroken > 0) && Math.random() < GUARD_BREAK_CHANCE;
+  if (broke) {
+    enemy.guardBroken = GUARD_BREAK_DURATION;
+    addMessage(formatText(t('breakGuardSuccess'), { enemy: enemy.type, damage: dmg }), "combat");
+  } else {
+    addMessage(formatText(t('breakGuardFail'), { enemy: enemy.type, damage: dmg }), "combat");
+  }
+  showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#FDBA74", "2em");
+  shakeScreen();
+
+  tickBuffs();
+  updateUI();
+  if (enemy.hp <= 0) { await delay(400); return endCombat(true); }
+  await delay(700); await enemyTurn();
+}
+
 async function playerAttack() {
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
@@ -261,7 +332,7 @@ async function playerAttack() {
   const total = dmg + extraHit;
 
   playSound("attack");
-  applyDamageToEnemy(total);
+  applyDamageToEnemy(total, weaponType);
   playSound("hit");
 
   const critLabel = isCrit ? " 💥 ¡CRÍTICO!" : "";
@@ -324,7 +395,7 @@ async function playerMagic() {
   dmg = applyResistance(dmg, magicType, ENEMY_COMBAT_DATA[enemy.id]?.resistances);
 
   playSound("magic");
-  applyDamageToEnemy(dmg);
+  applyDamageToEnemy(dmg, magicType);
   playSound("hit");
   addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType), "combat");
   maybeResistanceAdvice(enemy, magicType);
@@ -367,7 +438,7 @@ async function useSkill(skillId) {
       maybeResistanceAdvice(gameState.currentEnemy, skillType);
       grantMasteryXP(skillType);
     }
-    applyDamageToEnemy(dmg);
+    applyDamageToEnemy(dmg, skillType || "physical");
     playSound("hit");
     showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em");
     shakeScreen();
@@ -436,6 +507,13 @@ async function enemyTurn() {
   // SPEC-0802: la guardia expira al empezar su turno — así los ticks de
   // veneno/quemadura de abajo hacen daño completo
   enemy.isDefending = false;
+
+  // SPEC-1101: la guardia de raíces (Forest Titan) se restaura sola pasados
+  // los turnos de "Romper Guardia"
+  if (enemy.guardBroken > 0) {
+    enemy.guardBroken--;
+    if (enemy.guardBroken <= 0) addMessage(formatText(t('enemyGuardRestored'), { enemy: enemy.type }), "system");
+  }
 
   // Tick player debuffs (poison/burn damage)
   if (processPlayerDebuffs()) return;
@@ -511,6 +589,72 @@ async function enemyTurn() {
     return;
   }
 
+  // SPEC-1101 — Cave Devourer: "devorar" cada 3er turno (contador propio, no
+  // RNG), telegrafiado con antelación por rollEnemyIntent como cualquier otra
+  // acción. Daño = % del maxHp actual del jugador, pasado por el mismo
+  // defenseMult que un ataque normal — Defender lo reduce a la mitad sin
+  // lógica especial de "¿respondió bien?".
+  if (action === "devour") {
+    const devourMult = gameState.activeBuffs?.defend_stance > 0 ? DEFEND_DAMAGE_MULT : 1.0;
+    if (gameState.activeBuffs?.defend_stance > 0) {
+      gameState.activeBuffs.defend_stance--;
+      if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
+    }
+    const devourDmg = Math.max(1, Math.floor((p.maxHp || 100) * DEVOUR_HP_PCT * devourMult));
+    p.hp = Math.max(0, (p.hp || 0) - devourDmg);
+    playSound("player_hurt");
+    addMessage(formatText(t("enemyDevours"), { enemy: enemy.type, damage: devourDmg }), "combat");
+    showFloatingText(`-${devourDmg}`, window.innerWidth/2, window.innerHeight/2, "#ef4444", "2.2em", "critical");
+    shakeScreen();
+    enemy.turnsSinceDevour = 0;
+    if (p.hp <= 0) {
+      p.hp = 0;
+      gameState.isGameOver = true;
+      gameState.isInCombat = false;
+      playSound("player_die");
+      addMessage(t('combatStatusEffectsDefeat'), "combat");
+      recordRun("defeat");
+      updateUI();
+      setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+      return;
+    }
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
+  // SPEC-1101 — Ancient Construct: "sobrecarga" cada 4to turno, daño mágico
+  // fijo. Mismo patrón de contador que devour, pero se contrarresta con
+  // Defender (no con aturdir, para diferenciarlo de Cave Devourer).
+  if (action === "overload") {
+    const overloadMult = gameState.activeBuffs?.defend_stance > 0 ? DEFEND_DAMAGE_MULT : 1.0;
+    if (gameState.activeBuffs?.defend_stance > 0) {
+      gameState.activeBuffs.defend_stance--;
+      if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
+    }
+    const overloadDmg = Math.max(1, Math.floor((p.maxHp || 100) * OVERLOAD_HP_PCT * overloadMult));
+    p.hp = Math.max(0, (p.hp || 0) - overloadDmg);
+    playSound("player_hurt");
+    addMessage(formatText(t("enemyOverloads"), { enemy: enemy.type, damage: overloadDmg }), "combat");
+    showFloatingText(`-${overloadDmg}`, window.innerWidth/2, window.innerHeight/2, "#818cf8", "2.2em", "critical");
+    shakeScreen();
+    enemy.turnsSinceOverload = 0;
+    if (p.hp <= 0) {
+      p.hp = 0;
+      gameState.isGameOver = true;
+      gameState.isInCombat = false;
+      playSound("player_die");
+      addMessage(t('combatStatusEffectsDefeat'), "combat");
+      recordRun("defeat");
+      updateUI();
+      setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+      return;
+    }
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
   const useMagic = action === "magic" && enemy.magicAttack;
   const powerMult = action === "power_attack" ? POWER_ATTACK_MULT : 1.0;
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
@@ -541,7 +685,7 @@ async function enemyTurn() {
     // Duelista: 25% de contraatacar al esquivar
     if (spec?.bonuses?.counterattack && Math.random() < 0.25) {
       const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5));
-      applyDamageToEnemy(counterDmg);
+      applyDamageToEnemy(counterDmg, "physical");
       playSound("attack");
       addMessage(formatText(t('counterattackMsg'), { damage: counterDmg }), "combat");
       showFloatingText(`-${counterDmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#fbbf24", "1.6em");
@@ -679,7 +823,10 @@ function processPlayerDebuffs() {
   return false;
 }
 
-function applyDamageToEnemy(dmg) {
+// damageType es opcional: solo lo pasan los ataques reales del jugador (no
+// los ticks de veneno/quemadura sobre el enemigo) — así la guardia de Forest
+// Titan bloquea ataques, nunca daño continuo.
+function applyDamageToEnemy(dmg, damageType) {
   const enemy = gameState.currentEnemy;
   if (!enemy) return;
   let final = dmg;
@@ -687,6 +834,13 @@ function applyDamageToEnemy(dmg) {
   if (enemy.isDefending && dmg > 1) {
     final = Math.max(1, Math.ceil(dmg * DEFEND_DAMAGE_MULT));
     addMessage(formatText(t("enemyBlocksDamage"), { enemy: enemy.type, blocked: dmg - final }), "combat");
+  }
+  // SPEC-1101: guardia de raíces (Forest Titan) — reduce daño físico 60%
+  // mientras esté activa; "Romper Guardia" la desactiva unos turnos.
+  if (enemy.hasGuard && !(enemy.guardBroken > 0) && damageType && PHYSICAL_TYPES.has(damageType) && final > 1) {
+    const reduced = Math.max(1, Math.ceil(final * GUARD_DAMAGE_MULT));
+    addMessage(formatText(t("enemyGuardBlocks"), { enemy: enemy.type, blocked: final - reduced }), "combat");
+    final = reduced;
   }
   enemy.hp = Math.max(0, (enemy.hp || 0) - final);
   updateUI();

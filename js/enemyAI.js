@@ -25,6 +25,10 @@ export const ACTION_META = {
   regen:        { icon: "💚", labelKey: "intentRegen" },
   status:       { icon: "☠️", labelKey: "intentStatus" },
   enrage:       { icon: "😡", labelKey: "intentEnrage" },
+  // SPEC-1101: acciones de boss forzadas por contador de turno (no RNG),
+  // decididas en combat.js/rollForcedBossAction — no pasan por decideNextAction.
+  devour:       { icon: "😱", labelKey: "intentDevour" },
+  overload:     { icon: "⚡", labelKey: "intentOverload" },
   unknown:      { icon: "❓", labelKey: "intentUnknown" }
 };
 

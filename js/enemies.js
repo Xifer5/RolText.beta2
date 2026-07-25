@@ -691,14 +691,17 @@ export const enemyData = {
 
   //bosses
   forest_titan: {
+    // SPEC-1101: tanque de guardia -- ATK/magicAttack bajos (no necesita
+    // pegar fuerte, su guardia de raíces hace el trabajo defensivo), HP
+    // alto porque la pelea se alarga mientras el jugador rompe la guardia.
     isBoss: true,
     type: "Forest Titan",
     levelRequirement: 8,
-    hp: 800,
-    maxHp: 800,
-    attack: 40,
-    defense: 15,
-    magicAttack: 30,
+    hp: 950,
+    maxHp: 950,
+    attack: 32,
+    defense: 18,
+    magicAttack: 15,
     experience: 800,
     gold: 120,
     drops: ["titan_branch", "inferno_blade"],
@@ -706,14 +709,16 @@ export const enemyData = {
     img: "img/enemies/forest_titan.webp",
   },
   cave_devourer: {
+    // SPEC-1101: brutal de golpe fuerte y bajo HP relativo -- la amenaza real
+    // es "devorar" cada 3er turno, no el desgaste normal.
     isBoss: true,
     type: "Cave Devourer",
     levelRequirement: 8,
-    hp: 800,
-    maxHp: 800,
-    attack: 40,
-    defense: 15,
-    magicAttack: 30,
+    hp: 780,
+    maxHp: 780,
+    attack: 46,
+    defense: 12,
+    magicAttack: 10,
     experience: 800,
     gold: 120,
     drops: ["devourer_fang", "inferno_blade"],
