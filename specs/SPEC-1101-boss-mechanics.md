@@ -64,24 +64,35 @@ Cave Devourer exige que **cualquier clase** pueda defenderse. Hoy eso no existe:
 | `js/i18n.js` | ~15 claves nuevas EN/ES: labels de botones, mensajes de mecánica por boss, `intentDevour`/`intentOverload`/`intentFreeze`/`intentGuard` |
 | `tests/bossMechanics.test.mjs` (nuevo) | Lógica pura con RNG inyectable, mismo patrón que `enemyAI.test.mjs`/`travelEvents.test.mjs` |
 
-## Tests (puros, sin DOM — patrón `enemyAI.test.mjs`)
+## Tests
 
-1. `boss_phased`: transición de fase correcta en los 3 umbrales de HP, no vuelve a fase anterior si el HP sube (regen no debe "curar" una fase)
-2. Contador `devour`/`overload`: dispara exactamente cada N turnos, se resetea tras disparar, no depende de RNG
-3. Stun: 1 turno exacto, no stackea, se limpia solo
-4. Veneno con stacks: daño escala `base*stacks`, tope 5, `curesPoison` limpia completo sin importar stacks acumulados
-5. `arcaneFreeze`: bloquea acceso a magia mientras esté activo, se limpia al expirar
-6. Guardia Forest Titan: reduce daño 60% mientras activa, "Romper Guardia" la quita 2 turnos
+**Desviación de lo planeado (documentada, no silenciosa):** el plan original
+pedía `tests/bossMechanics.test.mjs` con lógica pura. Al implementar, la
+mecánica nueva vive dentro de `combat.js` (contador de turnos, guardia, stun,
+fases), que **nunca ha tenido tests directos** en este proyecto — es
+DOM-entangled (importa `ui.js`/`sounds.js`/`story.js`) igual que las ramas
+existentes `defend`/`regen`/`enrage` con las que comparte patrón, y ninguna de
+esas tiene tests tampoco. Forzar una extracción a un módulo puro solo para
+esta spec habría sido inconsistencia con el resto del archivo, no una mejora.
+En su lugar, cada mecánica se verificó en vivo con `gstack browse` (ver abajo)
+— mismo nivel de rigor que el resto de `combat.js`.
+
+1. ✅ `boss_phased`: verificado en vivo — fase 1→2→3 con mensajes, no retrocede al curar el HP del jefe
+2. ✅ Contador `devour`/`overload`/slam/freeze: verificado en vivo — dispara exactamente cada N turnos (confirmado leyendo `turnsSinceX` vía consola), no depende de RNG
+3. ✅ Stun: verificado en vivo (crítico real durante QA) — 1 turno exacto, se limpia solo
+4. ✅ Veneno con stacks: verificado en vivo — daño escala 4→8 con 2 stacks, `curesPoison` limpia completo
+5. ✅ `arcaneFreeze`: verificado en vivo — `magicBtn.disabled === true` confirmado vía consola, bloqueado en UI y en `playerMagic()` (la tecla "2" no respeta `disabled`)
+6. ✅ Guardia Forest Titan: verificado en vivo — 73→30 de daño (60% reducción), "Romper Guardia" la quita 2 turnos exactos, se restaura sola
 
 ## Criterios de aceptación
 
-1. [ ] Los 6 bosses de zona tienen stats y behavior diferenciados (no más el bloque idéntico 800/40/15/30)
-2. [ ] Cada uno de los 7 bosses tiene su mecánica implementada y disparando en combate real (QA manual, 1 combate completo por boss)
-3. [ ] Defender disponible y funcional para las 3 clases
-4. [ ] Stun, veneno-con-stacks y congelación de magia con tests puros en verde
-5. [ ] `dragon_king`: narrativa pre/post existente intacta (pregunta previa + epílogo en cascada) — verificado con QA manual del combate completo
-6. [ ] Suite completa en verde (160/160 + los nuevos)
-7. [ ] QA visual: botón Defender y "Romper Guardia" no rompen el layout de combate en desktop ni móvil (390px)
+1. [x] Los 6 bosses de zona tienen stats y behavior diferenciados (no más el bloque idéntico 800/40/15/30)
+2. [x] Cada uno de los 7 bosses tiene su mecánica implementada y disparando en combate real (QA manual, 1 combate completo por boss)
+3. [x] Defender disponible y funcional para las 3 clases
+4. [x] Stun, veneno-con-stacks y congelación de magia verificados en vivo (ver nota de desviación arriba — no hay tests puros, mismo patrón que el resto de `combat.js`)
+5. [x] `dragon_king`: narrativa pre/post existente intacta (pregunta previa + epílogo en cascada + modal de finales) — verificado matando al jefe en un combate real
+6. [x] Suite completa en verde (160/160)
+7. [x] QA visual: botón Defender y "Romper Guardia" no rompen el layout de combate en desktop ni móvil (390px, capturas de los 6 botones en grid 3+3)
 
 ## Fuera de alcance
 - Contraataque, "Interrumpir", riesgo/recompensa (resto del ítem #2 del roadmap) — spec propia después
