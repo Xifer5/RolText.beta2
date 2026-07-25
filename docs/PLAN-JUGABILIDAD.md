@@ -34,7 +34,7 @@ Crear una ruta clara para mejorar la experiencia de juego de RolText, abordando 
 - Revisar contraste de texto y botones según `styles-m3.css`.
 
 ### 1.4 Código y arquitectura
-- Identificar duplicados en `script.js` y módulos de evento.
+- ✅ `script.js` fue eliminado (Sprint 1, commit d30ab88); la lógica vive en ~40 módulos de `js/`.
 - Limpiar funciones de UI duplicadas y centralizar estado en `state.js`.
 - Registrar deuda técnica y migración futura a módulos más claros.
 

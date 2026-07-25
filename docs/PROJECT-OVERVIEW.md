@@ -8,8 +8,7 @@ A browser-based text RPG with a Material Design 3 visual shell and a responsive 
 
 ## Core structure
 - `index.html` - main UI shell with topbar, left sidebar, center game screen, and mobile-friendly layout.
-- `styles-m3.css` - Material Design 3 skin for the existing app. Contains color tokens, typography, shape radius, elevation, and responsive visual system.
-- `styles.css` - original app styling (kept separate from the M3 skin).
+- `styles-m3.css` - Material Design 3 skin for the app. Contains color tokens, typography, shape radius, elevation, and responsive visual system (the original `styles.css` was removed once the M3 skin covered everything).
 - `js/` - game logic modules: combat, inventory, crafting, map, dialogue, save system, UI management, audio, and story.
 - `img/`, `music/`, `sounds/` - asset folders.
 
