@@ -4589,11 +4589,20 @@ kbd {
 .ipv-dark    { background: #050508; }
 
 /* ── Nombre ASTERION (letras animadas) ─────────────────── */
+/* Overlay absoluto sobre la imagen/fondo: sin esto, las letras se
+   dibujaban como hermano de <img> dentro del flex de .ipv-name y
+   chocaban con la imagen (que ya ocupa 100% del ancho). */
 .ipv-name-letters {
-  display: flex;
-  gap: 4px;
+  position: absolute;
+  inset: 0;
   z-index: 2;
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 12px;
+  text-align: center;
 }
 .name-letter {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;

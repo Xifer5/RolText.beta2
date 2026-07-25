@@ -137,7 +137,7 @@ export const ENEMY_COMBAT_DATA = {
   cave_devourer:  { attackDamageType: "blunt",  behavior: "berserker" },
   mountain_colossus: { resistances: { blunt: 40, slash: 20 }, attackDamageType: "blunt", behavior: "boss" },
   ancient_construct: { attackDamageType: "magic", magicDamageType: "lightning", behavior: "mage" },
-  swamp_abominatinon: { resistances: { water: 40, poison_dmg: 80, holy: -30 }, attackDamageType: "dark", behavior: "status" },
+  swamp_abomination: { resistances: { water: 40, poison_dmg: 80, holy: -30 }, attackDamageType: "dark", behavior: "status" },
   frost_wyrm: { resistances: { ice: 100, fire: -60, water: 50 }, attackDamageType: "ice", behavior: "boss" },
   dragon_king: { resistances: { fire: 80, dark: 50, physical: 30, ice: -20, light: -30, holy: -20 }, attackDamageType: "fire", behavior: "boss" },
 };

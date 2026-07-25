@@ -8,6 +8,7 @@ import { enemyData } from "../js/enemies.js";
 import { biomeBosses } from "../js/biomeBosses.js";
 import { biomeCandidateMap } from "../js/mapgen.js";
 import { worldMap } from "../js/worldMap.js";
+import { ENEMY_COMBAT_DATA } from "../js/damageTypes.js";
 
 const realBiomeIds = new Set(Object.values(worldMap).map(loc => loc.biome).filter(Boolean));
 
@@ -75,5 +76,28 @@ test("los 12 mini-bosses del sprint (9 reuso + 3 nuevos) existen todos", () => {
   ];
   for (const id of expected) {
     assert.ok(enemyData[id], `mini-boss esperado '${id}' no existe en enemyData`);
+  }
+});
+
+test("ENEMY_COMBAT_DATA: toda clave existe en enemyData", () => {
+  for (const id of Object.keys(ENEMY_COMBAT_DATA)) {
+    assert.ok(enemyData[id], `ENEMY_COMBAT_DATA['${id}'] no existe en enemyData (typo o enemigo eliminado)`);
+  }
+});
+
+test("todo boss/mini-boss de biomeBosses tiene datos de combate en ENEMY_COMBAT_DATA", () => {
+  for (const [biomeKey, data] of Object.entries(biomeBosses)) {
+    assert.ok(ENEMY_COMBAT_DATA[data.boss], `boss '${data.boss}' de biomeBosses.${biomeKey} no tiene entrada en ENEMY_COMBAT_DATA`);
+    for (const miniId of data.miniBosses ?? []) {
+      assert.ok(ENEMY_COMBAT_DATA[miniId], `mini-boss '${miniId}' de biomeBosses.${biomeKey} no tiene entrada en ENEMY_COMBAT_DATA`);
+    }
+  }
+});
+
+test("todo enemigo con isBoss:true en enemyData tiene datos de combate en ENEMY_COMBAT_DATA", () => {
+  for (const [id, data] of Object.entries(enemyData)) {
+    if (data.isBoss) {
+      assert.ok(ENEMY_COMBAT_DATA[id], `boss '${id}' (isBoss:true) no tiene entrada en ENEMY_COMBAT_DATA`);
+    }
   }
 });
