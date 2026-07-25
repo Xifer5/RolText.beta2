@@ -748,7 +748,6 @@ button:focus-visible,
 /* ── Chip base M3 (SPEC-0302) ───────────────────────────────── */
 .chip,
 .risk-chip,
-.mobile-risk-chip,
 .exit-chip,
 .buff-chip {
   display: inline-flex;
@@ -766,8 +765,7 @@ button:focus-visible,
   line-height: 1.4;
   white-space: nowrap;
 }
-.risk-chip,
-.mobile-risk-chip {
+.risk-chip {
   border-color: var(--md-outline-variant);
 }
 .risk-safe,
@@ -1363,14 +1361,25 @@ button:focus-visible,
 @media (max-width: 960px) {
   #topbar {
     height: auto;
-    min-height: 64px;
+    min-height: 48px;
   }
   #game { grid-template-columns: 1fr; height: auto; }
   #right-panel { display: none; }
   #left-panel { display: none; }
-  .topbar-inner { height: auto; flex-wrap: wrap; justify-content: space-between; padding: 10px 14px; }
+  /* Barra de marca reducida a una sola fila: el título/tagline solo
+     aporta valor en intro/charselect, en juego es peso muerto que
+     empuja el HUD y el hero fuera de la pantalla. */
+  .topbar-inner { height: auto; flex-wrap: nowrap; justify-content: space-between; padding: 6px 12px; gap: 8px; }
+  .topbar-brand .brand-title,
+  .topbar-brand .brand-sub { display: none; }
   .topbar-nav { display: none; }
-  .topbar-actions { width: 100%; justify-content: flex-end; margin-top: 8px; }
+  .topbar-actions { width: auto; justify-content: flex-end; margin-top: 0; }
+  .lang-label { display: none; }
+  /* Hero de ubicación más bajo: cede espacio vertical al story log,
+     que es la superficie de lectura real del juego. */
+  #location-hero { height: 160px; margin: 10px 10px 0; }
+  #location-name { font-size: 24px; bottom: 8px; left: 12px; }
+  .location-subtitle { bottom: 46px; left: 12px; }
   .mobile-status-hud {
     display: block;
     position: sticky;

@@ -97,7 +97,6 @@ export function initUICache() {
     "screen","buff-bar","skill-panel","stat-points-row","char-portrait-emoji",
     "questTracker","questTrackerContent","questTrackerOpenBtn",
     "mobile-location-name","mobile-state-chip","mobile-level","mobile-gold",
-    "mobile-risk-chip",
     "mobile-hp-bar","mobile-hp-text","mobile-mp-bar","mobile-mp-text",
     "mobile-xp-bar","mobile-xp-text",
     "location-rest-btn","location-shop-btn",
@@ -352,11 +351,6 @@ export function updateUI() {
   const locName = localizeText(loc?.name) || t("unknownLocation");
   if (ui["location-name"]) ui["location-name"].textContent = locName;
   if (ui["mobile-location-name"]) ui["mobile-location-name"].textContent = locName;
-  const risk = getLocationRisk(loc);
-  if (ui["mobile-risk-chip"]) {
-    ui["mobile-risk-chip"].textContent = risk.label;
-    ui["mobile-risk-chip"].className = `mobile-hud-chip mobile-risk-chip risk-${risk.tone}`;
-  }
   if (ui["mobile-state-chip"]) {
     ui["mobile-state-chip"].classList.toggle("in-combat", gameState.isInCombat);
     ui["mobile-state-chip"].classList.toggle("game-over", gameState.isGameOver);
