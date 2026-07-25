@@ -40,6 +40,22 @@ const SKILL_DAMAGE_TYPES = {
   whirlwind: "slash", berserker_rage: "slash", avatar_of_war: "slash",
 };
 
+// SPEC-1101: aturdimiento reusable — 15% en todo golpe crítico del jugador
+// (hoy solo playerAttack tiene crits; playerMagic no rola crítico).
+const STUN_ON_CRIT_CHANCE = 0.15;
+// SPEC-1101: veneno acumulativo — tope de stacks (Swamp Abomination y cualquier
+// otro enemigo con status "poison" ya se benefician del mismo sistema).
+const POISON_MAX_STACKS = 5;
+function maybeStunEnemy(enemy) {
+  if (!enemy || enemy.hp <= 0) return false;
+  if (gameState.activeDebuffs?.stunned) return false;
+  if (Math.random() >= STUN_ON_CRIT_CHANCE) return false;
+  if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
+  gameState.activeDebuffs.stunned = { turns: 1 };
+  addMessage(formatText(t('enemyStunnedByPlayer'), { enemy: enemy.type }), "combat");
+  return true;
+}
+
 // Nota "(🔥 Vuln. 30%)" para el log cuando el enemigo resiste o es vulnerable
 function resistanceNote(enemyId, damageType) {
   const res = ENEMY_COMBAT_DATA[enemyId]?.resistances?.[damageType] ?? 0;
@@ -99,6 +115,7 @@ const ENEMY_STATUS_EFFECTS = {
 export function setupCombat() {
   window.addEventListener("pixel:attack", () => handleAction(playerAttack));
   window.addEventListener("pixel:magic",  () => handleAction(playerMagic));
+  window.addEventListener("pixel:defend", () => handleAction(playerDefend));
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
   window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
@@ -194,6 +211,23 @@ export function startCombat(enemyType, isBoss = false) {
 }
 
 // ── Player Actions ──────────────────────────────────────
+// SPEC-1101: Defender universal — versión gratuita y de 1 turno del mismo
+// defend_stance que ya usa la skill "Postura Defensiva" del Guerrero (que
+// sigue siendo mejor: 3 turnos + cura 15% HP, por su costo de MP/nivel).
+async function playerDefend() {
+  if (!gameState.activeBuffs) gameState.activeBuffs = {};
+  // tickBuffs() de abajo resta 1 antes de que enemyTurn() lo lea — necesita
+  // 2 para sobrevivir hasta el chequeo de defenseMult (mismo patrón que
+  // buffTurns:3 en useSkill, que en la práctica cubre 1 ataque enemigo).
+  gameState.activeBuffs.defend_stance = Math.max(gameState.activeBuffs.defend_stance || 0, 2);
+  addMessage(t('combatDefendMsg'), "combat");
+  playSound("defend");
+
+  tickBuffs();
+  updateUI();
+  await delay(500); await enemyTurn();
+}
+
 async function playerAttack() {
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
@@ -238,6 +272,7 @@ async function playerAttack() {
     crit: critLabel
   }) + resistanceNote(enemy.id, weaponType), "combat");
   maybeResistanceAdvice(enemy, weaponType);
+  if (isCrit) maybeStunEnemy(enemy);
 
   grantMasteryXP(weaponType);
 
@@ -259,6 +294,15 @@ async function playerAttack() {
 }
 
 async function playerMagic() {
+  // SPEC-1101: Frost Wyrm congela la magia — el botón se deshabilita en UI,
+  // pero el atajo de teclado "2" no respeta `disabled`, así que se bloquea
+  // acá también. No consume el turno (mismo patrón que "sin MP suficiente").
+  if (gameState.playerDebuffs?.arcaneFreeze) {
+    addMessage(t('arcaneFreezeBlocksMagic'), "system");
+    showFloatingText(t('arcaneFreezeIcon'), window.innerWidth/2, window.innerHeight/2, "#93C5FD");
+    return;
+  }
+
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const spec = getActiveSpec();
   const enemy = gameState.currentEnemy;
@@ -426,6 +470,17 @@ async function enemyTurn() {
     if (frozenDebuff.turns <= 0) { delete gameState.activeDebuffs.frozen; addMessage(t('frozenWearsOff'), "system"); }
   }
 
+  // SPEC-1101: aturdido — pierde el turno por completo (no telegrafía nada nuevo hasta que expire)
+  if (gameState.activeDebuffs?.stunned) {
+    const stunInfo = gameState.activeDebuffs.stunned;
+    addMessage(formatText(t("enemyStunned"), { enemy: enemy.type }), "combat");
+    stunInfo.turns--;
+    if (stunInfo.turns <= 0) delete gameState.activeDebuffs.stunned;
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
   // SPEC-0802: ejecuta la acción telegrafiada (el chip mostró esto al jugador)
   const action = enemy.nextAction || "attack";
   enemy.lastAction = action;
@@ -541,13 +596,20 @@ async function enemyTurn() {
   const se = ENEMY_STATUS_EFFECTS[enemy.id];
   if (se && Math.random() < (action === "status" ? 1 : se.chance)) {
     if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
-    if (!gameState.playerDebuffs[se.type]) {
+    // SPEC-1101: el veneno acumula stacks (tope 5) en vez de solo refrescar/
+    // ignorarse — cada stack nueva multiplica el daño por turno.
+    if (se.type === "poison") {
+      const existing = gameState.playerDebuffs.poison;
+      const stacks = Math.min(POISON_MAX_STACKS, (existing?.stacks || 0) + 1);
+      gameState.playerDebuffs.poison = { turns: se.turns, damage: se.damage, stacks };
+      addMessage(formatText(t(stacks > 1 ? 'enemyPoisonStackEffect' : 'enemyPoisonEffect'), {
+        enemy: enemy.type, damage: se.damage * stacks, turns: se.turns, stacks
+      }), "combat");
+      updateUI();
+    } else if (!gameState.playerDebuffs[se.type]) {
       if (se.type === "stun") {
         gameState.playerDebuffs.stun = { turns: se.turns };
         addMessage(formatText(t('enemyStunEffect'), { enemy: enemy.type }), "combat");
-      } else if (se.type === "poison") {
-        gameState.playerDebuffs.poison = { turns: se.turns, damage: se.damage };
-        addMessage(formatText(t('enemyPoisonEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
       } else if (se.type === "burn") {
         gameState.playerDebuffs.burn = { turns: se.turns, damage: se.damage };
         addMessage(formatText(t('enemyBurnEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
@@ -568,16 +630,28 @@ function processPlayerDebuffs() {
   if (!debuffs || !Object.keys(debuffs).length) return false;
   const p = gameState.player;
 
+  // SPEC-1101: arcaneFreeze no hace daño, solo bloquea Magia mientras dure —
+  // necesita decrementarse aunque no tenga `damage` (el loop de abajo lo salta).
+  if (debuffs.arcaneFreeze) {
+    debuffs.arcaneFreeze.turns--;
+    if (debuffs.arcaneFreeze.turns <= 0) {
+      delete debuffs.arcaneFreeze;
+      addMessage(t('arcaneFreezeWearsOff'), "system");
+    }
+  }
+
   for (const key of Object.keys({ ...debuffs })) {
-    if (key === "stun") continue;
+    if (key === "stun" || key === "arcaneFreeze") continue;
     const data = debuffs[key];
     if (!data?.damage) continue;
 
-    p.hp = Math.max(0, p.hp - data.damage);
+    // SPEC-1101: el veneno escala con stacks acumuladas (1 si no aplica, ej. burn)
+    const tickDamage = key === "poison" ? data.damage * (data.stacks || 1) : data.damage;
+    p.hp = Math.max(0, p.hp - tickDamage);
     const icon  = key === "poison" ? "☠️" : "🔥";
     const label = key === "poison" ? "Veneno" : "Quemadura";
-    addMessage(formatText(t('playerDebuffDamage'), { icon, label, damage: data.damage }), "combat");
-    showFloatingText(`-${data.damage}`,
+    addMessage(formatText(t('playerDebuffDamage'), { icon, label, damage: tickDamage }), "combat");
+    showFloatingText(`-${tickDamage}`,
       window.innerWidth/2 - 80, window.innerHeight/2 - 20,
       key === "poison" ? "#4ade80" : "#fb923c", "1.6em");
 

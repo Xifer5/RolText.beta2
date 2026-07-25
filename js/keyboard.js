@@ -1,7 +1,7 @@
 /**
  * keyboard.js — Atajos de teclado Material Design 3
  *
- * Combate:  1=Atacar  2=Magia  3=Ítem  4=Huir
+ * Combate:  1=Atacar  2=Magia  3=Ítem  4=Huir  5=Defender  6=Romper Guardia (si aplica)
  * Movimiento: WASD o flechas
  * ESC: cierra el modal más reciente
  * M: abre/cierra menú principal
@@ -20,6 +20,7 @@ const COMBAT_KEYS = {
   "1": "pixel:attack",
   "2": "pixel:magic",
   "4": "pixel:flee",
+  "5": "pixel:defend",
 };
 
 export function setupKeyboard() {

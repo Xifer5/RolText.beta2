@@ -90,7 +90,7 @@ export function initUICache() {
     "gold","level","strength","agility","intelligence","stat-points",
     "location-name","location-subtitle","enemy-panel","enemy-name","enemy-hp","enemy-hp-bar",
     "combat-menu","navigation-menu","combat-content","navigation-content",
-    "attackBtn","magicBtn","itemBtn","fleeBtn",
+    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn",
     "derived-attack","derived-defense","derived-magic",
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
@@ -173,6 +173,7 @@ function _setupMobileNav() {
     ["mob-attackBtn", () => window.dispatchEvent(new Event("pixel:attack"))],
     ["mob-magicBtn",  () => window.dispatchEvent(new Event("pixel:magic"))],
     ["mob-itemBtn",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
+    ["mob-defendBtn", () => window.dispatchEvent(new Event("pixel:defend"))],
     ["mob-fleeBtn",   () => window.dispatchEvent(new Event("pixel:flee"))],
     ["mob-moveMenuBtn", () => _openMobileSheet("mobileMoveMenu")],
     ["mob-inventoryBtn", () => _openMobileSheet("mobileActionMenu")],
@@ -466,16 +467,21 @@ export function updateUI() {
     mobCombat.classList.toggle("hidden", !inCombat);
     mobNav.classList.toggle("hidden",  inCombat);
     // Sincronizar estado disabled de botones móviles
-    ["mob-attackBtn","mob-magicBtn","mob-itemBtn","mob-fleeBtn"].forEach(id => {
+    ["mob-attackBtn","mob-magicBtn","mob-itemBtn","mob-defendBtn","mob-fleeBtn"].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.disabled = !inCombat;
     });
+    // SPEC-1101: Frost Wyrm congela la magia — bloquea el botón móvil aunque haya MP
+    const mobMagicFrozen = document.getElementById("mob-magicBtn");
+    if (mobMagicFrozen && inCombat && gameState.playerDebuffs?.arcaneFreeze) mobMagicFrozen.disabled = true;
   }
 
   const disabled = !gameState.isInCombat;
   if (ui.attackBtn) ui.attackBtn.disabled = disabled;
-  if (ui.magicBtn)  ui.magicBtn.disabled  = disabled;
+  // SPEC-1101: Frost Wyrm congela la magia — bloquea el botón incondicionalmente mientras dure
+  if (ui.magicBtn)  ui.magicBtn.disabled  = disabled || !!gameState.playerDebuffs?.arcaneFreeze;
   if (ui.itemBtn)   ui.itemBtn.disabled   = disabled;
+  if (ui.defendBtn) ui.defendBtn.disabled = disabled;
   if (ui.fleeBtn)   ui.fleeBtn.disabled   = disabled;
 
   if (ui["derived-attack"])  ui["derived-attack"].textContent  = derived.attack ?? 0;
@@ -1045,6 +1051,7 @@ export function setupUIListeners() {
   document.getElementById("attackBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:attack")));
   document.getElementById("magicBtn")?.addEventListener("click",  () => window.dispatchEvent(new Event("pixel:magic")));
   document.getElementById("itemBtn")?.addEventListener("click",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); });
+  document.getElementById("defendBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:defend")));
   document.getElementById("fleeBtn")?.addEventListener("click",   () => window.dispatchEvent(new Event("pixel:flee")));
 
   // Story log filters

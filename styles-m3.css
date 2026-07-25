@@ -1171,12 +1171,13 @@ button:focus-visible,
   color: var(--md-error);
 }
 
-/* Combat grid 2×2 */
+/* Combat grid 2×3 (Atacar/Magia/Ítem/Defender/Huir siempre + Romper Guardia
+   condicional vs. bosses con guardia — SPEC-1101) */
 #combat-content,
 .combat-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: repeat(3, 1fr);
   gap: 6px;
   flex: 1;
   min-height: 0;
@@ -1224,6 +1225,8 @@ button:focus-visible,
 .combat-btn.magic   { color: #80DEEA; }
 .combat-btn.item    { color: var(--c-heal); }
 .combat-btn.flee    { color: var(--md-on-surface-variant); }
+.combat-btn.defend  { color: #93C5FD; }
+.combat-btn.break-guard { color: #FDBA74; }
 .combat-btn .key-hint,
 .combat-btn kbd {
   position: absolute;
@@ -1625,6 +1628,12 @@ button:focus-visible,
     min-height: 40px;
   }
   .mob-attack { background: var(--md-error-container); color: var(--md-on-error-container); }
+  /* Defender + Romper Guardia (SPEC-1101) suman una 2ª fila en vez de
+     achicar los 4 botones existentes en una sola fila ya justa de espacio. */
+  .mob-bar-combat { flex-wrap: wrap; }
+  .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
+  .mob-defend { color: #93C5FD; }
+  .mob-break-guard { color: #FDBA74; }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
     border-color: var(--md-primary);
