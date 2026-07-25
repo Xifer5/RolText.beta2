@@ -4,7 +4,7 @@ import { loadGame } from "./saveSystem.js";
 import { openSaveSlotsModal, setupSaveSlotsModal } from "./saveSlotsModal.js";
 import { setupRunLog } from "./runLog.js";
 import { t } from "./i18n.js";
-import { isOnboardingEnabled, toggleOnboarding } from "./onboarding.js";
+import { isOnboardingEnabled, toggleOnboarding, replayOnboarding } from "./onboarding.js";
 import { showToast } from "./toast.js";
 
 function updateOnboardingLabel() {
@@ -21,6 +21,12 @@ export function setupMainMenuListeners() {
     const enabled = toggleOnboarding();
     updateOnboardingLabel();
     showToast(t(enabled ? "onbTipsReactivated" : "onbTipsDisabled"), "info");
+  });
+
+  document.getElementById("onboardingHelpBtn")?.addEventListener("click", () => {
+    replayOnboarding();
+    updateOnboardingLabel();
+    showToast(t("onbHelpReplayed"), "info");
   });
 
   document.getElementById("newGameBtn")?.addEventListener("click", () => {

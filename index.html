@@ -45,6 +45,7 @@
           <span class="m3-select-icon">▼</span>
         </div>
       </div>
+      <button class="icon-btn" id="onboardingHelpBtn" aria-label="Ver consejos de novato de nuevo" data-i18n-attr="aria-label" data-i18n="onbHelpLabel" data-tooltip="Ver consejos de novato de nuevo" data-tooltip-pos="bottom">❓</button>
       <button class="icon-btn" id="themeToggleBtn" aria-label="Cambiar tema" data-i18n-attr="aria-label" data-i18n="themeToggleLabel" data-tooltip="Cambiar entre tema claro y oscuro" data-tooltip-pos="bottom">🌙</button>
       <button class="icon-btn" id="floatingMenuBtn" aria-label="Menú principal" data-i18n-attr="aria-label" data-i18n="mainMenuLabel" data-tooltip="Menú: guardar partida, opciones, créditos" data-tooltip-pos="bottom">☰</button>
     </div>
@@ -475,17 +476,43 @@
       <p class="modal-points-label"><span data-i18n="statPointsText">Puntos disponibles</span>: <strong id="modal-stat-points" class="gold-accent stat-pts-display">0</strong></p>
       <p id="stat-class-hint" class="hint-text" data-i18n="statClassHint"></p>
       <div class="stat-increase-grid">
-        <div class="stat-row">💪 STR — <span id="modal-strength">0</span>
-          <button id="inc-str" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        <div class="stat-row">
+          <div class="stat-row-main">💪 STR — <span id="modal-strength">0</span>
+            <button id="inc-str" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+          </div>
+          <p class="stat-row-hint" data-i18n="statHintStrength">Aumenta el daño físico</p>
         </div>
-        <div class="stat-row">🏃 AGI — <span id="modal-agility">0</span>
-          <button id="inc-agi" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        <div class="stat-row">
+          <div class="stat-row-main">🏃 AGI — <span id="modal-agility">0</span>
+            <button id="inc-agi" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+          </div>
+          <p class="stat-row-hint" data-i18n="statHintAgility">Mejora la evasión y velocidad de ataque</p>
         </div>
-        <div class="stat-row">🔮 INT — <span id="modal-intelligence">0</span>
-          <button id="inc-int" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+        <div class="stat-row">
+          <div class="stat-row-main">🔮 INT — <span id="modal-intelligence">0</span>
+            <button id="inc-int" class="btn-action small" data-i18n="raiseStatBtn">+ Subir</button>
+          </div>
+          <p class="stat-row-hint" data-i18n="statHintIntelligence">Aumenta el poder mágico y MP máximo</p>
         </div>
       </div>
       <p class="hint-text hint-text-mt" data-i18n="statHintText">Ganas 5 puntos por nivel. Inviértelos sabiamente.</p>
+
+      <h3 class="mastery-section-title" data-i18n="statDerivedTitle">🗡️ Estadísticas de combate</h3>
+      <div class="stats-trio">
+        <div class="stat-cell">
+          <span class="stat-val" id="modal-derived-attack">0</span>
+          <span class="stat-key">ATK</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-val" id="modal-derived-defense">0</span>
+          <span class="stat-key">DEF</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-val" id="modal-derived-magic">0</span>
+          <span class="stat-key">MAG</span>
+        </div>
+      </div>
+      <p class="hint-text" data-i18n="statDerivedHint">Incluye los bonos de tu equipo actual.</p>
       <div class="mastery-section">
         <h3 class="mastery-section-title" data-i18n="masterySectionTitle">⚔️ Maestría de Armas</h3>
         <div id="mastery-list" class="mastery-list"></div>

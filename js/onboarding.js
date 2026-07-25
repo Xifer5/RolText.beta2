@@ -101,6 +101,18 @@ export function toggleOnboarding() {
   return _state.enabled;
 }
 
+/**
+ * Acción directa del botón "❓" del topbar: reinicia `seen` sin pasar por el
+ * baile ON→OFF→ON del toggle del menú. Los hints vuelven a disparar con las
+ * mismas acciones de siempre (moverse, combatir, lootear...), no todos de
+ * golpe.
+ */
+export function replayOnboarding() {
+  const st = loadState();
+  _state = resetSeen(st);
+  saveState();
+}
+
 // ── Render de la tarjeta (una a la vez, con cola) ───────────────────
 
 let _queue = [];

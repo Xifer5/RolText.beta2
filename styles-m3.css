@@ -2125,14 +2125,25 @@ button:focus-visible,
 .stat-increase-grid { display: flex; flex-direction: column; gap: 8px; }
 .stat-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 4px;
   padding: 12px;
   background: var(--md-surface-c-low);
   border-radius: var(--r-md);
   font-family: var(--font-ui);
   font-size: 14px;
+}
+.stat-row-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.stat-row-hint {
+  margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--md-on-surface-variant);
 }
 
 /* Player avatar in attributes panel */

@@ -768,6 +768,14 @@ export function renderStatsModal() {
   if (agiEl) agiEl.textContent = p.agility ?? 0;
   if (intEl) intEl.textContent = p.intelligence ?? 0;
 
+  const derived = calculateTotalStats(p, gameState.equipment);
+  const derAtkEl = document.getElementById("modal-derived-attack");
+  const derDefEl = document.getElementById("modal-derived-defense");
+  const derMagEl = document.getElementById("modal-derived-magic");
+  if (derAtkEl) derAtkEl.textContent = derived.attack ?? 0;
+  if (derDefEl) derDefEl.textContent = derived.defense ?? 0;
+  if (derMagEl) derMagEl.textContent = derived.magic ?? 0;
+
   const hint = document.getElementById("stat-class-hint");
   const cls = CLASS_DEFINITIONS[p.class];
   if (hint && cls) {
