@@ -135,11 +135,19 @@ export const ENEMY_COMBAT_DATA = {
   inferno_dragon: { resistances: { fire: 100, dark: 30, physical: 20, ice: -50, water: -30 }, attackDamageType: "fire", behavior: "boss" },
   forest_titan:   { attackDamageType: "earth",  behavior: "boss" },
   cave_devourer:  { attackDamageType: "blunt",  behavior: "berserker" },
-  mountain_colossus: { resistances: { blunt: 40, slash: 20 }, attackDamageType: "blunt", behavior: "boss" },
-  ancient_construct: { attackDamageType: "magic", magicDamageType: "lightning", behavior: "mage" },
+  // SPEC-1101: coraza pétrea — resiste 50% físico en las 3 formas (bloqueaba
+  // solo blunt/slash antes), obligando a usar magia u objetos para no
+  // estancarse. Slam garantizado cada 4 turnos vía rollForcedBossAction.
+  mountain_colossus: { resistances: { blunt: 50, slash: 50, pierce: 50 }, attackDamageType: "blunt", behavior: "boss" },
+  // SPEC-1101: resistencia física de construcción (golem) — la magia pasa
+  // normal, para que "sobrecarga" (contrarrestada con Defender) no sea la
+  // única razón de pelear distinto contra este boss.
+  ancient_construct: { resistances: { physical: 30, blunt: 20, slash: 20, pierce: 20 }, attackDamageType: "magic", magicDamageType: "lightning", behavior: "mage" },
   swamp_abomination: { resistances: { water: 40, poison_dmg: 80, holy: -30 }, attackDamageType: "dark", behavior: "status" },
   frost_wyrm: { resistances: { ice: 100, fire: -60, water: 50 }, attackDamageType: "ice", behavior: "boss" },
-  dragon_king: { resistances: { fire: 80, dark: 50, physical: 30, ice: -20, light: -30, holy: -20 }, attackDamageType: "fire", behavior: "boss" },
+  // SPEC-1101: 3 fases por umbral de HP (ver enemyAI.js decideNextAction
+  // caso "boss_phased") — la narrativa pre/post sigue intacta en combat.js.
+  dragon_king: { resistances: { fire: 80, dark: 50, physical: 30, ice: -20, light: -30, holy: -20 }, attackDamageType: "fire", behavior: "boss_phased" },
 };
 
 // ── Resistencias base por clase ─────────────────────────

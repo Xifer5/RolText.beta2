@@ -29,6 +29,7 @@ export const ACTION_META = {
   // decididas en combat.js/rollForcedBossAction — no pasan por decideNextAction.
   devour:       { icon: "😱", labelKey: "intentDevour" },
   overload:     { icon: "⚡", labelKey: "intentOverload" },
+  freeze_magic: { icon: "❄️", labelKey: "intentFreezeMagic" },
   unknown:      { icon: "❓", labelKey: "intentUnknown" }
 };
 
@@ -68,6 +69,29 @@ export function decideNextAction(e, rng = Math.random) {
       if (r < 0.65) return "power_attack";
       if (r < 0.85) return canMagic ? "magic" : "power_attack";
       return e.lastAction !== "defend" ? "defend" : "attack";
+    }
+
+    // SPEC-1101 — Dragon King: 3 fases por umbral de HP, cada una más
+    // agresiva (mismo patrón de hpRatio que "berserker", sin tocar la
+    // narrativa pre/post ya implementada en combat.js). No telegrafía
+    // "defend" en fase 3 — un jefe agonizante no se cubre.
+    case "boss_phased": {
+      const r = rng();
+      if (hpRatio > 0.66) { // Fase 1
+        if (r < 0.45) return "attack";
+        if (r < 0.70) return "power_attack";
+        if (r < 0.90) return canMagic ? "magic" : "power_attack";
+        return e.lastAction !== "defend" ? "defend" : "attack";
+      }
+      if (hpRatio > 0.33) { // Fase 2
+        if (r < 0.30) return "attack";
+        if (r < 0.65) return "power_attack";
+        return canMagic ? "magic" : "power_attack";
+      }
+      // Fase 3
+      if (r < 0.20) return "attack";
+      if (r < 0.60) return "power_attack";
+      return canMagic ? "magic" : "power_attack";
     }
 
     default: // standard — comportamiento previo a SPEC-0802

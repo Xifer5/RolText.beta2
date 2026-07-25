@@ -54,6 +54,8 @@ const GUARD_DAMAGE_MULT = 0.4;      // reduce daño físico entrante 60%
 const GUARD_BREAK_CHANCE = 0.75;
 const GUARD_BREAK_DMG_MULT = 0.5;   // "Romper Guardia" pega más flojo que un ataque normal
 const GUARD_BREAK_DURATION = 2;     // turnos sin guardia tras romperla
+// SPEC-1101: Frost Wyrm — duración de la congelación de magia
+const ARCANE_FREEZE_DURATION = 3;
 function maybeStunEnemy(enemy) {
   if (!enemy || enemy.hp <= 0) return false;
   if (gameState.activeDebuffs?.stunned) return false;
@@ -118,6 +120,10 @@ const ENEMY_STATUS_EFFECTS = {
   pyro_elemental:    { type: "burn",   chance: 0.45, damage: 10, turns: 2 },
   inferno_dragon:    { type: "burn",   chance: 0.50, damage: 12, turns: 3 },
   dragon_king:       { type: "burn",   chance: 0.45, damage: 15, turns: 3 },
+  // SPEC-1101: Swamp Abomination — veneno acumulativo (sistema compartido de
+  // stacks); behavior "status" ya le da ~50% de elegir "status" como acción
+  // (aplicación garantizada), + este chance en cualquier otra acción.
+  swamp_abomination: { type: "poison", chance: 0.30, damage: 6, turns: 3 },
 };
 
 export function setupCombat() {
@@ -173,7 +179,33 @@ function rollForcedBossAction(enemy) {
     if (enemy.turnsSinceOverload >= 3) return "overload";
     enemy.turnsSinceOverload++;
   }
+  if (enemy.id === "mountain_colossus") {
+    enemy.turnsSinceSlam = enemy.turnsSinceSlam ?? 0;
+    if (enemy.turnsSinceSlam >= 3) { enemy.turnsSinceSlam = 0; return "power_attack"; }
+    enemy.turnsSinceSlam++;
+  }
+  if (enemy.id === "frost_wyrm") {
+    enemy.turnsSinceFreeze = enemy.turnsSinceFreeze ?? 0;
+    if (enemy.turnsSinceFreeze >= 3) return "freeze_magic";
+    enemy.turnsSinceFreeze++;
+  }
   return null;
+}
+
+// SPEC-1101 — Dragon King: mensaje de flavor al escalar de fase. Nunca
+// retrocede si el HP sube (no hay regen en dragon_king, pero por si acaso).
+function updateBossPhase(enemy) {
+  if (ENEMY_COMBAT_DATA[enemy.id]?.behavior !== "boss_phased") return;
+  const hpRatio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
+  const phase = hpRatio > 0.66 ? 1 : hpRatio > 0.33 ? 2 : 3;
+  const prev = enemy.bossPhase || 1;
+  if (phase > prev) {
+    enemy.bossPhase = phase;
+    addMessage(formatText(t(`dragonKingPhase${phase}`), { enemy: enemy.type }), "combat");
+    shakeScreen();
+  } else if (!enemy.bossPhase) {
+    enemy.bossPhase = 1;
+  }
 }
 
 // SPEC-0802: pre-decide la próxima acción del enemigo (y si un jefe la oculta)
@@ -181,6 +213,7 @@ function rollForcedBossAction(enemy) {
 function rollEnemyIntent() {
   const enemy = gameState.currentEnemy;
   if (!enemy || enemy.hp <= 0) return;
+  updateBossPhase(enemy);
   const forced = rollForcedBossAction(enemy);
   if (forced) {
     enemy.nextAction = forced;
@@ -584,6 +617,19 @@ async function enemyTurn() {
     enemy.attack = Math.max(1, Math.floor(enemy.attack * ENRAGE_ATK_MULT));
     addMessage(formatText(t("enemyEnrages"), { enemy: enemy.type }), "combat");
     shakeScreen();
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
+  // SPEC-1101 — Frost Wyrm: congela la magia del jugador cada 3er turno
+  // (contador propio, no daño). Bloquea el botón Magia en UI y en lógica
+  // (playerMagic ya chequea playerDebuffs.arcaneFreeze).
+  if (action === "freeze_magic") {
+    if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
+    gameState.playerDebuffs.arcaneFreeze = { turns: ARCANE_FREEZE_DURATION };
+    addMessage(formatText(t("enemyFreezesMagic"), { enemy: enemy.type }), "combat");
+    showFloatingText(t('arcaneFreezeIcon'), window.innerWidth/2, window.innerHeight/2 - 40, "#93C5FD", "1.8em");
     rollEnemyIntent();
     updateUI();
     return;
