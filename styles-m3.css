@@ -315,7 +315,11 @@ button:focus-visible,
   align-items: center;
   gap: 6px;
 }
-.nav-tab::after {
+/* ::before (no ::after): .nav-tab tambien lleva data-tooltip, que ya usa
+   ::after para el globo de ayuda. Compartir el mismo pseudo-elemento hacía
+   que .nav-tab.active::after (mas especifico) le ganara el opacity al
+   tooltip, dejandolo visible todo el tiempo en la pestaña activa. */
+.nav-tab::before {
   content: '';
   position: absolute;
   bottom: 0;
@@ -345,7 +349,7 @@ button:focus-visible,
   background: var(--md-secondary-container);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
 }
-.nav-tab.active::after {
+.nav-tab.active::before {
   opacity: 1;
 }
 
@@ -4105,6 +4109,17 @@ button:focus-visible,
    M3 TOOLTIP (data-tooltip="texto")
    ═══════════════════════════════════════════════════════════ */
 [data-tooltip] { position: relative; }
+/* Muchos botones con tooltip aplican transform en :hover (ver .nav-tab,
+   .icon-btn, .combat-btn, etc.) — eso crea un nuevo contexto de apilamiento
+   que atrapa el z-index:9999 del ::after dentro de si mismo. Como sus
+   ancestros (#topbar, #game...) no tienen contexto propio, el empate se
+   resolvia por orden en el DOM y el location-hero (declarado despues)
+   tapaba el tooltip. Promover el propio elemento en :hover lo saca de esa
+   trampa para todos los tooltips de la app de una sola vez. */
+[data-tooltip]:hover,
+[data-tooltip]:focus-visible {
+  z-index: 9999;
+}
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
