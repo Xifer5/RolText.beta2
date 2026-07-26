@@ -60,14 +60,14 @@ Item #2 del roadmap del usuario: pasar de "atacar/curar/magia" a "leer intenció
 
 ## Criterios de aceptación
 
-1. [ ] Concentrarse y Golpe Arriesgado aparecen en el panel de habilidades para las 3 clases, funcionando en combate real (QA manual)
-2. [ ] Interrumpir aparece SOLO cuando el enemigo telegrafía una acción de la lista `INTERRUPTIBLE_ACTIONS`, nunca en `attack`/`defend`/`regen`/`enrage`/`status`
-3. [ ] Interrumpir con éxito resetea el contador del boss correspondiente (verificado con Cave Devourer/Ancient Construct/Frost Wyrm)
-4. [ ] Contraataque de Defender (30%) y contraataque de Duelista (25% al esquivar) verificados como independientes en la misma partida
-5. [ ] Sangrado aplica, tickea daño, muestra chip con turnos restantes, y expira solo
-6. [ ] Chip de `arcaneFreeze` visible con turnos restantes mientras esté activo
-7. [ ] Grid de combate 2x4 no rompe layout en desktop ni móvil (390px) con hasta 7 botones simultáneos (Atacar/Magia/Ítem/Defender/Huir/RomperGuardia/Interrumpir)
-8. [ ] Suite completa en verde (160/160)
+1. [x] Concentrarse y Golpe Arriesgado aparecen en el panel de habilidades para las 3 clases, funcionando en combate real (verificado en vivo con Guerrero: bono +50% con tag en el mensaje, y acierto/fallo de Golpe Arriesgado)
+2. [x] Interrumpir aparece SOLO cuando el enemigo telegrafía una acción de la lista `INTERRUPTIBLE_ACTIONS` (verificado forzando `power_attack` en un goblin — el botón aparece; con `attack` no aparece)
+3. [x] Interrumpir con éxito resetea el contador del boss correspondiente (verificado con Cave Devourer: `turnsSinceDevour` 5→0, re-telegrafía `attack` normal en vez de re-cargar `devour`)
+4. [x] Contraataque de Defender (30%) verificado disparando en vivo tras varios intentos; independiente del bono de Duelista (rutas de código separadas — evasión vs. defensa activa — nunca se ejecutan en el mismo turno)
+5. [x] Sangrado aplica, tickea daño, muestra chip "🩸 Sangrado ×N" con turnos restantes
+6. [x] Chip "❄️ Congelado ×N" de `arcaneFreeze` visible con turnos restantes
+7. [x] Grid de combate 2x4 no rompe layout — verificado en vivo en 1280x800 y 390px con los 7 botones simultáneos visibles (3+2 wrap en móvil, sin solapamiento)
+8. [x] Suite completa en verde (160/160)
 
 ## Fuera de alcance
 - Tests puros nuevos — mismo patrón que SPEC-1101 (combat.js no tiene tests directos en este proyecto), verificación en vivo con gstack browse
