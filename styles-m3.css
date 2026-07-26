@@ -804,6 +804,8 @@ button:focus-visible,
 .buff-chip.debuff-poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
 .buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: #FDBA74; }
 .buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: #93C5FD; }
+.buff-chip.debuff-bleed  { background: rgba(239,68,68,.18); color: #FCA5A5; }
+.buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: #93C5FD; }
 .location-actions {
   position: absolute;
   top: 54px;
@@ -1171,13 +1173,15 @@ button:focus-visible,
   color: var(--md-error);
 }
 
-/* Combat grid 2×3 (Atacar/Magia/Ítem/Defender/Huir siempre + Romper Guardia
-   condicional vs. bosses con guardia — SPEC-1101) */
+/* Combat grid 2×4 (Atacar/Magia/Ítem/Defender/Huir siempre + Romper Guardia
+   condicional vs. bosses con guardia [SPEC-1101] + Interrumpir condicional
+   vs. acciones cargadas del enemigo [SPEC-1102] -- ambos condicionales
+   pueden estar visibles a la vez) */
 #combat-content,
 .combat-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 1fr);
   gap: 6px;
   flex: 1;
   min-height: 0;
@@ -1227,6 +1231,7 @@ button:focus-visible,
 .combat-btn.flee    { color: var(--md-on-surface-variant); }
 .combat-btn.defend  { color: #93C5FD; }
 .combat-btn.break-guard { color: #FDBA74; }
+.combat-btn.interrupt   { color: #C4B5FD; }
 .combat-btn .key-hint,
 .combat-btn kbd {
   position: absolute;
@@ -1634,6 +1639,7 @@ button:focus-visible,
   .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
   .mob-defend { color: #93C5FD; }
   .mob-break-guard { color: #FDBA74; }
+  .mob-interrupt   { color: #C4B5FD; }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
     border-color: var(--md-primary);

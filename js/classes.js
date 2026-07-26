@@ -63,8 +63,39 @@ export const CLASS_DEFINITIONS = {
   }
 };
 
+// SPEC-1102: skills universales — disponibles para las 3 clases, se
+// prependean a cada lista de abajo. Viven acá (no en combat.js) porque el
+// resto de las skills de clase también son datos, no lógica de combate.
+const UNIVERSAL_SKILLS = [
+  {
+    id: "concentrate",
+    name: "Concentrarse",
+    emoji: "🧠",
+    mpCost: 5,
+    levelReq: 1,
+    description: "Te concentras: tu próximo hechizo hace 50% más daño. Si no lanzas magia, el efecto se pierde.",
+    effect: () => ({ buff: "focused", buffTurns: 2, msg: "Te concentras — tu próximo hechizo será más poderoso." })
+  },
+  {
+    id: "risky_strike",
+    name: "Golpe Arriesgado",
+    emoji: "🎲",
+    mpCost: 0,
+    levelReq: 1,
+    description: "Golpe de alto riesgo: el doble de daño de tu arma, pero 45% de probabilidad de fallar por completo.",
+    effect: (stats, enemy) => {
+      const hit = Math.random() < 0.55;
+      if (!hit) return { damage: 0, msg: "¡Fallaste el Golpe Arriesgado!" };
+      const raw = Math.floor(stats.attack * 2.0 * (0.9 + Math.random() * 0.2));
+      const dmg = Math.max(1, raw - (enemy?.defense || 0));
+      return { damage: dmg, ignoresDef: true, msg: `¡Golpe Arriesgado conecta! ${dmg} daño` };
+    }
+  }
+];
+
 export const SKILLS_BY_CLASS = {
   warrior: [
+    ...UNIVERSAL_SKILLS,
     {
       id: "bash",
       name: "Golpe Brutal",
@@ -148,6 +179,7 @@ export const SKILLS_BY_CLASS = {
     }
   ],
   mage: [
+    ...UNIVERSAL_SKILLS,
     {
       id: "fireball",
       name: "Bola de Fuego",
@@ -226,6 +258,7 @@ export const SKILLS_BY_CLASS = {
     }
   ],
   rogue: [
+    ...UNIVERSAL_SKILLS,
     {
       id: "backstab",
       name: "Golpe Furtivo",

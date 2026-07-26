@@ -254,6 +254,7 @@
         <button class="combat-btn defend" id="defendBtn" aria-keyshortcuts="5" data-i18n-attr="aria-label" data-i18n="combatDefendAria" data-tooltip="Reduce a la mitad el próximo golpe que recibas" data-tooltip-pos="bottom">🛡️<span data-i18n="combatDefend">Defender</span><kbd class="key-hint">5</kbd></button>
         <button class="combat-btn flee"   id="fleeBtn"   aria-keyshortcuts="4" data-i18n-attr="aria-label" data-i18n="combatFleeAria" data-tooltip="Intentar escapar del combate (puede fallar)" data-tooltip-pos="bottom">🏃<span data-i18n="combatFlee">Huir</span><kbd class="key-hint">4</kbd></button>
         <button class="combat-btn break-guard hidden" id="breakGuardBtn" aria-keyshortcuts="6" data-i18n-attr="aria-label" data-i18n="combatBreakGuardAria" data-tooltip="Golpe especial: baja daño, pero puede romper la guardia del enemigo" data-tooltip-pos="bottom">💥<span data-i18n="combatBreakGuard">Romper Guardia</span><kbd class="key-hint">6</kbd></button>
+        <button class="combat-btn interrupt hidden" id="interruptBtn" aria-keyshortcuts="7" data-i18n-attr="aria-label" data-i18n="combatInterruptAria" data-tooltip="Cancela el ataque cargado del enemigo (8 MP, 60% de éxito)" data-tooltip-pos="bottom">⏹️<span data-i18n="combatInterrupt">Interrumpir</span><kbd class="key-hint">7</kbd></button>
       </div>
     </div>
 
@@ -321,6 +322,9 @@
     </button>
     <button class="mob-btn mob-break-guard hidden" id="mob-breakGuardBtn" aria-keyshortcuts="6" aria-label="Romper Guardia (tecla 6)" data-i18n-aria="combatBreakGuardAria">
       <span class="mob-icon">💥</span><span data-i18n="combatBreakGuard">Romper Guardia</span>
+    </button>
+    <button class="mob-btn mob-interrupt hidden" id="mob-interruptBtn" aria-keyshortcuts="7" aria-label="Interrumpir (tecla 7)" data-i18n-aria="combatInterruptAria">
+      <span class="mob-icon">⏹️</span><span data-i18n="combatInterrupt">Interrumpir</span>
     </button>
   </div>
 

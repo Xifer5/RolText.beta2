@@ -17,6 +17,10 @@ import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
 import { applyRest } from "./modifiers.js";
 
+// SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
+// import circular ui.js<->combat.js solo para una constante chica.
+const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
+
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
 export const INTENT_ADVICE_KEYS = {
   power_attack: "advicePowerAttack",
@@ -90,7 +94,7 @@ export function initUICache() {
     "gold","level","strength","agility","intelligence","stat-points",
     "location-name","location-subtitle","enemy-panel","enemy-name","enemy-hp","enemy-hp-bar",
     "combat-menu","navigation-menu","combat-content","navigation-content",
-    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn",
+    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn","interruptBtn",
     "derived-attack","derived-defense","derived-magic",
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
@@ -175,6 +179,7 @@ function _setupMobileNav() {
     ["mob-itemBtn",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
     ["mob-defendBtn", () => window.dispatchEvent(new Event("pixel:defend"))],
     ["mob-breakGuardBtn", () => window.dispatchEvent(new Event("pixel:breakGuard"))],
+    ["mob-interruptBtn", () => window.dispatchEvent(new Event("pixel:interrupt"))],
     ["mob-fleeBtn",   () => window.dispatchEvent(new Event("pixel:flee"))],
     ["mob-moveMenuBtn", () => _openMobileSheet("mobileMoveMenu")],
     ["mob-inventoryBtn", () => _openMobileSheet("mobileActionMenu")],
@@ -482,6 +487,13 @@ export function updateUI() {
       mobBreakGuard.classList.toggle("hidden", !showGuard);
       mobBreakGuard.disabled = !showGuard;
     }
+    // SPEC-1102: "Interrumpir" solo cuando el enemigo telegrafía algo "grande"
+    const mobInterrupt = document.getElementById("mob-interruptBtn");
+    if (mobInterrupt) {
+      const showInterrupt = inCombat && INTERRUPTIBLE_ACTIONS.has(gameState.currentEnemy?.nextAction);
+      mobInterrupt.classList.toggle("hidden", !showInterrupt);
+      mobInterrupt.disabled = !showInterrupt;
+    }
   }
 
   const disabled = !gameState.isInCombat;
@@ -496,6 +508,12 @@ export function updateUI() {
     const showGuard = !disabled && !!gameState.currentEnemy?.hasGuard;
     ui.breakGuardBtn.classList.toggle("hidden", !showGuard);
     ui.breakGuardBtn.disabled = !showGuard;
+  }
+  // SPEC-1102: "Interrumpir" solo cuando el enemigo telegrafía algo "grande"
+  if (ui.interruptBtn) {
+    const showInterrupt = !disabled && INTERRUPTIBLE_ACTIONS.has(gameState.currentEnemy?.nextAction);
+    ui.interruptBtn.classList.toggle("hidden", !showInterrupt);
+    ui.interruptBtn.disabled = !showInterrupt;
   }
 
   if (ui["derived-attack"])  ui["derived-attack"].textContent  = derived.attack ?? 0;
@@ -606,10 +624,17 @@ function updateBuffBar() {
   if (buffs.warcry > 0)        chips.push(`<span class="buff-chip buff">📣 Grito ×${buffs.warcry}</span>`);
   if (buffs.defend_stance > 0)  chips.push(`<span class="buff-chip buff">🛡️ Postura ×${buffs.defend_stance}</span>`);
   if (buffs.arcane_shield > 0)  chips.push(`<span class="buff-chip buff">💠 Escudo</span>`);
+  // SPEC-1102: Concentrarse — se consume en el próximo hechizo, no decae por turnos visibles
+  if (buffs.focused > 0)       chips.push(`<span class="buff-chip buff">🧠 Concentrado</span>`);
   // Player debuffs
   if (playerDebuffs.poison) chips.push(`<span class="buff-chip debuff-poison">☠️ Veneno ×${playerDebuffs.poison.turns}</span>`);
   if (playerDebuffs.burn)   chips.push(`<span class="buff-chip debuff-burn">🔥 Quemadura ×${playerDebuffs.burn.turns}</span>`);
+  // SPEC-1102: nuevo — mismo patrón que veneno/quemadura
+  if (playerDebuffs.bleed) chips.push(`<span class="buff-chip debuff-bleed">🩸 Sangrado ×${playerDebuffs.bleed.turns}</span>`);
   if (playerDebuffs.stun)   chips.push(`<span class="buff-chip debuff-stun">💫 Aturdido ×${playerDebuffs.stun.turns}</span>`);
+  // SPEC-1102 fix: arcaneFreeze (SPEC-1101, Frost Wyrm) no tenía chip — el
+  // jugador no veía cuántos turnos le quedaban sin magia.
+  if (playerDebuffs.arcaneFreeze) chips.push(`<span class="buff-chip debuff-freeze">❄️ Congelado ×${playerDebuffs.arcaneFreeze.turns}</span>`);
   bar.innerHTML = chips.join("") || "";
   bar.style.display = chips.length ? "flex" : "none";
 }
@@ -1067,6 +1092,7 @@ export function setupUIListeners() {
   document.getElementById("itemBtn")?.addEventListener("click",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); });
   document.getElementById("defendBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:defend")));
   document.getElementById("breakGuardBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:breakGuard")));
+  document.getElementById("interruptBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:interrupt")));
   document.getElementById("fleeBtn")?.addEventListener("click",   () => window.dispatchEvent(new Event("pixel:flee")));
 
   // Story log filters

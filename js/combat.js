@@ -56,6 +56,23 @@ const GUARD_BREAK_DMG_MULT = 0.5;   // "Romper Guardia" pega más flojo que un a
 const GUARD_BREAK_DURATION = 2;     // turnos sin guardia tras romperla
 // SPEC-1101: Frost Wyrm — duración de la congelación de magia
 const ARCANE_FREEZE_DURATION = 3;
+
+// SPEC-1102: icono/label/color por tipo de debuff de jugador (tick de daño)
+const DEBUFF_TICK_META = {
+  poison: { icon: "☠️", label: "Veneno",     color: "#4ade80" },
+  burn:   { icon: "🔥", label: "Quemadura",  color: "#fb923c" },
+  bleed:  { icon: "🩸", label: "Sangrado",   color: "#f87171" },
+};
+
+// SPEC-1102: Interrumpir — solo tiene sentido contra una acción "grande"
+// telegrafiada, nunca contra attack/defend/regen/enrage/status.
+const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
+const INTERRUPT_MP_COST = 8;
+const INTERRUPT_CHANCE = 0.6;
+// SPEC-1102: contraataque universal vía Defender (independiente del bono de Duelista)
+const DEFEND_COUNTER_CHANCE = 0.3;
+const DEFEND_COUNTER_DMG_MULT = 0.5;
+
 function maybeStunEnemy(enemy) {
   if (!enemy || enemy.hp <= 0) return false;
   if (gameState.activeDebuffs?.stunned) return false;
@@ -124,6 +141,10 @@ const ENEMY_STATUS_EFFECTS = {
   // stacks); behavior "status" ya le da ~50% de elegir "status" como acción
   // (aplicación garantizada), + este chance en cualquier otra acción.
   swamp_abomination: { type: "poison", chance: 0.30, damage: 6, turns: 3 },
+  // SPEC-1102: sangrado — enemigos de garras/hoja cortante (attackDamageType
+  // "slash" en damageTypes.js), no acumula stacks (mismo patrón que quemadura).
+  jungle_tiger:      { type: "bleed",  chance: 0.35, damage: 5,  turns: 3 },
+  pirate_captain:    { type: "bleed",  chance: 0.30, damage: 6,  turns: 3 },
 };
 
 export function setupCombat() {
@@ -131,6 +152,7 @@ export function setupCombat() {
   window.addEventListener("pixel:magic",  () => handleAction(playerMagic));
   window.addEventListener("pixel:defend", () => handleAction(playerDefend));
   window.addEventListener("pixel:breakGuard", () => handleAction(playerBreakGuard));
+  window.addEventListener("pixel:interrupt", () => handleAction(playerInterrupt));
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
   window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
@@ -332,6 +354,36 @@ async function playerBreakGuard() {
   await delay(700); await enemyTurn();
 }
 
+// SPEC-1102 — Interrumpir: cancela la acción cargada del enemigo. Solo
+// disponible cuando enemy.nextAction es "grande" (ver toggleInterruptButton
+// en ui.js, mismo patrón condicional que "Romper Guardia").
+async function playerInterrupt() {
+  const enemy = gameState.currentEnemy;
+  if (!enemy || !INTERRUPTIBLE_ACTIONS.has(enemy.nextAction)) return;
+  if ((gameState.player.mp || 0) < INTERRUPT_MP_COST) {
+    addMessage(t('notEnoughMana'), "system");
+    return;
+  }
+  gameState.player.mp -= INTERRUPT_MP_COST;
+
+  const success = Math.random() < INTERRUPT_CHANCE;
+  if (success) {
+    // La acción interrumpida no debe poder re-telegrafiarse de inmediato —
+    // resetea el contador de turno del boss correspondiente (si aplica).
+    if (enemy.id === "cave_devourer")    enemy.turnsSinceDevour = 0;
+    if (enemy.id === "ancient_construct") enemy.turnsSinceOverload = 0;
+    if (enemy.id === "frost_wyrm")        enemy.turnsSinceFreeze = 0;
+    enemy.nextAction = "interrupted";
+    addMessage(formatText(t('interruptSuccess'), { enemy: enemy.type }), "combat");
+  } else {
+    addMessage(formatText(t('interruptFail'), { enemy: enemy.type }), "combat");
+  }
+
+  tickBuffs();
+  updateUI();
+  await delay(500); await enemyTurn();
+}
+
 async function playerAttack() {
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
@@ -424,13 +476,19 @@ async function playerMagic() {
   // Escuela de magia: el ataque mágico toma el elemento de la especialización
   const magicType = spec?.bonuses?.dmgType || "magic";
   const magicBonus = 1 + getMasteryBonus(magicType) + (spec?.bonuses?.dmgBonus || 0);
-  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * (0.9 + Math.random()*0.2)));
+  // SPEC-1102: Concentrarse — +50% al próximo hechizo, se consume acá (no
+  // decae por turnos: si el jugador no lanza magia mientras esté activo,
+  // simplemente expira solo sin bonus).
+  const wasFocused = gameState.activeBuffs?.focused > 0;
+  const focusMult = wasFocused ? 1.5 : 1.0;
+  if (wasFocused) delete gameState.activeBuffs.focused;
+  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * (0.9 + Math.random()*0.2)));
   dmg = applyResistance(dmg, magicType, ENEMY_COMBAT_DATA[enemy.id]?.resistances);
 
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
   playSound("hit");
-  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType), "combat");
+  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : ""), "combat");
   maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
   showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em");
@@ -635,6 +693,14 @@ async function enemyTurn() {
     return;
   }
 
+  // SPEC-1102: acción cancelada por "Interrumpir" — el enemigo no actúa este turno
+  if (action === "interrupted") {
+    addMessage(formatText(t("enemyInterrupted"), { enemy: enemy.type }), "combat");
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
   // SPEC-1101 — Cave Devourer: "devorar" cada 3er turno (contador propio, no
   // RNG), telegrafiado con antelación por rollEnemyIntent como cualquier otra
   // acción. Daño = % del maxHp actual del jugador, pasado por el mismo
@@ -707,7 +773,10 @@ async function enemyTurn() {
   const atkVal = Math.floor(atkBase * powerMult * frozenMult);
 
   // Player defense (warrior stance halves damage)
-  const defenseMult = gameState.activeBuffs?.defend_stance > 0 ? 0.5 : 1.0;
+  // SPEC-1102: se guarda ANTES de decrementar — el contraataque universal de
+  // Defender depende de que la guardia haya estado activa este turno.
+  const wasDefending = gameState.activeBuffs?.defend_stance > 0;
+  const defenseMult = wasDefending ? 0.5 : 1.0;
   if (gameState.activeBuffs?.defend_stance > 0) {
     gameState.activeBuffs.defend_stance--;
     if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
@@ -781,6 +850,18 @@ async function enemyTurn() {
     return;
   }
 
+  // SPEC-1102: contraataque universal vía Defender — 30%, cualquier clase,
+  // independiente del 25% de Duelista al esquivar (ese ya se resolvió arriba
+  // en la rama de evasión y no llega hasta acá).
+  if (wasDefending && Math.random() < DEFEND_COUNTER_CHANCE) {
+    const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * DEFEND_COUNTER_DMG_MULT));
+    applyDamageToEnemy(counterDmg, "physical");
+    playSound("attack");
+    addMessage(formatText(t('defendCounterMsg'), { enemy: enemy.type, damage: counterDmg }), "combat");
+    showFloatingText(`-${counterDmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#93C5FD", "1.6em");
+    if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
+
   // Apply a new status effect if enemy has one and player doesn't already have it
   // SPEC-0802: la acción "status" telegrafiada garantiza el intento de efecto
   const se = ENEMY_STATUS_EFFECTS[enemy.id];
@@ -803,6 +884,10 @@ async function enemyTurn() {
       } else if (se.type === "burn") {
         gameState.playerDebuffs.burn = { turns: se.turns, damage: se.damage };
         addMessage(formatText(t('enemyBurnEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
+      } else if (se.type === "bleed") {
+        // SPEC-1102: sangrado — mismo patrón que quemadura, no acumula stacks
+        gameState.playerDebuffs.bleed = { turns: se.turns, damage: se.damage };
+        addMessage(formatText(t('enemyBleedEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
       }
       updateUI();
     }
@@ -835,15 +920,17 @@ function processPlayerDebuffs() {
     const data = debuffs[key];
     if (!data?.damage) continue;
 
-    // SPEC-1101: el veneno escala con stacks acumuladas (1 si no aplica, ej. burn)
+    // SPEC-1101: el veneno escala con stacks acumuladas (1 si no aplica al resto)
     const tickDamage = key === "poison" ? data.damage * (data.stacks || 1) : data.damage;
     p.hp = Math.max(0, p.hp - tickDamage);
-    const icon  = key === "poison" ? "☠️" : "🔥";
-    const label = key === "poison" ? "Veneno" : "Quemadura";
+    // SPEC-1102: sangrado se suma a veneno/quemadura en este lookup (antes era un ternario de 2 opciones)
+    const meta  = DEBUFF_TICK_META[key] || DEBUFF_TICK_META.burn;
+    const icon  = meta.icon;
+    const label = meta.label;
     addMessage(formatText(t('playerDebuffDamage'), { icon, label, damage: tickDamage }), "combat");
     showFloatingText(`-${tickDamage}`,
       window.innerWidth/2 - 80, window.innerHeight/2 - 20,
-      key === "poison" ? "#4ade80" : "#fb923c", "1.6em");
+      meta.color, "1.6em");
 
     data.turns--;
     if (data.turns <= 0) {
