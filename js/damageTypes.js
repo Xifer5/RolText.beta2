@@ -198,6 +198,19 @@ export function applyResistance(damage, damageType, resistances) {
   return Math.max(1, Math.floor(damage * (1 - res / 100)));
 }
 
+// SPEC-1103: resistencias efectivas de un enemigo en combate, sumando el
+// bono en memoria del rasgo "Antiguo" (enemy.traitResistances) a la base
+// estática de ENEMY_COMBAT_DATA — sin mutar el objeto compartido.
+export function getEffectiveResistances(enemy) {
+  const base = ENEMY_COMBAT_DATA[enemy?.id]?.resistances;
+  if (!enemy?.traitResistances) return base;
+  const merged = { ...base };
+  for (const [type, bonus] of Object.entries(enemy.traitResistances)) {
+    merged[type] = (base?.[type] ?? 0) + bonus;
+  }
+  return merged;
+}
+
 // Tipo con la resistencia más baja del mapa (las vulnerabilidades ganan); null si está vacío
 export function getWeakestResistance(resistances = {}) {
   let best = null;

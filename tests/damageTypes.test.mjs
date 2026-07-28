@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel,
-  ENEMY_COMBAT_DATA, WEAPON_DAMAGE_TYPES, PHYSICAL_TYPES, DAMAGE_TYPES
+  ENEMY_COMBAT_DATA, WEAPON_DAMAGE_TYPES, PHYSICAL_TYPES, DAMAGE_TYPES,
+  getEffectiveResistances
 } from "../js/damageTypes.js";
 
 test("applyResistance reduce con resistencia positiva", () => {
@@ -54,6 +55,26 @@ test("ENEMY_COMBAT_DATA: attackDamageType siempre es un tipo conocido", () => {
       assert.ok(DAMAGE_TYPES[type], `${id} resiste tipo desconocido: ${type}`);
     }
   }
+});
+
+test("SPEC-1103: getEffectiveResistances sin rasgo devuelve la base tal cual", () => {
+  assert.deepEqual(getEffectiveResistances({ id: "wolf" }), ENEMY_COMBAT_DATA.wolf.resistances);
+  assert.equal(getEffectiveResistances({ id: "no_existe" }), undefined);
+});
+
+test("SPEC-1103: getEffectiveResistances suma el bono del rasgo Antiguo sin mutar ENEMY_COMBAT_DATA", () => {
+  const before = JSON.stringify(ENEMY_COMBAT_DATA.wolf.resistances);
+  const res = getEffectiveResistances({ id: "wolf", traitResistances: { physical: 30, light: -30 } });
+  assert.equal(res.physical, 30);
+  assert.equal(res.light, -30);
+  assert.equal(res.fire, ENEMY_COMBAT_DATA.wolf.resistances.fire); // conserva la base
+  assert.equal(JSON.stringify(ENEMY_COMBAT_DATA.wolf.resistances), before); // no mutó el objeto compartido
+});
+
+test("SPEC-1103: getEffectiveResistances suma sobre una resistencia ya existente", () => {
+  // giant_spider ya tiene physical:20 en su base
+  const res = getEffectiveResistances({ id: "giant_spider", traitResistances: { physical: 30 } });
+  assert.equal(res.physical, 50);
 });
 
 test("PHYSICAL_TYPES contiene los tipos físicos base", () => {

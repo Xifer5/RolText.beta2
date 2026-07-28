@@ -24,7 +24,7 @@ import { showEnding } from "./endings.js";
 import { recordRun } from "./runLog.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
-  ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES
+  ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES, getEffectiveResistances
 } from "./damageTypes.js";
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -72,6 +72,12 @@ const INTERRUPT_CHANCE = 0.6;
 // SPEC-1102: contraataque universal vía Defender (independiente del bono de Duelista)
 const DEFEND_COUNTER_CHANCE = 0.3;
 const DEFEND_COUNTER_DMG_MULT = 0.5;
+// SPEC-1103: rasgos aleatorios de enemigo (solo no-boss) — rejugabilidad
+const ENEMY_TRAIT_CHANCE = 0.25;
+const ENEMY_TRAITS = ["furious", "thief", "ancient", "regenerator", "coward"];
+const THIEF_GOLD_STEAL_PCT = 0.15;
+const COWARD_HP_THRESHOLD = 0.2;
+const COWARD_FLEE_CHANCE = 0.6;
 
 function maybeStunEnemy(enemy) {
   if (!enemy || enemy.hp <= 0) return false;
@@ -83,9 +89,18 @@ function maybeStunEnemy(enemy) {
   return true;
 }
 
+// SPEC-1103: resistencias efectivas del enemigo `enemyId` — usa el bono en
+// memoria del rasgo "Antiguo" cuando `enemyId` es el enemigo actual de combate
+// (gameState.currentEnemy); si no (ej. llamado en tests con un id arbitrario,
+// sin combate en curso), cae a la base estática de ENEMY_COMBAT_DATA.
+function resistancesFor(enemyId) {
+  const enemy = gameState.currentEnemy;
+  return (enemy && enemy.id === enemyId) ? getEffectiveResistances(enemy) : ENEMY_COMBAT_DATA[enemyId]?.resistances;
+}
+
 // Nota "(🔥 Vuln. 30%)" para el log cuando el enemigo resiste o es vulnerable
 function resistanceNote(enemyId, damageType) {
-  const res = ENEMY_COMBAT_DATA[enemyId]?.resistances?.[damageType] ?? 0;
+  const res = resistancesFor(enemyId)?.[damageType] ?? 0;
   if (!res) return "";
   return ` (${DAMAGE_TYPE_EMOJI[damageType] || ""} ${getResistanceLabel(res)})`;
 }
@@ -93,7 +108,7 @@ function resistanceNote(enemyId, damageType) {
 // SPEC-0904 — recomendación táctica cuando el golpe fue resistido (≥20%).
 // Pura: decide QUÉ aconsejar; null si no procede.
 export function resistanceAdviceFor(enemyId, damageType) {
-  const res = ENEMY_COMBAT_DATA[enemyId]?.resistances;
+  const res = resistancesFor(enemyId);
   if (!res || (res[damageType] ?? 0) < 20) return null;
   const bad = DAMAGE_TYPES[damageType] || damageType;
   const weakest = getWeakestResistance(res);
@@ -242,6 +257,8 @@ function rollEnemyIntent() {
     enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
     return;
   }
+  // SPEC-1103: rasgo "Regenerador" — cuenta turnos desde el último daño de fuego
+  enemy.turnsSinceFireHit = (enemy.turnsSinceFireHit ?? 99) + 1;
   enemy.nextAction = decideNextAction({
     behavior: ENEMY_COMBAT_DATA[enemy.id]?.behavior,
     isBoss: enemy.isBoss,
@@ -250,7 +267,9 @@ function rollEnemyIntent() {
     magicAttack: enemy.magicAttack,
     hasStatusEffect: !!ENEMY_STATUS_EFFECTS[enemy.id],
     lastAction: enemy.lastAction,
-    enraged: enemy.enraged
+    enraged: enemy.enraged,
+    hasRegenTrait: enemy.trait === "regenerator",
+    recentlyBurned: (enemy.turnsSinceFireHit ?? 99) < 2
   });
   enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
 }
@@ -281,8 +300,24 @@ export function startCombat(enemyType, isBoss = false) {
     hasGuard: enemyType === "forest_titan",
     guardBroken: 0,
     turnsSinceDevour: 0,
-    turnsSinceOverload: 0
+    turnsSinceOverload: 0,
+    turnsSinceFireHit: 99
   };
+
+  // SPEC-1103: rasgos aleatorios de enemigo (solo no-boss, rejugabilidad)
+  if (!isBoss && Math.random() < ENEMY_TRAIT_CHANCE) {
+    const trait = ENEMY_TRAITS[Math.floor(Math.random() * ENEMY_TRAITS.length)];
+    gameState.currentEnemy.trait = trait;
+    if (trait === "furious") {
+      gameState.currentEnemy.attack = Math.max(1, Math.floor(gameState.currentEnemy.attack * 1.35));
+      gameState.currentEnemy.defense = Math.max(0, Math.floor(gameState.currentEnemy.defense * 0.75));
+    } else if (trait === "ancient") {
+      gameState.currentEnemy.traitResistances = { physical: 30, light: -30 };
+    }
+    const traitKey = { furious: "traitFurious", thief: "traitThief", ancient: "traitAncient", regenerator: "traitRegenerator", coward: "traitCoward" }[trait];
+    gameState.currentEnemy.type = `${gameState.currentEnemy.type} ${t(traitKey)}`;
+  }
+
   gameState.isInCombat = true;
   gameState.activeDebuffs  = {};
   gameState.playerDebuffs  = {};
@@ -329,7 +364,7 @@ async function playerBreakGuard() {
   if (!enemy?.hasGuard) return;
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
-  const enemyRes = ENEMY_COMBAT_DATA[enemy.id]?.resistances;
+  const enemyRes = getEffectiveResistances(enemy);
   const rawDmg = Math.max(1, Math.floor(stats.attack * GUARD_BREAK_DMG_MULT) - (enemy.defense || 0));
   const dmg = applyResistance(Math.max(1, rawDmg), weaponType, enemyRes);
 
@@ -389,7 +424,7 @@ async function playerAttack() {
   const enemy = gameState.currentEnemy;
   const spec = getActiveSpec();
   const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
-  const enemyRes = ENEMY_COMBAT_DATA[enemy.id]?.resistances;
+  const enemyRes = getEffectiveResistances(enemy);
 
   // Warcry buff + maestría de arma + bono de especialización por tipo de daño
   const masteryBonus = getMasteryBonus(weaponType);
@@ -483,7 +518,7 @@ async function playerMagic() {
   const focusMult = wasFocused ? 1.5 : 1.0;
   if (wasFocused) delete gameState.activeBuffs.focused;
   let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * (0.9 + Math.random()*0.2)));
-  dmg = applyResistance(dmg, magicType, ENEMY_COMBAT_DATA[enemy.id]?.resistances);
+  dmg = applyResistance(dmg, magicType, getEffectiveResistances(enemy));
 
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
@@ -525,7 +560,7 @@ async function useSkill(skillId) {
     if (skillType) {
       const specBonus = spec?.bonuses?.dmgType === skillType ? (spec.bonuses.dmgBonus || 0) : 0;
       dmg = Math.max(1, Math.floor(dmg * (1 + getMasteryBonus(skillType) + specBonus)));
-      dmg = applyResistance(dmg, skillType, ENEMY_COMBAT_DATA[gameState.currentEnemy?.id]?.resistances);
+      dmg = applyResistance(dmg, skillType, getEffectiveResistances(gameState.currentEnemy));
       maybeResistanceAdvice(gameState.currentEnemy, skillType);
       grantMasteryXP(skillType);
     }
@@ -580,6 +615,13 @@ async function tryFlee() {
     + (getActiveSpec()?.bonuses?.fleeBonus || 0);
   if (Math.random() < chance) {
     playSound("flee");
+    // SPEC-1103: rasgo "Ladrón" — roba oro cuando el jugador huye con éxito
+    const enemy = gameState.currentEnemy;
+    if (enemy?.trait === "thief" && gameState.player.gold > 0) {
+      const stolen = Math.max(1, Math.floor(gameState.player.gold * THIEF_GOLD_STEAL_PCT));
+      gameState.player.gold = Math.max(0, gameState.player.gold - stolen);
+      addMessage(formatText(t('enemyStealsGold'), { enemy: enemy.type, gold: stolen }), "system");
+    }
     addMessage(t('fleeSuccess'), "system");
     endCombat(false, true);
   } else {
@@ -589,6 +631,17 @@ async function tryFlee() {
 }
 
 // ── Enemy Turn ─────────────────────────────────────────
+// SPEC-1103: rasgo "Cobarde" — bajo COWARD_HP_THRESHOLD, chance por turno de
+// huir sin dar recompensa (simétrico a tryFlee() del jugador). true = huyó.
+function checkCowardFlee(enemy) {
+  if (enemy.trait !== "coward" || enemy.hp <= 0) return false;
+  if (enemy.hp / enemy.maxHp >= COWARD_HP_THRESHOLD) return false;
+  if (Math.random() >= COWARD_FLEE_CHANCE) return false;
+  addMessage(formatText(t('enemyFleesCoward'), { enemy: enemy.type }), "system");
+  endCombat(false, false, true);
+  return true;
+}
+
 async function enemyTurn() {
   if (!gameState.currentEnemy || gameState.isGameOver) return;
   const enemy = gameState.currentEnemy;
@@ -605,6 +658,9 @@ async function enemyTurn() {
     enemy.guardBroken--;
     if (enemy.guardBroken <= 0) addMessage(formatText(t('enemyGuardRestored'), { enemy: enemy.type }), "system");
   }
+
+  // SPEC-1103: rasgo "Cobarde" — huye solo (sin recompensa) bajo cierto % de HP
+  if (checkCowardFlee(enemy)) return;
 
   // Tick player debuffs (poison/burn damage)
   if (processPlayerDebuffs()) return;
@@ -962,6 +1018,8 @@ function processPlayerDebuffs() {
 function applyDamageToEnemy(dmg, damageType) {
   const enemy = gameState.currentEnemy;
   if (!enemy) return;
+  // SPEC-1103: rasgo "Regenerador" — recibir fuego bloquea su regen próxima
+  if (damageType === "fire") enemy.turnsSinceFireHit = 0;
   let final = dmg;
   // SPEC-0802: en guardia recibe la mitad del daño del jugador (mín. 1)
   if (enemy.isDefending && dmg > 1) {
@@ -987,7 +1045,11 @@ function tickBuffs() {
   }
 }
 
-function endCombat(victory, fled = false) {
+// SPEC-1103: enemyFled=true cuando un enemigo con rasgo "Cobarde" huyó solo —
+// el mensaje ya lo emitió checkCowardFlee(); acá solo evita confundirlo con
+// una huida del jugador (fled) y documenta que tampoco entrega recompensas
+// (ya cubierto por el gate `if (victory && enemy)` de más abajo).
+function endCombat(victory, fled = false, enemyFled = false) {
   const enemy = gameState.currentEnemy;
   gameState.isInCombat = false;
   gameState.activeDebuffs = {};

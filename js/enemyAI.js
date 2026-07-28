@@ -39,6 +39,14 @@ export function decideNextAction(e, rng = Math.random) {
   const canMagic = !!e.magicAttack;
   const hpRatio = e.maxHp > 0 ? e.hp / e.maxHp : 1;
 
+  // SPEC-1103: rasgo "Regenerador" — capa aditiva, independiente de `behavior`
+  // (un enemigo "mage" con este rasgo conserva su magia y además puede regenerar).
+  // Mismas condiciones que el case "regenerate" de abajo, más el gate de
+  // "no quemado hace ≤1 turno" (recentlyBurned).
+  if (e.hasRegenTrait && !e.recentlyBurned && hpRatio < 0.6 && e.lastAction !== "regen" && rng() < 0.5) {
+    return "regen";
+  }
+
   switch (behavior) {
     case "aggressive":
       return rng() < 0.4 ? "power_attack" : "attack";

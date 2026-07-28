@@ -38,6 +38,19 @@ test("regenerate: cura bajo 60% HP, nunca dos veces seguidas", () => {
   assert.equal(decideNextAction({ ...base, behavior: "regenerate", hp: 70 }, rngOf(0.01)), "attack");
 });
 
+test("SPEC-1103: rasgo Regenerador — regen aditivo, independiente de behavior", () => {
+  const e = { ...base, behavior: "aggressive", hp: 50, hasRegenTrait: true, recentlyBurned: false };
+  assert.equal(decideNextAction(e, rngOf(0.49)), "regen");
+  // por encima de 60% HP no aplica el rasgo, cae al behavior normal
+  assert.equal(decideNextAction({ ...e, hp: 70 }, rngOf(0.01)), "power_attack");
+  // quemado recientemente bloquea el regen del rasgo aunque cumpla el resto
+  assert.equal(decideNextAction({ ...e, recentlyBurned: true }, rngOf(0.01)), "power_attack");
+  // nunca dos regens seguidos, igual que el behavior "regenerate" nativo
+  assert.equal(decideNextAction({ ...e, lastAction: "regen" }, rngOf(0.01)), "power_attack");
+  // sin el rasgo, un agresivo común nunca regenera
+  assert.equal(decideNextAction({ ...base, behavior: "aggressive", hp: 50 }, rngOf(0.01)), "power_attack");
+});
+
 test("mage: 70% magia solo si tiene magicAttack", () => {
   const e = { ...base, behavior: "mage", magicAttack: 8 };
   assert.equal(decideNextAction(e, rngOf(0.69)), "magic");
