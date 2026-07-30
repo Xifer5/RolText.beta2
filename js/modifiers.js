@@ -9,6 +9,8 @@ export const CRUEL_REST_COST   = 10;    // oro por descansar (paga lo que tengas
 export const SCARCE_GOLD_MULT  = 0.5;
 export const SCARCE_LOOT_CHANCE = 0.5;  // probabilidad de CONSERVAR cada ítem
 export const SCARCE_PRICE_MULT = 1.25;
+// SPEC-1104: ayudar al viajero → descuento de mercader permanente
+export const MERCHANT_DISCOUNT_MULT = 0.90;
 
 export const MODIFIERS = {
   fog: {
@@ -74,10 +76,12 @@ export function areMapsHidden(state) {
   return isActive(state, "fog");
 }
 
-/** Precio de compra efectivo (redondeo hacia arriba con botín escaso). */
+/** Precio de compra efectivo (redondeo hacia arriba con botín escaso; descuento del viajero ayudado). */
 export function buyPriceOf(item, state) {
   const price = item?.price ?? 0;
-  return isActive(state, "scarce") ? Math.ceil(price * SCARCE_PRICE_MULT) : price;
+  const scarceMult = isActive(state, "scarce") ? SCARCE_PRICE_MULT : 1;
+  const discountMult = state?.worldFlags?.traveler_helped ? MERCHANT_DISCOUNT_MULT : 1;
+  return Math.ceil(price * scarceMult * discountMult);
 }
 
 /** Con botín escaso cada ítem tiene 50% de perderse. RNG inyectable para tests. */

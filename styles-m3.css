@@ -1232,6 +1232,7 @@ button:focus-visible,
 .combat-btn.defend  { color: #93C5FD; }
 .combat-btn.break-guard { color: #FDBA74; }
 .combat-btn.interrupt   { color: #C4B5FD; }
+.combat-btn.mercy       { color: #6EE7B7; }
 .combat-btn .key-hint,
 .combat-btn kbd {
   position: absolute;
@@ -1640,6 +1641,7 @@ button:focus-visible,
   .mob-defend { color: #93C5FD; }
   .mob-break-guard { color: #FDBA74; }
   .mob-interrupt   { color: #C4B5FD; }
+  .mob-mercy       { color: #6EE7B7; }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
     border-color: var(--md-primary);

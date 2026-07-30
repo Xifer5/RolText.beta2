@@ -94,7 +94,7 @@ export function initUICache() {
     "gold","level","strength","agility","intelligence","stat-points",
     "location-name","location-subtitle","enemy-panel","enemy-name","enemy-hp","enemy-hp-bar",
     "combat-menu","navigation-menu","combat-content","navigation-content",
-    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn","interruptBtn",
+    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn","interruptBtn","mercyBtn",
     "derived-attack","derived-defense","derived-magic",
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
@@ -180,6 +180,7 @@ function _setupMobileNav() {
     ["mob-defendBtn", () => window.dispatchEvent(new Event("pixel:defend"))],
     ["mob-breakGuardBtn", () => window.dispatchEvent(new Event("pixel:breakGuard"))],
     ["mob-interruptBtn", () => window.dispatchEvent(new Event("pixel:interrupt"))],
+    ["mob-mercyBtn", () => window.dispatchEvent(new Event("pixel:spare"))],
     ["mob-fleeBtn",   () => window.dispatchEvent(new Event("pixel:flee"))],
     ["mob-moveMenuBtn", () => _openMobileSheet("mobileMoveMenu")],
     ["mob-inventoryBtn", () => _openMobileSheet("mobileActionMenu")],
@@ -494,6 +495,14 @@ export function updateUI() {
       mobInterrupt.classList.toggle("hidden", !showInterrupt);
       mobInterrupt.disabled = !showInterrupt;
     }
+    // SPEC-1104: "Perdonar" solo contra mini-bosses reales bajo 25% HP
+    const mobMercy = document.getElementById("mob-mercyBtn");
+    if (mobMercy) {
+      const enemy = gameState.currentEnemy;
+      const showMercy = inCombat && !!enemy?.isMiniBoss && (enemy.hp / enemy.maxHp) < 0.25;
+      mobMercy.classList.toggle("hidden", !showMercy);
+      mobMercy.disabled = !showMercy;
+    }
   }
 
   const disabled = !gameState.isInCombat;
@@ -514,6 +523,13 @@ export function updateUI() {
     const showInterrupt = !disabled && INTERRUPTIBLE_ACTIONS.has(gameState.currentEnemy?.nextAction);
     ui.interruptBtn.classList.toggle("hidden", !showInterrupt);
     ui.interruptBtn.disabled = !showInterrupt;
+  }
+  // SPEC-1104: "Perdonar" solo contra mini-bosses reales bajo 25% HP
+  if (ui.mercyBtn) {
+    const enemy = gameState.currentEnemy;
+    const showMercy = !disabled && !!enemy?.isMiniBoss && (enemy.hp / enemy.maxHp) < 0.25;
+    ui.mercyBtn.classList.toggle("hidden", !showMercy);
+    ui.mercyBtn.disabled = !showMercy;
   }
 
   if (ui["derived-attack"])  ui["derived-attack"].textContent  = derived.attack ?? 0;
@@ -714,7 +730,10 @@ function openNpcModal(npc) {
   document.getElementById("npcEmoji").textContent = npc.emoji;
   document.getElementById("npcName").textContent  = npc.name;
   document.getElementById("npcRole").textContent  = npc.role;
-  document.getElementById("npcLore").textContent  = npc.lore;
+  // SPEC-1104: absorber el eco → percepción distinta de NPCs (solo Elara)
+  const echoLine = (npc.id === "elara" && gameState.worldFlags?.echo_absorbed)
+    ? " " + t("elaraEchoPerception") : "";
+  document.getElementById("npcLore").textContent  = npc.lore + echoLine;
 
   // Support both questId (singular) and questIds (array) — pick first implemented, non-completed quest
   const ids = npc.questId ? [npc.questId] : (npc.questIds || []);
@@ -1093,6 +1112,7 @@ export function setupUIListeners() {
   document.getElementById("defendBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:defend")));
   document.getElementById("breakGuardBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:breakGuard")));
   document.getElementById("interruptBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:interrupt")));
+  document.getElementById("mercyBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:spare")));
   document.getElementById("fleeBtn")?.addEventListener("click",   () => window.dispatchEvent(new Event("pixel:flee")));
 
   // Story log filters

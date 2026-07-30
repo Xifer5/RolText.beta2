@@ -7,13 +7,17 @@ import { allItems } from "./items.js";
 import { playSound, playMusic } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
-import { trySpawnBoss } from "./biomeBosses.js";
+import { trySpawnBoss, AMBUSH_CHANCE_MULT } from "./biomeBosses.js";
+import { showMiniBossReunion } from "./miniBossReunion.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
 import { maybeStartEchoIntro } from "./echoIntro.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
+// SPEC-1104: liberar el eco en el bosque → protección del bosque (-50%,
+// solo bioma forest); se compone con AMBUSH_CHANCE_MULT si ambos aplican.
+const FOREST_PROTECTION_MULT = 0.5;
 
 // ── ZONAS BLOQUEADAS ──────────────────────────────────────────────
 // La primera vez que el jugador intenta entrar, consume el ítem-llave.
@@ -135,8 +139,23 @@ export function handleMove(direction) {
   let asBoss = false;
 
   if (biome && _movesSinceLastBoss >= BOSS_COOLDOWN) {
-    const bossId = trySpawnBoss(biome);
+    // SPEC-1104: robar la bolsa → más emboscadas; liberar el eco en el
+    // bosque → protección del bosque (solo bioma forest). Se componen.
+    let ambushMult = gameState.worldFlags?.purse_taken ? AMBUSH_CHANCE_MULT : 1;
+    if (biome === "forest" && gameState.worldFlags?.echo_freed) ambushMult *= FOREST_PROTECTION_MULT;
+    const bossId = trySpawnBoss(biome, ambushMult);
     if (bossId) {
+      const spareFlag = "spared_" + bossId;
+      if (gameState.worldFlags?.[spareFlag] && !gameState.worldFlags?.[spareFlag + "_resolved"]) {
+        // SPEC-1104: mini-boss perdonado antes — reencuentro narrativo en vez
+        // de combate; no debe además tirar un encuentro normal este mismo
+        // movimiento, así que corta acá (mismo patrón early-return que
+        // maybeStartEchoIntro más arriba).
+        _movesSinceLastBoss = 0;
+        setTimeout(() => showMiniBossReunion(bossId), 700);
+        updateUI();
+        return;
+      }
       combatTarget = bossId;
       asBoss = true;
       _movesSinceLastBoss = 0;

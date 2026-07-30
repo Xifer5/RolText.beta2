@@ -52,12 +52,17 @@ export const biomeBosses = {
 // Se integra con tu sistema de combate actual
 // -----------------------------------------------------
 
-export function trySpawnBoss(biomeId) {
+// SPEC-1104: robar la bolsa → más emboscadas (+50%); liberar el eco en el
+// bosque → protección del bosque (-50%, solo bioma forest). Ambos se
+// componen en movement.js y llegan acá como un único multiplicador.
+export const AMBUSH_CHANCE_MULT = 1.5;
+
+export function trySpawnBoss(biomeId, ambushMult = 1) {
   const biome = biomeBosses[biomeId];
   if (!biome) return null;
 
-  // Probabilidad base del bioma
-  if (Math.random() > biome.spawnChance) return null;
+  // Probabilidad base del bioma, ajustada por el multiplicador de emboscadas
+  if (Math.random() > biome.spawnChance * ambushMult) return null;
 
   // Seleccionar boss o mini-boss
   const isBoss = Math.random() < 0.3; // 30% de probabilidad de ser el boss principal
@@ -77,6 +82,13 @@ export function trySpawnBoss(biomeId) {
 // Uso sugerido:
 // const bossId = getBossForBiome(location.biome);
 // if (bossId) startCombat(bossId);
+
+// SPEC-1104: identifica positivamente un mini-boss (nunca el boss principal
+// de zona, que vive en biome.boss, ni dragon_king, que no está en ninguna
+// lista miniBosses[]) — usado para habilitar el botón "Perdonar" solo en ellos.
+export function isMiniBossId(enemyId) {
+  return Object.values(biomeBosses).some(b => b.miniBosses.includes(enemyId));
+}
 
 export function getBossForBiome(biomeId) {
   const biome = biomeBosses[biomeId];

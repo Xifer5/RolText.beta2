@@ -6,7 +6,7 @@ import * as state from "../js/state.js";
 import {
   MODIFIERS, activeModifiers, isActive, modifierXpMult, cruelAtkMult,
   scarceGoldMult, isIntentAlwaysHidden, areMapsHidden, buyPriceOf,
-  filterLoot, applyRest, CRUEL_REST_COST
+  filterLoot, applyRest, CRUEL_REST_COST, MERCHANT_DISCOUNT_MULT
 } from "../js/modifiers.js";
 import { buildRunRecord } from "../js/runLog.js";
 
@@ -89,6 +89,17 @@ test("buyPriceOf: ×1.25 con redondeo arriba solo bajo scarce", () => {
   assert.equal(buyPriceOf({ price: 10 }, { modifiers: ["scarce"] }), 13);
   assert.equal(buyPriceOf({ price: 100 }, { modifiers: [] }), 100);
   assert.equal(buyPriceOf({}, { modifiers: ["scarce"] }), 0);
+});
+
+test("SPEC-1104: buyPriceOf aplica el descuento del viajero ayudado (10%)", () => {
+  assert.equal(MERCHANT_DISCOUNT_MULT, 0.90);
+  assert.equal(buyPriceOf({ price: 100 }, { modifiers: [], worldFlags: { traveler_helped: true } }), 90);
+  assert.equal(buyPriceOf({ price: 100 }, { modifiers: [], worldFlags: {} }), 100);
+  assert.equal(buyPriceOf({ price: 100 }, { modifiers: [] }), 100); // sin worldFlags del todo
+});
+
+test("SPEC-1104: descuento y botín escaso se componen (1.25 × 0.90 = 1.125)", () => {
+  assert.equal(buyPriceOf({ price: 100 }, { modifiers: ["scarce"], worldFlags: { traveler_helped: true } }), 113);
 });
 
 test("save viejo sin modifiers: resetState lo trae y las lecturas no rompen", () => {

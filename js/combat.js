@@ -22,6 +22,7 @@ import { consumeEchoReward } from "./echoIntro.js";
 import { cruelAtkMult, isIntentAlwaysHidden, modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
 import { showEnding } from "./endings.js";
 import { recordRun } from "./runLog.js";
+import { isMiniBossId } from "./biomeBosses.js";
 import {
   applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
   ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES, getEffectiveResistances
@@ -78,6 +79,8 @@ const ENEMY_TRAITS = ["furious", "thief", "ancient", "regenerator", "coward"];
 const THIEF_GOLD_STEAL_PCT = 0.15;
 const COWARD_HP_THRESHOLD = 0.2;
 const COWARD_FLEE_CHANCE = 0.6;
+// SPEC-1104: perdonar mini-boss — botón condicional bajo este umbral de HP
+const SPARE_HP_THRESHOLD = 0.25;
 
 function maybeStunEnemy(enemy) {
   if (!enemy || enemy.hp <= 0) return false;
@@ -168,6 +171,7 @@ export function setupCombat() {
   window.addEventListener("pixel:defend", () => handleAction(playerDefend));
   window.addEventListener("pixel:breakGuard", () => handleAction(playerBreakGuard));
   window.addEventListener("pixel:interrupt", () => handleAction(playerInterrupt));
+  window.addEventListener("pixel:spare", () => handleAction(playerSpare));
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
   window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
@@ -295,6 +299,9 @@ export function startCombat(enemyType, isBoss = false) {
     attack:  scaledAtk,
     defense: scaledDef,
     isBoss,
+    // SPEC-1104: distingue un mini-boss real (perdonable) del boss principal
+    // de zona (nunca perdonable) — ver isMiniBossId() en biomeBosses.js
+    isMiniBoss: isBoss && isMiniBossId(enemyType),
     // SPEC-1101: estado propio por-boss, en memoria (no toca el save, mismo
     // patrón que nextAction/enraged/isDefending)
     hasGuard: enemyType === "forest_titan",
@@ -417,6 +424,23 @@ async function playerInterrupt() {
   tickBuffs();
   updateUI();
   await delay(500); await enemyTurn();
+}
+
+// SPEC-1104 — Perdonar: solo mini-bosses reales (nunca el boss de zona),
+// solo bajo SPARE_HP_THRESHOLD. Termina el combate sin oro/XP/loot ni kill
+// registrada — la recompensa real es que puede volver como aliado más
+// adelante (ver miniBossReunion.js). Reusa el mecanismo "sin recompensa" de
+// endCombat(victory, fled, enemyFled) de SPEC-1103 (mismo efecto: sin premio,
+// sin mensaje de fleeSuccess — el mensaje ya se emitió acá).
+async function playerSpare() {
+  const enemy = gameState.currentEnemy;
+  if (!enemy?.isMiniBoss) return;
+  if (enemy.hp / enemy.maxHp >= SPARE_HP_THRESHOLD) return;
+
+  if (!gameState.worldFlags) gameState.worldFlags = {};
+  gameState.worldFlags["spared_" + enemy.id] = true;
+  addMessage(formatText(t('mercySuccess'), { enemy: enemy.type }), "system");
+  endCombat(false, false, true);
 }
 
 async function playerAttack() {
