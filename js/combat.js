@@ -20,7 +20,7 @@ import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
 import { consumeEchoReward } from "./echoIntro.js";
 import { cruelAtkMult, isIntentAlwaysHidden, modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
-import { showEnding } from "./endings.js";
+import { showEnding, MORAL_DECISIONS } from "./endings.js";
 import { recordRun } from "./runLog.js";
 import { isMiniBossId } from "./biomeBosses.js";
 import {
@@ -89,6 +89,26 @@ function maybeStunEnemy(enemy) {
   if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
   gameState.activeDebuffs.stunned = { turns: 1 };
   addMessage(formatText(t('enemyStunnedByPlayer'), { enemy: enemy.type }), "combat");
+  return true;
+}
+
+// SPEC-1106: Anillo de Último Aliento — una vez por combate, evita la
+// derrota dejando al jugador en 1 HP en vez de 0. Se llama en TODOS los
+// puntos donde el jugador puede morir (ataque normal, devorar, sobrecarga,
+// tics de veneno/quemadura/sangrado), cada uno reemplaza su chequeo
+// `if (p.hp <= 0)` por `if (p.hp <= 0 && !tryLastBreath())`. El flag de "ya
+// usado" vive en `gameState.currentEnemy` (mismo patrón que hasGuard/
+// guardBroken: estado efímero por-combate, se reinicia solo con cada
+// enemigo nuevo).
+function tryLastBreath() {
+  const enemy = gameState.currentEnemy;
+  if (!enemy || enemy.lastBreathUsed) return false;
+  if (gameState.equipment?.ring?.special !== "lastBreath") return false;
+  enemy.lastBreathUsed = true;
+  gameState.player.hp = 1;
+  addMessage(t('lastBreathMsg'), "system");
+  showFloatingText("1 HP!", window.innerWidth/2, window.innerHeight/2, "#fbbf24", "2em", "critical");
+  updateUI();
   return true;
 }
 
@@ -545,6 +565,9 @@ async function playerMagic() {
   const enemy = gameState.currentEnemy;
   let cost = gameState.player.class === "mage" && gameState.player.level >= 10 ? 7 : 10;
   if (spec?.bonuses?.mpDiscount) cost = Math.max(1, Math.round(cost * (1 - spec.bonuses.mpDiscount)));
+  // SPEC-1106: Libro Quemado — más costo de maná, a cambio de más daño de fuego
+  const burntBook = gameState.equipment?.rightHand?.special === "burntBook" ? gameState.equipment.rightHand : null;
+  if (burntBook) cost = Math.max(1, Math.round(cost * burntBook.mpCostMult));
 
   if ((gameState.player.mp || 0) < cost) {
     addMessage(t('notEnoughMana'), "system");
@@ -556,7 +579,8 @@ async function playerMagic() {
   const mult = gameState.player.class === "mage" && gameState.player.level >= 20 ? 2.0 : 1.0;
   // Escuela de magia: el ataque mágico toma el elemento de la especialización
   const magicType = spec?.bonuses?.dmgType || "magic";
-  const magicBonus = 1 + getMasteryBonus(magicType) + (spec?.bonuses?.dmgBonus || 0);
+  const burntBookFireBonus = (burntBook && magicType === "fire") ? burntBook.fireDmgBonus : 0;
+  const magicBonus = 1 + getMasteryBonus(magicType) + (spec?.bonuses?.dmgBonus || 0) + burntBookFireBonus;
   // SPEC-1102: Concentrarse — +50% al próximo hechizo, se consume acá (no
   // decae por turnos: si el jugador no lanza magia mientras esté activo,
   // simplemente expira solo sin bonus).
@@ -721,6 +745,9 @@ async function enemyTurn() {
   const enemy = gameState.currentEnemy;
   const p = gameState.player;
   const stats = calculateTotalStats(p, gameState.equipment);
+  // SPEC-1106: Capa de Niebla — cuenta el turno de enemigo actual (empieza en
+  // 0, esta es la ronda enemy.combatRound tras el incremento)
+  enemy.combatRound = (enemy.combatRound || 0) + 1;
 
   // SPEC-0802: la guardia expira al empezar su turno — así los ticks de
   // veneno/quemadura de abajo hacen daño completo
@@ -866,7 +893,7 @@ async function enemyTurn() {
     showFloatingText(`-${devourDmg}`, window.innerWidth/2, window.innerHeight/2, "#ef4444", "2.2em", "critical");
     shakeScreen();
     enemy.turnsSinceDevour = 0;
-    if (p.hp <= 0) {
+    if (p.hp <= 0 && !tryLastBreath()) {
       p.hp = 0;
       gameState.isGameOver = true;
       gameState.isInCombat = false;
@@ -898,7 +925,7 @@ async function enemyTurn() {
     showFloatingText(`-${overloadDmg}`, window.innerWidth/2, window.innerHeight/2, "#818cf8", "2.2em", "critical");
     shakeScreen();
     enemy.turnsSinceOverload = 0;
-    if (p.hp <= 0) {
+    if (p.hp <= 0 && !tryLastBreath()) {
       p.hp = 0;
       gameState.isGameOver = true;
       gameState.isInCombat = false;
@@ -940,10 +967,14 @@ async function enemyTurn() {
 
   // Rogue evasion (+ especialización Duelista)
   const spec = getActiveSpec();
+  // SPEC-1106: Capa de Niebla — evasión extra SOLO en la primera ronda de combate
+  const mistBonus = (gameState.equipment?.armor?.special === "mistEvasion" && enemy.combatRound === 1)
+    ? gameState.equipment.armor.mistEvasionBonus : 0;
   const evasionChance = (stats.agility || 0) * 0.01
     + (p.class === "rogue" ? 0.1 : 0)
     + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
-    + (spec?.bonuses?.evasionBonus || 0);
+    + (spec?.bonuses?.evasionBonus || 0)
+    + mistBonus;
   if (Math.random() < evasionChance) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
     // Duelista: 25% de contraatacar al esquivar (+ bono de daño propio)
@@ -999,7 +1030,7 @@ async function enemyTurn() {
 
   updateUI();
 
-  if (p.hp <= 0) {
+  if (p.hp <= 0 && !tryLastBreath()) {
     p.hp = 0;
     gameState.isGameOver = true;
     gameState.isInCombat = false;
@@ -1104,7 +1135,7 @@ function processPlayerDebuffs() {
   }
 
   updateUI();
-  if (p.hp <= 0) {
+  if (p.hp <= 0 && !tryLastBreath()) {
     p.hp = 0;
     gameState.isGameOver  = true;
     gameState.isInCombat  = false;
@@ -1165,15 +1196,28 @@ function endCombat(victory, fled = false, enemyFled = false) {
   if (victory && enemy) {
     playSound("enemy_die");
     const diff = getDifficultyConfig(gameState.difficulty);
-    const xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult * modifierXpMult(gameState)));
+    let xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult * modifierXpMult(gameState)));
     let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult * scarceGoldMult(gameState)));
+    // SPEC-1106: Amuleto del Eco — más recompensa si ya tomaste alguna
+    // decisión compasiva (reutiliza los flags "luz" de MORAL_DECISIONS,
+    // sin curar una segunda lista de "qué es compasivo")
+    const echoAmulet = gameState.equipment?.accessory;
+    if (echoAmulet?.special === "compassionReward") {
+      const hasCompassion = MORAL_DECISIONS.some(d => d.weight > 0 && gameState.worldFlags?.[d.flag]);
+      if (hasCompassion) {
+        xp = Math.floor(xp * (1 + echoAmulet.compassionRewardBonus));
+        gold = Math.floor(gold * (1 + echoAmulet.compassionRewardBonus));
+      }
+    }
     gameState.player.experience = (gameState.player.experience || 0) + xp;
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
     addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
 
     // SPEC-1105: Caballero Sagrado — cura al matar un enemigo
-    const healOnKill = getActiveSpec()?.bonuses?.healOnKill;
+    // SPEC-1106: Espada Voraz — cura al matar (fuente independiente, vía equipo)
+    const healOnKill = (getActiveSpec()?.bonuses?.healOnKill || 0)
+      + (gameState.equipment?.rightHand?.special === "healOnKill" ? gameState.equipment.rightHand.healOnKillPct : 0);
     if (healOnKill) {
       const p = gameState.player;
       const stats = calculateTotalStats(p, gameState.equipment);
@@ -1181,7 +1225,7 @@ function endCombat(victory, fled = false, enemyFled = false) {
       const healed = Math.floor(missing * healOnKill);
       if (healed > 0) {
         p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
-        addMessage(formatText(t('holyKnightHealOnKillMsg'), { heal: healed }), "combat");
+        addMessage(formatText(t('healOnKillMsg'), { heal: healed }), "combat");
       }
     }
 
