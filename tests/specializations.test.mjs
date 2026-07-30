@@ -6,7 +6,8 @@ import assert from "node:assert/strict";
 const state = await import("../js/state.js");
 const { resetState } = state;
 const {
-  SPECIALIZATIONS, getClassSpecializations, canSpecialize, chooseSpecialization, getActiveSpec
+  SPECIALIZATIONS, getClassSpecializations, canSpecialize, chooseSpecialization, getActiveSpec,
+  migrateUnknownSpecialization
 } = await import("../js/specializations.js");
 
 test("cada clase tiene exactamente 3 especializaciones", () => {
@@ -19,7 +20,7 @@ test("cada clase tiene exactamente 3 especializaciones", () => {
 test("canSpecialize exige nivel 10 y no tener spec previa", () => {
   assert.equal(canSpecialize({ level: 9, specialization: null }), false);
   assert.equal(canSpecialize({ level: 10, specialization: null }), true);
-  assert.equal(canSpecialize({ level: 15, specialization: "sword_master" }), false);
+  assert.equal(canSpecialize({ level: 15, specialization: "tank" }), false);
   assert.equal(canSpecialize({}), false);
 });
 
@@ -28,16 +29,16 @@ test("chooseSpecialization valida clase, nivel y unicidad", () => {
   state.gameState.player.class = "warrior";
   state.gameState.player.level = 10;
 
-  assert.equal(chooseSpecialization("fire_school"), null, "spec de otra clase");
+  assert.equal(chooseSpecialization("elementalist"), null, "spec de otra clase");
   assert.equal(chooseSpecialization("no_existe"), null);
 
-  const spec = chooseSpecialization("sword_master");
-  assert.equal(spec.id, "sword_master");
-  assert.equal(state.gameState.player.specialization, "sword_master");
+  const spec = chooseSpecialization("tank");
+  assert.equal(spec.id, "tank");
+  assert.equal(state.gameState.player.specialization, "tank");
   assert.equal(getActiveSpec().name, spec.name);
 
-  assert.equal(chooseSpecialization("mace_master"), null, "la elección es permanente");
-  assert.equal(state.gameState.player.specialization, "sword_master");
+  assert.equal(chooseSpecialization("berserker"), null, "la elección es permanente");
+  assert.equal(state.gameState.player.specialization, "tank");
 });
 
 test("chooseSpecialization rechaza por nivel insuficiente", () => {
@@ -48,14 +49,48 @@ test("chooseSpecialization rechaza por nivel insuficiente", () => {
   assert.equal(getActiveSpec(), null);
 });
 
+test("SPEC-1105: las 9 especializaciones son las nombradas por el usuario, una por clase", () => {
+  const byClass = {
+    warrior: ["tank", "berserker", "holy_knight"],
+    mage: ["elementalist", "necromancer", "chronomancer"],
+    rogue: ["assassin", "trapper", "duelist"]
+  };
+  for (const [cls, ids] of Object.entries(byClass)) {
+    const actual = getClassSpecializations(cls).map(s => s.id).sort();
+    assert.deepEqual(actual, [...ids].sort(), cls);
+  }
+});
+
 test("los bonos de cada spec usan campos conocidos", () => {
   const known = new Set([
     "dmgType", "dmgBonus", "physicalDefenseBonus", "mpDiscount", "extraFrozenTurn",
-    "critBonus", "poisonOnAttack", "evasionBonus", "counterattack", "goldBonus", "fleeBonus"
+    "critBonus", "poisonOnAttack", "evasionBonus", "counterattack",
+    "maxHpBonus", "counterattackOnHit", "dmgBonusAll", "enrageThreshold", "enrageDmgMult",
+    "physicalDefensePenalty", "healOnKill", "debuffResistPct", "lifeStealOnMagic",
+    "curseOnMagicCrit", "extraTurnChance", "enemyStunOnHitChance", "executeBonus",
+    "bleedOnAttack", "enemyDefenseShred", "counterDmgBonus"
   ]);
   for (const spec of Object.values(SPECIALIZATIONS)) {
     for (const key of Object.keys(spec.bonuses)) {
       assert.ok(known.has(key), `${spec.id}: bono desconocido ${key}`);
     }
   }
+});
+
+test("SPEC-1105: migrateUnknownSpecialization resetea ids que ya no existen", () => {
+  const player = { specialization: "sword_master" };
+  assert.equal(migrateUnknownSpecialization(player), true);
+  assert.equal(player.specialization, null);
+});
+
+test("SPEC-1105: migrateUnknownSpecialization no toca ids válidos ni null", () => {
+  const withValid = { specialization: "tank" };
+  assert.equal(migrateUnknownSpecialization(withValid), false);
+  assert.equal(withValid.specialization, "tank");
+
+  const withNull = { specialization: null };
+  assert.equal(migrateUnknownSpecialization(withNull), false);
+
+  assert.equal(migrateUnknownSpecialization(null), false);
+  assert.equal(migrateUnknownSpecialization({}), false);
 });

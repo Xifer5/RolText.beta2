@@ -4,6 +4,7 @@ import { addMessage } from "./story.js";
 import { t, formatText } from "./i18n.js";
 import { updateUI } from "./ui.js";
 import { CLASS_BASE_RESISTANCES, ITEM_RESISTANCES } from "./damageTypes.js";
+import { getActiveSpec } from "./specializations.js";
 
 /**
  * Calcula estadísticas derivadas a partir de los atributos base y equipo.
@@ -47,6 +48,9 @@ export function calculateTotalStats(player, equipment = {}) {
   const classBonusHp = player.bonusHp || 0;
   const classBonusMp = player.bonusMp || 0;
   stats.maxHp = 80 + ((stats.strength || 0) * 2) + hpBonusSum + classBonusHp + (player.permanentHpBonus || 0);
+  // SPEC-1105: Tanque — +20% HP máximo
+  const maxHpBonus = getActiveSpec()?.bonuses?.maxHpBonus;
+  if (maxHpBonus) stats.maxHp = Math.floor(stats.maxHp * (1 + maxHpBonus));
   const mpPerInt = (player.class === "mage") ? 15 : 5;
   stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + classBonusMp + (player.permanentMpBonus || 0);
 

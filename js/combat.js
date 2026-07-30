@@ -453,7 +453,11 @@ async function playerAttack() {
   // Warcry buff + maestría de arma + bono de especialización por tipo de daño
   const masteryBonus = getMasteryBonus(weaponType);
   const specDmgBonus = spec?.bonuses?.dmgType === weaponType ? (spec.bonuses.dmgBonus || 0) : 0;
-  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus);
+  // SPEC-1105: Berserker — daño físico sin importar el arma, más furia bajo cierto % de HP
+  const specDmgBonusAll = spec?.bonuses?.dmgBonusAll || 0;
+  const isEnraged = !!spec?.bonuses?.enrageThreshold && (gameState.player.hp / (stats.maxHp || 1)) < spec.bonuses.enrageThreshold;
+  const enrageMult = isEnraged ? (spec.bonuses.enrageDmgMult || 1) : 1;
+  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus + specDmgBonusAll) * enrageMult;
   const rawDmg = Math.floor(stats.attack * atkMult);
   const defense = enemy.defense || 0;
   const variance = 0.9 + Math.random() * 0.2;
@@ -472,7 +476,10 @@ async function playerAttack() {
   const isCrit  = Math.random() < critChance;
   const critMul = isCrit ? 1.75 : 1.0;
 
-  const dmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul)), weaponType, enemyRes);
+  // SPEC-1105: Asesino — daño adicional al ejecutar enemigos debilitados
+  const executeMult = (spec?.bonuses?.executeBonus && enemy.maxHp > 0 && (enemy.hp / enemy.maxHp) < 0.3)
+    ? (1 + spec.bonuses.executeBonus) : 1;
+  const dmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul * executeMult)), weaponType, enemyRes);
   const total = dmg + extraHit;
 
   playSound("attack");
@@ -496,6 +503,21 @@ async function playerAttack() {
     if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
     gameState.activeDebuffs.poison = { turns: 2, damage: Math.max(2, Math.floor(stats.attack * 0.15)) };
     addMessage(formatText(t('specPoisonMsg'), { enemy: enemy.type }), "combat");
+  }
+  // SPEC-1105: Trampero — los ataques normales pueden desangrar al enemigo
+  if (spec?.bonuses?.bleedOnAttack && enemy.hp > 0 && Math.random() < spec.bonuses.bleedOnAttack && !gameState.activeDebuffs?.bleed) {
+    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
+    gameState.activeDebuffs.bleed = { turns: 3, damage: Math.max(2, Math.floor(stats.attack * 0.12)) };
+    addMessage(formatText(t('trapperBleedMsg'), { enemy: enemy.type }), "combat");
+  }
+  // SPEC-1105: Trampero — cada golpe desgasta la defensa del enemigo (tope 3 veces por combate)
+  if (spec?.bonuses?.enemyDefenseShred && enemy.hp > 0) {
+    enemy._defenseShredStacks = enemy._defenseShredStacks || 0;
+    if (enemy._defenseShredStacks < 3) {
+      enemy._defenseShredStacks++;
+      enemy.defense = Math.max(0, Math.floor(enemy.defense * (1 - spec.bonuses.enemyDefenseShred)));
+      addMessage(formatText(t('trapperShredMsg'), { enemy: enemy.type }), "combat");
+    }
   }
   showFloatingText(`-${total}${isCrit ? "!" : ""}`,
     window.innerWidth/2+50, window.innerHeight/2-50,
@@ -541,21 +563,50 @@ async function playerMagic() {
   const wasFocused = gameState.activeBuffs?.focused > 0;
   const focusMult = wasFocused ? 1.5 : 1.0;
   if (wasFocused) delete gameState.activeBuffs.focused;
-  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * (0.9 + Math.random()*0.2)));
+  // SPEC-1105: crítico mágico — mismo cálculo base que playerAttack(), sin el
+  // +10% de clase pícaro (ese bono es específico del físico de rogue).
+  const magicCritChance = 0.10 + (gameState.player.agility || 0) * 0.005 + (spec?.bonuses?.critBonus || 0);
+  const isMagicCrit = Math.random() < magicCritChance;
+  const magicCritMul = isMagicCrit ? 1.75 : 1.0;
+  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * magicCritMul * (0.9 + Math.random()*0.2)));
   dmg = applyResistance(dmg, magicType, getEffectiveResistances(enemy));
 
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
   playSound("hit");
-  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : ""), "combat");
+  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : "") + (isMagicCrit ? " 💥 ¡CRÍTICO!" : ""), "combat");
   maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
-  showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em");
+  showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", isMagicCrit ? "critical" : "");
   shakeScreen();
+
+  // SPEC-1105: Nigromante — roba vida del daño mágico infligido
+  if (spec?.bonuses?.lifeStealOnMagic) {
+    const healed = Math.max(1, Math.floor(dmg * spec.bonuses.lifeStealOnMagic));
+    const p = gameState.player;
+    p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
+    addMessage(formatText(t('necromancerLifeStealMsg'), { heal: healed }), "combat");
+  }
+  // SPEC-1105: Nigromante — el crítico mágico maldice al enemigo (-15% ataque, 2 turnos)
+  if (spec?.bonuses?.curseOnMagicCrit && isMagicCrit && enemy.hp > 0) {
+    enemy.cursedDebuff = { turns: 2 };
+    addMessage(formatText(t('necromancerCurseMsg'), { enemy: enemy.type }), "combat");
+  }
+  // SPEC-1105: Cronomante — probabilidad de cancelar la próxima acción del enemigo
+  if (spec?.bonuses?.enemyStunOnHitChance && enemy.hp > 0 && Math.random() < spec.bonuses.enemyStunOnHitChance) {
+    enemy.nextAction = "interrupted";
+    addMessage(formatText(t('chronomancerStunMsg'), { enemy: enemy.type }), "combat");
+  }
 
   tickBuffs();
   updateUI();
   if (gameState.currentEnemy.hp <= 0) { await delay(400); return endCombat(true); }
+  // SPEC-1105: Cronomante — probabilidad de actuar de nuevo sin pasar el turno
+  if (spec?.bonuses?.extraTurnChance && Math.random() < spec.bonuses.extraTurnChance) {
+    addMessage(t('chronomancerExtraTurnMsg'), "system");
+    await delay(500);
+    return;
+  }
   await delay(700); await enemyTurn();
 }
 
@@ -635,8 +686,7 @@ async function useSkill(skillId) {
 async function tryFlee() {
   const agiMod = (gameState.player.agility || 0) * 0.02;
   const chance = 0.4 + agiMod
-    + (gameState.player.class === "rogue" ? 0.15 : 0)
-    + (getActiveSpec()?.bonuses?.fleeBonus || 0);
+    + (gameState.player.class === "rogue" ? 0.15 : 0);
   if (Math.random() < chance) {
     playSound("flee");
     // SPEC-1103: rasgo "Ladrón" — roba oro cuando el jugador huye con éxito
@@ -709,6 +759,23 @@ async function enemyTurn() {
     burnInfo.turns--;
     if (burnInfo.turns <= 0) { delete gameState.activeDebuffs.burn; addMessage(t('burnWearsOff'), "system"); }
     if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
+
+  // SPEC-1105: Trampero — daño de sangrado sobre el enemigo
+  if (gameState.activeDebuffs?.bleed) {
+    const bleedInfo = gameState.activeDebuffs.bleed;
+    const bleedDmg = bleedInfo.damage || 3;
+    applyDamageToEnemy(bleedDmg);
+    addMessage(formatText(t('enemyBleedDamage'), { enemy: enemy.type, damage: bleedDmg }), "combat");
+    bleedInfo.turns--;
+    if (bleedInfo.turns <= 0) { delete gameState.activeDebuffs.bleed; addMessage(t('enemyBleedWearsOff'), "system"); }
+    if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
+
+  // SPEC-1105: Nigromante — la maldición del crítico mágico decae con el tiempo
+  if (enemy.cursedDebuff?.turns > 0) {
+    enemy.cursedDebuff.turns--;
+    if (enemy.cursedDebuff.turns <= 0) delete enemy.cursedDebuff;
   }
 
   // Frozen: enemy attacks less
@@ -850,7 +917,9 @@ async function enemyTurn() {
   const useMagic = action === "magic" && enemy.magicAttack;
   const powerMult = action === "power_attack" ? POWER_ATTACK_MULT : 1.0;
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
-  const atkVal = Math.floor(atkBase * powerMult * frozenMult);
+  // SPEC-1105: Nigromante — la maldición reduce el ataque del enemigo mientras dure
+  const curseMult = enemy.cursedDebuff?.turns > 0 ? 0.85 : 1;
+  const atkVal = Math.floor(atkBase * powerMult * frozenMult * curseMult);
 
   // Player defense (warrior stance halves damage)
   // SPEC-1102: se guarda ANTES de decrementar — el contraataque universal de
@@ -877,9 +946,9 @@ async function enemyTurn() {
     + (spec?.bonuses?.evasionBonus || 0);
   if (Math.random() < evasionChance) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
-    // Duelista: 25% de contraatacar al esquivar
+    // Duelista: 25% de contraatacar al esquivar (+ bono de daño propio)
     if (spec?.bonuses?.counterattack && Math.random() < 0.25) {
-      const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5));
+      const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5 * (1 + (spec.bonuses.counterDmgBonus || 0))));
       applyDamageToEnemy(counterDmg, "physical");
       playSound("attack");
       addMessage(formatText(t('counterattackMsg'), { damage: counterDmg }), "combat");
@@ -900,14 +969,26 @@ async function enemyTurn() {
   const variance = 0.85 + Math.random() * 0.3;
   const rawDmg = Math.max(0, atkVal - defVal);
   let finalDmg = Math.max(1, Math.floor(rawDmg * variance * defenseMult * shieldMult));
-  // Maestro de Escudos: -25% daño físico recibido
+  // Tanque: -30% daño físico recibido
   if (spec?.bonuses?.physicalDefenseBonus && PHYSICAL_TYPES.has(atkType)) {
     finalDmg = Math.max(1, Math.floor(finalDmg * (1 - spec.bonuses.physicalDefenseBonus)));
+  }
+  // SPEC-1105: Berserker — a cambio de más daño propio, recibe más daño físico
+  if (spec?.bonuses?.physicalDefensePenalty && PHYSICAL_TYPES.has(atkType)) {
+    finalDmg = Math.max(1, Math.floor(finalDmg * (1 + spec.bonuses.physicalDefensePenalty)));
   }
   finalDmg = applyResistance(finalDmg, atkType, stats.resistances);
 
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
+  // SPEC-1105: Tanque — probabilidad de contraatacar cualquier golpe recibido
+  if (spec?.bonuses?.counterattackOnHit && enemy.hp > 0 && Math.random() < spec.bonuses.counterattackOnHit) {
+    const tankCounterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5));
+    applyDamageToEnemy(tankCounterDmg, "physical");
+    addMessage(formatText(t('tankCounterMsg'), { damage: tankCounterDmg }), "combat");
+    showFloatingText(`-${tankCounterDmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#fbbf24", "1.6em");
+    if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
 
   const attackLabel = useMagic ? t('magicAttackLabel')
     : action === "power_attack" ? t('powerAttackLabel')
@@ -944,8 +1025,10 @@ async function enemyTurn() {
 
   // Apply a new status effect if enemy has one and player doesn't already have it
   // SPEC-0802: la acción "status" telegrafiada garantiza el intento de efecto
+  // SPEC-1105: Caballero Sagrado — reduce la probabilidad de sufrir el efecto
   const se = ENEMY_STATUS_EFFECTS[enemy.id];
-  if (se && Math.random() < (action === "status" ? 1 : se.chance)) {
+  const debuffResistMult = 1 - (spec?.bonuses?.debuffResistPct || 0);
+  if (se && Math.random() < (action === "status" ? debuffResistMult : se.chance * debuffResistMult)) {
     if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
     // SPEC-1101: el veneno acumula stacks (tope 5) en vez de solo refrescar/
     // ignorarse — cada stack nueva multiplica el daño por turno.
@@ -1084,13 +1167,23 @@ function endCombat(victory, fled = false, enemyFled = false) {
     const diff = getDifficultyConfig(gameState.difficulty);
     const xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult * modifierXpMult(gameState)));
     let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult * scarceGoldMult(gameState)));
-    // Explorador: +10% oro
-    const goldBonus = getActiveSpec()?.bonuses?.goldBonus;
-    if (goldBonus) gold = Math.floor(gold * (1 + goldBonus));
     gameState.player.experience = (gameState.player.experience || 0) + xp;
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
     addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
+
+    // SPEC-1105: Caballero Sagrado — cura al matar un enemigo
+    const healOnKill = getActiveSpec()?.bonuses?.healOnKill;
+    if (healOnKill) {
+      const p = gameState.player;
+      const stats = calculateTotalStats(p, gameState.equipment);
+      const missing = Math.max(0, stats.maxHp - (p.hp || 0));
+      const healed = Math.floor(missing * healOnKill);
+      if (healed > 0) {
+        p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
+        addMessage(formatText(t('holyKnightHealOnKillMsg'), { heal: healed }), "combat");
+      }
+    }
 
     // SPEC-0902: recompensa del eco tras el combate guionizado del bosque
     consumeEchoReward();

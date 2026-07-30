@@ -3,6 +3,7 @@ import { addMessage } from "./story.js";
 import { deepClone } from "./utils.js";
 import { t, formatText } from "./i18n.js";
 import { migratePermanentBonuses, applyDerivedMaxes } from "./stats.js";
+import { migrateUnknownSpecialization } from "./specializations.js";
 
 const LEGACY_KEY = "pixelQuestSave";
 export const SAVE_SLOTS = ["auto", "slot1", "slot2", "slot3"];
@@ -71,6 +72,9 @@ export function loadFromSlot(slotId) {
     Object.assign(gameState, deepClone(initialGameState), deepClone(parsed.gameState));
     // Saves antiguos acumulaban level-ups mutando maxHp/maxMp; reconstruye los bonos permanentes
     if (migratePermanentBonuses(gameState.player, gameState.equipment)) applyDerivedMaxes();
+    // SPEC-1105: saves con un id de especialización que ya no existe (ej. "sword_master")
+    // vuelven a null — el jugador puede elegir de nuevo entre las 9 especializaciones actuales
+    if (migrateUnknownSpecialization(gameState.player)) applyDerivedMaxes();
     // Restore profile card
     setTimeout(() => {
       const p = gameState.player;
