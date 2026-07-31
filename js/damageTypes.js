@@ -79,6 +79,7 @@ export const ENEMY_COMBAT_DATA = {
   slime:    { resistances: { slash: 30, pierce: -20, fire: -30, blunt: -10 }, attackDamageType: "blunt" },
   fungedBeast:    { attackDamageType: "blunt",   behavior: "status" },
   thief:          { attackDamageType: "pierce",  behavior: "aggressive" },
+  kestrel_rival:  { attackDamageType: "pierce",  behavior: "aggressive" }, // SPEC-1108
   guard:          { attackDamageType: "slash",   behavior: "defensive" },
   cave_bat: { resistances: { pierce: 20, slash: -10 }, attackDamageType: "pierce", behavior: "aggressive" },
   goblin:   { resistances: { fire: -10 }, attackDamageType: "slash", behavior: "aggressive" },

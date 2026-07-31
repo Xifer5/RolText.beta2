@@ -12,6 +12,7 @@ import { showMiniBossReunion } from "./miniBossReunion.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
 import { maybeStartEchoIntro } from "./echoIntro.js";
+import { maybeStartRivalEncounter } from "./rivalArc.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
@@ -130,6 +131,12 @@ export function handleMove(direction) {
   if (maybeStartEchoIntro(nextId)) {
     updateUI();
     return; // la escena gestiona isProcessingMove vía el modal de evento
+  }
+
+  // ── SPEC-1108: Kestrel, el rival recurrente — 3 encuentros guionizados ──
+  if (maybeStartRivalEncounter(nextId)) {
+    updateUI();
+    return; // mismo patrón: el modal gestiona isProcessingMove
   }
 
   // ── Intentar aparición de jefe primero ────────────────────────────

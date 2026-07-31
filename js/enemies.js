@@ -536,6 +536,21 @@ export const enemyData = {
     img: "img/enemies/dragon.webp",
   },
 
+  // SPEC-1108: Kestrel, el rival recurrente — duelo único si el jugador no
+  // lo ayudó ni lo traicionó lo suficiente en sus 2 apariciones previas.
+  kestrel_rival: {
+    type: "Kestrel",
+    levelRequirement: 10,
+    hp: 400,
+    maxHp: 400,
+    attack: 45,
+    defense: 18,
+    experience: 350,
+    gold: 150,
+    drops: ["health_potion"],
+    img: "img/enemies/thief.webp",
+  },
+
   dragon_king: {
     isBoss: true,
     type: "Dragon",
