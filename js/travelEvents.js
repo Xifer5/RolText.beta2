@@ -1003,6 +1003,159 @@ export const TRAVEL_EVENTS = [
         }
       }
     ]
+  },
+
+  // ── SPEC-1107: eventos con riesgo dependiente de clase/origen/stats ─────
+  // (roadmap ítem #7) — mismo patrón que "Desprendimiento": la clase o
+  // estadística correcta abre una vía segura; cualquier otro build puede
+  // arriesgarse igual (55-65% de éxito) al mismo daño real (8-17 HP) que
+  // ya usan los eventos de riesgo existentes.
+  {
+    id: "light_among_trees",
+    icon: "🌟",
+    title: { en: "A Light Among the Trees", es: "Luz entre los árboles" },
+    text: { en: "A soft light flickers between the trunks, drifting closer with every breath. It could be harmless — or it could be a lure.", es: "Una luz suave parpadea entre los troncos, acercándose con cada respiración. Podría ser inofensiva... o un señuelo." },
+    biomes: ["forest", "garden", "jungle"],
+    choices: [
+      {
+        label: { en: "Investigate", es: "Investigar" },
+        icon: "🔎",
+        apply() {
+          const p = gameState.player;
+          const safe = p.class === "mage" || (p.intelligence ?? 0) >= 12;
+          if (safe || Math.random() < 0.6) {
+            p.mp = Math.min(p.maxMp, (p.mp ?? 0) + 15);
+            p.experience = (p.experience ?? 0) + 20;
+            const msg = safe
+              ? { en: "You recognize it at once — harmless arcane residue. You study it safely. +15 MP, +20 XP", es: "La reconoces al instante: residuo arcano inofensivo. La estudias sin riesgo. +15 MP, +20 XP" }
+              : { en: "It turns out to be harmless residue after all. +15 MP, +20 XP", es: "Resulta ser un residuo inofensivo. +15 MP, +20 XP" };
+            return msg;
+          }
+          const dmg = 10 + Math.floor(Math.random() * 8);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `It was a lure — a will-o'-wisp bites at your mind. −${dmg} HP`, es: `Era un señuelo — un fuego fatuo muerde tu mente. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Walk past", es: "Seguir de largo" },
+        icon: "🚶",
+        apply() {
+          return { en: "You leave the light behind, unanswered.", es: "Dejas la luz atrás, sin respuesta." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "broken_bridge",
+    icon: "🌉",
+    title: { en: "Broken Bridge", es: "Puente roto" },
+    text: { en: "The bridge ahead has collapsed in the middle — only a narrow beam remains, spanning a long drop.", es: "El puente se ha derrumbado en el medio — solo queda una viga angosta, sobre una caída larga." },
+    biomes: ["mountain", "jungle", "tundra"],
+    choices: [
+      {
+        label: { en: "Cross the beam", es: "Cruzar por la viga" },
+        icon: "🤸",
+        apply() {
+          const p = gameState.player;
+          const safe = p.class === "rogue" || (p.agility ?? 0) >= 12;
+          if (safe || Math.random() < 0.6) {
+            p.experience = (p.experience ?? 0) + 20;
+            const msg = safe
+              ? { en: "You cross the beam with practiced ease. +20 XP", es: "Cruzas la viga con soltura de experto. +20 XP" }
+              : { en: "You wobble, but make it across. +20 XP", es: "Te tambaleas, pero logras cruzar. +20 XP" };
+            return msg;
+          }
+          const dmg = 10 + Math.floor(Math.random() * 8);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `You slip and catch the edge hard on the way down. −${dmg} HP, but you make it across.`, es: `Resbalas y te golpeas fuerte al caer. −${dmg} HP, pero logras cruzar.` };
+        }
+      },
+      {
+        label: { en: "Find another way", es: "Buscar otro camino" },
+        icon: "🧭",
+        apply() {
+          return { en: "The detour costs you time, but you arrive unharmed.", es: "El desvío te cuesta tiempo, pero llegas ileso." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "ancient_altar",
+    icon: "🗿",
+    title: { en: "Ancient Altar", es: "Altar antiguo" },
+    text: { en: "Runes cover a weathered altar, still humming faintly with old power. Reading them wrong could wake something.", es: "Runas cubren un altar desgastado, aún vibrando débilmente con poder antiguo. Leerlas mal podría despertar algo." },
+    biomes: ["ruins", "dungeon", "catacomb"],
+    choices: [
+      {
+        label: { en: "Study the runes", es: "Estudiar las runas" },
+        icon: "📖",
+        apply() {
+          const p = gameState.player;
+          const safe = hasFlag("origin_apprentice") || (p.intelligence ?? 0) >= 12;
+          if (safe || Math.random() < 0.55) {
+            p.mp = Math.min(p.maxMp, (p.mp ?? 0) + 12);
+            p.experience = (p.experience ?? 0) + 25;
+            const msg = safe
+              ? { en: "You decipher the runes with ease. The altar's power settles calmly. +12 MP, +25 XP", es: "Descifras las runas sin esfuerzo. El poder del altar se calma. +12 MP, +25 XP" }
+              : { en: "You piece the meaning together just in time. +12 MP, +25 XP", es: "Logras entender el significado justo a tiempo. +12 MP, +25 XP" };
+            return msg;
+          }
+          const dmg = 10 + Math.floor(Math.random() * 8);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `You misread a rune — a ward flares and burns you. −${dmg} HP`, es: `Lees mal una runa — una salvaguarda estalla y te quema. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Leave it undisturbed", es: "Dejarlo en paz" },
+        icon: "🙏",
+        apply() {
+          return { en: "Whatever sleeps here, you let it sleep.", es: "Lo que sea que duerme aquí, lo dejas dormir." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "wounded_enemy",
+    icon: "🩹",
+    title: { en: "A Wounded Enemy", es: "Un enemigo herido" },
+    text: { en: "A creature lies in the road, too hurt to fight. It watches you, waiting to see what you'll do.", es: "Una criatura yace en el camino, demasiado herida para luchar. Te observa, esperando a ver qué haces." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Finish it off", es: "Rematarlo" },
+        icon: "⚔️",
+        apply() {
+          setFlag("wounded_enemy_killed");
+          const gold = 10 + Math.floor(Math.random() * 11);
+          gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+          gameState.player.experience = (gameState.player.experience ?? 0) + 5;
+          return { en: `A quick, cold end. You find ${gold} gold on it. +5 XP`, es: `Un final rápido y frío. Le encuentras ${gold} de oro. +5 XP` };
+        }
+      },
+      {
+        label: { en: "Let it go", es: "Dejarlo ir" },
+        icon: "🕊️",
+        apply() {
+          setFlag("wounded_enemy_spared");
+          const p = gameState.player;
+          const safe = p.class === "warrior" || (p.strength ?? 0) >= 12;
+          if (safe || Math.random() < 0.55) {
+            p.experience = (p.experience ?? 0) + 15;
+            const msg = safe
+              ? { en: "You back away in full control. It limps into the brush. +15 XP", es: "Retrocedes con pleno control. Se aleja cojeando hacia la maleza. +15 XP" }
+              : { en: "It slips away into the brush without incident. +15 XP", es: "Se escabulle hacia la maleza sin incidentes. +15 XP" };
+            return msg;
+          }
+          const dmg = 8 + Math.floor(Math.random() * 7);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          p.experience = (p.experience ?? 0) + 5;
+          return { en: `It lashes out as you turn — −${dmg} HP — then flees. +5 XP`, es: `Ataca cuando te das vuelta — −${dmg} HP — y luego huye. +5 XP` };
+        }
+      }
+    ]
   }
 
 ];

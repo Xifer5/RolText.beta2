@@ -41,6 +41,12 @@ test("SPEC-1106: los 5 ítems nuevos aparecen en al menos una tabla de loot", as
 });
 
 test("SPEC-1106: el Amuleto del Eco reutiliza los flags \"luz\" (peso positivo) de MORAL_DECISIONS", () => {
-  const lightFlags = MORAL_DECISIONS.filter(d => d.weight > 0).map(d => d.flag).sort();
-  assert.deepEqual(lightFlags, ["echo_freed", "purse_left", "shrine_prayed", "traveler_helped"]);
+  const lightFlags = MORAL_DECISIONS.filter(d => d.weight > 0).map(d => d.flag);
+  // SPEC-1107 agregó "wounded_enemy_spared" — el amuleto lo hereda gratis
+  // porque recorre TODA la tabla; este test solo exige que los 4 flags
+  // originales sigan presentes, sin fijar la lista completa (evita que este
+  // test rompa cada vez que una spec futura sume un flag "luz" más).
+  for (const flag of ["echo_freed", "purse_left", "shrine_prayed", "traveler_helped"]) {
+    assert.ok(lightFlags.includes(flag), `${flag} debería seguir siendo un flag "luz"`);
+  }
 });

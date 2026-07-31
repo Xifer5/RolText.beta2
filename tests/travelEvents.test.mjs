@@ -45,6 +45,71 @@ test("mercader: solo marca flag si la compra se completa", () => {
   assert.equal(gameState.player.gold, 2);
 });
 
+// SPEC-1107: eventos con riesgo dependiente de clase/origen/stats
+function withRandom(value, fn) {
+  const orig = Math.random;
+  Math.random = () => value;
+  try { return fn(); } finally { Math.random = orig; }
+}
+
+test("luz entre los árboles: mago o INT≥12 siempre segura, el resto arriesga daño con RNG baja", () => {
+  gameState.player.class = "mage";
+  gameState.player.intelligence = 5;
+  gameState.player.mp = 0; // deja espacio para ver el +15 MP de la rama segura
+  withRandom(0.99, () => choose("light_among_trees", 0)); // aunque el roll "falle", mago es siempre seguro
+  assert.ok(gameState.player.mp > 0, "mago siempre gana MP, nunca pierde HP");
+
+  resetState();
+  gameState.player.class = "warrior";
+  gameState.player.intelligence = 5;
+  const hpBefore = gameState.player.hp;
+  withRandom(0.99, () => choose("light_among_trees", 0)); // sin calzar clase/stat y RNG alta → falla
+  assert.ok(gameState.player.hp < hpBefore, "sin mago/INT alta, RNG alta dispara el daño");
+});
+
+test("puente roto: pícaro o AGI≥12 siempre seguro, el resto arriesga caída con RNG baja", () => {
+  gameState.player.class = "rogue";
+  gameState.player.agility = 5;
+  const hpBefore = gameState.player.hp;
+  withRandom(0.99, () => choose("broken_bridge", 0));
+  assert.equal(gameState.player.hp, hpBefore, "pícaro nunca pierde HP al cruzar");
+
+  resetState();
+  gameState.player.class = "mage";
+  gameState.player.agility = 5;
+  const hpBefore2 = gameState.player.hp;
+  withRandom(0.99, () => choose("broken_bridge", 0));
+  assert.ok(gameState.player.hp < hpBefore2, "sin pícaro/AGI alta, RNG alta dispara la caída");
+});
+
+test("altar antiguo: origen aprendiz o INT≥12 siempre seguro", () => {
+  gameState.worldFlags = { origin_apprentice: true };
+  gameState.player.intelligence = 5;
+  const hpBefore = gameState.player.hp;
+  withRandom(0.99, () => choose("ancient_altar", 0));
+  assert.equal(gameState.player.hp, hpBefore, "origen aprendiz nunca activa la salvaguarda");
+
+  resetState();
+  gameState.worldFlags = {};
+  gameState.player.intelligence = 5;
+  const hpBefore2 = gameState.player.hp;
+  withRandom(0.99, () => choose("ancient_altar", 0));
+  assert.ok(gameState.player.hp < hpBefore2, "sin origen/INT alta, RNG alta activa la salvaguarda");
+});
+
+test("enemigo herido: rematar marca flag oscuro; dejarlo ir marca flag de luz SIEMPRE, incluso si sale mal", () => {
+  choose("wounded_enemy", 0);
+  assert.equal(gameState.worldFlags.wounded_enemy_killed, true);
+
+  resetState();
+  gameState.player.class = "mage"; // no calza guerrero/fuerza → puede arriesgar
+  gameState.player.strength = 5;
+  const hpBefore = gameState.player.hp;
+  withRandom(0.99, () => choose("wounded_enemy", 1)); // RNG alta → sale mal
+  assert.equal(gameState.worldFlags.wounded_enemy_spared, true, "el flag de compasión se marca aunque el roll salga mal");
+  assert.ok(gameState.player.hp < hpBefore, "pero SÍ se recibe el daño del zarpazo");
+});
+
 test("sin flags no hay follow-ups elegibles", () => {
   const pool = eligibleEvents("forest");
   assert.ok(pool.length > 0);

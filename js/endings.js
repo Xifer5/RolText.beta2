@@ -10,7 +10,10 @@ export const MORAL_DECISIONS = [
   { flag: "traveler_ignored", weight: -1, recapKey: "recapTravelerIgnored" },
   { flag: "purse_left",       weight: +1, recapKey: "recapPurseLeft" },
   { flag: "purse_taken",      weight: -1, recapKey: "recapPurseTaken" },
-  { flag: "shrine_prayed",    weight: +1, recapKey: "recapShrinePrayed" }
+  { flag: "shrine_prayed",    weight: +1, recapKey: "recapShrinePrayed" },
+  // SPEC-1107: evento "Un enemigo herido" — mismo par luz/oscuridad que los anteriores
+  { flag: "wounded_enemy_spared", weight: +1, recapKey: "recapWoundedEnemySpared" },
+  { flag: "wounded_enemy_killed",  weight: -1, recapKey: "recapWoundedEnemyKilled" }
 ];
 
 /** Tono del final a partir de las decisiones: light (≥2), dark (≤−2), gray en medio. */
