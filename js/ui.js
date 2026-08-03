@@ -11,6 +11,7 @@ import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
+import { allItems } from "./items.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
@@ -664,7 +665,9 @@ function updateQuestTracker() {
     return;
   }
 
-  const lines = activeQuests.slice(0, 2).map((q) => {
+  // SPEC-1109: sube de 2 a 4 para que quepan la misión principal activa +
+  // hasta 3 rumores auto-activados al empezar la partida.
+  const lines = activeQuests.slice(0, 4).map((q) => {
     const progress = (() => {
       switch (q.type) {
         case "visit": {

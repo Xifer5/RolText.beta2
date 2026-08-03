@@ -1225,6 +1225,18 @@ export const allItems = {
     icon: "./img/iceCristal.webp",
   },
 
+  // Bug real preexistente (encontrado vía SPEC-1109): lootTables.js y
+  // quests.js (collect_fairy_dust) ya referenciaban este id, pero nunca
+  // existió en allItems — la misión nunca podía completarse de verdad.
+  fairy_dust: {
+    id: "fairy_dust",
+    name: { en: "Fairy Dust", es: "Polvo de Hadas" },
+    type: "material",
+    rarity: "uncommon",
+    price: 15,
+    icon: "🧚",
+  },
+
   wyvern_scale: {
     id: "wyvern_scale",
     name: { en: "Wyvern Scale", es: "Escama de Wyvern" },

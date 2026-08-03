@@ -306,6 +306,31 @@ export function activateQuest(questId) {
   }
 }
 
+// SPEC-1109: "rumores" — objetivos secundarios por partida (roadmap ítem
+// #9). Son las mismas 6 misiones secundarias de siempre (nunca las
+// principales, que sí tienen prerequisiteQuest y dependen de la historia),
+// pero auto-activadas al empezar la run en vez de esperar a hablar con un
+// NPC — la fantasía de "ya oíste el rumor, no necesitás que alguien te lo
+// cuente". Reusa por completo activateQuest()/checkQuestCondition()/
+// completeQuest() y el tracker ya existentes, sin sistema paralelo.
+export const RUMOR_POOL = [
+  "explore_forest", "collect_crystal", "kill_pirates",
+  "collect_fairy_dust", "collect_ice_crystal", "defeat_dark_lord"
+];
+export const RUMOR_COUNT = 3;
+
+/** Elige RUMOR_COUNT ids distintos de RUMOR_POOL y los activa. rng inyectable para tests. */
+export function rollRumors(rng = Math.random) {
+  const pool = [...RUMOR_POOL];
+  const chosen = [];
+  for (let i = 0; i < RUMOR_COUNT && pool.length; i++) {
+    const idx = Math.floor(rng() * pool.length);
+    chosen.push(pool.splice(idx, 1)[0]);
+  }
+  chosen.forEach(activateQuest);
+  return chosen;
+}
+
 /** ¿Se cumple la condición de entrega? */
 export function checkQuestCondition(questId) {
   const q = QUEST_DATA[questId];

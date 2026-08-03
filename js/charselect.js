@@ -11,6 +11,7 @@ import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { setupRadioGroupArrowNav } from "./a11yRadioNav.js";
+import { rollRumors, QUEST_DATA } from "./quests.js";
 
 const STEP_COUNT = 5; // SPEC-1006: 0=Clase+Nombre 1=Origen 2=Dificultad 3=Modificadores 4=Confirmar
 
@@ -318,6 +319,13 @@ export function showCharacterSelect(onComplete) {
       const list = [...selectedModifiers].map(id => `${MODIFIERS[id].emoji} ${localizeText(MODIFIERS[id].name)}`).join(", ");
       const xp = Math.round(selectedModifiers.size * MODIFIER_XP_BONUS * 100);
       addMessage(formatText('modChosenMsg', { list, xp }), "system");
+    }
+
+    // SPEC-1109: objetivos secundarios de esta partida — 3 rumores al azar
+    const rumors = rollRumors();
+    if (rumors.length) {
+      const list = rumors.map(id => localizeText(QUEST_DATA[id].title)).join(", ");
+      addMessage(formatText(t('rumorsRolledMsg'), { list }), "system");
     }
 
     updateUI();
