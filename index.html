@@ -14,6 +14,9 @@
 
 <body role="application">
 
+<!-- SPEC-1110: flash dramático no-bloqueante al iniciar un combate de boss -->
+<div id="boss-flash-overlay" class="boss-flash-overlay hidden" aria-hidden="true"></div>
+
 <!-- ══ TOPBAR ══════════════════════════════════════════════════ -->
 <header id="topbar">
   <div class="topbar-inner">
@@ -169,6 +172,7 @@
            style="display:none" onerror="this.style.display='none'">
       <div id="location-name" aria-level="2" role="heading">Oakhaven</div>
       <div id="location-subtitle" class="location-subtitle"></div>
+      <div id="modifier-badge" class="modifier-badge hidden" data-tooltip="Modificadores de partida activos" data-tooltip-pos="bottom"></div>
       <div class="location-actions" aria-label="Acciones de ubicación" data-i18n-attr="aria-label" data-i18n="locationActionsLabel">
         <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-i18n-aria="restActionLabel" data-i18n="quickRest" data-tooltip="Descansar recupera HP y MP al máximo">
           Descansar

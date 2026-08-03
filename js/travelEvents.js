@@ -3,8 +3,10 @@ import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { playSound } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
-import { localizeText } from "./i18n.js";
+import { localizeText, t } from "./i18n.js";
 import { applyDerivedMaxes } from "./stats.js";
+import { MORAL_DECISIONS } from "./endings.js";
+import { showToast } from "./toast.js";
 
 // Pacing (SPEC-0804): cooldown duro + probabilidad creciente hasta un tope
 export const COOLDOWN_STEPS = 3;
@@ -1211,7 +1213,16 @@ export function showTravelEvent(event) {
     btn.className = "btn te-choice-btn";
     btn.innerHTML = `${choice.icon} ${localizeText(choice.label)}`;
     btn.onclick = () => {
+      // SPEC-1110: toast de "decisión importante" — cualquier flag nuevo
+      // de MORAL_DECISIONS que esta elección acabe de marcar por primera
+      // vez, sin curar una lista nueva de qué es "importante".
+      const before = MORAL_DECISIONS.map(d => !!gameState.worldFlags?.[d.flag]);
       const resultText = choice.apply();
+      MORAL_DECISIONS.forEach((d, i) => {
+        if (!before[i] && gameState.worldFlags?.[d.flag]) {
+          showToast(t(d.recapKey), "decision");
+        }
+      });
       playSound("loot");
       addMessage(`📍 Evento — ${localizeText(event.title)}: ${localizeText(resultText)}`, "narrative");
       updateUI();

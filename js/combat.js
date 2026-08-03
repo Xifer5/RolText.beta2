@@ -121,6 +121,18 @@ function resistancesFor(enemyId) {
   return (enemy && enemy.id === enemyId) ? getEffectiveResistances(enemy) : ENEMY_COMBAT_DATA[enemyId]?.resistances;
 }
 
+// SPEC-1110: tipo de floating-text según crítico > vulnerable > resistido >
+// normal — mismo umbral (±20) que resistanceAdviceFor(), para que el efecto
+// visual solo dispare cuando la resistencia es lo bastante fuerte como para
+// que el consejo táctico ya la señale.
+function damageFloatType(isCrit, damageType, resistances) {
+  if (isCrit) return "critical";
+  const res = resistances?.[damageType] ?? 0;
+  if (res <= -20) return "vulnerable";
+  if (res >= 20) return "resisted";
+  return "";
+}
+
 // Nota "(🔥 Vuln. 30%)" para el log cuando el enemigo resiste o es vulnerable
 function resistanceNote(enemyId, damageType) {
   const res = resistancesFor(enemyId)?.[damageType] ?? 0;
@@ -352,6 +364,13 @@ export function startCombat(enemyType, isBoss = false) {
   if (isBoss) {
     addMessage(formatText(t('bossAppears'), { enemy: gameState.currentEnemy.type }), "combat");
     showFloatingText(t('bossAlert'), window.innerWidth / 2 - 40, window.innerHeight / 2 - 100, "#ff4444", "1.8em");
+    // SPEC-1110: flash dramático no-bloqueante, no interrumpe el flujo del combate
+    const flash = document.getElementById("boss-flash-overlay");
+    if (flash) {
+      flash.classList.remove("hidden");
+      flash.classList.add("active");
+      setTimeout(() => { flash.classList.remove("active"); flash.classList.add("hidden"); }, 1450);
+    }
     if (enemyType === "dragon_king") {
       setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 900);
     }
@@ -507,12 +526,13 @@ async function playerAttack() {
   playSound("hit");
 
   const critLabel = isCrit ? " 💥 ¡CRÍTICO!" : "";
+  // SPEC-1110: log destacado en críticos — mismo mensaje, tipo distinto
   addMessage(formatText(t('attackEnemy'), {
     enemy: enemy.type,
     damage: dmg,
     extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
     crit: critLabel
-  }) + resistanceNote(enemy.id, weaponType), "combat");
+  }) + resistanceNote(enemy.id, weaponType), isCrit ? "combat-crit" : "combat");
   maybeResistanceAdvice(enemy, weaponType);
   if (isCrit) maybeStunEnemy(enemy);
 
@@ -541,7 +561,7 @@ async function playerAttack() {
   }
   showFloatingText(`-${total}${isCrit ? "!" : ""}`,
     window.innerWidth/2+50, window.innerHeight/2-50,
-    "#ef4444", "2em", isCrit ? "critical" : "");
+    "#ef4444", "2em", damageFloatType(isCrit, weaponType, enemyRes));
   shakeScreen();
 
   tickBuffs();
@@ -598,10 +618,10 @@ async function playerMagic() {
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
   playSound("hit");
-  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : "") + (isMagicCrit ? " 💥 ¡CRÍTICO!" : ""), "combat");
+  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : "") + (isMagicCrit ? " 💥 ¡CRÍTICO!" : ""), isMagicCrit ? "combat-crit" : "combat");
   maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
-  showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", isMagicCrit ? "critical" : "");
+  showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", damageFloatType(isMagicCrit, magicType, getEffectiveResistances(enemy)));
   shakeScreen();
 
   // SPEC-1105: Nigromante — roba vida del daño mágico infligido
@@ -665,7 +685,8 @@ async function useSkill(skillId) {
     }
     applyDamageToEnemy(dmg, skillType || "physical");
     playSound("hit");
-    showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em");
+    showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em",
+      damageFloatType(false, skillType, getEffectiveResistances(gameState.currentEnemy)));
     shakeScreen();
   }
 
@@ -1255,6 +1276,12 @@ function endCombat(victory, fled = false, enemyFled = false) {
     if (enemy.isBoss) {
       recordBossKill();
       setTimeout(() => { saveGame(); showToast(t('victorySaved')); }, 800);
+      // SPEC-1110: recap ceremonial solo para el boss principal de zona — ni
+      // mini-bosses (perdonables, ya tienen su propio flujo) ni dragon_king
+      // (que ya dispara su propio epílogo extenso arriba).
+      if (!enemy.isMiniBoss && enemy.id !== "dragon_king") {
+        setTimeout(() => showToast(formatText(t('zoneBossVictoryToast'), { enemy: enemy.type }), "boss"), 1600);
+      }
     }
 
     // Loot
@@ -1322,5 +1349,6 @@ function levelUp() {
     saveGame();
     showToast(t('autoSaveToast'));
   }, 1200);
-  showFloatingText(t('levelUpText') || "⭐ LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em");
+  // SPEC-1110: animación dedicada de level-up (antes usaba el floatUp genérico)
+  showFloatingText(t('levelUpText') || "⭐ LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em", "levelup");
 }

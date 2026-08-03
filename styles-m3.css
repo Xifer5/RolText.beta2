@@ -749,6 +749,29 @@ button:focus-visible,
   border-radius: 999px;
   border: 1px solid rgba(123, 211, 137, .3);
 }
+/* SPEC-1110: badge de modificadores de partida activos, visible durante
+   toda la run (antes solo se mostraba en la pantalla de creación de
+   personaje y en la crónica post-run) */
+.modifier-badge {
+  /* posición vía #id: [data-tooltip]{position:relative} (misma especificidad,
+     declarado después en el archivo) si no, ganaría y rompería el anclaje */
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  font-size: 15px;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--md-outline-variant);
+  cursor: help;
+}
+#modifier-badge {
+  position: absolute;
+  bottom: 56px; right: 16px;
+}
+.modifier-badge.hidden { display: none; }
+
 /* ── Chip base M3 (SPEC-0302) ───────────────────────────────── */
 .chip,
 .risk-chip,
@@ -3134,6 +3157,12 @@ button:focus-visible,
 .simple-toast-success { border-left-color: #4ade80; }
 .simple-toast-error   { border-left-color: #ef4444; }
 .simple-toast-warn    { border-left-color: #f59e0b; }
+.simple-toast-decision { border-left-color: #c084fc; } /* SPEC-1110 */
+.simple-toast-boss {
+  border-left-color: #f59e0b;
+  font-weight: 700;
+  background: rgba(245,158,11,.10);
+} /* SPEC-1110: recap ceremonial de boss de zona */
 
 .ach-toast {
   min-width: 300px;
@@ -4254,6 +4283,50 @@ kbd {
     0 2px 6px rgba(0,0,0,.4);
 }
 
+/* SPEC-1110: daño resistido/vulnerable — mismo umbral (±20) que
+   resistanceAdviceFor(), distinto de crítico/heal ya existentes */
+.floating-text.resisted {
+  font-size: 1.3em;
+  color: #9CA3AF;
+  opacity: .9;
+  text-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
+.floating-text.vulnerable {
+  color: #FB923C;
+  text-shadow:
+    0 0 16px rgba(251,146,60,.55),
+    0 2px 6px rgba(0,0,0,.45);
+}
+
+/* SPEC-1110: animación dedicada de level-up, distinta del floatUp genérico.
+   1.1s exactos — showFloatingText() borra el elemento a los 1100ms sin
+   importar la duración de la animación CSS, así que no puede pasar de ahí
+   o se corta a mitad de camino (mismo límite que ya rozaba .critical). */
+.floating-text.levelup {
+  font-size: 2.6em;
+  color: #fbbf24;
+  text-shadow:
+    0 0 24px rgba(251,191,36,.7),
+    0 2px 8px rgba(0,0,0,.5);
+  animation: floatLevelUp 1.1s var(--ease-spring) forwards;
+}
+@keyframes floatLevelUp {
+  0%   { transform: translateY(10px) scale(.4)  rotate(0);    opacity: 0; }
+  35%  { transform: translateY(-10px) scale(1.35) rotate(-4deg); opacity: 1; }
+  60%  { transform: translateY(-25px) scale(1.1) rotate(3deg);  opacity: 1; }
+  100% { transform: translateY(-90px) scale(.95) rotate(0);    opacity: 0; }
+}
+
+/* SPEC-1110: log destacado en críticos */
+.msg-combat-crit {
+  color: var(--md-error);
+  font-weight: 700;
+  border-left: 3px solid var(--md-error);
+  padding-left: 8px;
+  background: rgba(239,68,68,.08);
+  border-radius: var(--r-sm, 4px);
+}
+
 /* Screen shake */
 #screen.shake {
   animation: screenShake 380ms var(--ease) both;
@@ -4265,6 +4338,26 @@ kbd {
   50%     { transform: translateX(-4px); }
   65%     { transform: translateX(4px); }
   80%     { transform: translateX(-2px); }
+}
+
+/* SPEC-1110: flash dramático no-bloqueante (~1.4s) al iniciar un boss —
+   pointer-events:none para no interceptar clics durante la animación. */
+.boss-flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+.boss-flash-overlay.hidden { display: none; }
+.boss-flash-overlay.active {
+  display: block;
+  animation: bossFlash 1.4s var(--ease) forwards;
+}
+@keyframes bossFlash {
+  0%   { background: rgba(255,60,60,0); box-shadow: inset 0 0 0 0 rgba(255,60,60,0); }
+  8%   { background: rgba(180,0,0,.55); box-shadow: inset 0 0 120px 20px rgba(255,60,60,.6); }
+  25%  { background: rgba(180,0,0,.15); box-shadow: inset 0 0 90px 12px rgba(255,60,60,.3); }
+  100% { background: rgba(180,0,0,0);   box-shadow: inset 0 0 0 0 rgba(255,60,60,0); }
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -16,7 +16,7 @@ import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
-import { applyRest } from "./modifiers.js";
+import { applyRest, activeModifiers, MODIFIERS } from "./modifiers.js";
 
 // SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
 // import circular ui.js<->combat.js solo para una constante chica.
@@ -590,6 +590,22 @@ function updateLocationSubtitle(loc) {
   const dirLabels = { north:"N", south:"S", east:"E", west:"O", up:"↑", down:"↓", enter:"⬤", out:"↩" };
   const exitChips = exits.map(d => `<span class="exit-chip">${dirLabels[d]||d}</span>`).join("");
   sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ` <span class="exit-chip">${t('restChipLabel')}</span>` : ""}<span class="flex-spacer"></span>${exitChips}`;
+
+  updateModifierBadge();
+}
+
+// SPEC-1110: badge persistente de modificadores de partida activos — antes
+// solo se veían en la creación de personaje y en la crónica final.
+function updateModifierBadge() {
+  const badge = document.getElementById("modifier-badge");
+  if (!badge) return;
+  const ids = activeModifiers(gameState);
+  if (!ids.length) {
+    badge.classList.add("hidden");
+    return;
+  }
+  badge.innerHTML = ids.map(id => `<span>${MODIFIERS[id].emoji}</span>`).join("");
+  badge.classList.remove("hidden");
 }
 
 function updateProfileCard() {
