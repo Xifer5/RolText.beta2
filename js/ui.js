@@ -769,43 +769,58 @@ function openNpcModal(npc) {
   const ids = npc.questId ? [npc.questId] : (npc.questIds || []);
   const knownIds = ids.filter(id => !!QUEST_DATA[id]);
   const questId = knownIds.find(id => getQuestStatus(id) !== "completed") ?? knownIds[0] ?? ids[0];
-  const status  = getQuestStatus(questId);
-  const lines   = getQuestDialogue(questId);
-  const label   = getQuestActionLabel(questId);
-
-  const badge = document.getElementById("npcQuestBadge");
-  if (badge) {
-    badge.className = `npc-quest-badge ${status}`;
-    badge.textContent = status === "inactive" ? t("qlStatusAvailable")
-                      : status === "active"   ? t("qlStatusActive")
-                      : t("qlStatusCompleted");
-  }
-
-  const titleEl = document.getElementById("npcQuestTitle");
-  if (titleEl) titleEl.textContent = localizeText(QUEST_DATA[questId]?.title) ?? "";
-
-  const dialogueEl = document.getElementById("npcDialogue");
-  if (dialogueEl) dialogueEl.innerHTML = lines.map(l => `<p>${l}</p>`).join("");
+  // SPEC-1114: NPCs sin ninguna misión asignada (ej. mentor_aldric,
+  // weaponsmith_garrett — entrenadores) no tienen questId real. Antes se
+  // seguía de largo con questId=undefined y se armaba una sección de misión
+  // sin sentido ("Habla con Desconocido para aceptar esta misión.", con un
+  // botón "Aceptar misión" que de clickearse guardaba basura en la partida:
+  // gameState.quests[undefined] = "active"). Si no hay misión, ocultar toda
+  // la sección en vez de fingir que existe.
+  const hasQuest = ids.length > 0;
+  const questSection = document.getElementById("npcQuestSection");
+  if (questSection) questSection.classList.toggle("hidden", !hasQuest);
 
   const actionBtn = document.getElementById("npcActionBtn");
-  if (actionBtn) {
-    if (label) {
-      actionBtn.textContent = label;
-      actionBtn.classList.remove("hidden");
-      actionBtn.onclick = () => {
-        const curStatus = getQuestStatus(questId);
-        if (curStatus === "inactive") {
-          activateQuest(questId);
-          updateUI();
-        } else if (curStatus === "active" && checkQuestCondition(questId)) {
-          completeQuest(questId);
-          updateUI();
-        }
-        openNpcModal(npc);
-      };
-    } else {
-      actionBtn.classList.add("hidden");
-      actionBtn.onclick = null;
+  if (!hasQuest) {
+    if (actionBtn) { actionBtn.classList.add("hidden"); actionBtn.onclick = null; }
+  } else {
+    const status  = getQuestStatus(questId);
+    const lines   = getQuestDialogue(questId);
+    const label   = getQuestActionLabel(questId);
+
+    const badge = document.getElementById("npcQuestBadge");
+    if (badge) {
+      badge.className = `npc-quest-badge ${status}`;
+      badge.textContent = status === "inactive" ? t("qlStatusAvailable")
+                        : status === "active"   ? t("qlStatusActive")
+                        : t("qlStatusCompleted");
+    }
+
+    const titleEl = document.getElementById("npcQuestTitle");
+    if (titleEl) titleEl.textContent = localizeText(QUEST_DATA[questId]?.title) ?? "";
+
+    const dialogueEl = document.getElementById("npcDialogue");
+    if (dialogueEl) dialogueEl.innerHTML = lines.map(l => `<p>${l}</p>`).join("");
+
+    if (actionBtn) {
+      if (label) {
+        actionBtn.textContent = label;
+        actionBtn.classList.remove("hidden");
+        actionBtn.onclick = () => {
+          const curStatus = getQuestStatus(questId);
+          if (curStatus === "inactive") {
+            activateQuest(questId);
+            updateUI();
+          } else if (curStatus === "active" && checkQuestCondition(questId)) {
+            completeQuest(questId);
+            updateUI();
+          }
+          openNpcModal(npc);
+        };
+      } else {
+        actionBtn.classList.add("hidden");
+        actionBtn.onclick = null;
+      }
     }
   }
 
