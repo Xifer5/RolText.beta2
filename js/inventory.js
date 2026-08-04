@@ -163,26 +163,35 @@ export function renderInventory() {
     const attrEl = document.createElement('div');
     attrEl.className = 'inv-item-attrs';
     attrEl.textContent = attrs.join(' | ');
+    // SPEC-1112: attrEl vive DENTRO de nameWrap (segunda línea, misma
+    // columna 1fr) en vez de ser una columna de grid propia — como columna
+    // separada competía por ancho con la columna del nombre y la aplastaba
+    // a 0px cuando el texto de stats era largo, dejando nombre y stats
+    // literalmente superpuestos (ver errores/registro_de_errores.md).
+    if (attrs.length) nameWrap.appendChild(attrEl);
 
-    // action button
-    const btn = document.createElement('button');
-    btn.className = 'btn tiny';
+    // action button — items sin uso ni slot (materiales de crafteo) no
+    // tienen acción propia: mostrar un "Info" deshabilitado ACÁ, además del
+    // botón "Info" real de abajo, era un botón fantasma duplicado.
     const isConsumable = item.type === 'consumable';
     const isEquippable = !!item.slot;
-    if (isConsumable) {
-      btn.textContent = t('btnUse');
-      btn.onclick = (e) => { e.stopPropagation(); useItem(itemId, item); };
-    } else if (isEquippable) {
-      btn.textContent = t('btnEquip');
-      btn.className = 'btn tiny equip-btn';
-      btn.onclick = (e) => { e.stopPropagation(); equipItem(itemId, item); };
-    } else if (item.type === 'quest') {
-      btn.textContent = t('missionTag');
-      btn.disabled = true;
-      btn.title = t('missionTagTooltip');
-    } else {
-      btn.textContent = t('btnInfo');
-      btn.disabled = true;
+    const isQuest = item.type === 'quest';
+    let btn = null;
+    if (isConsumable || isEquippable || isQuest) {
+      btn = document.createElement('button');
+      btn.className = 'btn tiny';
+      if (isConsumable) {
+        btn.textContent = t('btnUse');
+        btn.onclick = (e) => { e.stopPropagation(); useItem(itemId, item); };
+      } else if (isEquippable) {
+        btn.textContent = t('btnEquip');
+        btn.className = 'btn tiny equip-btn';
+        btn.onclick = (e) => { e.stopPropagation(); equipItem(itemId, item); };
+      } else {
+        btn.textContent = t('missionTag');
+        btn.disabled = true;
+        btn.title = t('missionTagTooltip');
+      }
     }
 
     const info = document.createElement('button');
@@ -202,8 +211,7 @@ export function renderInventory() {
 
     li.appendChild(iconDiv);
     li.appendChild(nameWrap);
-    if (attrEl.textContent) li.appendChild(attrEl);
-    li.appendChild(btn);
+    if (btn) li.appendChild(btn);
     li.appendChild(info);
 
     if (selectedInventoryItemId === itemId) {

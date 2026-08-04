@@ -1209,7 +1209,13 @@ button:focus-visible,
   flex-direction: column;
   gap: 8px;
   min-height: 0;
-  overflow: hidden;
+  /* SPEC-1112: overflow-y:auto en vez de hidden — con poca altura de
+     viewport, el panel de combate podía quedarse corto para sus 4 filas de
+     altura mínima (ver .combat-grid) y "Huir" se recortaba en silencio sin
+     ninguna pista de que había más contenido. Con scroll, nunca se pierde
+     un botón — se ve/usa igual, solo aparece un scrollbar si hace falta. */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 #right-panel .block-label {
   margin: 0;
@@ -1232,7 +1238,13 @@ button:focus-visible,
 .combat-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
+  /* SPEC-1112: filas de altura mínima real (icono+label+pastilla de daño ≈
+     65-70px), no "1fr" repartido a ciegas — con poca altura de viewport
+     (ej. 1024x800, laptop chico) las 4 filas iguales se comprimían a ~39px
+     y la pastilla de daño quedaba cortada por overflow:hidden. Si aún así
+     no entra todo, el scroll del .sidebar-block padre (ver arriba) se
+     encarga — un solo contenedor con scroll, no dos anidados. */
+  grid-template-rows: repeat(4, minmax(66px, 1fr));
   gap: 6px;
   flex: 1;
   min-height: 0;
@@ -1939,7 +1951,29 @@ button:focus-visible,
 }
 .item-detail-header { margin-top: 12px; }
 .inv-equipment-section { margin-top: 20px; }
-.inv-item-namewrap { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.inv-item-namewrap { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 2px; }
+/* M3 — jerarquía título/soporte dentro de la columna 1fr de #inventoryList li.
+   attrEl vive ACÁ (segunda línea), no como columna de grid propia — ver
+   inventory.js SPEC-1112. */
+.inv-item-name {
+  font-weight: 600;
+  color: var(--md-on-surface);
+  overflow-wrap: break-word;
+}
+.inv-item-qty {
+  font-size: 11px;
+  color: var(--md-on-surface-variant);
+}
+.inv-item-attrs {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  overflow-wrap: break-word;
+}
+.btn.tiny {
+  padding: 6px 12px;
+  font-size: 11px;
+  min-height: 32px;
+}
 
 /* a11y M3 — filter chips del inventario */
 .inv-filter-bar {
