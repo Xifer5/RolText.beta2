@@ -1,0 +1,8 @@
+node_modules/
+
+# gstack QA/browse tool session artifacts (logs, audit trails) — regenerados
+# cada sesión, no son parte del código del juego.
+.gstack/
+
+# Config local de Claude Code — personal por máquina, no se comparte.
+.claude/settings.local.json
