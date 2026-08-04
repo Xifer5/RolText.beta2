@@ -5,7 +5,7 @@
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
 import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
-import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, getAvailableSkills } from "./classes.js";
+import { CLASS_DEFINITIONS, SKILLS_BY_CLASS, LEARNABLE_SKILLS, getAvailableSkills } from "./classes.js";
 import { renderJournal } from "./journal.js";
 import { renderBestiary } from "./bestiary.js";
 import { t, formatText, localizeText } from "./i18n.js";
@@ -219,8 +219,14 @@ function renderEquipment() {
 function renderSpellbook() {
   const p = gameState.player;
   const cls = p.class;
-  const allSkills = SKILLS_BY_CLASS[cls] || [];
-  const available = getAvailableSkills(cls, p.level);
+  // SPEC-0607: sin el 3er argumento, getAvailableSkills nunca incluía las
+  // habilidades universales aprendidas — ni acá ni en el panel de combate
+  // (ver ui.js updateSkillPanel). Además, allSkills solo traía las de clase:
+  // aunque availIds las reconociera, nunca les tocaba una fila propia.
+  const classSkills = SKILLS_BY_CLASS[cls] || [];
+  const learnedUniversal = (gameState.learnedSkills || []).map(id => LEARNABLE_SKILLS[id]).filter(Boolean);
+  const allSkills = [...classSkills, ...learnedUniversal];
+  const available = getAvailableSkills(cls, p.level, gameState.learnedSkills);
   const availIds = new Set(available.map(s => s.id));
   const clsDef = CLASS_DEFINITIONS[cls];
   const classColor = clsDef?.color || "#d0bcff";

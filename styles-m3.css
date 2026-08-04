@@ -4228,6 +4228,40 @@ button:focus-visible,
 .npc-dialogue p { margin: 0 0 6px; }
 .npc-dialogue p:last-child { margin-bottom: 0; }
 
+/* SPEC-0702 — NPCs entrenadores (Maestro Aldric, Herrero Garrett): aprender
+   habilidades universales por oro. #npcTrainerSection existía en el HTML
+   desde antes, oculto, sin ningún CSS ni JS que lo llenara. */
+.npc-trainer-section {
+  background: var(--md-surface-c-high);
+  border-radius: var(--r-md);
+  border: 1px solid var(--md-outline-variant);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.npc-trainer-header {
+  font-family: var(--font-title);
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--md-on-surface);
+  margin-bottom: 10px;
+}
+.trainer-list { display: flex; flex-direction: column; gap: 10px; }
+.trainer-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--md-surface-c);
+  border: 1px solid var(--md-outline-variant);
+}
+.trainer-emoji { font-size: 1.4rem; }
+.trainer-info { min-width: 0; }
+.trainer-skill-name { display: block; color: var(--md-on-surface); font-size: .85rem; }
+.trainer-skill-desc { margin: 2px 0 0; font-size: .75rem; color: var(--md-on-surface-variant); line-height: 1.4; }
+.trainer-learn-btn.learned { color: var(--c-heal); border-color: var(--c-heal); background: transparent; }
+
 .npc-actions {
   display: flex;
   gap: 10px;

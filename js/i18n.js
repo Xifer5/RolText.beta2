@@ -493,6 +493,16 @@ export const dictionaries = {
     usedItem: "Used {{item}}.",
     usedItemCuredStatuses: "Used {{item}} and cured: {{statuses}}.",
     usedItemNoEffect: "Used {{item}}, but there were no active effects.",
+    // SPEC-0607: scrolls (type "scroll" + teachesSkill) existed as items but
+    // useItem() never handled them — they were consumed for nothing.
+    scrollLearnedSkill: "📖 You learned {{skill}}!",
+    scrollAlreadyKnown: "You already know {{skill}} — the scroll returns to your inventory.",
+    // SPEC-0702: NPC trainers (mentor_aldric, weaponsmith_garrett)
+    trainerSectionTitle: "📚 Training",
+    trainerLearnBtn: "Learn ({{gold}}💰)",
+    trainerLearned: "✓ Learned",
+    trainerNoGold: "Not enough gold",
+    trainerLearnedMsg: "📚 {{skill}} learned!",
     restoredHpAmount: "Recovered {{amount}} HP.",
     equippedItem: "Equipped {{item}}!",
     emptySlot: "Empty",
@@ -1035,6 +1045,14 @@ export const dictionaries = {
     usedItem: "Usaste {{item}}.",
     usedItemCuredStatuses: "Usaste {{item}} y curaste: {{statuses}}.",
     usedItemNoEffect: "Usaste {{item}}, pero no había efectos activos.",
+    scrollLearnedSkill: "📖 ¡Aprendiste {{skill}}!",
+    scrollAlreadyKnown: "Ya conocés {{skill}} — el pergamino vuelve a tu inventario.",
+    // SPEC-0702: NPCs entrenadores (mentor_aldric, weaponsmith_garrett)
+    trainerSectionTitle: "📚 Entrenamiento",
+    trainerLearnBtn: "Aprender ({{gold}}💰)",
+    trainerLearned: "✓ Aprendida",
+    trainerNoGold: "Sin oro",
+    trainerLearnedMsg: "📚 ¡Aprendiste {{skill}}!",
     restoredHpAmount: "Recuperas {{amount}} HP.",
     equippedItem: "¡Equipaste {{item}}!",
     emptySlot: "Vacío",

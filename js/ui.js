@@ -5,7 +5,7 @@ import { renderCrafting } from "./crafting.js";
 import { renderInventory } from "./inventory.js";
 import { calculateMagicAttack, calculateTotalStats, increaseStat } from "./stats.js";
 import { latestSlotId, readSlot, listSlots } from "./saveSystem.js";
-import { CLASS_DEFINITIONS, getAvailableSkills } from "./classes.js";
+import { CLASS_DEFINITIONS, getAvailableSkills, LEARNABLE_SKILLS, hasLearnedSkill, learnUniversalSkill } from "./classes.js";
 import { getNpcAt } from "./npcs.js";
 import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
@@ -733,7 +733,9 @@ function updateSkillPanel() {
   const p = gameState.player;
   if (!p.class || !gameState.isInCombat) { panel.innerHTML = ""; return; }
 
-  const skills = getAvailableSkills(p.class, p.level);
+  // SPEC-0607: sin el 3er argumento, las habilidades universales aprendidas
+  // (pergaminos/entrenadores) nunca llegaban a mostrarse en combate.
+  const skills = getAvailableSkills(p.class, p.level, gameState.learnedSkills);
   if (!skills.length) { panel.innerHTML = ""; return; }
 
   panel.innerHTML = skills.map(s => {
@@ -824,7 +826,59 @@ function openNpcModal(npc) {
     }
   }
 
+  // SPEC-0702: NPCs entrenadores (mentor_aldric, weaponsmith_garrett) enseñan
+  // habilidades universales por oro. El HTML (#npcTrainerSection) y el dato
+  // (npc.trainerSkills en npcs.js) ya existían, pero nada de JS los conectaba.
+  renderTrainerSection(npc);
+
   modal.classList.remove("hidden");
+}
+
+function renderTrainerSection(npc) {
+  const section = document.getElementById("npcTrainerSection");
+  if (!section) return;
+  const skills = npc.trainerSkills || [];
+  section.classList.toggle("hidden", skills.length === 0);
+  if (!skills.length) { section.innerHTML = ""; return; }
+
+  const rows = skills.map(({ skillId, gold }) => {
+    const skill = LEARNABLE_SKILLS[skillId];
+    if (!skill) return "";
+    const learned = hasLearnedSkill(gameState, skillId);
+    const canAfford = (gameState.player.gold || 0) >= gold;
+    const btnLabel = learned ? t("trainerLearned")
+                    : canAfford ? formatText(t("trainerLearnBtn"), { gold })
+                    : t("trainerNoGold");
+    const btnDisabled = learned || !canAfford;
+    return `
+      <div class="trainer-row">
+        <span class="trainer-emoji">${skill.emoji}</span>
+        <div class="trainer-info">
+          <strong class="trainer-skill-name">${localizeText(skill.name)}</strong>
+          <p class="trainer-skill-desc">${localizeText(skill.description)}</p>
+        </div>
+        <button class="btn tiny trainer-learn-btn ${learned ? "learned" : ""}"
+          data-skill="${skillId}" data-gold="${gold}" ${btnDisabled ? "disabled" : ""}>
+          ${btnLabel}
+        </button>
+      </div>`;
+  }).join("");
+
+  section.innerHTML = `<div class="npc-trainer-header">${t("trainerSectionTitle")}</div><div class="trainer-list">${rows}</div>`;
+
+  section.querySelectorAll(".trainer-learn-btn:not(:disabled)").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const skillId = btn.dataset.skill;
+      const gold = Number(btn.dataset.gold);
+      if ((gameState.player.gold || 0) < gold) return; // el estado pudo cambiar entre renders
+      gameState.player.gold -= gold;
+      learnUniversalSkill(gameState, skillId);
+      playSound("level_up");
+      addMessage(formatText(t("trainerLearnedMsg"), { skill: localizeText(LEARNABLE_SKILLS[skillId]?.name) }), "stat");
+      updateUI();
+      renderTrainerSection(npc);
+    });
+  });
 }
 
 // ── MAIN MENU ──────────────────────────────────────────

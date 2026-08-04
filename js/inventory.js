@@ -1,6 +1,7 @@
 import { gameState } from "./state.js";
 import { allItems, addItemToInventory, removeItemFromInventory } from "./items.js";
 import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
+import { LEARNABLE_SKILLS, hasLearnedSkill, learnUniversalSkill } from "./classes.js";
 import { createIconElement } from "./utils.js";
 import { addMessage } from "./story.js";
 import { updateUI, renderStatsModal } from "./ui.js";
@@ -173,7 +174,10 @@ export function renderInventory() {
     // action button — items sin uso ni slot (materiales de crafteo) no
     // tienen acción propia: mostrar un "Info" deshabilitado ACÁ, además del
     // botón "Info" real de abajo, era un botón fantasma duplicado.
-    const isConsumable = item.type === 'consumable';
+    // "scroll" es consumible tanto como "consumable" (CONSUMABLE_TYPES ya
+    // los agrupa así para el filtro) — antes solo se chequeaba 'consumable'
+    // literal, así que los pergaminos no tenían botón "Usar" en ningún lado.
+    const isConsumable = CONSUMABLE_TYPES.has(item.type);
     const isEquippable = !!item.slot;
     const isQuest = item.type === 'quest';
     let btn = null;
@@ -380,7 +384,7 @@ function showItemDetails(itemId, item) {
   detailIcon.appendChild(createIconElement(item.icon || (item.type === 'consumable' ? '🧪' : (item.type === 'weapon' ? '⚔️' : (item.type === 'armor' ? '🛡️' : '✨'))), 64));
 
   if (useBtn) {
-    const isConsumable = item.type === 'consumable';
+    const isConsumable = CONSUMABLE_TYPES.has(item.type);
     useBtn.classList.toggle('hidden', !isConsumable);
     if (isConsumable) {
       useBtn.disabled = false;
@@ -429,8 +433,22 @@ function useItem(itemId, item) {
     return false;
   }
 
+  // SPEC-0607: pergaminos de habilidad universal — el tipo "scroll" con
+  // teachesSkill:<skillId> existía en items.js (scroll_of_rally/power/arcane,
+  // en venta en castle_shop) pero useItem() nunca lo manejaba: se consumían
+  // sin hacer nada. Si ya la sabe, se devuelve el pergamino (no se pierde).
+  if (item.type === 'scroll' && item.teachesSkill) {
+    const skillName = localizeText(LEARNABLE_SKILLS[item.teachesSkill]?.name) || item.teachesSkill;
+    if (hasLearnedSkill(gameState, item.teachesSkill)) {
+      gameState.inventory[itemId] = (gameState.inventory[itemId] || 0) + 1;
+      addMessage(formatText(t('scrollAlreadyKnown'), { skill: skillName }), 'system');
+    } else {
+      learnUniversalSkill(gameState, item.teachesSkill);
+      addMessage(formatText(t('scrollLearnedSkill'), { skill: skillName }), 'stat');
+    }
+  }
   // Specific known items still supported for backwards-compatibility
-  if (itemId === 'health_potion') {
+  else if (itemId === 'health_potion') {
     gameState.player.hp = Math.min(gameState.player.hp + 25, gameState.player.maxHp);
     addMessage(formatText(t('usedItemRestoreHp'), { item: localizeText(item.name), amount: 25 }), 'stat');
   } else if (itemId === 'mana_potion') {

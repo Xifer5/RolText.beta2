@@ -382,6 +382,21 @@ export const LEARNABLE_SKILLS = {
   }
 };
 
+// SPEC-0607/SPEC-0702: punto único para aprender una habilidad universal —
+// lo usan tanto los pergaminos (useItem en inventory.js) como los NPCs
+// entrenadores (openNpcModal en ui.js), para no duplicar la lógica de
+// "¿ya la sabe?" en dos lugares.
+export function hasLearnedSkill(gameState, skillId) {
+  return (gameState.learnedSkills || []).includes(skillId);
+}
+export function learnUniversalSkill(gameState, skillId) {
+  if (!LEARNABLE_SKILLS[skillId]) return false;
+  if (!gameState.learnedSkills) gameState.learnedSkills = [];
+  if (gameState.learnedSkills.includes(skillId)) return false;
+  gameState.learnedSkills.push(skillId);
+  return true;
+}
+
 // Obtener habilidades disponibles para el player actual
 export function getAvailableSkills(playerClass, playerLevel, learnedSkillIds = []) {
   const classSkills = (SKILLS_BY_CLASS[playerClass] || []).filter(s => s.levelReq <= playerLevel);
