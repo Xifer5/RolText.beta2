@@ -9,6 +9,7 @@ import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { showTravelEvent } from "./travelEvents.js";
 import { getQuestStatus } from "./quests.js";
+import { computeEndingTone } from "./endings.js";
 
 const flags = () => (gameState.worldFlags ??= {});
 const setFlag = k => { flags()[k] = true; };
@@ -16,13 +17,69 @@ const hasFlag = k => !!flags()[k];
 const rivalScore = () => flags().rival_score || 0;
 const addRivalScore = n => { flags().rival_score = rivalScore() + n; };
 
+// SPEC-1108b — más voz para Kestrel: 3 "beats" cortos que se anexan al texto
+// base según quién sos jugando (clase, encuentro 1), de dónde venís (origen,
+// encuentro 2) y cómo jugaste hasta ahora (tono moral, resolución final).
+// Si el dato no está disponible (ej. save viejo sin origen), no se agrega
+// nada — el texto base ya funciona solo.
+function withBeat(base, beat) {
+  if (!beat) return base;
+  return { en: `${base.en} ${beat.en}`, es: `${base.es} ${beat.es}` };
+}
+const CLASS_BEATS = {
+  warrior: {
+    en: "She sizes up your blade before your face. \"Muscle. Predictable — I can work with that.\"",
+    es: "Te mide primero la espada, después la cara. \"Músculo. Predecible — con eso puedo trabajar.\""
+  },
+  mage: {
+    en: "Her eyes flick to the runes worn into your sleeve. \"A spellslinger. Try not to torch the ruins before I get my cut.\"",
+    es: "Sus ojos van directo a las runas gastadas en tu manga. \"Una hechicera. Tratá de no prender fuego las ruinas antes de que cobre mi parte.\""
+  },
+  rogue: {
+    en: "She notices you noticed her first. \"Light-footed. I hate working with people faster than me.\"",
+    es: "Nota que la notaste primero. \"Ligera de pies. Odio trabajar con gente más rápida que yo.\""
+  }
+};
+const ORIGIN_BEATS = {
+  exile: {
+    en: "\"Wilds-raised, aren't you. Didn't even hesitate before touching fae work. Most people hesitate.\"",
+    es: "\"Criada en tierras salvajes, ¿no? No dudaste ni un segundo antes de tocar magia feérica. La mayoría duda.\""
+  },
+  apprentice: {
+    en: "\"Tower books taught you that unraveling trick. I've seen that exact motion in exactly one place.\"",
+    es: "\"Los libros de la torre te enseñaron ese truco para deshacerla. Vi ese movimiento exacto en un solo lugar.\""
+  },
+  mercenary: {
+    en: "\"You checked what I was carrying before you helped. Good. At least one of us thinks like a professional.\"",
+    es: "\"Revisaste qué llevaba encima antes de ayudar. Bien. Al menos una de las dos piensa como profesional.\""
+  }
+};
+const TONE_BEATS = {
+  light: {
+    en: "\"Word travels. They say you let things go you didn't have to. Soft reputation. Doesn't mean soft hands, apparently.\"",
+    es: "\"Se corre la voz. Dicen que dejaste ir cosas que no tenías por qué. Fama de blanda. Aunque no de manos blandas, al parecer.\""
+  },
+  dark: {
+    en: "\"I've heard what you did to the ones who didn't fight back. Don't expect me to lose sleep over what happens here.\"",
+    es: "\"Escuché lo que le hiciste a los que no se defendían. No esperes que pierda el sueño por lo que pase acá.\""
+  },
+  gray: {
+    en: "\"Nobody quite agrees on what you are. Neither do I, honestly.\"",
+    es: "\"Nadie se pone de acuerdo en qué sos. Yo tampoco, para ser sincera.\""
+  }
+};
+
+const ENCOUNTER_1_BASE_TEXT = {
+  en: "A stranger blocks your path in town, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Trade notes, or keep your secrets?\"",
+  es: "Un desconocido te corta el paso en el pueblo, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
+};
+
 export const RIVAL_ENCOUNTER_1 = {
   id: "rival_encounter_1",
   icon: "🗡️",
   title: { en: "An Unexpected Rival", es: "Un rival inesperado" },
-  text: {
-    en: "A stranger blocks your path in town, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Trade notes, or keep your secrets?\"",
-    es: "Un desconocido te corta el paso en el pueblo, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
+  get text() {
+    return withBeat(ENCOUNTER_1_BASE_TEXT, CLASS_BEATS[gameState.player?.class]);
   },
   biomes: null,
   choices: [
@@ -47,13 +104,17 @@ export const RIVAL_ENCOUNTER_1 = {
   ]
 };
 
+const ENCOUNTER_2_BASE_TEXT = {
+  en: "You find Kestrel tangled in a fairy ward, cursing under their breath. They spot you and stop struggling, waiting to see what you'll do.",
+  es: "Encuentras a Kestrel enredado en una salvaguarda de hadas, maldiciendo por lo bajo. Te ve y deja de forcejear, esperando a ver qué hacés."
+};
+
 export const RIVAL_ENCOUNTER_2 = {
   id: "rival_encounter_2",
   icon: "🧚",
   title: { en: "Kestrel in Trouble", es: "Kestrel en apuros" },
-  text: {
-    en: "You find Kestrel tangled in a fairy ward, cursing under their breath. They spot you and stop struggling, waiting to see what you'll do.",
-    es: "Encuentras a Kestrel enredado en una salvaguarda de hadas, maldiciendo por lo bajo. Te ve y deja de forcejear, esperando a ver qué hacés."
+  get text() {
+    return withBeat(ENCOUNTER_2_BASE_TEXT, ORIGIN_BEATS[gameState.player?.origin]);
   },
   biomes: null,
   choices: [
@@ -81,12 +142,16 @@ export const RIVAL_ENCOUNTER_2 = {
 
 export function rivalResolutionEvent() {
   const score = rivalScore();
+  // SPEC-1108b: Kestrel decide cuánto confiar en vos también según cómo
+  // jugaste hasta ahora, no solo según el propio historial que tiene con
+  // ella — mismo tono (light/dark/gray) que ya usa el epílogo de la run.
+  const toneBeat = TONE_BEATS[computeEndingTone(gameState.worldFlags).tone];
   if (score >= 1) {
     return {
       id: "rival_resolution_ally",
       icon: "🤝",
       title: { en: "An Unlikely Ally", es: "Un aliado inesperado" },
-      text: { en: "Kestrel steps out of the shadows at the threshold. \"Figures I'd end up owing you. Don't die in there — I'm not done being annoyed at you.\"", es: "Kestrel sale de las sombras en el umbral. \"Tenía que terminar debiéndote una. No te mueras ahí adentro — todavía no termino de estar molesto con vos.\"" },
+      text: withBeat({ en: "Kestrel steps out of the shadows at the threshold. \"Figures I'd end up owing you. Don't die in there — I'm not done being annoyed at you.\"", es: "Kestrel sale de las sombras en el umbral. \"Tenía que terminar debiéndote una. No te mueras ahí adentro — todavía no termino de estar molesto con vos.\"" }, toneBeat),
       biomes: null,
       choices: [{
         label: { en: "Accept the help", es: "Aceptar la ayuda" },
@@ -107,7 +172,7 @@ export function rivalResolutionEvent() {
       id: "rival_resolution_traitor",
       icon: "🔪",
       title: { en: "A Familiar Betrayal", es: "Una traición conocida" },
-      text: { en: "Kestrel corners you at the threshold, all pretense gone. \"Nothing personal. I just don't share.\"", es: "Kestrel te acorrala en el umbral, sin fingir ya. \"Nada personal. Solo que no comparto.\"" },
+      text: withBeat({ en: "Kestrel corners you at the threshold, all pretense gone. \"Nothing personal. I just don't share.\"", es: "Kestrel te acorrala en el umbral, sin fingir ya. \"Nada personal. Solo que no comparto.\"" }, toneBeat),
       biomes: null,
       choices: [{
         label: { en: "...", es: "..." },
@@ -126,7 +191,7 @@ export function rivalResolutionEvent() {
     id: "rival_resolution_competitor",
     icon: "⚔️",
     title: { en: "One Last Contest", es: "Un último desafío" },
-    text: { en: "Kestrel blocks the threshold, drawing steel. \"Neither of us trusted the other enough. Let's settle it the simple way — whoever's still standing goes in first.\"", es: "Kestrel bloquea el umbral, desenvainando. \"Ninguno de los dos confió lo suficiente en el otro. Resolvámoslo simple — el que quede en pie entra primero.\"" },
+    text: withBeat({ en: "Kestrel blocks the threshold, drawing steel. \"Neither of us trusted the other enough. Let's settle it the simple way — whoever's still standing goes in first.\"", es: "Kestrel bloquea el umbral, desenvainando. \"Ninguno de los dos confió lo suficiente en el otro. Resolvámoslo simple — el que quede en pie entra primero.\"" }, toneBeat),
     biomes: null,
     choices: [{
       label: { en: "Accept the duel", es: "Aceptar el duelo" },
