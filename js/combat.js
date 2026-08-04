@@ -1,177 +1,63 @@
+/**
+ * combat.js — Orquestador de combate
+ *
+ * Modularizado post SPEC-1110 (ver errores/registro_de_errores.md /
+ * project_polish_sprint en memoria): este archivo quedó como el núcleo
+ * (arranque de combate, resolución del turno enemigo, daño/buffs base) y
+ * delega subsistemas a:
+ *   - combatFeedback.js       → notas de resistencia, floating-text, maestría, Último Aliento
+ *   - combatRewards.js        → fin de combate: XP/oro/loot/level up
+ *   - bossMechanics.js        → telegraph de bosses (devorar/sobrecarga/congelar) + guardia de raíces
+ *   - enemyTraits.js          → rasgos aleatorios de enemigo (furioso/ladrón/antiguo/regenerador/cobarde)
+ *   - playerCombatActions.js  → Atacar/Magia/Defender/Interrumpir/Perdonar/Huir/skills
+ *
+ * Varias de estas dependencias son circulares a propósito (combat.js
+ * exporta applyDamageToEnemy/tickBuffs/enemyTurn, que los otros módulos
+ * importan; combat.js a su vez importa sus funciones para setupCombat()).
+ * Es seguro: todas las llamadas cruzadas ocurren dentro de cuerpos de
+ * función invocados en tiempo de juego, nunca en la evaluación top-level
+ * de un módulo.
+ */
 import { gameState } from "./state.js";
 import { enemyData } from "./enemies.js";
-import { calculateTotalStats, calculateMagicAttack, applyDerivedMaxes } from "./stats.js";
+import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI, showFloatingText, shakeScreen } from "./ui.js";
-import { getLoot } from "./lootTables.js";
-import { allItems } from "./items.js";
-import { SKILLS_BY_CLASS } from "./classes.js";
-import { recordEnemyKill, recordBossKill } from "./bestiary.js";
-import { checkAchievements } from "./achievements.js";
-import { saveGame } from "./saveSystem.js";
+import { t, formatText } from "./i18n.js";
 import { playSound, playMusic } from "./sounds.js";
-import { showToast } from "./toast.js";
-import { t, formatText, localizeText } from "./i18n.js";
 import { getDifficultyConfig } from "./difficulty.js";
-import { getMasteryBonus, addMasteryXP } from "./mastery.js";
-import { getActiveSpec, canSpecialize } from "./specializations.js";
-import { showSpecializationModal } from "./specModal.js";
+import { getActiveSpec } from "./specializations.js";
 import { maybeShowHint } from "./onboarding.js";
 import { decideNextAction, isIntentHidden, POWER_ATTACK_MULT, DEFEND_DAMAGE_MULT, REGEN_PCT, ENRAGE_ATK_MULT } from "./enemyAI.js";
-import { consumeEchoReward } from "./echoIntro.js";
-import { cruelAtkMult, isIntentAlwaysHidden, modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
-import { showEnding, MORAL_DECISIONS } from "./endings.js";
+import { cruelAtkMult, isIntentAlwaysHidden } from "./modifiers.js";
 import { recordRun } from "./runLog.js";
 import { isMiniBossId } from "./biomeBosses.js";
-import {
-  applyResistance, getWeaponDamageType, getResistanceLabel, getWeakestResistance,
-  ENEMY_COMBAT_DATA, PHYSICAL_TYPES, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES, getEffectiveResistances
-} from "./damageTypes.js";
+import { applyResistance, ENEMY_COMBAT_DATA, PHYSICAL_TYPES } from "./damageTypes.js";
 
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+import { delay, tryLastBreath, resistanceAdviceFor } from "./combatFeedback.js";
+import { endCombat } from "./combatRewards.js";
+import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
+import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
+import { playerAttack, playerMagic, playerDefend, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
 
-// Tipo de daño de cada habilidad de clase (para resistencias y bonos de especialización)
-const SKILL_DAMAGE_TYPES = {
-  fireball: "fire", meteor: "fire",
-  icebolt: "ice",
-  arcane_storm: "magic", singularity: "magic", arcane_bolt: "magic",
-  backstab: "pierce", shadow_strike: "pierce", double_strike: "pierce",
-  death_dance: "slash",
-  bash: "blunt", power_strike: "blunt",
-  whirlwind: "slash", berserker_rage: "slash", avatar_of_war: "slash",
-};
+// Re-exportado: tests/combatAdvice.test.mjs y cualquier otro consumidor
+// externo lo importan desde "./combat.js" (API pública histórica).
+export { resistanceAdviceFor };
 
-// SPEC-1101: aturdimiento reusable — 15% en todo golpe crítico del jugador
-// (hoy solo playerAttack tiene crits; playerMagic no rola crítico).
-const STUN_ON_CRIT_CHANCE = 0.15;
 // SPEC-1101: veneno acumulativo — tope de stacks (Swamp Abomination y cualquier
 // otro enemigo con status "poison" ya se benefician del mismo sistema).
 const POISON_MAX_STACKS = 5;
-// SPEC-1101: mecánicas de boss — % del maxHp actual del jugador
-const DEVOUR_HP_PCT = 0.35;
-const OVERLOAD_HP_PCT = 0.35;
-// SPEC-1101: Forest Titan — guardia de raíces
-const GUARD_DAMAGE_MULT = 0.4;      // reduce daño físico entrante 60%
-const GUARD_BREAK_CHANCE = 0.75;
-const GUARD_BREAK_DMG_MULT = 0.5;   // "Romper Guardia" pega más flojo que un ataque normal
-const GUARD_BREAK_DURATION = 2;     // turnos sin guardia tras romperla
-// SPEC-1101: Frost Wyrm — duración de la congelación de magia
-const ARCANE_FREEZE_DURATION = 3;
-
+// SPEC-1101: Forest Titan — guardia de raíces (reduce daño físico entrante 60%)
+const GUARD_DAMAGE_MULT = 0.4;
 // SPEC-1102: icono/label/color por tipo de debuff de jugador (tick de daño)
 const DEBUFF_TICK_META = {
   poison: { icon: "☠️", label: "Veneno",     color: "#4ade80" },
   burn:   { icon: "🔥", label: "Quemadura",  color: "#fb923c" },
   bleed:  { icon: "🩸", label: "Sangrado",   color: "#f87171" },
 };
-
-// SPEC-1102: Interrumpir — solo tiene sentido contra una acción "grande"
-// telegrafiada, nunca contra attack/defend/regen/enrage/status.
-const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
-const INTERRUPT_MP_COST = 8;
-const INTERRUPT_CHANCE = 0.6;
 // SPEC-1102: contraataque universal vía Defender (independiente del bono de Duelista)
 const DEFEND_COUNTER_CHANCE = 0.3;
 const DEFEND_COUNTER_DMG_MULT = 0.5;
-// SPEC-1103: rasgos aleatorios de enemigo (solo no-boss) — rejugabilidad
-const ENEMY_TRAIT_CHANCE = 0.25;
-const ENEMY_TRAITS = ["furious", "thief", "ancient", "regenerator", "coward"];
-const THIEF_GOLD_STEAL_PCT = 0.15;
-const COWARD_HP_THRESHOLD = 0.2;
-const COWARD_FLEE_CHANCE = 0.6;
-// SPEC-1104: perdonar mini-boss — botón condicional bajo este umbral de HP
-const SPARE_HP_THRESHOLD = 0.25;
-
-function maybeStunEnemy(enemy) {
-  if (!enemy || enemy.hp <= 0) return false;
-  if (gameState.activeDebuffs?.stunned) return false;
-  if (Math.random() >= STUN_ON_CRIT_CHANCE) return false;
-  if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
-  gameState.activeDebuffs.stunned = { turns: 1 };
-  addMessage(formatText(t('enemyStunnedByPlayer'), { enemy: enemy.type }), "combat");
-  return true;
-}
-
-// SPEC-1106: Anillo de Último Aliento — una vez por combate, evita la
-// derrota dejando al jugador en 1 HP en vez de 0. Se llama en TODOS los
-// puntos donde el jugador puede morir (ataque normal, devorar, sobrecarga,
-// tics de veneno/quemadura/sangrado), cada uno reemplaza su chequeo
-// `if (p.hp <= 0)` por `if (p.hp <= 0 && !tryLastBreath())`. El flag de "ya
-// usado" vive en `gameState.currentEnemy` (mismo patrón que hasGuard/
-// guardBroken: estado efímero por-combate, se reinicia solo con cada
-// enemigo nuevo).
-function tryLastBreath() {
-  const enemy = gameState.currentEnemy;
-  if (!enemy || enemy.lastBreathUsed) return false;
-  if (gameState.equipment?.ring?.special !== "lastBreath") return false;
-  enemy.lastBreathUsed = true;
-  gameState.player.hp = 1;
-  addMessage(t('lastBreathMsg'), "system");
-  showFloatingText("1 HP!", window.innerWidth/2, window.innerHeight/2, "#fbbf24", "2em", "critical");
-  updateUI();
-  return true;
-}
-
-// SPEC-1103: resistencias efectivas del enemigo `enemyId` — usa el bono en
-// memoria del rasgo "Antiguo" cuando `enemyId` es el enemigo actual de combate
-// (gameState.currentEnemy); si no (ej. llamado en tests con un id arbitrario,
-// sin combate en curso), cae a la base estática de ENEMY_COMBAT_DATA.
-function resistancesFor(enemyId) {
-  const enemy = gameState.currentEnemy;
-  return (enemy && enemy.id === enemyId) ? getEffectiveResistances(enemy) : ENEMY_COMBAT_DATA[enemyId]?.resistances;
-}
-
-// SPEC-1110: tipo de floating-text según crítico > vulnerable > resistido >
-// normal — mismo umbral (±20) que resistanceAdviceFor(), para que el efecto
-// visual solo dispare cuando la resistencia es lo bastante fuerte como para
-// que el consejo táctico ya la señale.
-function damageFloatType(isCrit, damageType, resistances) {
-  if (isCrit) return "critical";
-  const res = resistances?.[damageType] ?? 0;
-  if (res <= -20) return "vulnerable";
-  if (res >= 20) return "resisted";
-  return "";
-}
-
-// Nota "(🔥 Vuln. 30%)" para el log cuando el enemigo resiste o es vulnerable
-function resistanceNote(enemyId, damageType) {
-  const res = resistancesFor(enemyId)?.[damageType] ?? 0;
-  if (!res) return "";
-  return ` (${DAMAGE_TYPE_EMOJI[damageType] || ""} ${getResistanceLabel(res)})`;
-}
-
-// SPEC-0904 — recomendación táctica cuando el golpe fue resistido (≥20%).
-// Pura: decide QUÉ aconsejar; null si no procede.
-export function resistanceAdviceFor(enemyId, damageType) {
-  const res = resistancesFor(enemyId);
-  if (!res || (res[damageType] ?? 0) < 20) return null;
-  const bad = DAMAGE_TYPES[damageType] || damageType;
-  const weakest = getWeakestResistance(res);
-  if (weakest && weakest.value < 0) {
-    return { key: "combatResistAdviceVuln", params: { bad, good: DAMAGE_TYPES[weakest.type] || weakest.type } };
-  }
-  return { key: "combatResistAdvice", params: { bad } };
-}
-
-// Una sola vez por combate, para no llenar el log
-function maybeResistanceAdvice(enemy, damageType) {
-  if (!enemy || enemy._resAdviceShown) return;
-  const advice = resistanceAdviceFor(enemy.id, damageType);
-  if (!advice) return;
-  enemy._resAdviceShown = true;
-  addMessage(formatText(advice.key, advice.params), "system");
-}
-
-function grantMasteryXP(damageType, amount = 5) {
-  const tierUp = addMasteryXP(damageType, amount);
-  if (tierUp) {
-    const label = DAMAGE_TYPES[tierUp.type] || tierUp.type;
-    const msg = formatText(t('masteryTierUp'), { type: label, tier: `${tierUp.tier.emoji} ${tierUp.tier.title}` });
-    addMessage(msg, "stat");
-    showToast(msg);
-    playSound("level_up");
-  }
-}
 
 // ── Status effects que cada enemigo puede aplicar al jugador ────────
 const ENEMY_STATUS_EFFECTS = {
@@ -238,49 +124,6 @@ export function getRandomEncounter(locationId) {
   return null;
 }
 
-// SPEC-1101: contadores de turno propios (no RNG) para Cave Devourer /
-// Ancient Construct — se telegrafían como cualquier otra acción, así el
-// jugador siempre los ve venir con 1 turno de antelación.
-function rollForcedBossAction(enemy) {
-  if (enemy.id === "cave_devourer") {
-    enemy.turnsSinceDevour = enemy.turnsSinceDevour ?? 0;
-    if (enemy.turnsSinceDevour >= 2) return "devour";
-    enemy.turnsSinceDevour++;
-  }
-  if (enemy.id === "ancient_construct") {
-    enemy.turnsSinceOverload = enemy.turnsSinceOverload ?? 0;
-    if (enemy.turnsSinceOverload >= 3) return "overload";
-    enemy.turnsSinceOverload++;
-  }
-  if (enemy.id === "mountain_colossus") {
-    enemy.turnsSinceSlam = enemy.turnsSinceSlam ?? 0;
-    if (enemy.turnsSinceSlam >= 3) { enemy.turnsSinceSlam = 0; return "power_attack"; }
-    enemy.turnsSinceSlam++;
-  }
-  if (enemy.id === "frost_wyrm") {
-    enemy.turnsSinceFreeze = enemy.turnsSinceFreeze ?? 0;
-    if (enemy.turnsSinceFreeze >= 3) return "freeze_magic";
-    enemy.turnsSinceFreeze++;
-  }
-  return null;
-}
-
-// SPEC-1101 — Dragon King: mensaje de flavor al escalar de fase. Nunca
-// retrocede si el HP sube (no hay regen en dragon_king, pero por si acaso).
-function updateBossPhase(enemy) {
-  if (ENEMY_COMBAT_DATA[enemy.id]?.behavior !== "boss_phased") return;
-  const hpRatio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
-  const phase = hpRatio > 0.66 ? 1 : hpRatio > 0.33 ? 2 : 3;
-  const prev = enemy.bossPhase || 1;
-  if (phase > prev) {
-    enemy.bossPhase = phase;
-    addMessage(formatText(t(`dragonKingPhase${phase}`), { enemy: enemy.type }), "combat");
-    shakeScreen();
-  } else if (!enemy.bossPhase) {
-    enemy.bossPhase = 1;
-  }
-}
-
 // SPEC-0802: pre-decide la próxima acción del enemigo (y si un jefe la oculta)
 // para que el chip de intent siempre anuncie futuro, nunca pasado.
 function rollEnemyIntent() {
@@ -344,18 +187,7 @@ export function startCombat(enemyType, isBoss = false) {
   };
 
   // SPEC-1103: rasgos aleatorios de enemigo (solo no-boss, rejugabilidad)
-  if (!isBoss && Math.random() < ENEMY_TRAIT_CHANCE) {
-    const trait = ENEMY_TRAITS[Math.floor(Math.random() * ENEMY_TRAITS.length)];
-    gameState.currentEnemy.trait = trait;
-    if (trait === "furious") {
-      gameState.currentEnemy.attack = Math.max(1, Math.floor(gameState.currentEnemy.attack * 1.35));
-      gameState.currentEnemy.defense = Math.max(0, Math.floor(gameState.currentEnemy.defense * 0.75));
-    } else if (trait === "ancient") {
-      gameState.currentEnemy.traitResistances = { physical: 30, light: -30 };
-    }
-    const traitKey = { furious: "traitFurious", thief: "traitThief", ancient: "traitAncient", regenerator: "traitRegenerator", coward: "traitCoward" }[trait];
-    gameState.currentEnemy.type = `${gameState.currentEnemy.type} ${t(traitKey)}`;
-  }
+  assignRandomTrait(gameState.currentEnemy, isBoss);
 
   gameState.isInCombat = true;
   gameState.activeDebuffs  = {};
@@ -384,384 +216,8 @@ export function startCombat(enemyType, isBoss = false) {
   maybeShowHint("first_combat"); // SPEC-0801: primer combate
 }
 
-// ── Player Actions ──────────────────────────────────────
-// SPEC-1101: Defender universal — versión gratuita y de 1 turno del mismo
-// defend_stance que ya usa la skill "Postura Defensiva" del Guerrero (que
-// sigue siendo mejor: 3 turnos + cura 15% HP, por su costo de MP/nivel).
-async function playerDefend() {
-  if (!gameState.activeBuffs) gameState.activeBuffs = {};
-  // tickBuffs() de abajo resta 1 antes de que enemyTurn() lo lea — necesita
-  // 2 para sobrevivir hasta el chequeo de defenseMult (mismo patrón que
-  // buffTurns:3 en useSkill, que en la práctica cubre 1 ataque enemigo).
-  gameState.activeBuffs.defend_stance = Math.max(gameState.activeBuffs.defend_stance || 0, 2);
-  addMessage(t('combatDefendMsg'), "combat");
-  playSound("defend");
-
-  tickBuffs();
-  updateUI();
-  await delay(500); await enemyTurn();
-}
-
-// SPEC-1101 — Forest Titan: golpe especial de daño bajo que puede romper la
-// guardia de raíces. Solo visible/disponible cuando enemy.hasGuard (ver
-// toggleBreakGuardButton en ui.js).
-async function playerBreakGuard() {
-  const enemy = gameState.currentEnemy;
-  if (!enemy?.hasGuard) return;
-  const stats = calculateTotalStats(gameState.player, gameState.equipment);
-  const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
-  const enemyRes = getEffectiveResistances(enemy);
-  const rawDmg = Math.max(1, Math.floor(stats.attack * GUARD_BREAK_DMG_MULT) - (enemy.defense || 0));
-  const dmg = applyResistance(Math.max(1, rawDmg), weaponType, enemyRes);
-
-  playSound("attack");
-  // Ataque especial: no pasa por la reducción de guardia (todo su punto es romperla)
-  applyDamageToEnemy(dmg);
-  playSound("hit");
-
-  const broke = !(enemy.guardBroken > 0) && Math.random() < GUARD_BREAK_CHANCE;
-  if (broke) {
-    enemy.guardBroken = GUARD_BREAK_DURATION;
-    addMessage(formatText(t('breakGuardSuccess'), { enemy: enemy.type, damage: dmg }), "combat");
-  } else {
-    addMessage(formatText(t('breakGuardFail'), { enemy: enemy.type, damage: dmg }), "combat");
-  }
-  showFloatingText(`-${dmg}`, window.innerWidth/2+50, window.innerHeight/2-50, "#FDBA74", "2em");
-  shakeScreen();
-
-  tickBuffs();
-  updateUI();
-  if (enemy.hp <= 0) { await delay(400); return endCombat(true); }
-  await delay(700); await enemyTurn();
-}
-
-// SPEC-1102 — Interrumpir: cancela la acción cargada del enemigo. Solo
-// disponible cuando enemy.nextAction es "grande" (ver toggleInterruptButton
-// en ui.js, mismo patrón condicional que "Romper Guardia").
-async function playerInterrupt() {
-  const enemy = gameState.currentEnemy;
-  if (!enemy || !INTERRUPTIBLE_ACTIONS.has(enemy.nextAction)) return;
-  if ((gameState.player.mp || 0) < INTERRUPT_MP_COST) {
-    addMessage(t('notEnoughMana'), "system");
-    return;
-  }
-  gameState.player.mp -= INTERRUPT_MP_COST;
-
-  const success = Math.random() < INTERRUPT_CHANCE;
-  if (success) {
-    // La acción interrumpida no debe poder re-telegrafiarse de inmediato —
-    // resetea el contador de turno del boss correspondiente (si aplica).
-    if (enemy.id === "cave_devourer")    enemy.turnsSinceDevour = 0;
-    if (enemy.id === "ancient_construct") enemy.turnsSinceOverload = 0;
-    if (enemy.id === "frost_wyrm")        enemy.turnsSinceFreeze = 0;
-    enemy.nextAction = "interrupted";
-    addMessage(formatText(t('interruptSuccess'), { enemy: enemy.type }), "combat");
-  } else {
-    addMessage(formatText(t('interruptFail'), { enemy: enemy.type }), "combat");
-  }
-
-  tickBuffs();
-  updateUI();
-  await delay(500); await enemyTurn();
-}
-
-// SPEC-1104 — Perdonar: solo mini-bosses reales (nunca el boss de zona),
-// solo bajo SPARE_HP_THRESHOLD. Termina el combate sin oro/XP/loot ni kill
-// registrada — la recompensa real es que puede volver como aliado más
-// adelante (ver miniBossReunion.js). Reusa el mecanismo "sin recompensa" de
-// endCombat(victory, fled, enemyFled) de SPEC-1103 (mismo efecto: sin premio,
-// sin mensaje de fleeSuccess — el mensaje ya se emitió acá).
-async function playerSpare() {
-  const enemy = gameState.currentEnemy;
-  if (!enemy?.isMiniBoss) return;
-  if (enemy.hp / enemy.maxHp >= SPARE_HP_THRESHOLD) return;
-
-  if (!gameState.worldFlags) gameState.worldFlags = {};
-  gameState.worldFlags["spared_" + enemy.id] = true;
-  addMessage(formatText(t('mercySuccess'), { enemy: enemy.type }), "system");
-  endCombat(false, false, true);
-}
-
-async function playerAttack() {
-  const stats = calculateTotalStats(gameState.player, gameState.equipment);
-  const enemy = gameState.currentEnemy;
-  const spec = getActiveSpec();
-  const weaponType = getWeaponDamageType(gameState.equipment?.rightHand);
-  const enemyRes = getEffectiveResistances(enemy);
-
-  // Warcry buff + maestría de arma + bono de especialización por tipo de daño
-  const masteryBonus = getMasteryBonus(weaponType);
-  const specDmgBonus = spec?.bonuses?.dmgType === weaponType ? (spec.bonuses.dmgBonus || 0) : 0;
-  // SPEC-1105: Berserker — daño físico sin importar el arma, más furia bajo cierto % de HP
-  const specDmgBonusAll = spec?.bonuses?.dmgBonusAll || 0;
-  const isEnraged = !!spec?.bonuses?.enrageThreshold && (gameState.player.hp / (stats.maxHp || 1)) < spec.bonuses.enrageThreshold;
-  const enrageMult = isEnraged ? (spec.bonuses.enrageDmgMult || 1) : 1;
-  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus + specDmgBonusAll) * enrageMult;
-  const rawDmg = Math.floor(stats.attack * atkMult);
-  const defense = enemy.defense || 0;
-  const variance = 0.9 + Math.random() * 0.2;
-
-  // Rogue: chance of double strike
-  let extraHit = 0;
-  if (gameState.player.class === "rogue" && gameState.player.level >= 15 && Math.random() < 0.3) {
-    extraHit = applyResistance(Math.max(1, Math.floor(rawDmg * 0.7)), weaponType, enemyRes);
-  }
-
-  // Critical hit: 10% base + AGI * 0.5% (rogues +10%, spec critBonus)
-  const critChance = 0.10
-    + (gameState.player.agility || 0) * 0.005
-    + (gameState.player.class === "rogue" ? 0.10 : 0)
-    + (spec?.bonuses?.critBonus || 0);
-  const isCrit  = Math.random() < critChance;
-  const critMul = isCrit ? 1.75 : 1.0;
-
-  // SPEC-1105: Asesino — daño adicional al ejecutar enemigos debilitados
-  const executeMult = (spec?.bonuses?.executeBonus && enemy.maxHp > 0 && (enemy.hp / enemy.maxHp) < 0.3)
-    ? (1 + spec.bonuses.executeBonus) : 1;
-  const dmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul * executeMult)), weaponType, enemyRes);
-  const total = dmg + extraHit;
-
-  playSound("attack");
-  applyDamageToEnemy(total, weaponType);
-  playSound("hit");
-
-  const critLabel = isCrit ? " 💥 ¡CRÍTICO!" : "";
-  // SPEC-1110: log destacado en críticos — mismo mensaje, tipo distinto
-  addMessage(formatText(t('attackEnemy'), {
-    enemy: enemy.type,
-    damage: dmg,
-    extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
-    crit: critLabel
-  }) + resistanceNote(enemy.id, weaponType), isCrit ? "combat-crit" : "combat");
-  maybeResistanceAdvice(enemy, weaponType);
-  if (isCrit) maybeStunEnemy(enemy);
-
-  grantMasteryXP(weaponType);
-
-  // Asesino: los ataques normales pueden envenenar
-  if (spec?.bonuses?.poisonOnAttack && enemy.hp > 0 && Math.random() < 0.25 && !gameState.activeDebuffs?.poison) {
-    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
-    gameState.activeDebuffs.poison = { turns: 2, damage: Math.max(2, Math.floor(stats.attack * 0.15)) };
-    addMessage(formatText(t('specPoisonMsg'), { enemy: enemy.type }), "combat");
-  }
-  // SPEC-1105: Trampero — los ataques normales pueden desangrar al enemigo
-  if (spec?.bonuses?.bleedOnAttack && enemy.hp > 0 && Math.random() < spec.bonuses.bleedOnAttack && !gameState.activeDebuffs?.bleed) {
-    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
-    gameState.activeDebuffs.bleed = { turns: 3, damage: Math.max(2, Math.floor(stats.attack * 0.12)) };
-    addMessage(formatText(t('trapperBleedMsg'), { enemy: enemy.type }), "combat");
-  }
-  // SPEC-1105: Trampero — cada golpe desgasta la defensa del enemigo (tope 3 veces por combate)
-  if (spec?.bonuses?.enemyDefenseShred && enemy.hp > 0) {
-    enemy._defenseShredStacks = enemy._defenseShredStacks || 0;
-    if (enemy._defenseShredStacks < 3) {
-      enemy._defenseShredStacks++;
-      enemy.defense = Math.max(0, Math.floor(enemy.defense * (1 - spec.bonuses.enemyDefenseShred)));
-      addMessage(formatText(t('trapperShredMsg'), { enemy: enemy.type }), "combat");
-    }
-  }
-  showFloatingText(`-${total}${isCrit ? "!" : ""}`,
-    window.innerWidth/2+50, window.innerHeight/2-50,
-    "#ef4444", "2em", damageFloatType(isCrit, weaponType, enemyRes));
-  shakeScreen();
-
-  tickBuffs();
-  updateUI();
-  if (enemy.hp <= 0) { await delay(400); return endCombat(true); }
-  await delay(700); await enemyTurn();
-}
-
-async function playerMagic() {
-  // SPEC-1101: Frost Wyrm congela la magia — el botón se deshabilita en UI,
-  // pero el atajo de teclado "2" no respeta `disabled`, así que se bloquea
-  // acá también. No consume el turno (mismo patrón que "sin MP suficiente").
-  if (gameState.playerDebuffs?.arcaneFreeze) {
-    addMessage(t('arcaneFreezeBlocksMagic'), "system");
-    showFloatingText(t('arcaneFreezeIcon'), window.innerWidth/2, window.innerHeight/2, "#93C5FD");
-    return;
-  }
-
-  const stats = calculateTotalStats(gameState.player, gameState.equipment);
-  const spec = getActiveSpec();
-  const enemy = gameState.currentEnemy;
-  let cost = gameState.player.class === "mage" && gameState.player.level >= 10 ? 7 : 10;
-  if (spec?.bonuses?.mpDiscount) cost = Math.max(1, Math.round(cost * (1 - spec.bonuses.mpDiscount)));
-  // SPEC-1106: Libro Quemado — más costo de maná, a cambio de más daño de fuego
-  const burntBook = gameState.equipment?.rightHand?.special === "burntBook" ? gameState.equipment.rightHand : null;
-  if (burntBook) cost = Math.max(1, Math.round(cost * burntBook.mpCostMult));
-
-  if ((gameState.player.mp || 0) < cost) {
-    addMessage(t('notEnoughMana'), "system");
-    showFloatingText(t('noMana'), window.innerWidth/2, window.innerHeight/2, "#818cf8");
-    return;
-  }
-
-  gameState.player.mp -= cost;
-  const mult = gameState.player.class === "mage" && gameState.player.level >= 20 ? 2.0 : 1.0;
-  // Escuela de magia: el ataque mágico toma el elemento de la especialización
-  const magicType = spec?.bonuses?.dmgType || "magic";
-  const burntBookFireBonus = (burntBook && magicType === "fire") ? burntBook.fireDmgBonus : 0;
-  const magicBonus = 1 + getMasteryBonus(magicType) + (spec?.bonuses?.dmgBonus || 0) + burntBookFireBonus;
-  // SPEC-1102: Concentrarse — +50% al próximo hechizo, se consume acá (no
-  // decae por turnos: si el jugador no lanza magia mientras esté activo,
-  // simplemente expira solo sin bonus).
-  const wasFocused = gameState.activeBuffs?.focused > 0;
-  const focusMult = wasFocused ? 1.5 : 1.0;
-  if (wasFocused) delete gameState.activeBuffs.focused;
-  // SPEC-1105: crítico mágico — mismo cálculo base que playerAttack(), sin el
-  // +10% de clase pícaro (ese bono es específico del físico de rogue).
-  const magicCritChance = 0.10 + (gameState.player.agility || 0) * 0.005 + (spec?.bonuses?.critBonus || 0);
-  const isMagicCrit = Math.random() < magicCritChance;
-  const magicCritMul = isMagicCrit ? 1.75 : 1.0;
-  let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * magicCritMul * (0.9 + Math.random()*0.2)));
-  dmg = applyResistance(dmg, magicType, getEffectiveResistances(enemy));
-
-  playSound("magic");
-  applyDamageToEnemy(dmg, magicType);
-  playSound("hit");
-  addMessage(formatText(t('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : "") + (isMagicCrit ? " 💥 ¡CRÍTICO!" : ""), isMagicCrit ? "combat-crit" : "combat");
-  maybeResistanceAdvice(enemy, magicType);
-  grantMasteryXP(magicType);
-  showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", damageFloatType(isMagicCrit, magicType, getEffectiveResistances(enemy)));
-  shakeScreen();
-
-  // SPEC-1105: Nigromante — roba vida del daño mágico infligido
-  if (spec?.bonuses?.lifeStealOnMagic) {
-    const healed = Math.max(1, Math.floor(dmg * spec.bonuses.lifeStealOnMagic));
-    const p = gameState.player;
-    p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
-    addMessage(formatText(t('necromancerLifeStealMsg'), { heal: healed }), "combat");
-  }
-  // SPEC-1105: Nigromante — el crítico mágico maldice al enemigo (-15% ataque, 2 turnos)
-  if (spec?.bonuses?.curseOnMagicCrit && isMagicCrit && enemy.hp > 0) {
-    enemy.cursedDebuff = { turns: 2 };
-    addMessage(formatText(t('necromancerCurseMsg'), { enemy: enemy.type }), "combat");
-  }
-  // SPEC-1105: Cronomante — probabilidad de cancelar la próxima acción del enemigo
-  if (spec?.bonuses?.enemyStunOnHitChance && enemy.hp > 0 && Math.random() < spec.bonuses.enemyStunOnHitChance) {
-    enemy.nextAction = "interrupted";
-    addMessage(formatText(t('chronomancerStunMsg'), { enemy: enemy.type }), "combat");
-  }
-
-  tickBuffs();
-  updateUI();
-  if (gameState.currentEnemy.hp <= 0) { await delay(400); return endCombat(true); }
-  // SPEC-1105: Cronomante — probabilidad de actuar de nuevo sin pasar el turno
-  if (spec?.bonuses?.extraTurnChance && Math.random() < spec.bonuses.extraTurnChance) {
-    addMessage(t('chronomancerExtraTurnMsg'), "system");
-    await delay(500);
-    return;
-  }
-  await delay(700); await enemyTurn();
-}
-
-async function useSkill(skillId) {
-  const p = gameState.player;
-  const skills = SKILLS_BY_CLASS[p.class] || [];
-  const skill = skills.find(s => s.id === skillId);
-  if (!skill) { addMessage(t('skillNotFound'), "system"); return; }
-  if (p.level < skill.levelReq) { addMessage(formatText(t('skillLevelRequired'), { level: skill.levelReq }), "system"); return; }
-  const spec = getActiveSpec();
-  let mpCost = skill.mpCost;
-  if (spec?.bonuses?.mpDiscount) mpCost = Math.max(1, Math.round(mpCost * (1 - spec.bonuses.mpDiscount)));
-  if ((p.mp || 0) < mpCost) { addMessage(t('noMana'), "system"); return; }
-
-  const stats = calculateTotalStats(p, gameState.equipment);
-  const result = skill.effect(stats, gameState.currentEnemy, p);
-
-  p.mp -= mpCost;
-  playSound("skill");
-  addMessage(`${skill.emoji} ${result.msg}`, "combat");
-
-  // Apply damage
-  if (result.damage) {
-    let dmg = result.ignoresDef ? result.damage : Math.max(1, result.damage - (gameState.currentEnemy?.defense || 0));
-    const skillType = SKILL_DAMAGE_TYPES[skill.id];
-    if (skillType) {
-      const specBonus = spec?.bonuses?.dmgType === skillType ? (spec.bonuses.dmgBonus || 0) : 0;
-      dmg = Math.max(1, Math.floor(dmg * (1 + getMasteryBonus(skillType) + specBonus)));
-      dmg = applyResistance(dmg, skillType, getEffectiveResistances(gameState.currentEnemy));
-      maybeResistanceAdvice(gameState.currentEnemy, skillType);
-      grantMasteryXP(skillType);
-    }
-    applyDamageToEnemy(dmg, skillType || "physical");
-    playSound("hit");
-    showFloatingText(`-${dmg}`, window.innerWidth/2+60, window.innerHeight/2-60, "#fbbf24", "2.2em",
-      damageFloatType(false, skillType, getEffectiveResistances(gameState.currentEnemy)));
-    shakeScreen();
-  }
-
-  // Apply heal
-  if (result.heal) {
-    p.hp = Math.min(p.maxHp, (p.hp || 0) + result.heal);
-    showFloatingText(`+${result.heal}`, window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.8em", "heal");
-  }
-
-  // Apply buffs
-  if (result.buff) {
-    if (!gameState.activeBuffs) gameState.activeBuffs = {};
-    gameState.activeBuffs[result.buff] = result.buffTurns || 3;
-  }
-
-  // Apply debuffs to enemy
-  if (result.debuff) {
-    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
-    let debuffTurns = result.debuffTurns || 2;
-    // Escuela de Hielo: los congelamientos duran 1 turno extra
-    if (result.debuff === "frozen" && spec?.bonuses?.extraFrozenTurn) debuffTurns += 1;
-    gameState.activeDebuffs[result.debuff] = {
-      turns: debuffTurns,
-      damage: result.debuffDmg || 0
-    };
-  }
-
-  // Escape (smoke bomb)
-  if (result.escape) {
-    endCombat(false, true);
-    return;
-  }
-
-  tickBuffs();
-  updateUI();
-
-  if (gameState.currentEnemy?.hp <= 0) { await delay(400); return endCombat(true); }
-  await delay(700);
-  await enemyTurn();
-}
-
-async function tryFlee() {
-  const agiMod = (gameState.player.agility || 0) * 0.02;
-  const chance = 0.4 + agiMod
-    + (gameState.player.class === "rogue" ? 0.15 : 0);
-  if (Math.random() < chance) {
-    playSound("flee");
-    // SPEC-1103: rasgo "Ladrón" — roba oro cuando el jugador huye con éxito
-    const enemy = gameState.currentEnemy;
-    if (enemy?.trait === "thief" && gameState.player.gold > 0) {
-      const stolen = Math.max(1, Math.floor(gameState.player.gold * THIEF_GOLD_STEAL_PCT));
-      gameState.player.gold = Math.max(0, gameState.player.gold - stolen);
-      addMessage(formatText(t('enemyStealsGold'), { enemy: enemy.type, gold: stolen }), "system");
-    }
-    addMessage(t('fleeSuccess'), "system");
-    endCombat(false, true);
-  } else {
-    addMessage(t('fleeFail'), "system");
-    await delay(500); await enemyTurn();
-  }
-}
-
 // ── Enemy Turn ─────────────────────────────────────────
-// SPEC-1103: rasgo "Cobarde" — bajo COWARD_HP_THRESHOLD, chance por turno de
-// huir sin dar recompensa (simétrico a tryFlee() del jugador). true = huyó.
-function checkCowardFlee(enemy) {
-  if (enemy.trait !== "coward" || enemy.hp <= 0) return false;
-  if (enemy.hp / enemy.maxHp >= COWARD_HP_THRESHOLD) return false;
-  if (Math.random() >= COWARD_FLEE_CHANCE) return false;
-  addMessage(formatText(t('enemyFleesCoward'), { enemy: enemy.type }), "system");
-  endCombat(false, false, true);
-  return true;
-}
-
-async function enemyTurn() {
+export async function enemyTurn() {
   if (!gameState.currentEnemy || gameState.isGameOver) return;
   const enemy = gameState.currentEnemy;
   const p = gameState.player;
@@ -879,10 +335,7 @@ async function enemyTurn() {
   // (contador propio, no daño). Bloquea el botón Magia en UI y en lógica
   // (playerMagic ya chequea playerDebuffs.arcaneFreeze).
   if (action === "freeze_magic") {
-    if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
-    gameState.playerDebuffs.arcaneFreeze = { turns: ARCANE_FREEZE_DURATION };
-    addMessage(formatText(t("enemyFreezesMagic"), { enemy: enemy.type }), "combat");
-    showFloatingText(t('arcaneFreezeIcon'), window.innerWidth/2, window.innerHeight/2 - 40, "#93C5FD", "1.8em");
+    resolveFreezeMagic(enemy);
     rollEnemyIntent();
     updateUI();
     return;
@@ -898,65 +351,17 @@ async function enemyTurn() {
 
   // SPEC-1101 — Cave Devourer: "devorar" cada 3er turno (contador propio, no
   // RNG), telegrafiado con antelación por rollEnemyIntent como cualquier otra
-  // acción. Daño = % del maxHp actual del jugador, pasado por el mismo
-  // defenseMult que un ataque normal — Defender lo reduce a la mitad sin
-  // lógica especial de "¿respondió bien?".
+  // acción.
   if (action === "devour") {
-    const devourMult = gameState.activeBuffs?.defend_stance > 0 ? DEFEND_DAMAGE_MULT : 1.0;
-    if (gameState.activeBuffs?.defend_stance > 0) {
-      gameState.activeBuffs.defend_stance--;
-      if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
-    }
-    const devourDmg = Math.max(1, Math.floor((p.maxHp || 100) * DEVOUR_HP_PCT * devourMult));
-    p.hp = Math.max(0, (p.hp || 0) - devourDmg);
-    playSound("player_hurt");
-    addMessage(formatText(t("enemyDevours"), { enemy: enemy.type, damage: devourDmg }), "combat");
-    showFloatingText(`-${devourDmg}`, window.innerWidth/2, window.innerHeight/2, "#ef4444", "2.2em", "critical");
-    shakeScreen();
-    enemy.turnsSinceDevour = 0;
-    if (p.hp <= 0 && !tryLastBreath()) {
-      p.hp = 0;
-      gameState.isGameOver = true;
-      gameState.isInCombat = false;
-      playSound("player_die");
-      addMessage(t('combatStatusEffectsDefeat'), "combat");
-      recordRun("defeat");
-      updateUI();
-      setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
-      return;
-    }
+    if (resolveDevour(enemy, p)) return;
     rollEnemyIntent();
     updateUI();
     return;
   }
 
-  // SPEC-1101 — Ancient Construct: "sobrecarga" cada 4to turno, daño mágico
-  // fijo. Mismo patrón de contador que devour, pero se contrarresta con
-  // Defender (no con aturdir, para diferenciarlo de Cave Devourer).
+  // SPEC-1101 — Ancient Construct: "sobrecarga" cada 4to turno, daño mágico fijo.
   if (action === "overload") {
-    const overloadMult = gameState.activeBuffs?.defend_stance > 0 ? DEFEND_DAMAGE_MULT : 1.0;
-    if (gameState.activeBuffs?.defend_stance > 0) {
-      gameState.activeBuffs.defend_stance--;
-      if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
-    }
-    const overloadDmg = Math.max(1, Math.floor((p.maxHp || 100) * OVERLOAD_HP_PCT * overloadMult));
-    p.hp = Math.max(0, (p.hp || 0) - overloadDmg);
-    playSound("player_hurt");
-    addMessage(formatText(t("enemyOverloads"), { enemy: enemy.type, damage: overloadDmg }), "combat");
-    showFloatingText(`-${overloadDmg}`, window.innerWidth/2, window.innerHeight/2, "#818cf8", "2.2em", "critical");
-    shakeScreen();
-    enemy.turnsSinceOverload = 0;
-    if (p.hp <= 0 && !tryLastBreath()) {
-      p.hp = 0;
-      gameState.isGameOver = true;
-      gameState.isInCombat = false;
-      playSound("player_die");
-      addMessage(t('combatStatusEffectsDefeat'), "combat");
-      recordRun("defeat");
-      updateUI();
-      setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
-      return;
-    }
+    if (resolveOverload(enemy, p)) return;
     rollEnemyIntent();
     updateUI();
     return;
@@ -1174,7 +579,7 @@ function processPlayerDebuffs() {
 // damageType es opcional: solo lo pasan los ataques reales del jugador (no
 // los ticks de veneno/quemadura sobre el enemigo) — así la guardia de Forest
 // Titan bloquea ataques, nunca daño continuo.
-function applyDamageToEnemy(dmg, damageType) {
+export function applyDamageToEnemy(dmg, damageType) {
   const enemy = gameState.currentEnemy;
   if (!enemy) return;
   // SPEC-1103: rasgo "Regenerador" — recibir fuego bloquea su regen próxima
@@ -1196,159 +601,10 @@ function applyDamageToEnemy(dmg, damageType) {
   updateUI();
 }
 
-function tickBuffs() {
+export function tickBuffs() {
   if (!gameState.activeBuffs) return;
   for (const k in gameState.activeBuffs) {
     gameState.activeBuffs[k]--;
     if (gameState.activeBuffs[k] <= 0) delete gameState.activeBuffs[k];
   }
-}
-
-// SPEC-1103: enemyFled=true cuando un enemigo con rasgo "Cobarde" huyó solo —
-// el mensaje ya lo emitió checkCowardFlee(); acá solo evita confundirlo con
-// una huida del jugador (fled) y documenta que tampoco entrega recompensas
-// (ya cubierto por el gate `if (victory && enemy)` de más abajo).
-function endCombat(victory, fled = false, enemyFled = false) {
-  const enemy = gameState.currentEnemy;
-  gameState.isInCombat = false;
-  gameState.activeDebuffs = {};
-  gameState.playerDebuffs = {};
-
-  if (victory && enemy) {
-    playSound("enemy_die");
-    const diff = getDifficultyConfig(gameState.difficulty);
-    let xp = Math.max(1, Math.floor((enemy.experience || 10) * diff.xpMult * modifierXpMult(gameState)));
-    let gold = Math.max(0, Math.floor((enemy.gold || 5) * diff.goldMult * scarceGoldMult(gameState)));
-    // SPEC-1106: Amuleto del Eco — más recompensa si ya tomaste alguna
-    // decisión compasiva (reutiliza los flags "luz" de MORAL_DECISIONS,
-    // sin curar una segunda lista de "qué es compasivo")
-    const echoAmulet = gameState.equipment?.accessory;
-    if (echoAmulet?.special === "compassionReward") {
-      const hasCompassion = MORAL_DECISIONS.some(d => d.weight > 0 && gameState.worldFlags?.[d.flag]);
-      if (hasCompassion) {
-        xp = Math.floor(xp * (1 + echoAmulet.compassionRewardBonus));
-        gold = Math.floor(gold * (1 + echoAmulet.compassionRewardBonus));
-      }
-    }
-    gameState.player.experience = (gameState.player.experience || 0) + xp;
-    gameState.player.gold = (gameState.player.gold || 0) + gold;
-
-    addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
-
-    // SPEC-1105: Caballero Sagrado — cura al matar un enemigo
-    // SPEC-1106: Espada Voraz — cura al matar (fuente independiente, vía equipo)
-    const healOnKill = (getActiveSpec()?.bonuses?.healOnKill || 0)
-      + (gameState.equipment?.rightHand?.special === "healOnKill" ? gameState.equipment.rightHand.healOnKillPct : 0);
-    if (healOnKill) {
-      const p = gameState.player;
-      const stats = calculateTotalStats(p, gameState.equipment);
-      const missing = Math.max(0, stats.maxHp - (p.hp || 0));
-      const healed = Math.floor(missing * healOnKill);
-      if (healed > 0) {
-        p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
-        addMessage(formatText(t('healOnKillMsg'), { heal: healed }), "combat");
-      }
-    }
-
-    // SPEC-0902: recompensa del eco tras el combate guionizado del bosque
-    consumeEchoReward();
-
-    // Boss death message (narrative payoff from enemies.js deathMessage field)
-    if (enemy.isBoss && enemy.deathMessage) {
-      setTimeout(() => addMessage(formatText(t("bossDiesMessage"), { message: enemy.deathMessage }), "system"), 400);
-    }
-
-    // Dragon King epilogue — climax of the main story
-    if (enemy.id === "dragon_king") {
-      gameState.mainQuestCompleted = true;
-      setTimeout(() => addMessage(t("dragonKingThanks"),  "system"), 1200);
-      setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 2800);
-      setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
-      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 6200);
-      // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
-      // SPEC-1003: la crónica se escribe tras cerrar el resto de endCombat (kills ya contadas)
-      setTimeout(() => recordRun("victory"), 100);
-      setTimeout(() => showEnding(), 7800);
-    }
-
-    // Record kill for bestiary
-    recordEnemyKill(enemy.id);
-    if (enemy.isBoss) {
-      recordBossKill();
-      setTimeout(() => { saveGame(); showToast(t('victorySaved')); }, 800);
-      // SPEC-1110: recap ceremonial solo para el boss principal de zona — ni
-      // mini-bosses (perdonables, ya tienen su propio flujo) ni dragon_king
-      // (que ya dispara su propio epílogo extenso arriba).
-      if (!enemy.isMiniBoss && enemy.id !== "dragon_king") {
-        setTimeout(() => showToast(formatText(t('zoneBossVictoryToast'), { enemy: enemy.type }), "boss"), 1600);
-      }
-    }
-
-    // Loot
-    try {
-      const biomeId = window.worldMap?.[gameState.currentLocationId]?.biome;
-      const loot = filterLoot(getLoot(enemy.id, biomeId), gameState);
-      if (Array.isArray(loot) && loot.length) {
-        loot.forEach(item => {
-          gameState.inventory[item] = (gameState.inventory[item] || 0) + 1;
-        });
-        playSound("loot");
-        addMessage(formatText(t('lootObtained'), { items: loot.map(i => localizeText(allItems[i]?.name) ?? i.replace(/_/g, " ")).join(", ") }), "loot");
-        maybeShowHint("first_loot"); // SPEC-0801: primer botín
-      }
-    } catch(e) {}
-
-    // Level up
-    if (gameState.player.experience >= (gameState.player.nextLevelXp || 100)) {
-      levelUp();
-    }
-  } else if (fled) {
-    addMessage(t('fleeSuccess'), "system");
-  }
-
-  checkAchievements();
-  gameState.currentEnemy = null;
-  // Restaura música del bioma actual al terminar el combate
-  const zoneBiome = window.worldMap?.[gameState.currentLocationId]?.biome;
-  playMusic(zoneBiome || "none");
-  updateUI();
-}
-
-function levelUp() {
-  const p = gameState.player;
-  p.level = (p.level || 1) + 1;
-  p.experience = Math.max(0, (p.experience || 0) - (p.nextLevelXp || 100));
-  p.nextLevelXp = Math.floor((p.nextLevelXp || 100) * 1.5);
-  p.statPoints = (p.statPoints || 0) + 5;
-
-  // Class-based HP/MP growth
-  const hpGain = p.class === "warrior" ? 15 : p.class === "mage" ? 6 : 10;
-  const mpGain = p.class === "mage" ? 12 : p.class === "rogue" ? 5 : 3;
-  p.permanentHpBonus = (p.permanentHpBonus || 0) + hpGain;
-  p.permanentMpBonus = (p.permanentMpBonus || 0) + mpGain;
-  applyDerivedMaxes();
-  p.hp = p.maxHp;
-  p.mp = p.maxMp;
-
-  // Update profile card
-  const profileRole = document.querySelector(".profile-role");
-  if (profileRole) profileRole.textContent = `${t('levelBadgePrefix')} ${p.level} ${(p.className || "").toUpperCase()}`;
-
-  playSound("level_up");
-  addMessage(formatText(t('levelUp'), { level: p.level }), "stat");
-
-  // Especialización disponible a partir de nivel 10
-  if (canSpecialize(p)) {
-    addMessage(t('specUnlockedMsg'), "stat");
-    setTimeout(() => showSpecializationModal(), 1500);
-  }
-
-  checkAchievements();
-  // Autoguardar en cada level up
-  setTimeout(() => {
-    saveGame();
-    showToast(t('autoSaveToast'));
-  }, 1200);
-  // SPEC-1110: animación dedicada de level-up (antes usaba el floatUp genérico)
-  showFloatingText(t('levelUpText') || "⭐ LEVEL UP!", window.innerWidth/2 - 60, window.innerHeight/2 - 80, "#fbbf24", "2em", "levelup");
 }
