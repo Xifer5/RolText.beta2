@@ -2,6 +2,7 @@ import { QUEST_DATA, getQuestStatus, checkQuestCondition } from "./quests.js";
 import { NPC_DATA } from "./npcs.js";
 import { gameState } from "./state.js";
 import { allItems } from "./items.js";
+import { enemyData } from "./enemies.js";
 import { t, formatText, localizeText } from "./i18n.js";
 
 // NPC inverso: questId → NPC (soporta questId string y questIds array)
@@ -110,9 +111,13 @@ function _progressHtml(q, status) {
       const killed  = gameState.stats?.enemiesDefeated?.[q.enemy] ?? 0;
       const need    = q.count;
       const pct     = Math.min(100, Math.round((killed / need) * 100));
+      // q.enemy es un id interno (ej. "pirate") — localizeText(q.enemy) lo
+      // devolvía tal cual (no es un objeto {en,es}), mostrando el id crudo.
+      // El nombre real vive en enemyData[id].type (ej. "Pirate").
+      const enemyName = localizeText(enemyData[q.enemy]?.type) || q.enemy;
       return `
         <div class="ql-progress">
-          <span class="ql-progress-text">${formatText("qlProgressKill", { enemy: localizeText(q.enemy) || q.enemy, killed, need })}</span>
+          <span class="ql-progress-text">${formatText("qlProgressKill", { enemy: enemyName, killed, need })}</span>
           <div class="ql-bar-wrap"><div class="ql-bar" style="width:${pct}%"></div></div>
         </div>`;
     }

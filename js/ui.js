@@ -12,6 +12,7 @@ import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
 import { allItems } from "./items.js";
+import { enemyData } from "./enemies.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
@@ -700,7 +701,11 @@ function updateQuestTracker() {
         case "kill": {
           const killed = gameState.stats?.enemiesDefeated?.[q.enemy] ?? 0;
           const need = q.count;
-          return `${formatText('qlProgressKill', { enemy: localizeText(q.enemy) || q.enemy, killed, need })}`;
+          // q.enemy es un id interno (ej. "pirate") — localizeText(q.enemy)
+          // lo devolvía tal cual, mostrando el id crudo. El nombre real
+          // vive en enemyData[id].type (ej. "Pirate").
+          const enemyName = localizeText(enemyData[q.enemy]?.type) || q.enemy;
+          return `${formatText('qlProgressKill', { enemy: enemyName, killed, need })}`;
         }
         default:
           return t('qlProgressActive') || "In progress";
