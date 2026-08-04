@@ -49,13 +49,20 @@ function _questCard(q) {
   const loc      = window.worldMap?.[npc?.locationId];
   const locName  = localizeText(loc?.name) || t("unknownLocation");
   const canTurn  = status === "active" && checkQuestCondition(q.id);
-  const progress = _progressHtml(q, status);
+  // SPEC-1113: una misión "inactive" con prerequisiteQuest sin completar
+  // no está realmente disponible todavía — hablar con el NPC ya mostraba
+  // el diálogo `locked`, pero la card seguía diciendo "Disponible".
+  const locked   = status === "inactive" && !!q.prerequisiteQuest
+                    && getQuestStatus(q.prerequisiteQuest) !== "completed";
+  const progress = _progressHtml(q, status, locked);
   const reward   = _rewardHtml(q.reward);
 
-  const badgeClass = status === "completed" ? "completed"
+  const badgeClass = locked                ? "locked"
+                   : status === "completed" ? "completed"
                    : canTurn              ? "ready"
                    :                        status;
-  const badgeLabel = status === "completed" ? t("qlStatusCompleted")
+  const badgeLabel = locked                ? t("qlStatusLocked")
+                   : status === "completed" ? t("qlStatusCompleted")
                    : canTurn              ? t("qlStatusReady")
                    : status === "active"  ? t("qlStatusActive")
                    :                        t("qlStatusAvailable");
@@ -77,11 +84,15 @@ function _questCard(q) {
 }
 
 // ── PROGRESO ────────────────────────────────────────────────────────
-function _progressHtml(q, status) {
+function _progressHtml(q, status, locked) {
   if (status === "completed") {
     return `<div class="ql-progress-text done">${t("qlProgressCompleted")}</div>`;
   }
   if (status === "inactive") {
+    if (locked) {
+      const prereqTitle = localizeText(QUEST_DATA[q.prerequisiteQuest]?.title) ?? q.prerequisiteQuest;
+      return `<div class="ql-progress-text locked">${formatText(t("qlProgressLocked"), { quest: prereqTitle })}</div>`;
+    }
     return `<div class="ql-progress-text">${formatText(t("qlProgressInactive"), { npc: _questNpc[q.id]?.name ?? t("unknownLocation") })}</div>`;
   }
 

@@ -240,6 +240,11 @@ export const dictionaries = {
     qlStatusReady: "Ready to turn in!",
     qlStatusActive: "In progress",
     qlStatusAvailable: "Available",
+    // SPEC-1113: quest log listed a prerequisite-gated quest as plain
+    // "Available" — same label as one with no prerequisite at all, even
+    // though talking to the NPC gave a "come back later" locked line.
+    qlStatusLocked: "🔒 Locked",
+    qlProgressLocked: "Requires: <b>{{quest}}</b>",
     qlActionAcceptQuest: "📋 Accept quest",
     qlActionTurnInQuest: "✅ Turn in quest",
     qlProgressInactive: "Talk to {{npc}} to accept this quest.",
@@ -777,6 +782,11 @@ export const dictionaries = {
     qlStatusReady: "¡Lista para entregar!",
     qlStatusActive: "En progreso",
     qlStatusAvailable: "Disponible",
+    // SPEC-1113: el diario mostraba una misión con prerequisito sin cumplir
+    // como "Disponible" igual que una sin trabas, aunque hablar con el NPC
+    // daba una línea de "volvé más tarde" (dialogues.locked).
+    qlStatusLocked: "🔒 Bloqueada",
+    qlProgressLocked: "Requiere: <b>{{quest}}</b>",
     qlActionAcceptQuest: "📋 Aceptar misión",
     qlActionTurnInQuest: "✅ Entregar misión",
     qlProgressInactive: "Habla con {{npc}} para aceptar esta misión.",
