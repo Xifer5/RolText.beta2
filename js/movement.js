@@ -57,7 +57,10 @@ export function handleMove(direction) {
   if (!direction) return;
   if (gameState.isGameOver) return;
   if (gameState.isInCombat) { addMessage(t("cannotMoveCombat"), "system"); return; }
-  if (gameState.isProcessingMove) { addMessage(t("processingMove"), "system"); return; }
+  // Guard silencioso: el botón ya se deshabilita mientras se procesa el
+  // movimiento (ver ui.js updateDirectionControls), así que este mensaje
+  // solo se veía por spam de teclado/clicks y ensuciaba el log de historia.
+  if (gameState.isProcessingMove) return;
 
   gameState.isProcessingMove = true;
   updateUI();

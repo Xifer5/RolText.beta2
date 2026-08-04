@@ -174,13 +174,13 @@
       <div id="location-subtitle" class="location-subtitle"></div>
       <div id="modifier-badge" class="modifier-badge hidden" data-tooltip="Modificadores de partida activos" data-tooltip-pos="bottom"></div>
       <div class="location-actions" aria-label="Acciones de ubicación" data-i18n-attr="aria-label" data-i18n="locationActionsLabel">
-        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-i18n-aria="restActionLabel" data-i18n="quickRest" data-tooltip="Descansar recupera HP y MP al máximo">
+        <button id="location-rest-btn" type="button" class="location-action-btn hidden" aria-label="Descansar en esta zona" data-i18n-aria="restActionLabel" data-i18n="quickRest" data-tooltip="Descansar recupera HP y MP al máximo" data-tooltip-pos="bottom">
           Descansar
         </button>
-        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona" data-i18n-aria="shopActionLabel" data-i18n="quickShop" data-tooltip="Comprar y vender objetos">
+        <button id="location-shop-btn" type="button" class="location-action-btn hidden" aria-label="Abrir tienda de esta zona" data-i18n-aria="shopActionLabel" data-i18n="quickShop" data-tooltip="Comprar y vender objetos" data-tooltip-pos="bottom">
           Tienda
         </button>
-        <button id="npc-talk-btn" type="button" class="location-action-btn npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel" data-tooltip="Hablar con el NPC — misiones, entrenamiento, información">
+        <button id="npc-talk-btn" type="button" class="location-action-btn npc-talk-btn hidden" aria-label="Hablar con el NPC de esta zona" data-i18n-attr="aria-label" data-i18n="npcTalkLabel" data-tooltip="Hablar con el NPC — misiones, entrenamiento, información" data-tooltip-pos="bottom">
           💬 <span data-i18n="npcTalkText">Hablar</span>
         </button>
       </div>
@@ -239,8 +239,10 @@
       </div>
     </div>
 
-    <!-- Quest tracker: muestra la misión activa inmediata -->
-    <div id="questTracker" class="sidebar-block quest-tracker-block">
+    <!-- Quest tracker: solo se ve al abrir el diario con el botón "Misiones"
+         (no permanente en el sidebar — le robaba espacio al panel de
+         Navegación/Combate, ver feedback_sidebar_grid.md) -->
+    <div id="questTracker" class="sidebar-block quest-tracker-block hidden">
       <div class="block-label" data-i18n="questTrackerTitle">Seguimiento de misiones</div>
       <div class="quest-tracker-body">
         <div id="questTrackerContent" class="quest-tracker-content"></div>

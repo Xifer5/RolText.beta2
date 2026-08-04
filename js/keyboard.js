@@ -76,6 +76,10 @@ function onKey(e) {
   const dir = MOVE_KEYS[e.key];
   if (dir) {
     if (document.querySelector(".modal:not(.hidden)")) return;
+    // Mantener una flecha apretada dispara keydown repetidos del navegador;
+    // sin este guard cada uno pasaba por el aviso "Procesando tu
+    // movimiento..." en movement.js y saturaba el log de historia.
+    if (gameState.isProcessingMove || gameState.isGameOver) return;
     window.dispatchEvent(
       new CustomEvent("pixel:move", { detail: { direction: dir } })
     );
