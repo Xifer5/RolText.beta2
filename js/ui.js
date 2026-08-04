@@ -24,12 +24,18 @@ import { applyRest, activeModifiers, MODIFIERS } from "./modifiers.js";
 const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
+// SPEC-1111: devour/overload/freeze_magic (mecánicas de boss forzadas por
+// contador de turno) no tenían advice — el chip mostraba el ícono/nombre
+// corto pero no explicaba el riesgo real ni cómo contrarrestarlo.
 export const INTENT_ADVICE_KEYS = {
   power_attack: "advicePowerAttack",
   magic:        "adviceMagic",
   regen:        "adviceRegen",
   enrage:       "adviceEnrage",
-  defend:       "adviceDefend"
+  defend:       "adviceDefend",
+  devour:       "adviceDevour",
+  overload:     "adviceOverload",
+  freeze_magic: "adviceFreezeMagic"
 };
 import { showSpecializationModal } from "./specModal.js";
 

@@ -101,6 +101,13 @@ export const dictionaries = {
     adviceRegen: "It's about to heal — give it no respite.",
     adviceEnrage: "It's about to enrage: its attack will spike.",
     adviceDefend: "It will guard — your next hit deals half damage.",
+    // SPEC-1111: telegraph de las 3 mecánicas de boss forzadas por contador
+    // de turno (Cave Devourer/Ancient Construct/Frost Wyrm) — antes solo se
+    // veía el ícono + nombre corto del chip, sin explicar el riesgo real ni
+    // cómo contrarrestarlo (Defender la reduce a la mitad, Interrumpir la cancela).
+    adviceDevour: "Its jaws are opening: the next bite can tear off a third of your HP — Defend or Interrupt it.",
+    adviceOverload: "It's charging arcane energy: the overload hits hard — Defend or Interrupt before it fires.",
+    adviceFreezeMagic: "Frost is building in its breath: it will freeze your magic for several turns — cast now or Interrupt it.",
     combatResistAdvice: "💡 It resists {{bad}} damage — try another weapon type or magic.",
     combatResistAdviceVuln: "💡 It resists {{bad}} damage — but it's vulnerable to {{good}}.",
     diffEffectsLine: "👹 Enemies: {{hp}} HP, {{atk}} damage, {{def}} defense · 💰 Rewards: {{xp}} XP, {{gold}} gold",
@@ -631,6 +638,13 @@ export const dictionaries = {
     adviceRegen: "Va a curarse — no le des tregua.",
     adviceEnrage: "Está a punto de enfurecerse: su ataque se disparará.",
     adviceDefend: "Se pondrá en guardia — tu próximo golpe hará la mitad de daño.",
+    // SPEC-1111: telegraph de las 3 mecánicas de boss forzadas por contador
+    // de turno (Cave Devourer/Ancient Construct/Frost Wyrm) — antes solo se
+    // veía el ícono + nombre corto del chip, sin explicar el riesgo real ni
+    // cómo contrarrestarlo (Defender la reduce a la mitad, Interrumpir la cancela).
+    adviceDevour: "Abre las fauces: el próximo mordisco puede quitarte un tercio de tu HP — Defiende o Interrumpe.",
+    adviceOverload: "Está cargando energía arcana: la descarga golpea fuerte — Defiende o Interrumpe antes de que la suelte.",
+    adviceFreezeMagic: "Prepara aliento helado: te congelará la magia por varios turnos — lanza un hechizo ya o Interrumpe.",
     combatResistAdvice: "💡 Resiste el daño {{bad}} — prueba otro tipo de arma o magia.",
     combatResistAdviceVuln: "💡 Resiste el daño {{bad}} — pero es vulnerable a {{good}}.",
     diffEffectsLine: "👹 Enemigos: {{hp}} vida, {{atk}} daño, {{def}} defensa · 💰 Recompensas: {{xp}} XP, {{gold}} oro",
