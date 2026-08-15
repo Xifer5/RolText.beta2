@@ -4208,11 +4208,11 @@ button:focus-visible,
   font-weight: 700;
   white-space: nowrap;
 }
-.npc-quest-badge.status-inactive  { background: rgba(148,163,184,.1); border: 1px solid rgba(148,163,184,.3); color: var(--c-muted); }
-.npc-quest-badge.status-active    { background: rgba(212,175,85,.12); border: 1px solid var(--gold-dim);      color: var(--gold);    animation: pulse 2s ease infinite; }
-.npc-quest-badge.status-completed { background: rgba(82,192,122,.1);  border: 1px solid var(--c-heal);        color: var(--c-heal);  }
-/* SPEC-1113: sin prefijo "status-" — questlog.js genera la clase de
-   estado directa (ej. "locked", "ready"), no "status-locked". */
+/* Sin prefijo "status-" — ui.js/questlog.js generan la clase de estado
+   directa (ej. "active", "locked", "ready"), nunca "status-active". */
+.npc-quest-badge.inactive  { background: rgba(148,163,184,.1); border: 1px solid rgba(148,163,184,.3); color: var(--c-muted); }
+.npc-quest-badge.active    { background: rgba(212,175,85,.12); border: 1px solid var(--gold-dim);      color: var(--gold);    animation: pulse 2s ease infinite; }
+.npc-quest-badge.completed { background: rgba(82,192,122,.1);  border: 1px solid var(--c-heal);        color: var(--c-heal);  }
 .npc-quest-badge.locked {
   background: rgba(148,163,184,.1);
   border: 1px solid rgba(148,163,184,.3);
