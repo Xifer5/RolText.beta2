@@ -18,6 +18,7 @@ import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
 import { applyRest, activeModifiers, MODIFIERS } from "./modifiers.js";
+import { getTimeLabel } from "./timeOfDay.js";
 
 // SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
 // import circular ui.js<->combat.js solo para una constante chica.
@@ -108,7 +109,7 @@ export function initUICache() {
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
     "screen","buff-bar","skill-panel","stat-points-row","char-portrait-emoji",
     "questTracker","questTrackerContent","questTrackerOpenBtn",
-    "mobile-location-name","mobile-state-chip","mobile-level","mobile-gold",
+    "mobile-location-name","mobile-state-chip","mobile-time-chip","mobile-level","mobile-gold",
     "mobile-hp-bar","mobile-hp-text","mobile-mp-bar","mobile-mp-text",
     "mobile-xp-bar","mobile-xp-text",
     "location-rest-btn","location-shop-btn",
@@ -367,6 +368,7 @@ export function updateUI() {
   const locName = localizeText(loc?.name) || t("unknownLocation");
   if (ui["location-name"]) ui["location-name"].textContent = locName;
   if (ui["mobile-location-name"]) ui["mobile-location-name"].textContent = locName;
+  if (ui["mobile-time-chip"]) ui["mobile-time-chip"].textContent = getTimeLabel();
   if (ui["mobile-state-chip"]) {
     ui["mobile-state-chip"].classList.toggle("in-combat", gameState.isInCombat);
     ui["mobile-state-chip"].classList.toggle("game-over", gameState.isGameOver);
@@ -596,7 +598,7 @@ function updateLocationSubtitle(loc) {
   const risk = getLocationRisk(loc);
   const dirLabels = { north:"N", south:"S", east:"E", west:"O", up:"↑", down:"↓", enter:"⬤", out:"↩" };
   const exitChips = exits.map(d => `<span class="exit-chip">${dirLabels[d]||d}</span>`).join("");
-  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ` <span class="exit-chip">${t('restChipLabel')}</span>` : ""}<span class="flex-spacer"></span>${exitChips}`;
+  sub.innerHTML = `<span>${biomeEmoji} ${loc.biome || "zona"}</span><span class="exit-chip">${getTimeLabel()}</span><span class="risk-chip risk-${risk.tone}">${risk.label}</span>${loc.canRest ? ` <span class="exit-chip">${t('restChipLabel')}</span>` : ""}<span class="flex-spacer"></span>${exitChips}`;
 
   updateModifierBadge();
 }

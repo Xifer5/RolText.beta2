@@ -3,6 +3,7 @@
 //  SPEC-0701
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
+import { t } from "./i18n.js";
 
 // ── Reglas por enemigo ──────────────────────────────────
 // nightOnly: solo aparece de noche
@@ -52,43 +53,16 @@ export function isNight() {
 }
 
 export function getTimeLabel() {
-  return isNight() ? "🌙 Noche" : "☀️ Día";
+  return isNight() ? t("timeNightLabel") : t("timeDayLabel");
 }
 
-// Avanza el tiempo y sincroniza el tema visual.
+// Avanza el tiempo de juego (independiente del tema visual claro/oscuro,
+// que sigue siendo una preferencia manual del jugador vía themeToggleBtn).
 // El caller debe llamar updateUI() después si necesita refrescar el HUD.
 export function advanceTime() {
   gameState.timeOfDay = isNight() ? "day" : "night";
-  syncThemeToTime();
   window.dispatchEvent(new Event("pixel:timeChanged"));
   return gameState.timeOfDay;
-}
-
-// Sincroniza data-theme del documento al estado actual de gameState.timeOfDay
-export function syncThemeToTime() {
-  const theme = isNight() ? "dark" : "light";
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem("pqe-theme", theme);
-  const btn = document.getElementById("themeToggleBtn");
-  if (btn) btn.textContent = isNight() ? "🌙" : "☀️";
-}
-
-// Conecta el botón de tema para que también actualice gameState.
-// Llamar una sola vez desde setupUIListeners().
-export function setupThemeToggle() {
-  const btn = document.getElementById("themeToggleBtn");
-  if (!btn || btn.dataset.timewired) return;
-  btn.dataset.timewired = "1";
-  // El inline script ya cambió data-theme visualmente.
-  // Aquí sincronizamos gameState y disparamos el evento.
-  btn.addEventListener("click", () => {
-    const theme = document.documentElement.dataset.theme;
-    gameState.timeOfDay = theme === "dark" ? "night" : "day";
-    window.dispatchEvent(new Event("pixel:timeChanged"));
-  });
-  // Sync inicial desde el tema guardado
-  const stored = localStorage.getItem("pqe-theme") || "dark";
-  gameState.timeOfDay = stored === "dark" ? "night" : "day";
 }
 
 // ¿Puede aparecer este enemigo en la hora actual?
@@ -131,7 +105,5 @@ export function getTimeDamageMultiplier(damageType) {
 
 // Mensaje narrativo al cambiar de hora
 export function getTimeTransitionMessage(newTime) {
-  return newTime === "night"
-    ? "🌙 El sol se pone. La oscuridad envuelve el mundo... Los no-muertos despiertan."
-    : "☀️ Amanece. La luz del sol disipa las sombras. Un nuevo día comienza.";
+  return newTime === "night" ? t("timeToNightMsg") : t("timeToDayMsg");
 }

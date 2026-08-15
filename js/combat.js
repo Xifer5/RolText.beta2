@@ -33,6 +33,7 @@ import { cruelAtkMult, isIntentAlwaysHidden } from "./modifiers.js";
 import { recordRun } from "./runLog.js";
 import { isMiniBossId } from "./biomeBosses.js";
 import { applyResistance, ENEMY_COMBAT_DATA, PHYSICAL_TYPES } from "./damageTypes.js";
+import { isEnemyAvailable, applyTimeModifiers } from "./timeOfDay.js";
 
 import { delay, tryLastBreath, resistanceAdviceFor } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
@@ -117,7 +118,8 @@ async function handleAction(fn) {
 export function getRandomEncounter(locationId) {
   const loc = window.worldMap?.[locationId];
   if (!loc) return null;
-  const list = loc.enemies || [];
+  // SPEC-0701: filtra enemigos exclusivos de día/noche según la hora actual
+  const list = (loc.enemies || []).filter(isEnemyAvailable);
   const rate = typeof loc.encounterRate === "number" ? loc.encounterRate : 0.25;
   if (!list.length) return null;
   if (Math.random() < rate) return list[Math.floor(Math.random() * list.length)];
@@ -165,14 +167,16 @@ export function startCombat(enemyType, isBoss = false) {
   const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult * diff.hp);
   const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk * cruelAtkMult(gameState));
   const scaledDef = Math.floor((base.defense ?? 0) * diff.def);
+  // SPEC-0701: bonos/penalidades de día o noche sobre el ataque/defensa base
+  const { attack: timedAtk, defense: timedDef } = applyTimeModifiers(enemyType, scaledAtk, scaledDef);
 
   gameState.currentEnemy = {
     id: enemyType,
     ...base,
     hp:      scaledHp,
     maxHp:   scaledHp,
-    attack:  scaledAtk,
-    defense: scaledDef,
+    attack:  timedAtk,
+    defense: timedDef,
     isBoss,
     // SPEC-1104: distingue un mini-boss real (perdonable) del boss principal
     // de zona (nunca perdonable) — ver isMiniBossId() en biomeBosses.js

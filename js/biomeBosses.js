@@ -1,6 +1,7 @@
 // biomeBosses.js
 // Define los jefes (bosses) y mini-jefes de cada bioma
 // Compatible con biomes.js y el sistema de combate
+import { isEnemyAvailable } from "./timeOfDay.js";
 
 export const biomeBosses = {
   forest: {
@@ -70,7 +71,9 @@ export function trySpawnBoss(biomeId, ambushMult = 1) {
   if (isBoss) {
     return biome.boss;
   } else {
-    const mini = biome.miniBosses;
+    // SPEC-0701: no elegir un mini-boss exclusivo de día/noche fuera de su horario
+    const mini = biome.miniBosses.filter(isEnemyAvailable);
+    if (!mini.length) return null;
     return mini[Math.floor(Math.random() * mini.length)];
   }
 }

@@ -13,9 +13,12 @@ import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
 import { maybeStartEchoIntro } from "./echoIntro.js";
 import { maybeStartRivalEncounter } from "./rivalArc.js";
+import { advanceTime, getTimeTransitionMessage } from "./timeOfDay.js";
 
 let _movesSinceLastBoss = 0;
 const BOSS_COOLDOWN = 8; // mínimo de movimientos entre apariciones de jefe
+let _movesSinceTimeChange = 0;
+const TIME_CYCLE_MOVES = 6; // SPEC-0701: movimientos entre cambios de día/noche
 // SPEC-1104: liberar el eco en el bosque → protección del bosque (-50%,
 // solo bioma forest); se compone con AMBUSH_CHANCE_MULT si ambos aplican.
 const FOREST_PROTECTION_MULT = 0.5;
@@ -119,6 +122,14 @@ export function handleMove(direction) {
 
   // Record visit for journal/bestiary
   recordLocationVisit();
+
+  // ── SPEC-0701: ciclo día/noche — avanza cada TIME_CYCLE_MOVES ──────
+  _movesSinceTimeChange++;
+  if (_movesSinceTimeChange >= TIME_CYCLE_MOVES) {
+    _movesSinceTimeChange = 0;
+    const newTime = advanceTime();
+    addMessage(getTimeTransitionMessage(newTime), "narrative");
+  }
 
   // Contextual hints
   if (newLoc.canRest)   addMessage(t("restHint"), "system");

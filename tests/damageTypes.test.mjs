@@ -5,14 +5,19 @@ import {
   ENEMY_COMBAT_DATA, WEAPON_DAMAGE_TYPES, PHYSICAL_TYPES, DAMAGE_TYPES,
   getEffectiveResistances
 } from "../js/damageTypes.js";
+import { gameState } from "../js/state.js";
+
+// SPEC-0701: fire/dark/holy/etc. tienen multiplicador de daño por hora del
+// día — estos tests de resistencia "pura" usan tipos sin entrada en esa
+// tabla (slash/pierce/ice/water) para no depender de gameState.timeOfDay.
 
 test("applyResistance reduce con resistencia positiva", () => {
   assert.equal(applyResistance(100, "slash", { slash: 30 }), 70);
-  assert.equal(applyResistance(10, "fire", { fire: 50 }), 5);
+  assert.equal(applyResistance(10, "pierce", { pierce: 50 }), 5);
 });
 
 test("applyResistance amplifica con resistencia negativa (vulnerabilidad)", () => {
-  assert.equal(applyResistance(100, "fire", { fire: -30 }), 130);
+  assert.equal(applyResistance(100, "pierce", { pierce: -30 }), 130);
 });
 
 test("applyResistance nunca baja de 1 (inmunidad 100 → 1)", () => {
@@ -23,7 +28,22 @@ test("applyResistance nunca baja de 1 (inmunidad 100 → 1)", () => {
 test("applyResistance ignora tipos sin entrada o argumentos ausentes", () => {
   assert.equal(applyResistance(42, "ice", { fire: 50 }), 42);
   assert.equal(applyResistance(42, null, { fire: 50 }), 42);
-  assert.equal(applyResistance(42, "fire", null), 42);
+  assert.equal(applyResistance(42, "pierce", null), 42);
+});
+
+test("SPEC-0701: applyResistance aplica el multiplicador de daño por hora", () => {
+  const original = gameState.timeOfDay;
+  try {
+    gameState.timeOfDay = "day";
+    assert.equal(applyResistance(100, "fire", {}), 110);   // día: fuego +10%
+    assert.equal(applyResistance(100, "dark", {}), 80);    // día: oscuridad -20%
+    gameState.timeOfDay = "night";
+    assert.equal(applyResistance(100, "dark", {}), 130);   // noche: oscuridad +30%
+    assert.equal(applyResistance(100, "fire", {}), 90);    // noche: fuego -10%
+    assert.equal(applyResistance(100, "slash", {}), 100);  // sin entrada en la tabla → sin cambio
+  } finally {
+    gameState.timeOfDay = original;
+  }
 });
 
 test("getWeaponDamageType: sin arma → slash; damageType propio gana a la tabla", () => {

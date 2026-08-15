@@ -2,6 +2,7 @@
 //  DAMAGE TYPES — Motor de tipos de daño y resistencias
 //  SPEC-0601 / SPEC-0602
 // ══════════════════════════════════════════════════════
+import { getTimeDamageMultiplier } from "./timeOfDay.js";
 
 export const DAMAGE_TYPES = {
   // Físico
@@ -194,9 +195,11 @@ export const ITEM_RESISTANCES = {
 // resistance > 0 = absorbe (ej. 50 → recibe 50% menos)
 // resistance < 0 = vulnerabilidad (ej. -30 → recibe 30% más)
 export function applyResistance(damage, damageType, resistances) {
-  if (!damageType || !resistances) return damage;
+  // SPEC-0701: oscuridad/maldición pegan más fuerte de noche, luz/fuego de día
+  const timeMult = getTimeDamageMultiplier(damageType);
+  if (!damageType || !resistances) return Math.max(1, Math.floor(damage * timeMult));
   const res = resistances[damageType] ?? 0;
-  return Math.max(1, Math.floor(damage * (1 - res / 100)));
+  return Math.max(1, Math.floor(damage * timeMult * (1 - res / 100)));
 }
 
 // SPEC-1103: resistencias efectivas de un enemigo en combate, sumando el
