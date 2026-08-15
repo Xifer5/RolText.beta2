@@ -33,6 +33,7 @@ import { cruelAtkMult, isIntentAlwaysHidden } from "./modifiers.js";
 import { recordRun } from "./runLog.js";
 import { isMiniBossId } from "./biomeBosses.js";
 import { applyResistance, ENEMY_COMBAT_DATA, PHYSICAL_TYPES } from "./damageTypes.js";
+import { getBiome } from "./biomes.js";
 import { isEnemyAvailable, applyTimeModifiers } from "./timeOfDay.js";
 
 import { delay, tryLastBreath, resistanceAdviceFor } from "./combatFeedback.js";
@@ -118,8 +119,14 @@ async function handleAction(fn) {
 export function getRandomEncounter(locationId) {
   const loc = window.worldMap?.[locationId];
   if (!loc) return null;
+  // Encuentros dinámicos por bioma: además de los enemigos que mapgen.js
+  // asignó a esta sala en particular, cualquier enemigo de la lista
+  // completa del bioma (biomes.js) también puede aparecer acá. Sin esto,
+  // un enemigo objetivo de una misión (ej. "pirate" en kill_pirates) quedaba
+  // confinado a la única sala donde el sorteo de mapgen lo hubiera incluido.
+  const biomeEnemies = getBiome(loc.biome)?.enemies || [];
   // SPEC-0701: filtra enemigos exclusivos de día/noche según la hora actual
-  const list = (loc.enemies || []).filter(isEnemyAvailable);
+  const list = [...new Set([...(loc.enemies || []), ...biomeEnemies])].filter(isEnemyAvailable);
   const rate = typeof loc.encounterRate === "number" ? loc.encounterRate : 0.25;
   if (!list.length) return null;
   if (Math.random() < rate) return list[Math.floor(Math.random() * list.length)];

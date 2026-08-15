@@ -1945,6 +1945,17 @@ button:focus-visible,
 .inventory-grid.detail-open {
   grid-template-columns: 2fr 3fr;
 }
+/* M3 list-detail: con el panel de detalle abierto la fila solo selecciona
+   (ya dispara showItemDetails() al click, ver inventory.js) — las acciones
+   reales (Usar/Equipar) viven en el panel de detalle. Ocultar los botones
+   de la fila evita que dos columnas auto + el ícono coman todo el ancho de
+   la columna angostada y colapsen el nombre a 0px (partiendo cada letra). */
+.inventory-grid.detail-open #inventoryList li {
+  grid-template-columns: auto 1fr;
+}
+.inventory-grid.detail-open #inventoryList li .btn.tiny {
+  display: none;
+}
 .inventory-detail-col {
   overflow-y: auto;
   max-height: 60vh;
@@ -2048,7 +2059,7 @@ button:focus-visible,
   border-radius: var(--r-lg);
   border: 1px solid var(--md-outline-variant);
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto minmax(60px, 1fr) auto auto;
   align-items: center;
   gap: 12px;
   font-family: var(--font-ui);

@@ -10,7 +10,7 @@ import { getNpcAt } from "./npcs.js";
 import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
-import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest } from "./quests.js";
+import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest, isQuestLocked } from "./quests.js";
 import { allItems } from "./items.js";
 import { enemyData } from "./enemies.js";
 import { t, formatText, localizeText } from "./i18n.js";
@@ -769,10 +769,16 @@ function openNpcModal(npc) {
     ? " " + t("elaraEchoPerception") : "";
   document.getElementById("npcLore").textContent  = npc.lore + echoLine;
 
-  // Support both questId (singular) and questIds (array) — pick first implemented, non-completed quest
+  // Support both questId (singular) and questIds (array) — pick the first
+  // implemented quest that's actually startable right now (not completed,
+  // not locked behind an unfinished prerequisiteQuest); if every quest is
+  // locked/completed, fall back to the first non-completed one so the NPC
+  // still shows *something* coherent (e.g. its locked dialogue).
   const ids = npc.questId ? [npc.questId] : (npc.questIds || []);
   const knownIds = ids.filter(id => !!QUEST_DATA[id]);
-  const questId = knownIds.find(id => getQuestStatus(id) !== "completed") ?? knownIds[0] ?? ids[0];
+  const questId = knownIds.find(id => getQuestStatus(id) !== "completed" && !isQuestLocked(id))
+    ?? knownIds.find(id => getQuestStatus(id) !== "completed")
+    ?? knownIds[0] ?? ids[0];
   // SPEC-1114: NPCs sin ninguna misión asignada (ej. mentor_aldric,
   // weaponsmith_garrett — entrenadores) no tienen questId real. Antes se
   // seguía de largo con questId=undefined y se armaba una sección de misión
@@ -792,10 +798,12 @@ function openNpcModal(npc) {
     const lines   = getQuestDialogue(questId);
     const label   = getQuestActionLabel(questId);
 
+    const locked = isQuestLocked(questId);
     const badge = document.getElementById("npcQuestBadge");
     if (badge) {
-      badge.className = `npc-quest-badge ${status}`;
-      badge.textContent = status === "inactive" ? t("qlStatusAvailable")
+      badge.className = `npc-quest-badge ${locked ? "locked" : status}`;
+      badge.textContent = locked                ? t("qlStatusLocked")
+                        : status === "inactive" ? t("qlStatusAvailable")
                         : status === "active"   ? t("qlStatusActive")
                         : t("qlStatusCompleted");
     }

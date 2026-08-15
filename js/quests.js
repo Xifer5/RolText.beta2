@@ -396,6 +396,14 @@ export function completeQuest(questId) {
 
 // ── HELPERS PARA UI ────────────────────────────────────────────────
 
+/** ¿Está inactiva Y bloqueada por una prerequisiteQuest sin completar? */
+export function isQuestLocked(questId) {
+  const q = QUEST_DATA[questId];
+  if (!q?.prerequisiteQuest) return false;
+  return getQuestStatus(questId) === "inactive"
+    && getQuestStatus(q.prerequisiteQuest) !== "completed";
+}
+
 /** Líneas de diálogo según estado actual de la misión */
 export function getQuestDialogue(questId) {
   const q = QUEST_DATA[questId];
@@ -416,7 +424,7 @@ export function getQuestDialogue(questId) {
   }
 
   // inactive — show locked dialogue if prerequisite not yet completed
-  if (q.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") {
+  if (isQuestLocked(questId)) {
     return (q.dialogues.locked ?? q.dialogues.inactive).map(localizeText);
   }
 
@@ -428,12 +436,11 @@ export function getQuestDialogue(questId) {
  * null = no mostrar botón.
  */
 export function getQuestActionLabel(questId) {
-  const q = QUEST_DATA[questId];
   const status = getQuestStatus(questId);
   if (status === "completed") return null;
   if (status === "active" && checkQuestCondition(questId)) return t("qlActionTurnInQuest");
   if (status === "inactive") {
-    if (q?.prerequisiteQuest && getQuestStatus(q.prerequisiteQuest) !== "completed") return null;
+    if (isQuestLocked(questId)) return null;
     return t("qlActionAcceptQuest");
   }
   return null; // activa pero condición no cumplida

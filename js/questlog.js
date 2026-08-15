@@ -1,4 +1,4 @@
-import { QUEST_DATA, getQuestStatus, checkQuestCondition } from "./quests.js";
+import { QUEST_DATA, getQuestStatus, checkQuestCondition, isQuestLocked } from "./quests.js";
 import { NPC_DATA } from "./npcs.js";
 import { gameState } from "./state.js";
 import { allItems } from "./items.js";
@@ -52,8 +52,7 @@ function _questCard(q) {
   // SPEC-1113: una misión "inactive" con prerequisiteQuest sin completar
   // no está realmente disponible todavía — hablar con el NPC ya mostraba
   // el diálogo `locked`, pero la card seguía diciendo "Disponible".
-  const locked   = status === "inactive" && !!q.prerequisiteQuest
-                    && getQuestStatus(q.prerequisiteQuest) !== "completed";
+  const locked   = isQuestLocked(q.id);
   const progress = _progressHtml(q, status, locked);
   const reward   = _rewardHtml(q.reward);
 
