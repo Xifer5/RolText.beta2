@@ -100,6 +100,16 @@
   --md-dur-medium4: 400ms;
   --md-dur-long1:   450ms;
   --md-dur-long2:   500ms;
+
+  /* Escala de espaciado 4px — usada por el bloque Dificultad/Maestria/
+     Especializacion (SPEC de Sprint 2); antes de definirse acá, var(--sp-N)
+     sin fallback invalidaba el shorthand entero y ese sector perdía todo
+     el margin/padding/gap. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
 }
 
 [data-theme="light"] {
@@ -940,6 +950,20 @@ button:focus-visible,
   letter-spacing: .04em;
 }
 .enemy-debuffs { display: flex; gap: 4px; font-size: 11px; }
+/* .edebuff — sin regla propia se veían como texto plano suelto (el gap del
+   contenedor los separaba, pero no tenían fondo/pastilla como .buff-chip).
+   Reusa los mismos colores que .buff-chip.debuff-* para consistencia. */
+.edebuff {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.edebuff.poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
+.edebuff.burn   { background: rgba(251,146,60,.18); color: #FDBA74; }
+.edebuff.frozen { background: rgba(147,197,253,.18); color: #93C5FD; }
 .enemy-hp-row {
   display: flex;
   align-items: center;
@@ -1708,7 +1732,7 @@ button:focus-visible,
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
     border-color: var(--md-primary);
-    box-shadow: inset 0 0 0 1px rgba(79,70,229,.18);
+    box-shadow: inset 0 0 0 1px rgba(236,197,111,.18);
   }
   .mob-icon { font-size: 18px; }
   .mob-sep { width: 8px; }
@@ -1920,7 +1944,7 @@ button:focus-visible,
 .inventory-search-group select:focus {
   outline: none;
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+  box-shadow: 0 0 0 3px rgba(236,197,111,.12);
 }
 .inventory-empty {
   padding: 18px;
@@ -2128,7 +2152,7 @@ button:focus-visible,
 #inventoryList li.active {
   background: var(--md-surface-c-highest);
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 1px rgba(79, 70, 229, .12);
+  box-shadow: 0 0 0 1px rgba(236,197,111,.12);
 }
 .inv-icon {
   width: 56px;
@@ -4149,6 +4173,95 @@ button:focus-visible,
   color: var(--md-primary);
   border-bottom-color: var(--md-primary);
 }
+/* .ql-* (tarjetas de mision del Diario) no tenian ninguna regla propia —
+   .ql-bar en particular es un <div style="width:X%"> sin height/background,
+   asi que la barra de progreso era invisible. */
+.ql-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ql-empty {
+  padding: 18px;
+  border-radius: var(--r-lg);
+  background: var(--md-surface-c);
+  border: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface-variant);
+  font-style: italic;
+}
+.ql-card {
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  background: var(--md-surface-c-low);
+  border: 1px solid var(--md-outline-variant);
+}
+.ql-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ql-npc-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+}
+.ql-npc-emoji { font-size: 14px; }
+.ql-npc-name { font-weight: 600; color: var(--md-on-surface); }
+.ql-npc-loc { color: var(--md-on-surface-variant); }
+.ql-title {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--md-on-surface);
+  margin-bottom: 8px;
+}
+.ql-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ql-progress-text { font-size: 12px; color: var(--md-on-surface-variant); }
+.ql-progress-text.done { color: var(--c-heal); }
+.ql-check { font-size: 13px; }
+.ql-bar-wrap {
+  flex: 1;
+  min-width: 60px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--md-surface-c);
+  overflow: hidden;
+}
+.ql-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--md-primary);
+}
+.ql-reward {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+}
+.ql-reward-label {
+  font-weight: 700;
+  color: var(--md-primary);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .04em;
+  margin-right: 4px;
+}
+/* badgeClass "ready" (mision con condicion de entrega cumplida) no tenia
+   variante — caia al .npc-quest-badge base sin fondo/color. */
+.npc-quest-badge.ready {
+  background: rgba(123,211,137,.15);
+  border: 1px solid var(--c-heal);
+  color: var(--c-heal);
+}
 
 
 /* ══ NPC SYSTEM ═════════════════════════════════════════════════════
@@ -5156,21 +5269,21 @@ kbd {
 .mastery-section { margin-top: var(--sp-5); text-align: left; }
 .mastery-section-title {
   font-size: .85rem; font-weight: 700; letter-spacing: .04em;
-  color: var(--md-on-surface-var, #cac4d0); margin-bottom: var(--sp-3);
+  color: var(--md-on-surface-variant); margin-bottom: var(--sp-3);
 }
 .mastery-list { display: flex; flex-direction: column; gap: var(--sp-2); }
 .mastery-empty { font-size: .8rem; font-style: italic; }
 .mastery-row {
   display: flex; align-items: center; gap: var(--sp-3);
   padding: 8px 10px; border-radius: 10px;
-  background: var(--md-surface-2, #232129);
+  background: var(--md-surface-c);
 }
 .mastery-emoji { font-size: 1.1rem; }
 .mastery-info { flex: 1; min-width: 0; }
 .mastery-label { display: block; font-size: .78rem; margin-bottom: 4px; }
 .mastery-bar-wrap {
   height: 6px; border-radius: 3px; overflow: hidden;
-  background: var(--md-surface-4, #38343f);
+  background: var(--md-surface-c-highest);
 }
 .mastery-bar {
   height: 100%; border-radius: 3px;
@@ -5187,14 +5300,14 @@ kbd {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
   padding: var(--sp-4); border-radius: 14px; text-align: left;
   border: 1.5px solid var(--md-outline, #49454f);
-  background: var(--md-surface-2, #232129);
+  background: var(--md-surface-c);
   color: var(--md-on-surface, #e6e1e5);
   font-family: inherit; cursor: pointer;
   transition: border-color .15s, background .15s, transform .1s;
 }
 .spec-card:hover, .spec-card:focus-visible {
   border-color: var(--md-primary, #d0bcff);
-  background: var(--md-surface-3, #2b2830);
+  background: var(--md-surface-c-high);
   transform: translateY(-1px);
 }
 .spec-card-emoji { font-size: 1.6rem; }
