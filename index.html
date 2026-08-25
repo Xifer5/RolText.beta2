@@ -23,7 +23,7 @@
     <div class="topbar-brand">
       <span class="brand-icon">⚔</span>
       <div>
-        <div class="brand-title">Pixel Quest Echoes</div>
+        <h1 class="brand-title">Pixel Quest Echoes</h1>
         <div class="brand-sub" data-i18n="brandSubtitle">Explora · Combate · Forja tu destino</div>
       </div>
     </div>
@@ -578,12 +578,12 @@
       <div class="audio-row">
         <label for="sfx-volume" data-i18n="sfxLabel">🔊 Efectos</label>
         <input type="range" id="sfx-volume" min="0" max="100" value="50" class="vol-slider">
-        <button id="sfx-mute-btn" class="mute-btn" data-i18n-attr="title" data-i18n="muteSfxTooltip">🔊</button>
+        <button id="sfx-mute-btn" class="mute-btn" aria-label="Silenciar efectos" data-i18n-aria="muteSfxTooltip" data-i18n-attr="title" data-i18n="muteSfxTooltip">🔊</button>
       </div>
       <div class="audio-row">
         <label for="music-volume" data-i18n="musicLabel">🎵 Música</label>
         <input type="range" id="music-volume" min="0" max="100" value="40" class="vol-slider">
-        <button id="music-mute-btn" class="mute-btn" data-i18n-attr="title" data-i18n="muteMusicTooltip">🎵</button>
+        <button id="music-mute-btn" class="mute-btn" aria-label="Silenciar música" data-i18n-aria="muteMusicTooltip" data-i18n-attr="title" data-i18n="muteMusicTooltip">🎵</button>
       </div>
     </div>
     <div class="save-info" id="saveInfo"></div>

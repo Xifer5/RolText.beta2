@@ -74,6 +74,8 @@
 
   --ease:        cubic-bezier(.2,0,0,1);
   --ease-spring: cubic-bezier(.34,1.56,.64,1);
+  --ease-dec:    cubic-bezier(0,0,0,1); /* M3 decelerated — usado por sheetSlideUp y el panel de detalle del inventario */
+  --dur-m1:      200ms;
 
   --elev-1: 0 1px 2px rgba(0,0,0,.3), 0 1px 3px 1px rgba(0,0,0,.15);
   --elev-2: 0 1px 2px rgba(0,0,0,.3), 0 2px 6px 2px rgba(0,0,0,.15);
@@ -127,6 +129,7 @@
   --md-on-surface-variant:     #4D4632;
   --md-outline:                #7E7558;
   --md-outline-variant:        #D0C5A6;
+  --md-secondary:              #6B5D3F;
   --md-secondary-container:    #F4E2BD;
   --md-on-secondary-container: #241A04;
   --md-tertiary-container:     #C3ECD0;
@@ -153,6 +156,7 @@
     --md-on-surface-variant:     #4D4632;
     --md-outline:                #7E7558;
     --md-outline-variant:        #D0C5A6;
+    --md-secondary:              #6B5D3F;
     --md-secondary-container:    #F4E2BD;
     --md-on-secondary-container: #241A04;
     --md-tertiary-container:     #C3ECD0;
@@ -671,7 +675,7 @@ button:focus-visible,
   font-weight: 600;
   letter-spacing: .08em;
   text-transform: uppercase;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,.08);
 }
@@ -1290,7 +1294,7 @@ button:focus-visible,
   letter-spacing: .06em;
   text-transform: uppercase;
   padding: 8px;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,.08);
@@ -1318,7 +1322,7 @@ button:focus-visible,
 .combat-btn.flee    { color: var(--md-on-surface-variant); }
 .combat-btn.defend  { color: #93C5FD; }
 .combat-btn.break-guard { color: #FDBA74; }
-.combat-btn.interrupt   { color: #C4B5FD; }
+.combat-btn.interrupt   { color: var(--c-skill); }
 .combat-btn.mercy       { color: #6EE7B7; }
 .combat-btn .key-hint,
 .combat-btn kbd {
@@ -1402,7 +1406,7 @@ button:focus-visible,
   font-weight: 700;
   display: grid;
   place-items: center;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
 }
 .compass-dir-label:hover {
   background: var(--md-primary-container);
@@ -1446,7 +1450,7 @@ button:focus-visible,
   align-items: center;
   justify-content: center;
   gap: 3px;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
 }
 .compass-action-btn:hover {
   background: var(--md-primary-container);
@@ -1727,7 +1731,7 @@ button:focus-visible,
   .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
   .mob-defend { color: #93C5FD; }
   .mob-break-guard { color: #FDBA74; }
-  .mob-interrupt   { color: #C4B5FD; }
+  .mob-interrupt   { color: var(--c-skill); }
   .mob-mercy       { color: #6EE7B7; }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
@@ -1817,7 +1821,7 @@ button:focus-visible,
   font-size: 16px;
   display: grid;
   place-items: center;
-  transition: background .15s var(--ease);
+  transition: background var(--md-dur-short3) var(--ease);
 }
 .modal-close:hover { background: var(--md-surface-c-high); color: var(--md-on-surface); }
 
@@ -1874,7 +1878,7 @@ button:focus-visible,
   font-size: 13px;
   font-weight: 600;
   letter-spacing: .04em;
-  transition: filter .15s var(--ease), box-shadow .15s var(--ease), transform .15s var(--ease);
+  transition: filter var(--md-dur-short3) var(--ease), box-shadow var(--md-dur-short3) var(--ease), transform var(--md-dur-short3) var(--ease);
   cursor: pointer;
   position: relative;
 }
@@ -1938,7 +1942,7 @@ button:focus-visible,
   padding: 12px 14px;
   font-family: var(--font-ui);
   font-size: 13px;
-  transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+  transition: border-color var(--md-dur-short3) var(--ease), box-shadow var(--md-dur-short3) var(--ease);
 }
 .inventory-search-group input:focus,
 .inventory-search-group select:focus {
@@ -2085,7 +2089,7 @@ button:focus-visible,
   font-family: inherit;
   font-size: .8rem;
   cursor: pointer;
-  transition: background .15s, border-color .15s, color .15s;
+  transition: background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease), color var(--md-dur-short3) var(--ease);
 }
 .inv-filter-chip:hover { background: var(--md-surface-c-high); color: var(--md-on-surface); }
 .inv-filter-chip.active {
@@ -2107,6 +2111,7 @@ button:focus-visible,
   .sf-btn,
   .skill-btn { min-height: 44px; }
   .mob-dir-vertical { min-height: 44px; }
+  .btn.tiny { min-height: 44px; }
 }
 .inventory-list-col h3,
 .inventory-detail-col h3,
@@ -2144,7 +2149,7 @@ button:focus-visible,
   font-family: var(--font-ui);
   font-size: 13px;
   cursor: pointer;
-  transition: transform .15s var(--ease), background .15s var(--ease), border-color .15s var(--ease);
+  transition: transform var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease);
 }
 #inventoryList li:hover,
 #shopBuyList li:hover,
@@ -2202,7 +2207,7 @@ button:focus-visible,
 .item-detail-body p {
   margin: 0 0 12px;
   color: var(--md-on-surface-variant);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .item-detail-actions {
   display: flex;
@@ -2294,8 +2299,11 @@ button:focus-visible,
 .equipment-compare-chip.is-down em { color: var(--md-error); }
 .equipment-compare-chip.is-even em { color: var(--md-on-surface-variant); }
 
-/* Inventory — mobile master-detail (SPEC-0203) */
-@media (max-width: 640px) {
+/* Inventory — mobile master-detail (SPEC-0203). Umbral alineado a 680px
+   con .modal-content (arriba) — antes era 640px, dejando un hueco 641-680px
+   donde el modal ya iba full-width pero el grid seguia en 2 columnas
+   angostas (mismo patron que ya causo el bug de "letras partidas"). */
+@media (max-width: 680px) {
   .inventory-grid {
     grid-template-columns: 1fr;
   }
@@ -2497,20 +2505,8 @@ button:focus-visible,
   padding: 12px;
   margin-bottom: 12px;
 }
-.npc-quest-badge {
-  display: inline-block;
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--md-tertiary-container);
-  color: var(--md-on-tertiary-container);
-  margin-right: 6px;
-  border: 1px solid transparent;
-}
+/* .npc-quest-badge consolidado mas abajo junto a sus variantes de estado
+   (.active/.completed/.locked/.inactive/.ready) — ver seccion NPC SYSTEM. */
 .npc-quest-title {
   font-family: var(--font-title);
   font-size: 13px;
@@ -2559,7 +2555,7 @@ button:focus-visible,
   font-size: 13px;
   font-weight: 500;
   text-align: left;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
   cursor: pointer;
   position: relative;
 }
@@ -2639,6 +2635,11 @@ button:focus-visible,
   background: var(--md-surface-c-high);
   color: var(--md-on-surface);
   border-radius: 999px;
+}
+/* Override propio (no el bloque compartido de mas arriba en el archivo —
+   .mute-btn se define aca, despues, y ganaria por orden de fuente igual). */
+@media (max-width: 1023px), (pointer: coarse) {
+  .mute-btn { width: 44px; height: 44px; }
 }
 
 /* Game Over / Ending */
@@ -2724,7 +2725,7 @@ button:focus-visible,
   font-family: var(--font-body);
   font-size: 16px;
   color: var(--md-on-surface);
-  transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+  transition: border-color var(--md-dur-short3) var(--ease), box-shadow var(--md-dur-short3) var(--ease);
 }
 #playerNameInput:focus {
   outline: none;
@@ -3043,7 +3044,7 @@ button:focus-visible,
 }
 .equip-sum-stat small {
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -3212,10 +3213,27 @@ button:focus-visible,
   font-weight: 600;
   letter-spacing: .04em;
   cursor: pointer;
-  transition: filter .15s var(--ease);
+  transition: filter var(--md-dur-short3) var(--ease);
 }
 .btn:hover { filter: brightness(1.08); }
+/* .btn y .btn-action son dos sistemas de boton "filled" separados con el
+   mismo rol semantico — no se unifican (tocaria el padding de docenas de
+   botones ya en produccion) pero al menos comparten la misma sensacion de
+   interaccion en press/foco. */
+.btn:active { filter: brightness(.96); }
+.btn:focus-visible {
+  outline: 2px solid var(--md-on-primary);
+  outline-offset: 3px;
+}
 .btn.small { padding: 6px 14px; font-size: 11px; }
+.skill-cost {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(0,0,0,.15);
+}
 .btn.outlined {
   background: transparent;
   border: 1px solid var(--md-outline);
@@ -3257,7 +3275,7 @@ button:focus-visible,
 .save-slot-meta {
   font-size: 12px;
   color: var(--md-on-surface-variant);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 .save-slot-actions {
   display: flex;
@@ -3446,7 +3464,7 @@ button:focus-visible,
   text-transform: uppercase;
   border-bottom: 2px solid transparent;
   margin-bottom: -5px;
-  transition: color .15s var(--ease);
+  transition: color var(--md-dur-short3) var(--ease);
 }
 .craft-tab:hover { color: var(--md-on-surface); }
 .craft-tab.active {
@@ -3478,7 +3496,7 @@ button:focus-visible,
   border: 1px solid var(--md-outline-variant);
   border-radius: var(--r-md);
   cursor: pointer;
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
 }
 .craft-recipe-card:hover {
   background: var(--md-surface-c-high);
@@ -3618,7 +3636,7 @@ button:focus-visible,
 .rarity-badge {
   display: inline-block;
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -3816,7 +3834,13 @@ button:focus-visible,
   border-color: var(--md-outline);
   opacity: .65;
 }
-.mm-grid > .mm-empty {
+/* .mm-grid > .mm-empty nunca calzaba con nada — minimap.js genera
+   class="mm-cell mm-void" para celdas sin ubicacion, no "mm-empty" (ese
+   nombre lo usa el div de mensaje top-level "no hay mapa que mostrar",
+   fuera de .mm-grid). Las celdas vacias caian al fallback .mm-cell
+   generico (caja gris con borde) en vez de quedar en blanco. */
+.mm-grid > .mm-empty,
+.mm-grid > .mm-void {
   background: transparent;
   border: none;
   cursor: default;
@@ -3892,7 +3916,7 @@ button:focus-visible,
 }
 .jstat label {
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -3979,7 +4003,7 @@ button:focus-visible,
   background: var(--md-surface-c-low);
   border: 1px solid var(--md-outline-variant);
   border-radius: var(--r-md);
-  transition: all .15s var(--ease);
+  transition: all var(--md-dur-short3) var(--ease);
 }
 .ach-card.unlocked {
   border-color: var(--md-primary);
@@ -4021,7 +4045,7 @@ button:focus-visible,
   top: 6px;
   right: 6px;
   font-family: var(--font-ui);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -4112,7 +4136,7 @@ button:focus-visible,
   top: 2px;
   right: 2px;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .04em;
   color: var(--md-primary);
@@ -4368,13 +4392,17 @@ button:focus-visible,
   flex-wrap: wrap;
 }
 .npc-quest-badge {
+  display: inline-block;
   font-family: var(--font-ui);
-  font-size: .69rem;
+  font-size: 11px;
   letter-spacing: .07em;
+  text-transform: uppercase;
   padding: 3px 10px;
-  border-radius: 99px;
+  border-radius: 999px;
   font-weight: 700;
   white-space: nowrap;
+  margin-right: 6px;
+  border: 1px solid transparent;
 }
 /* Sin prefijo "status-" — ui.js/questlog.js generan la clase de estado
    directa (ej. "active", "locked", "ready"), nunca "status-active". */
@@ -5141,7 +5169,7 @@ kbd {
   letter-spacing: .04em;
   padding: 8px 20px;
   min-height: 36px;
-  transition: opacity .15s, background .15s, transform .1s;
+  transition: opacity var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), transform var(--md-dur-short2) var(--ease);
   white-space: nowrap;
 }
 .intro-btn:active { transform: scale(.97); }
@@ -5186,7 +5214,7 @@ kbd {
   border: 1.5px solid var(--md-outline, #49454f); border-radius: 20px;
   background: transparent; color: var(--md-on-surface, #e6e1e5);
   font-family: inherit; font-size: .85rem; cursor: pointer;
-  transition: background .15s, border-color .15s, transform .1s;
+  transition: background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease), transform var(--md-dur-short2) var(--ease);
 }
 .diff-chip:hover, .origin-chip:hover, .mod-chip:hover { border-color: var(--diff-color); transform: translateY(-1px); }
 .diff-chip.selected, .origin-chip.selected, .mod-chip.selected {
@@ -5220,7 +5248,7 @@ kbd {
   .cs-dot {
     width: 8px; height: 8px; border-radius: 50%;
     background: var(--md-outline-variant);
-    transition: background .15s, transform .15s;
+    transition: background var(--md-dur-short3) var(--ease), transform var(--md-dur-short3) var(--ease);
   }
   .cs-dot-active { background: var(--md-primary, #d0bcff); transform: scale(1.3); }
   .cs-step { display: none; }
@@ -5288,7 +5316,7 @@ kbd {
 .mastery-bar {
   height: 100%; border-radius: 3px;
   background: linear-gradient(90deg, #fbbf24, #f59e0b);
-  transition: width .3s ease;
+  transition: width var(--md-dur-medium2) var(--ease);
 }
 .mastery-xp { font-size: .72rem; color: var(--c-muted); white-space: nowrap; }
 
@@ -5303,7 +5331,7 @@ kbd {
   background: var(--md-surface-c);
   color: var(--md-on-surface, #e6e1e5);
   font-family: inherit; cursor: pointer;
-  transition: border-color .15s, background .15s, transform .1s;
+  transition: border-color var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), transform var(--md-dur-short2) var(--ease);
 }
 .spec-card:hover, .spec-card:focus-visible {
   border-color: var(--md-primary, #d0bcff);
@@ -5355,7 +5383,7 @@ kbd {
 }
 .onb-card.visible { opacity: 1; transform: translateY(0); }
 .onb-icon { font-size: 1.5rem; line-height: 1.2; flex-shrink: 0; }
-.onb-text { font-size: 14px; line-height: 1.45; flex: 1; }
+.onb-text { font-size: 14px; line-height: 1.4; flex: 1; }
 .onb-btn {
   flex-shrink: 0;
   align-self: flex-end;
