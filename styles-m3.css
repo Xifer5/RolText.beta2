@@ -1980,6 +1980,61 @@ button:focus-visible,
   color: var(--md-on-surface-variant);
   overflow-wrap: break-word;
 }
+/* M3 — filas de la tienda (#shopBuyList/#shopSellList, ver shop.js) sin estas
+   reglas: .shop-compare-chip son 3 <span> inline sin separador en el DOM, así
+   que sin display/gap propios el navegador los pegaba uno contra otro
+   ("ATK +4DEF 0MAG 0") — mismo layout que .inv-item-namewrap/.equipment-compare. */
+.shop-row-icon {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 16px;
+  object-fit: contain;
+  background: var(--md-surface-c);
+  border: 1px solid var(--md-outline-variant);
+  padding: 6px;
+}
+.shop-row-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+.shop-row-name {
+  font-weight: 600;
+  color: var(--md-on-surface);
+  overflow-wrap: break-word;
+}
+.shop-row-attrs {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  overflow-wrap: break-word;
+}
+.shop-row-price {
+  font-weight: 600;
+  color: var(--md-primary);
+  white-space: nowrap;
+}
+.shop-compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.shop-compare-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--md-surface-c);
+  border: 1px solid var(--md-outline-variant);
+  color: var(--md-on-surface-variant);
+}
+.shop-compare-chip.is-up { color: var(--c-heal); border-color: var(--c-heal); }
+.shop-compare-chip.is-down { color: var(--c-error); border-color: var(--c-error); }
 .btn.tiny {
   padding: 6px 12px;
   font-size: 11px;
