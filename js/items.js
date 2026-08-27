@@ -1824,9 +1824,6 @@ export const shopInventories = {
   ]
 };
 
-// Backwards-compatibility: default shopInventory maps to town 'shop'
-export const shopInventory = shopInventories.shop;
-
 
 export function addItemToInventory(inventory, itemId, qty = 1) {
   inventory[itemId] = (inventory[itemId] || 0) + qty;

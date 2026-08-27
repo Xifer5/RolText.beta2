@@ -238,29 +238,6 @@ export function getWeaponDamageType(weapon) {
   return weapon.damageType || WEAPON_DAMAGE_TYPES[weapon.id] || "slash";
 }
 
-// ── Alcance de armas (SPEC-0608) ───────────────────────
-// Default = 2 si no está en la tabla
-export const WEAPON_RANGE = {
-  goblin_dagger: 1, dagger: 1,                      // corto
-  vine_whip: 3, trident: 3,                          // largo cuerpo a cuerpo
-  staff: 3, wand: 3, elemental_wand: 3,              // magia
-  bless_staff: 3, water_staff: 3, ocean_staff: 3,
-  flame_staff: 3, spirit_staff: 3, healing_staff: 3,
-};
-
-// Alcance base de enemigos — default = 2
-export const ENEMY_RANGE = {
-  beholder:        4,   // rayos oculares
-  genie:           4,   // magia a distancia
-  warlock:         3,   // magia oscura
-  goblin_shaman:   3,
-  medusa:          3,   // mirada petrificante
-  jungle_spirit:   3,
-  ancient_construct: 3,
-  wyvern:          3,   // embiste desde el aire
-  vine_serpent:    3,
-};
-
 // Devuelve el emoji del tipo de daño para el log
 export const DAMAGE_TYPE_EMOJI = {
   slash:      "🗡️",

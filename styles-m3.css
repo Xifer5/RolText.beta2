@@ -1903,6 +1903,7 @@ button:focus-visible,
   box-shadow: inset 0 1px 3px rgba(0,0,0,.15), var(--elev-1);
 }
 .btn-action.small { padding: 6px 14px; font-size: 11px; }
+.btn-action:disabled { opacity: .4; cursor: not-allowed; filter: grayscale(.4); }
 
 .btn-ghost {
   border: 1px solid var(--md-outline);
@@ -3206,21 +3207,25 @@ button:focus-visible,
   border: none;
   background: var(--md-primary);
   color: var(--md-on-primary);
-  padding: 10px 20px;
+  padding: 10px 24px;
   border-radius: 999px;
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: .04em;
   cursor: pointer;
-  transition: filter var(--md-dur-short3) var(--ease);
+  transition: filter var(--md-dur-short3) var(--ease), box-shadow var(--md-dur-short3) var(--ease), transform var(--md-dur-short3) var(--ease);
 }
-.btn:hover { filter: brightness(1.08); }
-/* .btn y .btn-action son dos sistemas de boton "filled" separados con el
-   mismo rol semantico — no se unifican (tocaria el padding de docenas de
-   botones ya en produccion) pero al menos comparten la misma sensacion de
-   interaccion en press/foco. */
-.btn:active { filter: brightness(.96); }
+.btn:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--elev-2);
+  transform: translateY(-1px);
+}
+.btn:active {
+  filter: brightness(.96);
+  transform: translateY(0);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.25), var(--elev-1);
+}
 .btn:focus-visible {
   outline: 2px solid var(--md-on-primary);
   outline-offset: 3px;
@@ -4303,7 +4308,7 @@ button:focus-visible,
   background: linear-gradient(135deg, rgba(212,175,85,.14), rgba(212,175,85,.06));
   color: var(--gold);
   font-family: var(--font-ui);
-  font-size: .75rem;
+  font-size: 12px;
   letter-spacing: .1em;
   text-transform: uppercase;
   font-weight: 700;
@@ -4344,13 +4349,13 @@ button:focus-visible,
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: 35px;
   flex-shrink: 0;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--npc-color, var(--gold)) 15%, transparent);
 }
 .npc-name {
   font-family: var(--font-title);
-  font-size: 1.05rem;
+  font-size: 17px;
   font-weight: 600;
   color: var(--npc-color, var(--gold));
   margin-bottom: 4px;
@@ -4358,7 +4363,7 @@ button:focus-visible,
 }
 .npc-role {
   font-family: var(--font-ui);
-  font-size: .69rem;
+  font-size: 11px;
   color: var(--c-muted);
   letter-spacing: .1em;
   text-transform: uppercase;
@@ -4366,7 +4371,7 @@ button:focus-visible,
 
 .npc-lore {
   font-family: var(--font-body);
-  font-size: .9rem;
+  font-size: 14px;
   color: var(--c-muted);
   font-style: italic;
   line-height: 1.65;
@@ -4420,7 +4425,7 @@ button:focus-visible,
 }
 .npc-quest-title {
   font-family: var(--font-title);
-  font-size: .9rem;
+  font-size: 14px;
   font-weight: 600;
   color: var(--c-text);
 }
@@ -4428,7 +4433,7 @@ button:focus-visible,
 /* Líneas de diálogo */
 .npc-dialogue {
   font-family: var(--font-body);
-  font-size: .975rem;
+  font-size: 16px;
   color: var(--c-text);
   line-height: 1.75;
 }
@@ -4447,7 +4452,7 @@ button:focus-visible,
 }
 .npc-trainer-header {
   font-family: var(--font-title);
-  font-size: .9rem;
+  font-size: 14px;
   font-weight: 600;
   color: var(--md-on-surface);
   margin-bottom: 10px;
@@ -4463,10 +4468,10 @@ button:focus-visible,
   background: var(--md-surface-c);
   border: 1px solid var(--md-outline-variant);
 }
-.trainer-emoji { font-size: 1.4rem; }
+.trainer-emoji { font-size: 22px; }
 .trainer-info { min-width: 0; }
-.trainer-skill-name { display: block; color: var(--md-on-surface); font-size: .85rem; }
-.trainer-skill-desc { margin: 2px 0 0; font-size: .75rem; color: var(--md-on-surface-variant); line-height: 1.4; }
+.trainer-skill-name { display: block; color: var(--md-on-surface); font-size: 14px; }
+.trainer-skill-desc { margin: 2px 0 0; font-size: 12px; color: var(--md-on-surface-variant); line-height: 1.4; }
 .trainer-learn-btn.learned { color: var(--c-heal); border-color: var(--c-heal); background: transparent; }
 
 .npc-actions {
@@ -5203,7 +5208,7 @@ kbd {
 /* ── Selector de dificultad (character select) ── */
 .difficulty-row { margin: var(--sp-5) 0; text-align: center; }
 .difficulty-label {
-  display: block; font-size: .8rem; font-weight: 600;
+  display: block; font-size: 13px; font-weight: 600;
   color: var(--c-muted); text-transform: uppercase; letter-spacing: .06em;
   margin-bottom: var(--sp-2);
 }
@@ -5213,7 +5218,7 @@ kbd {
   min-height: 44px; padding: 8px 16px;
   border: 1.5px solid var(--md-outline, #49454f); border-radius: 20px;
   background: transparent; color: var(--md-on-surface, #e6e1e5);
-  font-family: inherit; font-size: .85rem; cursor: pointer;
+  font-family: inherit; font-size: 14px; cursor: pointer;
   transition: background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease), transform var(--md-dur-short2) var(--ease);
 }
 .diff-chip:hover, .origin-chip:hover, .mod-chip:hover { border-color: var(--diff-color); transform: translateY(-1px); }
@@ -5223,11 +5228,11 @@ kbd {
   font-weight: 700;
 }
 .diff-desc {
-  margin-top: var(--sp-2); font-size: .78rem; font-style: italic;
+  margin-top: var(--sp-2); font-size: 12px; font-style: italic;
   color: var(--c-muted); min-height: 1.2em;
 }
 .diff-effects {
-  margin-top: 4px; font-size: .74rem;
+  margin-top: 4px; font-size: 12px;
   font-family: var(--font-ui);
   color: var(--md-on-surface-variant); min-height: 1.2em;
 }
@@ -5237,7 +5242,7 @@ kbd {
 .cs-progress { display: none; }
 .cs-nav { display: none; }
 .cs-summary {
-  text-align: center; font-size: .9rem; color: var(--c-muted);
+  text-align: center; font-size: 14px; color: var(--c-muted);
   margin: var(--sp-4) 0; min-height: 1.4em;
 }
 @media (max-width: 767px) {
@@ -5296,19 +5301,19 @@ kbd {
 /* ── Maestría de armas (stats modal) ── */
 .mastery-section { margin-top: var(--sp-5); text-align: left; }
 .mastery-section-title {
-  font-size: .85rem; font-weight: 700; letter-spacing: .04em;
+  font-size: 14px; font-weight: 700; letter-spacing: .04em;
   color: var(--md-on-surface-variant); margin-bottom: var(--sp-3);
 }
 .mastery-list { display: flex; flex-direction: column; gap: var(--sp-2); }
-.mastery-empty { font-size: .8rem; font-style: italic; }
+.mastery-empty { font-size: 13px; font-style: italic; }
 .mastery-row {
   display: flex; align-items: center; gap: var(--sp-3);
   padding: 8px 10px; border-radius: 10px;
   background: var(--md-surface-c);
 }
-.mastery-emoji { font-size: 1.1rem; }
+.mastery-emoji { font-size: 18px; }
 .mastery-info { flex: 1; min-width: 0; }
-.mastery-label { display: block; font-size: .78rem; margin-bottom: 4px; }
+.mastery-label { display: block; font-size: 12px; margin-bottom: 4px; }
 .mastery-bar-wrap {
   height: 6px; border-radius: 3px; overflow: hidden;
   background: var(--md-surface-c-highest);
@@ -5318,11 +5323,11 @@ kbd {
   background: linear-gradient(90deg, #fbbf24, #f59e0b);
   transition: width var(--md-dur-medium2) var(--ease);
 }
-.mastery-xp { font-size: .72rem; color: var(--c-muted); white-space: nowrap; }
+.mastery-xp { font-size: 11px; color: var(--c-muted); white-space: nowrap; }
 
 /* ── Especialización ── */
 .spec-section { margin-top: var(--sp-5); text-align: left; }
-.spec-locked { font-size: .8rem; font-style: italic; }
+.spec-locked { font-size: 13px; font-style: italic; }
 .spec-choice-grid { display: flex; flex-direction: column; gap: var(--sp-3); }
 .spec-card {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
@@ -5338,17 +5343,17 @@ kbd {
   background: var(--md-surface-c-high);
   transform: translateY(-1px);
 }
-.spec-card-emoji { font-size: 1.6rem; }
-.spec-card-name { font-weight: 700; font-size: .95rem; color: var(--md-primary, #d0bcff); }
-.spec-card-desc { font-size: .78rem; color: var(--c-muted); line-height: 1.4; }
+.spec-card-emoji { font-size: 26px; }
+.spec-card-name { font-weight: 700; font-size: 15px; color: var(--md-primary, #d0bcff); }
+.spec-card-desc { font-size: 12px; color: var(--c-muted); line-height: 1.4; }
 .spec-badge {
   display: flex; align-items: center; gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4); border-radius: 12px;
   border: 1.5px solid var(--md-primary, #d0bcff);
   background: color-mix(in srgb, var(--md-primary, #d0bcff) 12%, transparent);
 }
-.spec-badge-emoji { font-size: 1.8rem; }
-.spec-badge p { font-size: .76rem; color: var(--c-muted); margin-top: 2px; }
+.spec-badge-emoji { font-size: 29px; }
+.spec-badge p { font-size: 12px; color: var(--c-muted); margin-top: 2px; }
 
 /* ═══════════════════════════════════════════════════════════
    ONBOARDING HINTS (SPEC-0801) — primeros 5 minutos

@@ -79,29 +79,10 @@ export function trySpawnBoss(biomeId, ambushMult = 1) {
 }
 
 
-// -----------------------------------------------------
-// Función principal usada desde tu sistema de combate
-// -----------------------------------------------------
-// Uso sugerido:
-// const bossId = getBossForBiome(location.biome);
-// if (bossId) startCombat(bossId);
-
 // SPEC-1104: identifica positivamente un mini-boss (nunca el boss principal
 // de zona, que vive en biome.boss, ni dragon_king, que no está en ninguna
 // lista miniBosses[]) — usado para habilitar el botón "Perdonar" solo en ellos.
 export function isMiniBossId(enemyId) {
   return Object.values(biomeBosses).some(b => b.miniBosses.includes(enemyId));
-}
-
-export function getBossForBiome(biomeId) {
-  const biome = biomeBosses[biomeId];
-  if (!biome) return null;
-
-  // Probabilidad dinámica (puede ajustarse según progreso del jugador)
-  if (Math.random() <= biome.spawnChance) {
-    return trySpawnBoss(biomeId);
-  }
-
-  return null;
 }
 

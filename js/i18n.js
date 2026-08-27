@@ -1187,6 +1187,3 @@ export function translatePage(root = document.body) {
   });
 }
 
-export function getSupportedLocales() {
-  return Object.keys(dictionaries);
-}

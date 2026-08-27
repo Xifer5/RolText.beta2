@@ -104,10 +104,3 @@ export function getLastMessages(count = 10) {
 export function getAllMessages() {
   return gameState.messages || [];
 }
-
-/**
- * Fuerza scroll al final inmediatamente
- */
-export function scrollToBottom() {
-  forceScroll();
-}
