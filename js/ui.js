@@ -402,8 +402,11 @@ export function updateUI() {
           `<span class="enemy-intent-chip" role="img" ` +
           `aria-label="${t("intentChipAria")}: ${label}" ` +
           `data-tooltip="${t("intentChipAria")}">${meta.icon} ${label}</span>`;
-        // SPEC-0904: recomendación contextual según lo telegrafiado
-        const adviceKey = hidden ? null : INTENT_ADVICE_KEYS[nextAction];
+        // SPEC-0904: recomendación contextual según lo telegrafiado.
+        // SPEC-1203: en Imposible se suprime (el chip de intent sigue
+        // mostrando QUÉ va a hacer el enemigo, pero no CÓMO contrarrestarlo
+        // — "sin piedad" deja de ser solo un multiplicador de daño).
+        const adviceKey = (hidden || gameState.difficulty === "impossible") ? null : INTENT_ADVICE_KEYS[nextAction];
         if (adviceKey) intentAdvice = `<span class="enemy-intent-advice">💡 ${t(adviceKey)}</span>`;
       }
       ui["enemy-name"].innerHTML =

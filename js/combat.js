@@ -609,6 +609,13 @@ export function applyDamageToEnemy(dmg, damageType) {
     final = reduced;
   }
   enemy.hp = Math.max(0, (enemy.hp || 0) - final);
+  // SPEC-1205 — instrumentación de balance, no rebalance a ciegas: la
+  // auditoría de jugabilidad marcó las especializaciones como "desbalanceadas
+  // en el papel" pero pidió confirmar con números reales del playtest
+  // pendiente antes de tocar cualquier multiplicador. Este contador (único
+  // punto por el que pasa TODO el daño del jugador al enemigo) es lo que
+  // convierte ese playtest en datos comparables en vez de una impresión.
+  gameState.stats.damageDealt = (gameState.stats.damageDealt || 0) + final;
   updateUI();
 }
 

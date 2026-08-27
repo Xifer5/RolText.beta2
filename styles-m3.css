@@ -3252,6 +3252,51 @@ button:focus-visible,
 /* ═══════════════════════════════════════════════════════════
    SAVE SLOTS (SPEC-0805)
    ═══════════════════════════════════════════════════════════ */
+/* SPEC-1201 — tienda de legado (Fragmentos de Eco), vive arriba de la lista
+   de la Crónica en el mismo modal. */
+.legacy-shop-section { margin-bottom: 16px; }
+.legacy-shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .04em;
+  margin-bottom: 10px;
+}
+.legacy-fragments-total { color: var(--md-primary); font-weight: 700; }
+.legacy-shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.legacy-perk-card {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--md-outline-variant);
+  background: var(--md-surface-c-low);
+}
+.legacy-perk-card.unlocked { border-color: var(--md-primary); background: var(--md-surface-c); }
+.legacy-perk-icon { font-size: 20px; text-align: center; }
+.legacy-perk-body { min-width: 0; }
+.legacy-perk-name { font-family: var(--font-ui); font-weight: 700; font-size: 12px; }
+.legacy-perk-desc { font-size: 11px; color: var(--md-on-surface-variant); line-height: 1.4; }
+.legacy-perk-owned {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--c-heal);
+  white-space: nowrap;
+}
+.legacy-buy-btn:disabled { opacity: .4; cursor: not-allowed; }
+
 .save-slots-content { max-width: 480px; }
 .save-slots-list {
   display: flex;

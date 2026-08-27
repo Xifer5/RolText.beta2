@@ -13,6 +13,16 @@ import { endCombat } from "./combatRewards.js";
 
 // SPEC-1103: rasgos aleatorios de enemigo (solo no-boss) — rejugabilidad
 const ENEMY_TRAIT_CHANCE = 0.25;
+// SPEC-1203 — auditoría de jugabilidad 2026-08-27: la dificultad nombrada
+// (Fácil/Aventura/Difícil/Imposible) solo escalaba números, mientras los
+// modificadores opcionales (niebla/cruel/escaso) sí cambiaban CÓMO se juega.
+// Esta es la primera pieza de dificultad-como-comportamiento: en Difícil/
+// Imposible más enemigos comunes traen un rasgo (Furioso/Ladrón/Antiguo/
+// Regenerador/Cobarde) — variedad táctica real, no solo HP/ATK más altos.
+const HARD_TRAIT_CHANCE_BONUS = { hard: 0.15, impossible: 0.25 };
+function getTraitChance() {
+  return ENEMY_TRAIT_CHANCE + (HARD_TRAIT_CHANCE_BONUS[gameState.difficulty] || 0);
+}
 const ENEMY_TRAITS = ["furious", "thief", "ancient", "regenerator", "coward"];
 const THIEF_GOLD_STEAL_PCT = 0.15;
 const COWARD_HP_THRESHOLD = 0.2;
@@ -21,7 +31,7 @@ const COWARD_FLEE_CHANCE = 0.6;
 // SPEC-1103: rasgos aleatorios de enemigo (solo no-boss, rejugabilidad).
 // Muta `enemy` in-place (mismo objeto que gameState.currentEnemy).
 export function assignRandomTrait(enemy, isBoss) {
-  if (isBoss || Math.random() >= ENEMY_TRAIT_CHANCE) return;
+  if (isBoss || Math.random() >= getTraitChance()) return;
   const trait = ENEMY_TRAITS[Math.floor(Math.random() * ENEMY_TRAITS.length)];
   enemy.trait = trait;
   if (trait === "furious") {

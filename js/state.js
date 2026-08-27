@@ -29,7 +29,8 @@ export const initialGameState = {
     kills: 0,
     bossKills: 0,
     locationsVisited: 0,
-    enemiesDefeated: {}
+    enemiesDefeated: {},
+    damageDealt: 0  // SPEC-1205: instrumentación de balance — ver [[project_uiux_audit_2026-08]] item #6
   },
   currentLocationId: "town",
   currentEnemy: null,

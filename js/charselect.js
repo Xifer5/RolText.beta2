@@ -5,13 +5,14 @@ import { CLASS_DEFINITIONS, applyClassBonuses } from "./classes.js";
 import { DIFFICULTY_CONFIG, getDifficultyEffects } from "./difficulty.js";
 import { ORIGINS, applyOrigin } from "./origins.js";
 import { MODIFIERS, MODIFIER_XP_BONUS } from "./modifiers.js";
+import { LEGACY_PERKS, isPerkUnlocked, applyLegacyPerk, getVictories } from "./metaProgress.js";
 import { gameState, resetState } from "./state.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { setupRadioGroupArrowNav } from "./a11yRadioNav.js";
-import { rollRumors, QUEST_DATA } from "./quests.js";
+import { rollRumors, QUEST_DATA, RUMOR_COUNT } from "./quests.js";
 
 const STEP_COUNT = 5; // SPEC-1006: 0=Clase+Nombre 1=Origen 2=Dificultad 3=Modificadores 4=Confirmar
 
@@ -113,6 +114,18 @@ export function showCharacterSelect(onComplete) {
           </div>
           <p class="diff-desc" id="modDesc"></p>
         </div>
+        ${LEGACY_PERKS.some(p => isPerkUnlocked(p.id)) ? `
+        <div class="difficulty-row" style="margin-top:var(--sp-4)">
+          <label class="difficulty-label">${t('legacyLabel')}</label>
+          <div class="difficulty-chips" role="group" aria-label="${t('legacyLabel')}">
+            ${LEGACY_PERKS.filter(p => isPerkUnlocked(p.id)).map(p => `
+              <button type="button" class="mod-chip selected" data-legacy="${p.id}" aria-pressed="true">
+                ${p.icon} ${localizeText(p.name)}
+              </button>
+            `).join("")}
+          </div>
+          <p class="diff-desc" id="legacyDesc"></p>
+        </div>` : ""}
       </div>
 
       <div class="cs-step" data-step="4">
@@ -167,6 +180,9 @@ export function showCharacterSelect(onComplete) {
   let selectedDifficulty = "easy";
   let selectedOrigin = "exile";
   const selectedModifiers = new Set(); // SPEC-1004: 0-3 apilables, ninguno por defecto
+  // SPEC-1201: perks de legado ya desbloqueados, activos por defecto (el
+  // jugador ya pagó el fragmento — apagarlos es la excepción, no la regla).
+  const selectedLegacyPerks = new Set(LEGACY_PERKS.filter(p => isPerkUnlocked(p.id)).map(p => p.id));
 
   // Modifier selection (SPEC-1004) — chips checkbox, no radio
   const updateModInfo = () => {
@@ -181,7 +197,11 @@ export function showCharacterSelect(onComplete) {
     el.textContent = `${descs} ${formatText('modXpBonusLine', { xp })}`;
   };
   updateModInfo();
-  modal.querySelectorAll(".mod-chip").forEach(chip => {
+  // :not([data-legacy]) — los chips de legado de abajo reusan la clase visual
+  // .mod-chip pero NO son modificadores; sin este filtro este querySelectorAll
+  // también los agarra y les pega un segundo listener que ensucia
+  // selectedModifiers con `undefined` (bug real, encontrado en vivo con gstack).
+  modal.querySelectorAll(".mod-chip:not([data-legacy])").forEach(chip => {
     chip.addEventListener("click", () => {
       const id = chip.dataset.mod;
       const active = selectedModifiers.has(id);
@@ -189,6 +209,25 @@ export function showCharacterSelect(onComplete) {
       chip.classList.toggle("selected", !active);
       chip.setAttribute("aria-pressed", String(!active));
       updateModInfo();
+    });
+  });
+
+  // Legacy perk toggles (SPEC-1201) — chips, no radio, apagables individualmente
+  const updateLegacyInfo = () => {
+    const el = modal.querySelector("#legacyDesc");
+    if (!el) return;
+    const active = LEGACY_PERKS.filter(p => selectedLegacyPerks.has(p.id));
+    el.textContent = active.length ? active.map(p => localizeText(p.desc)).join(" ") : t('legacyNoneLine');
+  };
+  updateLegacyInfo();
+  modal.querySelectorAll("[data-legacy]").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const id = chip.dataset.legacy;
+      const active = selectedLegacyPerks.has(id);
+      if (active) selectedLegacyPerks.delete(id); else selectedLegacyPerks.add(id);
+      chip.classList.toggle("selected", !active);
+      chip.setAttribute("aria-pressed", String(!active));
+      updateLegacyInfo();
     });
   });
 
@@ -283,6 +322,8 @@ export function showCharacterSelect(onComplete) {
     gameState.player.name = name;
     applyClassBonuses(gameState.player, selectedClass);
     applyOrigin(gameState, selectedOrigin); // antes de recalcular máximos: sus stats cuentan
+    // SPEC-1201: perks de legado (oro/ítem inicial) — después del origen, no tocan stats base
+    selectedLegacyPerks.forEach(id => applyLegacyPerk(gameState, id));
     // Sync hp/mp to the recalculated maximums for the chosen class
     const s = calculateTotalStats(gameState.player, gameState.equipment);
     gameState.player.maxHp = s.maxHp;
@@ -322,10 +363,18 @@ export function showCharacterSelect(onComplete) {
     }
 
     // SPEC-1109: objetivos secundarios de esta partida — 3 rumores al azar
-    const rumors = rollRumors();
+    // (+1 si el perk de legado "Oído en el Camino" está activo — SPEC-1201)
+    const rumorCount = RUMOR_COUNT + (selectedLegacyPerks.has("legacy_rumor") ? 1 : 0);
+    const rumors = rollRumors(Math.random, rumorCount);
     if (rumors.length) {
       const list = rumors.map(id => localizeText(QUEST_DATA[id].title)).join(", ");
       addMessage(formatText(t('rumorsRolledMsg'), { list }), "system");
+    }
+
+    // SPEC-1204: New Game+ liviano — badge cosmético, cero cambios de balance
+    const ngPlus = getVictories();
+    if (ngPlus > 0) {
+      addMessage(formatText(t('ngPlusMsg'), { n: ngPlus }), "system");
     }
 
     updateUI();
@@ -338,7 +387,7 @@ export function showCharacterSelect(onComplete) {
     const profileRole = document.querySelector(".profile-role");
     const profileAvatar = document.querySelector(".profile-avatar");
     if (profileName) profileName.textContent = name;
-    if (profileRole) profileRole.textContent = `${t('profileLevelPrefix')} 1 ${cls.name.toUpperCase()}`;
+    if (profileRole) profileRole.textContent = `${t('profileLevelPrefix')} 1 ${cls.name.toUpperCase()}${ngPlus > 0 ? ` · NG+${ngPlus}` : ""}`;
     if (profileAvatar) profileAvatar.textContent = cls.emoji;
 
     if (onComplete) onComplete();

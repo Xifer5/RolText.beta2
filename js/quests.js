@@ -319,11 +319,13 @@ export const RUMOR_POOL = [
 ];
 export const RUMOR_COUNT = 3;
 
-/** Elige RUMOR_COUNT ids distintos de RUMOR_POOL y los activa. rng inyectable para tests. */
-export function rollRumors(rng = Math.random) {
+/** Elige `count` (default RUMOR_COUNT) ids distintos de RUMOR_POOL y los activa.
+ *  rng inyectable para tests. `count` override lo usa el perk de legado
+ *  "Oído en el Camino" (metaProgress.js) para sumar 1 rumor extra. */
+export function rollRumors(rng = Math.random, count = RUMOR_COUNT) {
   const pool = [...RUMOR_POOL];
   const chosen = [];
-  for (let i = 0; i < RUMOR_COUNT && pool.length; i++) {
+  for (let i = 0; i < count && pool.length; i++) {
     const idx = Math.floor(rng() * pool.length);
     chosen.push(pool.splice(idx, 1)[0]);
   }

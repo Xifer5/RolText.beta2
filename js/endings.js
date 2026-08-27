@@ -23,6 +23,32 @@ export function computeEndingTone(flags = {}) {
   return { score, tone };
 }
 
+// SPEC-1202 — el arco de Kestrel (rivalArc.js) resuelve su propio worldFlag
+// (rival_resolved_ally/traitor/competitor) totalmente separado de
+// MORAL_DECISIONS a propósito (ver rivalArc.js) — no cambia el tono del
+// final, pero SÍ necesita aparecer en el recap: era el sistema de personaje
+// recurrente más grande del juego y el epílogo nunca lo mencionaba.
+const RIVAL_RECAP = {
+  rival_resolved_ally:       { icon: "🤝", key: "recapRivalAlly" },
+  rival_resolved_traitor:    { icon: "🔪", key: "recapRivalTraitor" },
+  rival_resolved_competitor: { icon: "⚔️", key: "recapRivalCompetitor" }
+};
+
+function getRivalRecap(flags = {}) {
+  const [, entry] = Object.entries(RIVAL_RECAP).find(([flag]) => flags[flag]) ?? [];
+  return entry ?? null;
+}
+
+// SPEC-1202 — coda de 1 frase por clase×tono (9 combinaciones), anexada al
+// texto base del tono. Multiplica la variedad real de epílogo de 3 a 9
+// textos distintos sin tocar el cálculo de tono (que sigue siendo el mismo
+// rango ±5 de MORAL_DECISIONS — solo se le agrega voz, no más buckets).
+const CLASS_BEAT_KEYS = {
+  warrior: { light: "endingBeatWarriorLight", gray: "endingBeatWarriorGray", dark: "endingBeatWarriorDark" },
+  mage:    { light: "endingBeatMageLight",    gray: "endingBeatMageGray",    dark: "endingBeatMageDark" },
+  rogue:   { light: "endingBeatRogueLight",   gray: "endingBeatRogueGray",   dark: "endingBeatRogueDark" }
+};
+
 /** Contenido del final: claves de título/texto por tono + recap de decisiones tomadas. */
 export function getEndingContent(flags = {}) {
   const { score, tone } = computeEndingTone(flags);
@@ -32,7 +58,9 @@ export function getEndingContent(flags = {}) {
     tone,
     titleKey: `endingTitle${cap}`,
     textKey: `endingText${cap}`,
-    recapKeys: MORAL_DECISIONS.filter(d => flags[d.flag]).map(d => d.recapKey)
+    classBeatKey: CLASS_BEAT_KEYS[gameState.player?.class]?.[tone] ?? null,
+    recapKeys: MORAL_DECISIONS.filter(d => flags[d.flag]).map(d => d.recapKey),
+    rivalRecap: getRivalRecap(flags)
   };
 }
 
@@ -46,7 +74,9 @@ export function showEnding() {
   const title = document.getElementById("ending-title");
   const msg   = document.getElementById("endingMessage");
   if (title) title.textContent = t(content.titleKey);
-  if (msg)   msg.textContent   = t(content.textKey);
+  if (msg)   msg.textContent   = content.classBeatKey
+    ? `${t(content.textKey)} ${t(content.classBeatKey)}`
+    : t(content.textKey);
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set("ending-level", p.level ?? 1);
@@ -55,9 +85,9 @@ export function showEnding() {
 
   const list = document.getElementById("ending-decisions");
   if (list) {
-    list.innerHTML = content.recapKeys.length
-      ? content.recapKeys.map(k => `<li>${t(k)}</li>`).join("")
-      : `<li>${t("recapNone")}</li>`;
+    const items = content.recapKeys.map(k => `<li>${t(k)}</li>`);
+    if (content.rivalRecap) items.push(`<li>${content.rivalRecap.icon} ${t(content.rivalRecap.key)}</li>`);
+    list.innerHTML = items.length ? items.join("") : `<li>${t("recapNone")}</li>`;
   }
 
   modal.classList.remove("hidden");
