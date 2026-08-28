@@ -46,11 +46,19 @@ function addFragments(amount) {
   return amount;
 }
 
+// SPEC-1208 — última cantidad ganada al cerrar una partida, para que el
+// resumen post-run (endings.js: showEnding()/showGameOver()) pueda mostrarla
+// sin tener que enhebrar el valor de retorno de recordRun() a través de los
+// 4 call-sites de derrota en combat.js/bossMechanics.js.
+let _lastRunFragments = 0;
+export function getLastRunFragments() { return _lastRunFragments; }
+
 /** Fragmentos ganados al cerrar una partida (victoria O derrota — un intento
  *  siempre suma algo al legado, no solo ganar). Llamado desde runLog.recordRun(). */
 export function earnFragments(rec) {
   const amount = 2 + (rec.bossKills || 0) * 2 + Math.floor((rec.level || 1) / 5) + (rec.outcome === "victory" ? 5 : 0);
   addFragments(amount);
+  _lastRunFragments = amount;
   addMessage(formatText(t("fragmentsEarnedMsg"), { amount }), "system");
   return amount;
 }

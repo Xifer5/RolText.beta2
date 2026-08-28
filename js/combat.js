@@ -38,6 +38,7 @@ import { isEnemyAvailable, applyTimeModifiers } from "./timeOfDay.js";
 
 import { delay, tryLastBreath, resistanceAdviceFor } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
+import { showGameOver } from "./endings.js";
 import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
 import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
 import { playerAttack, playerMagic, playerDefend, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
@@ -93,7 +94,7 @@ export function setupCombat() {
   window.addEventListener("pixel:interrupt", () => handleAction(playerInterrupt));
   window.addEventListener("pixel:spare", () => handleAction(playerSpare));
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
-  window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss));
+  window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss, e.detail?.extraMult));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
 }
 
@@ -162,7 +163,12 @@ function rollEnemyIntent() {
   enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
 }
 
-export function startCombat(enemyType, isBoss = false) {
+// SPEC-1207 — extraMult: hook de escalada opcional para contenido fuera de la
+// curva normal (hoy solo lo usa echoTrials.js). Se aplica ANTES de rollear el
+// intent/fase inicial del jefe para que todo lea el HP/ATK ya final — parchear
+// gameState.currentEnemy después de startCombat() dejaría rollEnemyIntent()/
+// updateBossPhase() decidiendo con números viejos.
+export function startCombat(enemyType, isBoss = false, extraMult = null) {
   const base = enemyData?.[enemyType];
   if (!base) { addMessage(formatText(t('enemyUnknownError'), { type: enemyType }), "system"); return; }
 
@@ -171,8 +177,10 @@ export function startCombat(enemyType, isBoss = false) {
     ? 1.6 + lvl * 0.08   // jefes escalan más fuerte
     : 1   + lvl * 0.05;
   const diff = getDifficultyConfig(gameState.difficulty);
-  const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult * diff.hp);
-  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk * cruelAtkMult(gameState));
+  const xHp  = extraMult?.hp  ?? 1;
+  const xAtk = extraMult?.atk ?? 1;
+  const scaledHp  = Math.floor((base.maxHp  ?? base.hp  ?? 10)  * lvlMult * diff.hp * xHp);
+  const scaledAtk = Math.floor((base.attack ?? 5) * (isBoss ? 1.4 + lvl * 0.04 : 1) * diff.atk * cruelAtkMult(gameState) * xAtk);
   const scaledDef = Math.floor((base.defense ?? 0) * diff.def);
   // SPEC-0701: bonos/penalidades de día o noche sobre el ataque/defensa base
   const { attack: timedAtk, defense: timedDef } = applyTimeModifiers(enemyType, scaledAtk, scaledDef);
@@ -475,7 +483,7 @@ export async function enemyTurn() {
     addMessage(t('combatGameOverDefeated'), "combat");
     recordRun("defeat");
     updateUI();
-    setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+    setTimeout(() => showGameOver(), 800);
     return;
   }
 
@@ -581,7 +589,7 @@ function processPlayerDebuffs() {
     addMessage(t('combatStatusEffectsDefeat'), "combat");
     recordRun("defeat");
     updateUI();
-    setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+    setTimeout(() => showGameOver(), 800);
     return true;
   }
   return false;

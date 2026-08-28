@@ -24,6 +24,7 @@ import { DEFEND_DAMAGE_MULT } from "./enemyAI.js";
 import { applyResistance, getWeaponDamageType, getEffectiveResistances, ENEMY_COMBAT_DATA } from "./damageTypes.js";
 import { delay, tryLastBreath } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
+import { showGameOver } from "./endings.js";
 import { applyDamageToEnemy, tickBuffs, enemyTurn } from "./combat.js";
 
 // SPEC-1101: mecánicas de boss — % del maxHp actual del jugador
@@ -106,7 +107,7 @@ export function resolveDevour(enemy, p) {
     addMessage(t('combatStatusEffectsDefeat'), "combat");
     recordRun("defeat");
     updateUI();
-    setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+    setTimeout(() => showGameOver(), 800);
     return true;
   }
   return false;
@@ -136,7 +137,7 @@ export function resolveOverload(enemy, p) {
     addMessage(t('combatStatusEffectsDefeat'), "combat");
     recordRun("defeat");
     updateUI();
-    setTimeout(() => document.getElementById("gameOverModal")?.classList.remove("hidden"), 800);
+    setTimeout(() => showGameOver(), 800);
     return true;
   }
   return false;

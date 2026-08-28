@@ -677,6 +677,15 @@
   <div class="modal-content modal-content-xs modal-text-center">
     <h2 id="game-over-title" class="gameover-title" data-i18n="gameOverTitle">💀 GAME OVER 💀</h2>
     <p class="modal-body-text" data-i18n="gameOverText">Has caído en tu aventura.</p>
+    <div class="ending-stats-grid">
+      <div><div class="es-label" data-i18n="endingLevelLabel">Nivel</div><div class="es-val" id="go-level">0</div></div>
+      <div><div class="es-label" data-i18n="endingGoldLabel">Oro</div><div class="es-val gold-accent" id="go-gold">0</div></div>
+      <div><div class="es-label" data-i18n="fragmentsLabel">Fragmentos</div><div class="es-val" id="go-fragments">✨ 0</div></div>
+    </div>
+    <div class="ending-decisions-block">
+      <div class="es-label" data-i18n="endingDecisionsLabel">El mundo recuerda</div>
+      <ul id="go-decisions" class="ending-decisions"></ul>
+    </div>
     <button id="restartBtn" class="btn-action" data-i18n="retryButton">🔄 Intentar de nuevo</button>
   </div>
 </div>
@@ -702,6 +711,7 @@
       <div><div class="es-label" data-i18n="endingLevelLabel">Nivel</div><div class="es-val" id="ending-level">0</div></div>
       <div><div class="es-label" data-i18n="endingGoldLabel">Oro</div><div class="es-val gold-accent" id="ending-gold">0</div></div>
       <div><div class="es-label" data-i18n="endingXpLabel">XP</div><div class="es-val" id="ending-xp">0</div></div>
+      <div><div class="es-label" data-i18n="fragmentsLabel">Fragmentos</div><div class="es-val" id="ending-fragments">✨ 0</div></div>
     </div>
     <div class="ending-decisions-block">
       <div class="es-label" data-i18n="endingDecisionsLabel">El mundo recuerda</div>

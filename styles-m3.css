@@ -2652,7 +2652,7 @@ button:focus-visible,
 }
 .ending-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
   gap: 8px;
   margin: 16px 0;
 }
@@ -2684,7 +2684,14 @@ button:focus-visible,
   font-size: 14px;
   font-weight: 600;
   color: var(--md-primary);
-  margin: 4px 0 12px;
+  margin: 4px 0 0;
+}
+.echo-trials-scale {
+  text-align: center;
+  font-size: 12px;
+  color: var(--c-error);
+  font-weight: 600;
+  margin: 2px 0 12px;
 }
 .echo-trials-warning {
   font-size: 12px;
@@ -5240,13 +5247,18 @@ kbd {
   white-space: nowrap;
 }
 .intro-btn:active { transform: scale(.97); }
+/* .intro-btn-ghost y .intro-page-counter se dejan en blanco/rgba a propósito:
+   viven siempre sobre los fondos cinematográficos oscuros de .ipv-* (dirección
+   de arte por escena, no debe trackear el tema claro/oscuro de la app) — solo
+   se tokenizan los botones "de marca" (primary/accent), que sí deben verse
+   con el mismo dorado que el resto del juego. */
 .intro-btn-ghost  { background: transparent; color: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.15); }
 .intro-btn-ghost:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.7); }
-.intro-btn-primary { background: var(--md-primary, #8b7355); color: #fff; }
+.intro-btn-primary { background: var(--gold); color: var(--md-on-primary); }
 .intro-btn-primary:hover { opacity: .9; }
 .intro-btn-dim  { opacity: .55; }
-.intro-btn-accent { background: linear-gradient(135deg, #c8a96e, #a07840); color: #0a0808; font-weight: 700; box-shadow: 0 2px 12px rgba(200,169,110,.4); }
-.intro-btn-accent:hover { box-shadow: 0 4px 20px rgba(200,169,110,.6); }
+.intro-btn-accent { background: linear-gradient(135deg, var(--gold), var(--gold-dim)); color: var(--md-on-primary); font-weight: 700; box-shadow: 0 2px 12px color-mix(in srgb, var(--gold) 40%, transparent); }
+.intro-btn-accent:hover { box-shadow: 0 4px 20px color-mix(in srgb, var(--gold) 60%, transparent); }
 
 /* ── Animación de entrada de página ───────────────────── */
 @keyframes page-enter {

@@ -4,90 +4,90 @@ import { playMusic } from "./sounds.js";
 // Cada página tiene hasta 3 paneles revelados uno a uno.
 // img: ruta relativa desde la raíz (null = usa fondo CSS como fallback).
 const PAGES = [
-  // Página 1 — El Mundo que Fue
+  // Página 1 — El Mundo que Cantaba
   {
     layout: "wide-top",
     music: "forest",
     panels: [
       {
         visual: "ipv-stars",
-        caption: "En el principio, Aetheria era un mundo de magia y luz. Sus bosques cantaban, sus ríos brillaban, sus montañas tocaban las estrellas.",
+        caption: "En el principio, Aetheria era un mundo joven. Sus bosques cantaban, sus ríos guardaban la luz de las estrellas y la magia corría libre bajo la tierra.",
         img: "img/intro/p1_stars.webp"
       },
       {
         visual: "ipv-guardian",
-        caption: "Un dragón antiguo velaba por todo ello. No como conquistador. Como guardián. Los humanos lo llamaban: el Rey Dragón.",
+        caption: "Sobre aquel mundo velaba un dragón. No gobernaba desde un trono ni exigía obediencia. Enseñó a los ríos su camino, entregó la magia a los mortales y protegió cuanto había aprendido a amar.",
         img: "img/intro/p1_guardian.webp"
       },
       {
         visual: "ipv-name",
-        caption: "Su nombre era Asterion. Hoy, nadie lo recuerda.",
+        caption: "Tuvo un nombre. Uno que fue pronunciado en canciones, juramentos y plegarias. Pero el tiempo pasó... y Aetheria aprendió a olvidarlo.",
         img: "img/intro/p1_name.webp"
       }
     ]
   },
-  // Página 2 — El Fin de una Era
+  // Página 2 — El Nombre Borrado
   {
     layout: "tall-left",
     music: "cave",
     panels: [
       {
         visual: "ipv-hourglass",
-        caption: "Hace mil años, Asterion murió.\nO eso creían todos.",
+        caption: "Mil años después, solo quedaron leyendas contradictorias: unas hablaban de un guardián; otras, de un rey terrible que quiso someter el mundo.",
         img: "img/intro/p2_hourglass.webp"
       },
       {
         visual: "ipv-cracks",
-        caption: "Pero los sueños de un dragón no mueren fácilmente.",
+        caption: "Sus templos fueron abandonados. Sus estatuas perdieron el rostro. Su nombre desapareció de los libros... como si alguien hubiera querido arrancarlo de la historia.",
         img: "img/intro/p2_cracks.webp"
       },
       {
         visual: "ipv-forest",
-        caption: "Y los sueños que sangran... se convierten en pesadillas.",
+        caption: "Pero aquello que el mundo olvida no siempre desaparece. A veces permanece bajo las raíces, esperando. A veces sueña.",
         img: "img/intro/p2_forest.webp"
       }
     ]
   },
-  // Página 3 — La Corrupción
+  // Página 3 — Las Heridas del Mundo
   {
     layout: "wide-bottom",
     music: "swamp",
     panels: [
       {
         visual: "ipv-volcano",
-        caption: "Las montañas vomitaron fuego. Las tormentas no cedían.",
+        caption: "Entonces las montañas despertaron envueltas en fuego. El hielo descendió desde el norte y antiguas ruinas abrieron sus ojos bajo la tierra.",
         img: "img/intro/p3_volcano.webp"
       },
       {
         visual: "ipv-eyes",
-        caption: "Y en el fondo de todo... algo antiguo comenzó a despertar.",
+        caption: "Criaturas que alguna vez fueron pacíficas comenzaron a atacar. No por hambre. No por crueldad. Huían de algo que solo ellas podían escuchar.",
         img: "img/intro/p3_eyes.webp"
       },
       {
         visual: "ipv-people",
-        caption: "Nadie sabía qué causaba la corrupción. Solo sabían que Aetheria estaba muriendo.",
+        caption: "Los reinos se acusaron entre sí. Los sabios hablaron de una maldición. Nadie comprendía la verdad. Solo sabían que Aetheria estaba muriendo... y que algo antiguo lloraba bajo sus ruinas.",
         img: "img/intro/p3_people.webp"
       }
     ]
   },
-  // Página 4 — La Esperanza
+  // Página 4 — La Voz en Oakhaven
   {
     layout: "tall-left",
     music: "forest",
     panels: [
       {
         visual: "ipv-candle",
-        caption: "Una anciana en Oakhaven escuchó algo.\nUn susurro entre las ruinas.",
+        caption: "Una noche, durante la Fiesta de las Primeras Nieves, las campanas de Oakhaven sonaron sin que nadie tocara sus cuerdas.",
         img: "img/intro/p4_candle.webp"
       },
       {
         visual: "ipv-scroll",
-        caption: "\"No busques al dragón para matarlo,\" susurraba.\n\"Búscalo para recordarlo.\"",
+        caption: "Entre la música y el viento, una sola persona escuchó una voz imposible:\n\n\"Devuélveme... mi nombre.\"",
         img: "img/intro/p4_scroll.webp"
       },
       {
         visual: "ipv-hero",
-        caption: "Y así llega alguien. Sin leyendas a sus espaldas. Sin destino escrito. Solo la voluntad de escuchar.",
+        caption: "No respondió un rey. Ni un héroe anunciado por las profecías. Respondió alguien sin leyendas a sus espaldas... pero con el valor suficiente para escuchar.",
         img: "img/intro/p4_hero.webp"
       }
     ]
@@ -105,7 +105,7 @@ const PAGES = [
       },
       {
         visual: "ipv-dark",
-        caption: "Aetheria te llama.\n¿Quién serás tú?",
+        caption: "Un mundo está olvidando su propia historia.\nUn dragón sueña bajo sus heridas.\n\nAetheria te llama.\n¿Qué elegirás recordar?",
         isLast: true,
         img: null
       }
@@ -202,11 +202,15 @@ function _buildPanel(panel, idx) {
     vis.appendChild(vig);
   }
 
-  // Panel especial: ASTERION — letras animadas desde distintas direcciones
+  // Panel especial: el nombre borrado — mismas letras animadas de siempre,
+  // pero ahora redactadas (▓) en vez de deletrear "ASTERION". El texto de
+  // esta página evita nombrar al dragón a propósito (se revela recién en
+  // el clímax) — mostrar el nombre completo acá lo arruinaría de entrada.
+  // La animación ahora LEE como "un nombre tachado", no como una revelación.
   if (panel.visual === "ipv-name") {
     const wrap = document.createElement("div");
     wrap.className = "ipv-name-letters";
-    "ASTERION".split("").forEach(ch => {
+    "▓▓▓▓▓▓▓▓".split("").forEach(ch => {
       const span = document.createElement("span");
       span.className = "name-letter";
       span.textContent = ch;

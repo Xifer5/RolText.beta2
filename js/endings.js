@@ -1,6 +1,7 @@
 // SPEC-1001 — finales según decisiones: el epílogo refleja cómo jugaste, no solo que ganaste.
 import { gameState } from "./state.js";
 import { t } from "./i18n.js";
+import { getLastRunFragments } from "./metaProgress.js";
 
 // Decisiones morales que el mundo recuerda (worldFlags → línea de recap + peso moral)
 export const MORAL_DECISIONS = [
@@ -64,6 +65,14 @@ export function getEndingContent(flags = {}) {
   };
 }
 
+// SPEC-1208 — recap de decisiones compartido entre el modal de victoria y el
+// de derrota: mismo contenido (el mundo recuerda lo mismo, ganes o pierdas).
+function decisionRecapHtml(content) {
+  const items = content.recapKeys.map(k => `<li>${t(k)}</li>`);
+  if (content.rivalRecap) items.push(`<li>${content.rivalRecap.icon} ${t(content.rivalRecap.key)}</li>`);
+  return items.length ? items.join("") : `<li>${t("recapNone")}</li>`;
+}
+
 /** Abre el modal de final con stats, epílogo según tono y recap de decisiones. */
 export function showEnding() {
   const modal = document.getElementById("endingModal");
@@ -79,16 +88,35 @@ export function showEnding() {
     : t(content.textKey);
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set("ending-level", p.level ?? 1);
-  set("ending-gold",  p.gold ?? 0);
-  set("ending-xp",    p.experience ?? 0);
+  set("ending-level",     p.level ?? 1);
+  set("ending-gold",      p.gold ?? 0);
+  set("ending-xp",        p.experience ?? 0);
+  set("ending-fragments", `✨ ${getLastRunFragments()}`);
 
   const list = document.getElementById("ending-decisions");
-  if (list) {
-    const items = content.recapKeys.map(k => `<li>${t(k)}</li>`);
-    if (content.rivalRecap) items.push(`<li>${content.rivalRecap.icon} ${t(content.rivalRecap.key)}</li>`);
-    list.innerHTML = items.length ? items.join("") : `<li>${t("recapNone")}</li>`;
-  }
+  if (list) list.innerHTML = decisionRecapHtml(content);
+
+  modal.classList.remove("hidden");
+}
+
+// SPEC-1208 — resumen post-run también en derrota (antes gameOverModal era
+// "GAME OVER" + botón, sin nada más): mismo recap de decisiones + fragmentos
+// ganados que ya tenía la victoria. NO reusa título/texto de tono (serían
+// narrativamente incoherentes en una derrota — "Guardián de Aetheria" al
+// morir no tiene sentido), solo las partes tono-neutrales: stats y recap.
+export function showGameOver() {
+  const modal = document.getElementById("gameOverModal");
+  if (!modal) return;
+  const p = gameState.player;
+  const content = getEndingContent(gameState.worldFlags ?? {});
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("go-level",     p.level ?? 1);
+  set("go-gold",      p.gold ?? 0);
+  set("go-fragments", `✨ ${getLastRunFragments()}`);
+
+  const list = document.getElementById("go-decisions");
+  if (list) list.innerHTML = decisionRecapHtml(content);
 
   modal.classList.remove("hidden");
 }

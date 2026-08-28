@@ -4,7 +4,8 @@
 // infraestructura de combate/boss ya existente — CERO IA/mecánica nueva:
 // cada "prueba" es simplemente re-pelear uno de los 7 jefes de zona vía el
 // mismo `pixel:startCombat` que ya usan Kestrel/mini-boss/echoIntro. El único
-// código nuevo es "cuál jefe toca" y "qué pasa cuando lo tumbás".
+// código nuevo es "cuál jefe toca", "cuánto escala" y "qué pasa cuando lo
+// tumbás".
 //
 // Decisión de diseño: NO se inventó un sistema de "muerte segura". Morir en
 // una Prueba es una derrota como cualquier otra (mismo flujo de Game Over de
@@ -22,6 +23,25 @@ export const TRIAL_BOSSES = [
   "ancient_construct", "swamp_abomination", "inferno_dragon", "frost_wyrm"
 ];
 
+// SPEC-1207 — escalada real y visible (feedback de review 2026-08-28: la
+// dificultad antes solo subía de forma implícita porque el jugador ganaba
+// niveles al jugar, nunca se garantizaba ni se mostraba). Nivel 1 = jefe
+// base; cada nivel extra suma +10% HP / +5% daño. Cada vuelta completa a los
+// 7 jefes (un "ciclo") suma otro +10%/+5% acumulado, para que seguir
+// grindeando más allá de la primera vuelta siga sintiéndose más duro.
+const PER_LEVEL_HP  = 0.10;
+const PER_LEVEL_ATK = 0.05;
+const PER_CYCLE_HP  = 0.10;
+const PER_CYCLE_ATK = 0.05;
+
+export function trialMultiplier(level) {
+  const cycles = Math.floor((level - 1) / TRIAL_BOSSES.length);
+  return {
+    hp:  1 + (level - 1) * PER_LEVEL_HP  + cycles * PER_CYCLE_HP,
+    atk: 1 + (level - 1) * PER_LEVEL_ATK + cycles * PER_CYCLE_ATK
+  };
+}
+
 function currentTrialBoss() {
   const level = gameState.echoTrials?.level ?? 0;
   return TRIAL_BOSSES[level % TRIAL_BOSSES.length];
@@ -31,6 +51,11 @@ export function renderEchoTrials() {
   const trials = gameState.echoTrials ?? { level: 0, best: 0 };
   const bossId = currentTrialBoss();
   const bossName = enemyData[bossId]?.type ?? bossId;
+  const nextLevel = trials.level + 1;
+  const mult = trialMultiplier(nextLevel);
+  const scaleLine = mult.hp > 1
+    ? formatText(t('echoTrialsScaleLine'), { hp: Math.round((mult.hp - 1) * 100), atk: Math.round((mult.atk - 1) * 100) })
+    : t('echoTrialsScaleBaseLine');
   return `
     <div class="echo-trials-panel">
       <p>${t('echoTrialsIntro')}</p>
@@ -38,7 +63,8 @@ export function renderEchoTrials() {
         <div><div class="es-label">${t('echoTrialsCurrentLabel')}</div><div class="es-val">${trials.level}</div></div>
         <div><div class="es-label">${t('echoTrialsBestLabel')}</div><div class="es-val gold-accent">${trials.best ?? 0}</div></div>
       </div>
-      <p class="echo-trials-next">${formatText(t('echoTrialsNextLabel'), { n: trials.level + 1, boss: bossName })}</p>
+      <p class="echo-trials-next">${formatText(t('echoTrialsNextLabel'), { n: nextLevel, boss: bossName })}</p>
+      <p class="echo-trials-scale">${scaleLine}</p>
       <p class="echo-trials-warning">⚠️ ${t('echoTrialsWarning')}</p>
       <button type="button" id="startEchoTrialBtn" class="btn-action">${t('echoTrialsStartButton')}</button>
     </div>`;
@@ -55,19 +81,33 @@ function startNextTrial() {
   saveGame(); // red de seguridad ANTES de marcar la prueba activa (ver nota de diseño arriba)
   gameState.echoTrialActive = true;
   document.getElementById("panelModal")?.classList.add("hidden");
-  window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: currentTrialBoss(), isBoss: true } }));
+  const nextLevel = (gameState.echoTrials?.level ?? 0) + 1;
+  window.dispatchEvent(new CustomEvent("pixel:startCombat", {
+    detail: { enemyId: currentTrialBoss(), isBoss: true, extraMult: trialMultiplier(nextLevel) }
+  }));
 }
 
-// combatRewards.js dispatca "pixel:bossDefeated" en TODO kill de boss (zona,
-// mini-boss, dragon_king, kestrel_rival...). Solo actuamos si coincide
-// exactamente con el jefe que ESTA prueba pidió — cualquier otro boss kill
-// (exploración normal, Kestrel) pasa de largo sin efecto.
-window.addEventListener("pixel:bossDefeated", (e) => {
-  if (!gameState.echoTrialActive || e.detail?.enemyId !== currentTrialBoss()) return;
+// Lógica pura (sin efectos de UI) para poder testearla directo — el stub de
+// DOM de los tests no implementa un EventTarget real en window/document, y
+// programar el toast acá adentro dejaba un setTimeout vivo disparando
+// después de terminado el test (requestAnimationFrame no definido en el
+// stub). El toast se programa en el listener de abajo, no acá.
+export function handleBossDefeated(enemyId) {
+  if (!gameState.echoTrialActive || enemyId !== currentTrialBoss()) return null;
   gameState.echoTrialActive = false;
   const trials = (gameState.echoTrials ??= { level: 0, best: 0 });
   trials.level += 1;
   trials.best = Math.max(trials.best ?? 0, trials.level);
   const bonus = earnTrialFragments(trials.level);
-  setTimeout(() => showToast(formatText(t('echoTrialClearedToast'), { n: trials.level, bonus }), "boss"), 2000);
+  return { level: trials.level, bonus };
+}
+
+// combatRewards.js dispatca "pixel:bossDefeated" en TODO kill de boss (zona,
+// mini-boss, dragon_king, kestrel_rival...). handleBossDefeated() ya filtra
+// por coincidencia exacta con el jefe que ESTA prueba pidió — cualquier otro
+// boss kill (exploración normal, Kestrel) pasa de largo sin efecto.
+window.addEventListener("pixel:bossDefeated", (e) => {
+  const result = handleBossDefeated(e.detail?.enemyId);
+  if (!result) return;
+  setTimeout(() => showToast(formatText(t('echoTrialClearedToast'), { n: result.level, bonus: result.bonus }), "boss"), 2000);
 });
