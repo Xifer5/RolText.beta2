@@ -1,5 +1,16 @@
 # INTRO.md — Pixel Quest Echoes: El Último Sueño del Dragón
-## Guión cinematográfico de introducción (15 paneles)
+## Guión cinematográfico de introducción
+
+> **Nota (2026-08-28)**: este documento describía originalmente 15 paneles
+> en 3 actos, pero la implementación real (`js/intro.js`) siempre usó 5
+> páginas de hasta 3 paneles cada una (13 paneles + título). El texto de
+> abajo quedó desactualizado tras la reescritura de esta fecha — el guión
+> real y vigente está en `js/intro.js` (`const PAGES`), no acá. Se deja este
+> archivo como referencia de tono/reglas de producción, no como texto
+> literal. Los cambios clave de la reescritura 2026-08-28: el nombre del
+> dragón ya no se revela en el Panel 3 (ver "Regla de Asterion" abajo, ahora
+> también aplica al *nombre*, no solo a la imagen) y la pregunta final del
+> Panel 15 cambió de "¿Quién serás tú?" a "¿Qué elegirás recordar?".
 
 ---
 
@@ -15,6 +26,12 @@ Tono: poético, melancólico, esperanzador. Música dinámica que cambia en el a
 - Nunca cara, cuerpo completo ni expresión clara
 
 Esta regla aplica en la intro, en el combate final y en cualquier arte generado.
+
+**Extensión 2026-08-28 — regla del nombre**: tampoco se revela su *nombre*
+completo antes del clímax. El panel que antes deletreaba "ASTERION" letra
+por letra ahora anima bloques redactados (▓▓▓▓▓▓▓▓) — mismo efecto visual,
+pero lee como censura en vez de revelación. El nombre real debe sentirse
+como una conquista narrativa, no un dato de la página 1.
 
 ---
 
@@ -156,9 +173,12 @@ Esta regla aplica en la intro, en el combate final y en cualquier arte generado.
 ### Panel 15 — EL LLAMADO
 **Visual:** Fundido a negro. Texto centrado, blanco puro.  
 **Música:** fade out suave  
-**Texto:**
+**Texto (actualizado 2026-08-28):**
+> *Un mundo está olvidando su propia historia.*  
+> *Un dragón sueña bajo sus heridas.*
+>
 > *Aetheria te llama.*  
-> *¿Quién serás tú?*
+> *¿Qué elegirás recordar?*
 
 Botón: **[ Comenzar Aventura ]**
 

@@ -298,4 +298,77 @@ En el cielo aparece una estrella con forma de dragón.
 
 ---
 
-*Última actualización: 2026-06-13 · Estado: diseño aprobado, implementación en curso (Bloque A)*
+## Actualización 2026-08-28 — Intro reescrita
+
+El guión de la introducción (`js/intro.js`) se reescribió con un planteo más
+fuerte del misterio central, manteniendo la misma estructura técnica (5
+páginas, mismos layouts/música/imágenes — solo cambió el texto):
+
+- **Nuevo eje**: el nombre del dragón se vuelve el misterio explícito desde
+  la página 1 ("Tuvo un nombre... Aetheria aprendió a olvidarlo") en vez de
+  revelarse directo. El panel especial que antes deletreaba "ASTERION"
+  letra por letra ahora anima 8 bloques redactados (▓) — la animación
+  refuerza el olvido en vez de arruinar la sorpresa.
+- **Pregunta final cambiada**: de *"Aetheria te llama. ¿Quién serás tú?"* a
+  *"Un mundo está olvidando su propia historia. Un dragón sueña bajo sus
+  heridas. Aetheria te llama. ¿Qué elegirás recordar?"* — conecta
+  directamente con el tema central del juego (la memoria como acto moral)
+  en vez de ser una pregunta genérica de creación de personaje.
+- Línea núcleo nueva de la página 2: *"Pero aquello que el mundo olvida no
+  siempre desaparece. A veces permanece bajo las raíces, esperando. A veces
+  sueña."*
+
+**Fuente**: el usuario aportó el guión mejorado desde un documento narrativo
+externo más amplio (ver sección siguiente). Solo se aplicó la parte de la
+intro — es 100% compatible con la estructura de código existente.
+
+## Documento de historia mejorada (evaluado, NO implementado en bloque)
+
+El usuario compartió una reescritura narrativa mucho más profunda (fuente:
+`pixel-quest-echoes_historia-mejorada.md`, generado con Codex) que
+introduce un antagonista ideológico completo (Valdris — que en esta doc
+YA existe como el Archimago aliado de MQ-02; la versión mejorada lo
+recontextualiza como antagonista secreto), a Eryndel y Pyrax con arcos
+propios, una estructura de 3 actos/10 capítulos, un clímax de 4 fases
+basado en "8 heridas/emociones" del dragón, y **tres finales alternativos**
+en vez del final único de tono que describe este documento:
+
+1. **La Constelación** (canónico) — el jugador devuelve todos los recuerdos
+   al Corazón; Asterion muere sabiendo quién fue (bueno y tirano a la vez).
+   El corazón se vuelve constelación. Es, en esencia, una versión más rica
+   del "Final verdadero" que ya está documentado arriba en este archivo.
+2. **El Nuevo Guardián** — el jugador toma la Corona y absorbe el Corazón:
+   salva el mundo pero queda atado al Trono para siempre. Final heroico y
+   amargo, sin equivalente actual.
+3. **La Edad de los Mortales** — el jugador destruye el Corazón: termina la
+   corrupción, pero también la magia. Aetheria sobrevive sin milagros. Sin
+   equivalente actual.
+
+**Evaluación**: la escritura es sólida y los 7 jefes de zona coinciden 1:1
+con los nombres ya usados en este documento (Titán del Bosque, Devorador,
+Coloso, Constructo, Abominación, Wyrm de Escarcha, Dragón Infernal) — pero
+el resto (antagonista nuevo, personajes con arcos completos, el sistema de
+3 finales, el clímax de 8 heridas) es contenido y sistemas que no existen
+todavía y representan un proyecto propio, no un ajuste de sesión. Queda
+como norte narrativo a futuro, no como tarea inmediata. El documento
+completo vive fuera del repo, en la carpeta de Codex del usuario — pedirlo
+de nuevo si se retoma esta línea de trabajo.
+
+## Deuda de jugabilidad pendiente (no narrativa, de la revisión 2026-08-28)
+
+Con nota global 8.4/10, el usuario dejó pendientes estos 4 ítems (los
+primeros 3 de su lista de 7 ya se implementaron — tests de meta-progresión,
+resumen post-run en derrota, escalada real de Pruebas del Eco):
+
+4. **Visibilidad de build**: mostrar diffs antes/después en level-up y al
+   elegir especialización (ej. "Antes: daño mágico 14. Ahora: 18").
+5. **2-3 eventos de viaje cruzados concretos** (clase+origen+ítem+decisión),
+   acotados a ejemplos puntuales — NO un sistema general de combinaciones.
+6. **Voz narrativa de Kestrel ampliada**: que reaccione a número de runs, a
+   si ya se venció al Rey Dragón (NG+), etc.
+7. **Telegraph narrativo de bosses**: texto atmosférico antes del consejo
+   táctico 💡 que ya existe (ej. "Dobla las rodillas. Algo enorme viene.").
+
+---
+
+*Última actualización: 2026-08-28 · Estado: Bloque A implementado (5 misiones principales, 7 jefes de zona, finales por tono) · Ver sección de arriba para la evaluación del documento de historia mejorada y la deuda pendiente*
