@@ -76,31 +76,3 @@ export function addMessage(text, type = "narrative") {
   autoScroll();
 }
 
-/**
- * Limpia el área de historia
- */
-export function clearStory() {
-  const storyEl = document.getElementById("story");
-  if (storyEl) {
-    storyEl.innerHTML = "";
-  }
-  forceScroll();
-}
-
-/**
- * Obtiene los últimos mensajes
- * @param {number} count - Número de mensajes a obtener
- * @returns {Array} Array de últimos mensajes
- */
-export function getLastMessages(count = 10) {
-  const messages = gameState.messages || [];
-  return messages.slice(-count);
-}
-
-/**
- * Obtiene todos los mensajes
- * @returns {Array} Array de todos los mensajes
- */
-export function getAllMessages() {
-  return gameState.messages || [];
-}

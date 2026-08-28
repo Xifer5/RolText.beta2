@@ -150,8 +150,6 @@ export function playMusic(key) {
   if (!_musicMuted) _fade(audio, 0, _musicVolume, 900);
 }
 
-export function stopMusic() { playMusic(null); }
-
 function _fade(audio, from, to, ms, cb) {
   const steps = 20;
   const step  = { n: 0 };
