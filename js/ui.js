@@ -320,6 +320,12 @@ function updateDirectionControls(loc, inCombat) {
 export function updateUI() {
   if (!ui.gold) initUICache();
 
+  // SPEC-1206: Pruebas del Eco solo aparece tras vencer al Rey Dragón —
+  // toggle liviano, no vale la pena cachear en `ui{}` para algo que cambia
+  // una sola vez por partida.
+  document.getElementById("echoTrialsNavBtn")?.classList.toggle("hidden", !gameState.mainQuestCompleted);
+  document.getElementById("echoTrialsMobBtn")?.classList.toggle("hidden", !gameState.mainQuestCompleted);
+
   const p = gameState.player;
   const derived = calculateTotalStats(p, gameState.equipment);
   const hpMax = derived.maxHp || p.maxHp || 1;

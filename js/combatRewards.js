@@ -97,6 +97,11 @@ export function endCombat(victory, fled = false, enemyFled = false) {
     recordEnemyKill(enemy.id);
     if (enemy.isBoss) {
       recordBossKill();
+      // SPEC-1206: hook genérico para Pruebas del Eco (echoTrials.js) — se
+      // dispara en TODO boss kill (zona, mini-boss, dragon_king, rival); el
+      // listener filtra por enemyId, así que un boss kill normal de
+      // exploración no interfiere con una prueba en curso.
+      window.dispatchEvent(new CustomEvent("pixel:bossDefeated", { detail: { enemyId: enemy.id } }));
       setTimeout(() => { saveGame(); showToast(t('victorySaved')); }, 800);
       // SPEC-1110: recap ceremonial solo para el boss principal de zona — ni
       // mini-bosses (perdonables, ya tienen su propio flujo) ni dragon_king

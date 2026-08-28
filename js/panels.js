@@ -20,6 +20,7 @@ import { updateUI } from "./ui.js";
 import { renderMinimap } from "./minimap.js";
 import { renderAchievements, checkAchievements } from "./achievements.js";
 import { renderCrafting, wireCraftingPanel } from "./crafting.js";
+import { renderEchoTrials, wireEchoTrialsPanel } from "./echoTrials.js";
 
 // ── MODAL GENÉRICO ──────────────────────────────────────
 function openPanel(title, html) {
@@ -331,6 +332,10 @@ export function setupPanelListeners() {
       else if (p === "crafting") {
         openPanel(t('craftingPanelTitle'), renderCrafting());
         wireCraftingPanel(document.getElementById("panelModalBody"));
+      }
+      else if (p === "echotrials") {
+        openPanel(t('echoTrialsPanelTitle'), renderEchoTrials());
+        wireEchoTrialsPanel();
       }
     });
   });

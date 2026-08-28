@@ -57,7 +57,9 @@ export const initialGameState = {
   difficulty: "easy",
   modifiers: [],       // [ "fog"|"cruel"|"scarce" ] — modificadores de partida (SPEC-1004)
   worldFlags: {},      // { flag: true } — memoria de decisiones (SPEC-0803)
-  travelPacing: { steps: 0, recent: [] }  // pacing de eventos de viaje (SPEC-0804)
+  travelPacing: { steps: 0, recent: [] },  // pacing de eventos de viaje (SPEC-0804)
+  echoTrials: { level: 0, best: 0 },  // SPEC-1206: progreso de esta partida en el gauntlet post-victoria
+  echoTrialActive: false             // true mientras dura el combate de una prueba en curso
 };
 
 export let gameState = deepClone(initialGameState);

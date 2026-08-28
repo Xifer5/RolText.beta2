@@ -2677,6 +2677,23 @@ button:focus-visible,
   color: var(--md-on-surface);
 }
 
+/* SPEC-1206 — Pruebas del Eco */
+.echo-trials-panel .ending-stats-grid { grid-template-columns: repeat(2, 1fr); }
+.echo-trials-next {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--md-primary);
+  margin: 4px 0 12px;
+}
+.echo-trials-warning {
+  font-size: 12px;
+  color: var(--md-on-surface-variant);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+#startEchoTrialBtn { display: block; width: 100%; }
+
 /* Travel event */
 .te-modal { max-width: 480px; text-align: center; }
 .te-icon { font-size: 48px; margin-bottom: 12px; }

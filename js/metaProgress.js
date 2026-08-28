@@ -39,15 +39,27 @@ function writeMeta(meta) {
   try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch { /* storage lleno: no bloquea la partida */ }
 }
 
+function addFragments(amount) {
+  const meta = readMeta();
+  meta.fragments += amount;
+  writeMeta(meta);
+  return amount;
+}
+
 /** Fragmentos ganados al cerrar una partida (victoria O derrota — un intento
  *  siempre suma algo al legado, no solo ganar). Llamado desde runLog.recordRun(). */
 export function earnFragments(rec) {
   const amount = 2 + (rec.bossKills || 0) * 2 + Math.floor((rec.level || 1) / 5) + (rec.outcome === "victory" ? 5 : 0);
-  const meta = readMeta();
-  meta.fragments += amount;
-  writeMeta(meta);
+  addFragments(amount);
   addMessage(formatText(t("fragmentsEarnedMsg"), { amount }), "system");
   return amount;
+}
+
+// SPEC-1206 — Pruebas del Eco: bonus por cada jefe repetible superado,
+// independiente de earnFragments() (esto no cierra la partida, solo una
+// prueba dentro de ella). Escala levemente con la profundidad alcanzada.
+export function earnTrialFragments(trialLevel) {
+  return addFragments(5 + trialLevel * 2);
 }
 
 export const LEGACY_PERKS = [

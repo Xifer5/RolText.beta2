@@ -414,7 +414,7 @@ export const TRAVEL_EVENTS = [
     icon: "🍾",
     title: { en: "Message in a Bottle", es: "Mensaje en una botella" },
     text: { en: "The waves bring a sealed bottle to your feet. Inside is a message written in a trembling hand.", es: "Las olas traen a tus pies una botella sellada. Dentro hay un mensaje escrito con letra temblorosa." },
-    biomes: ["sea", "beach"],
+    biomes: ["beach"],
     choices: [
       {
         label: { en: "Read the message", es: "Leer el mensaje" },
@@ -444,7 +444,7 @@ export const TRAVEL_EVENTS = [
     icon: "⚓",
     title: { en: "Washed Chest", es: "Cofre varado" },
     text: { en: "The tides have deposited a rusted metal chest on the shore.", es: "Las mareas han depositado un cofre con metal oxidado en la orilla." },
-    biomes: ["sea", "beach"],
+    biomes: ["beach"],
     choices: [
       {
         label: { en: "Force the lock", es: "Forzar la cerradura" },
@@ -1088,7 +1088,7 @@ export const TRAVEL_EVENTS = [
     icon: "🗿",
     title: { en: "Ancient Altar", es: "Altar antiguo" },
     text: { en: "Runes cover a weathered altar, still humming faintly with old power. Reading them wrong could wake something.", es: "Runas cubren un altar desgastado, aún vibrando débilmente con poder antiguo. Leerlas mal podría despertar algo." },
-    biomes: ["ruins", "dungeon", "catacomb"],
+    biomes: ["ruin", "dungeon", "catacomb"],
     choices: [
       {
         label: { en: "Study the runes", es: "Estudiar las runas" },
@@ -1155,6 +1155,264 @@ export const TRAVEL_EVENTS = [
           p.hp = Math.max(1, (p.hp ?? 0) - dmg);
           p.experience = (p.experience ?? 0) + 5;
           return { en: `It lashes out as you turn — −${dmg} HP — then flees. +5 XP`, es: `Ataca cuando te das vuelta — −${dmg} HP — y luego huye. +5 XP` };
+        }
+      }
+    ]
+  },
+
+  // ── Expansión de variedad (auditoría de jugabilidad 2026-08-27, hallazgo
+  // bajo #7): ruinas/catacumbas/volcán/desierto/playa tenían muy pocos
+  // eventos propios frente a los universales — el jugador veía repeticiones
+  // mucho antes de terminar una partida típica. 8 eventos nuevos, mismo
+  // patrón y escala de riesgo/recompensa que los ya existentes. ─────────
+  {
+    id: "sealed_sarcophagus",
+    icon: "⚱️",
+    title: { en: "Sealed Sarcophagus", es: "Sarcófago sellado" },
+    text: { en: "A stone sarcophagus, sealed for centuries, radiates a faint chill. The lid isn't fully closed.", es: "Un sarcófago de piedra, sellado por siglos, irradia un frío tenue. La tapa no está del todo cerrada." },
+    biomes: ["catacomb", "ruin"],
+    choices: [
+      {
+        label: { en: "Pry it open", es: "Forzar la tapa" },
+        icon: "🔓",
+        apply() {
+          if (Math.random() < 0.5) {
+            const gold = 20 + Math.floor(Math.random() * 21);
+            gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+            return { en: `Ancient grave goods, untouched. +${gold} gold`, es: `Ofrendas funerarias intactas. +${gold} oro` };
+          }
+          const dmg = 10;
+          gameState.player.hp = Math.max(1, (gameState.player.hp ?? 0) - dmg);
+          return { en: `A curse-ward flares as the seal breaks. −${dmg} HP`, es: `Una salvaguarda maldita estalla al romperse el sello. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Leave the dead in peace", es: "Dejar a los muertos en paz" },
+        icon: "🙏",
+        apply() {
+          return { en: "Whatever rests here, you let it rest.", es: "Lo que sea que descanse ahí, lo dejas descansar." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "fallen_statue",
+    icon: "👑",
+    title: { en: "The Fallen King", es: "El rey caído" },
+    text: { en: "A toppled statue of a forgotten king lies face-down in the rubble, one hand still clutching a shattered scepter.", es: "La estatua caída de un rey olvidado yace boca abajo entre los escombros, una mano todavía aferrada a un cetro roto." },
+    biomes: ["ruin"],
+    choices: [
+      {
+        label: { en: "Study the inscription at its base", es: "Estudiar la inscripción de la base" },
+        icon: "📖",
+        apply() {
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: "A name history erased, and why. The knowledge unsettles you a little. +25 XP", es: "Un nombre que la historia borró, y por qué. El saber te inquieta un poco. +25 XP" };
+        }
+      },
+      {
+        label: { en: "Take the scepter fragment", es: "Tomar el fragmento del cetro" },
+        icon: "💰",
+        apply() {
+          const gold = 20;
+          gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+          return { en: `Old gold is still gold. +${gold} gold`, es: `El oro viejo sigue siendo oro. +${gold} oro` };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "catacomb_whispers",
+    icon: "👻",
+    title: { en: "Whispers in the Dark", es: "Susurros en la oscuridad" },
+    text: { en: "Voices murmur from the walls, just at the edge of hearing. They seem to be saying your name.", es: "Voces murmuran desde las paredes, justo al borde de lo audible. Parecen decir tu nombre." },
+    biomes: ["catacomb"],
+    choices: [
+      {
+        label: { en: "Listen closely", es: "Escuchar con atención" },
+        icon: "👂",
+        apply() {
+          const p = gameState.player;
+          const safe = p.class === "mage" || (p.intelligence ?? 0) >= 12;
+          if (safe || Math.random() < 0.55) {
+            p.mp = Math.min(p.maxMp, (p.mp ?? 0) + 10);
+            p.experience = (p.experience ?? 0) + 15;
+            const msg = safe
+              ? { en: "A trained mind sorts the whispers from the noise — old echoes, nothing more. +10 MP, +15 XP", es: "Una mente entrenada separa los susurros del ruido — ecos viejos, nada más. +10 MP, +15 XP" }
+              : { en: "Just echoes of old grief, not a warning. +10 MP, +15 XP", es: "Solo ecos de un viejo duelo, no una advertencia. +10 MP, +15 XP" };
+            return msg;
+          }
+          const dmg = 8 + Math.floor(Math.random() * 8);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `A whisper claws at your mind. −${dmg} HP`, es: `Un susurro araña tu mente. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Cover your ears and hurry past", es: "Taparte los oídos y apurar el paso" },
+        icon: "🏃",
+        apply() {
+          gameState.player.experience = (gameState.player.experience ?? 0) + 5;
+          return { en: "Better not to know. +5 XP", es: "Mejor no saber. +5 XP" };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "ash_vent",
+    icon: "💨",
+    title: { en: "Ash Vent", es: "Grieta de ceniza" },
+    text: { en: "A vent in the rock hisses super-heated ash. Something glints within the cloud.", es: "Una grieta en la roca exhala ceniza sobrecalentada. Algo brilla dentro de la nube." },
+    biomes: ["volcano"],
+    choices: [
+      {
+        label: { en: "Reach into the ash", es: "Meter la mano en la ceniza" },
+        icon: "🖐️",
+        apply() {
+          if (Math.random() < 0.55) {
+            const gold = 15 + Math.floor(Math.random() * 16);
+            gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+            return { en: `Volcanic glass, prized by alchemists. +${gold} gold`, es: `Vidrio volcánico, apreciado por los alquimistas. +${gold} oro` };
+          }
+          const dmg = 8 + Math.floor(Math.random() * 9);
+          gameState.player.hp = Math.max(1, (gameState.player.hp ?? 0) - dmg);
+          return { en: `The ash burns worse than it looks. −${dmg} HP`, es: `La ceniza quema más de lo que parece. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Skirt around it", es: "Rodearla" },
+        icon: "🚶",
+        apply() {
+          return { en: "Not worth the burn. You continue on.", es: "No vale la pena quemarse. Sigues adelante." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "sleeping_salamander",
+    icon: "🦎",
+    title: { en: "Sleeping Salamander", es: "Salamandra dormida" },
+    text: { en: "A massive fire salamander sleeps curled around a nest of smoldering gems.", es: "Una salamandra de fuego enorme duerme enroscada sobre un nido de gemas humeantes." },
+    biomes: ["volcano"],
+    choices: [
+      {
+        label: { en: "Steal a gem quietly", es: "Robar una gema sin hacer ruido" },
+        icon: "🤏",
+        apply() {
+          const p = gameState.player;
+          const safe = p.class === "rogue" || (p.agility ?? 0) >= 12;
+          if (safe || Math.random() < 0.6) {
+            const gold = 25 + Math.floor(Math.random() * 21);
+            p.gold = (p.gold ?? 0) + gold;
+            const msg = safe
+              ? { en: `Not even a scale twitches. +${gold} gold`, es: `Ni una escama se mueve. +${gold} oro` }
+              : { en: `Your hand is steadier than you expected. +${gold} gold`, es: `Tu mano está más firme de lo que esperabas. +${gold} oro` };
+            return msg;
+          }
+          const dmg = 12 + Math.floor(Math.random() * 9);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `It snaps awake, furious. −${dmg} HP, but you escape with nothing.`, es: `Despierta de golpe, furiosa. −${dmg} HP, pero escapas con las manos vacías.` };
+        }
+      },
+      {
+        label: { en: "Let it sleep", es: "Dejarla dormir" },
+        icon: "😴",
+        apply() {
+          return { en: "Some treasures aren't worth waking a dragon's cousin for.", es: "Algunos tesoros no valen la pena si hay que despertar a un primo de dragón." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "gleaming_shell",
+    icon: "🐚",
+    title: { en: "Gleaming Shell", es: "Concha reluciente" },
+    text: { en: "Something catches the sun in the wet sand — a shell unlike any you've seen, humming faintly.", es: "Algo refleja el sol en la arena mojada — una concha como nunca viste, vibrando levemente." },
+    biomes: ["beach"],
+    choices: [
+      {
+        label: { en: "Pick it up", es: "Recogerla" },
+        icon: "🐚",
+        apply() {
+          const gold = 15;
+          gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+          return { en: `A collector in town would pay well for this. +${gold} gold`, es: `Un coleccionista del pueblo pagaría bien por esto. +${gold} oro` };
+        }
+      },
+      {
+        label: { en: "Leave it for the tide", es: "Dejarla para la marea" },
+        icon: "🌊",
+        apply() {
+          return { en: "The sea gave it, the sea can keep it.", es: "El mar la dio, el mar se la queda." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "desert_caravan_ruins",
+    icon: "🐫",
+    title: { en: "Lost Caravan", es: "Caravana perdida" },
+    text: { en: "The bones of camels and broken wagon wheels mark a caravan that never finished its crossing.", es: "Huesos de camellos y ruedas de carreta rotas marcan una caravana que nunca terminó de cruzar." },
+    biomes: ["desert"],
+    choices: [
+      {
+        label: { en: "Search the wreckage", es: "Registrar los restos" },
+        icon: "🔍",
+        apply() {
+          if (Math.random() < 0.55) {
+            const gold = 20 + Math.floor(Math.random() * 16);
+            gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+            return { en: `Coins scattered under the sand. +${gold} gold`, es: `Monedas dispersas bajo la arena. +${gold} oro` };
+          }
+          const dmg = 8 + Math.floor(Math.random() * 7);
+          gameState.player.hp = Math.max(1, (gameState.player.hp ?? 0) - dmg);
+          return { en: `A scorpion nest was using the wreck for shade. −${dmg} HP`, es: `Un nido de escorpiones usaba los restos como sombra. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Move on, respectfully", es: "Seguir, con respeto" },
+        icon: "🙏",
+        apply() {
+          return { en: "Whoever they were, they deserve to rest undisturbed.", es: "Quienesquiera que fueran, merecen descansar sin que los molesten." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "cruel_mirage",
+    icon: "🌀",
+    title: { en: "Cruel Mirage", es: "Espejismo cruel" },
+    text: { en: "Shapes shimmer on the horizon — water, shade, a city of glass. The desert loves to lie.", es: "Formas titilan en el horizonte — agua, sombra, una ciudad de cristal. Al desierto le encanta mentir." },
+    biomes: ["desert"],
+    choices: [
+      {
+        label: { en: "Chase it", es: "Perseguirlo" },
+        icon: "🏃",
+        apply() {
+          if (Math.random() < 0.45) {
+            const gold = 15;
+            gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+            return { en: `Real, this time — a buried supply cache. +${gold} gold`, es: `Real, esta vez — un alijo de provisiones enterrado. +${gold} oro` };
+          }
+          const dmg = 10;
+          gameState.player.hp = Math.max(1, (gameState.player.hp ?? 0) - dmg);
+          return { en: `Just sand, and precious energy wasted chasing it. −${dmg} HP`, es: `Solo arena, y energía preciosa desperdiciada persiguiéndolo. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Trust your instincts and rest instead", es: "Confiar en tu instinto y descansar" },
+        icon: "🧘",
+        apply() {
+          const hp = 8, mp = 5;
+          gameState.player.hp = Math.min(gameState.player.maxHp, (gameState.player.hp ?? 0) + hp);
+          gameState.player.mp = Math.min(gameState.player.maxMp, (gameState.player.mp ?? 0) + mp);
+          return { en: `You know better than to chase ghosts. +${hp} HP, +${mp} MP`, es: `Sabes que no hay que perseguir fantasmas. +${hp} HP, +${mp} MP` };
         }
       }
     ]
