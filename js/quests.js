@@ -164,12 +164,14 @@ export const QUEST_DATA = {
     reward: { item: "ancient_relic", xp: 50 },
     dialogues: {
       inactive: [
-        { en: "I heard your name in a dream, adventurer.", es: "Escuché tu nombre en un sueño, aventurero." },
+        { en: "Tonight, during the Feast of First Snows, a girl named Mara asked me how her grandmother's old song continued: 'When eight lights guard the sky…' Neither she nor I know the rest.", es: "Esta noche, durante la Fiesta de las Primeras Nieves, una niña llamada Mara me preguntó cómo seguía una vieja canción de su abuela: 'Cuando ocho luces guarden el cielo…' Ni ella ni yo conocemos el resto." },
+        { en: "Soon after, the bells rang on their own. I heard your name in a dream, adventurer.", es: "Poco después, las campanas sonaron solas. Escuché tu nombre en un sueño, aventurero." },
         { en: "The stars weep and the dragon dreams of fire. Only one who hears the echo of the world can restore the song. Take this… it will react when you are near the truth.", es: "Las estrellas lloran y el dragón sueña con fuego. Solo quien escuche el eco del mundo podrá restaurar la canción. Toma esto… reaccionará cuando estés cerca de la verdad." },
         { en: "Begin in the Valdris Forest, to the north. The echo will guide you.", es: "Empieza en el Bosque de Valdris, al norte. El eco te guiará." }
       ],
       active: [
-        { en: "The Valdris Forest awaits you. Head north from Oakhaven.", es: "El Bosque de Valdris te aguarda. Sigue al norte desde Oakhaven." }
+        { en: "The Valdris Forest awaits you. Head north from Oakhaven.", es: "El Bosque de Valdris te aguarda. Sigue al norte desde Oakhaven." },
+        { en: "Before you left, a beast from the forest attacked the village. As it fell, it whispered something it should not have known to say: 'Don't let them erase it again.'", es: "Antes de que partieras, una bestia del bosque atacó el pueblo. Al caer, susurró algo que no debía saber decir: 'No dejes que vuelvan a borrarlo.'" }
       ],
       completed: [
         { en: "You have taken the first step. The relic in your hands trembles… the guardian still breathes.", es: "Has dado el primer paso. La reliquia en tus manos tiembla… el guardián aún respira." },
@@ -201,7 +203,8 @@ export const QUEST_DATA = {
       ],
       completed: [
         { en: "Extraordinary. The Titan fell... but did you hear what it said? 'The dragon is crying.'", es: "Extraordinario. El titán cayó… ¿pero escuchaste lo que dijo? 'El dragón está llorando.'" },
-        { en: "This confirms everything I suspected. The guardians are not corrupted — they are grieving.", es: "Esto confirma todo lo que sospechaba. Los guardianes no están corrompidos — están de luto." }
+        { en: "This confirms everything I suspected. The guardians are not corrupted — they are grieving.", es: "Esto confirma todo lo que sospechaba. Los guardianes no están corrompidos — están de luto." },
+        { en: "Listen — as you find the other seals, bring them to me. Someone must keep them together, away from careless hands. I only want to understand them. I swear it.", es: "Escucha — a medida que encuentres los demás sellos, tráemelos a mí. Alguien debe mantenerlos juntos, lejos de manos descuidadas. Solo quiero comprenderlos. Lo juro." }
       ]
     }
   },

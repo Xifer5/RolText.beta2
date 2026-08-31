@@ -229,6 +229,12 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
       // ya existía. Sin esto el jugador nunca conecta ambos momentos.
       setTimeout(() => addMessage(t("dragonKingNameEcho"), "system"), 300);
       setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 1400);
+    } else if (base.introLine) {
+      // SPEC-1218 — historia mejorada, Acto I: linea de combate opcional por
+      // enemigo (forest_titan/cave_devourer/mountain_colossus por ahora).
+      // Generico a proposito: cualquier boss futuro puede sumar introLine
+      // sin tocar este archivo de nuevo.
+      setTimeout(() => addMessage(base.introLine, "system"), 600);
     }
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");

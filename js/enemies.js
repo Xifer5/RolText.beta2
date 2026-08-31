@@ -720,7 +720,16 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["titan_branch", "inferno_blade"],
+    // introLine/epilogueLines: SPEC-1218 — capitulo 1 de "historia mejorada"
+    // (ver memoria project_equipment_window... no, project_narrative_v2).
+    // deathMessage NO se toca: mq_02_los_sellos lo cita textual en su dialogo
+    // "completed" (quests.js) — cambiarlo desincroniza esa cita.
+    introLine: "—Quedaos... Esta vez, quedaos...",
     deathMessage: "El dragón... está llorando...",
+    epilogueLines: [
+      "El dragón no está despertando. Está soñando que aún vive.",
+      "Cuando el bosque vuelve a respirar, Oakhaven celebra hasta el amanecer. Alguien deja en tu mochila una pequeña figura de madera con forma de dragón."
+    ],
     img: "img/enemies/forest_titan.webp",
   },
   cave_devourer: {
@@ -737,7 +746,11 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["devourer_fang", "inferno_blade"],
+    introLine: "—Silencio... No quiero oír otra vez la sentencia...",
     deathMessage: "No... quería... que me olvidaran...",
+    epilogueLines: [
+      "En lo más profundo de la caverna, una inscripción tallada tiembla bajo tus dedos: «Ocho no fueron las cadenas que el dragón creó. Ocho fueron las cadenas con que lo atamos.» Junto a ella, un emblema — idéntico al medallón que Elara lleva siempre al cuello."
+    ],
     img: "img/enemies/cave_devourer.webp",
   },
   mountain_colossus: {
@@ -754,7 +767,11 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["earthbreaker_core", "inferno_blade"],
+    introLine: "—No puedo caer. Lo juré. No puedo...",
     deathMessage: "Seguí... de pie... hasta el final...",
+    epilogueLines: [
+      "Por un instante, su recuerdo se abre ante ti: Asterion frente a ejércitos humanos, su voz haciendo temblar las montañas. «Si vuestra libertad solo sirve para mataros, os libraré de ella.»"
+    ],
     img: "img/enemies/mountain_colossus.webp",
   },
   ancient_construct: {

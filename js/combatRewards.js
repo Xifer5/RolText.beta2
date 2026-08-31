@@ -79,6 +79,14 @@ export function endCombat(victory, fled = false, enemyFled = false) {
     if (enemy.isBoss && enemy.deathMessage) {
       setTimeout(() => addMessage(formatText(t("bossDiesMessage"), { message: enemy.deathMessage }), "system"), 400);
     }
+    // SPEC-1218 — historia mejorada, Acto I: revelaciones extra tras el
+    // deathMessage corto (generico, cualquier boss puede sumar epilogueLines
+    // en enemies.js sin tocar este archivo).
+    if (enemy.isBoss && Array.isArray(enemy.epilogueLines)) {
+      enemy.epilogueLines.forEach((line, i) => {
+        setTimeout(() => addMessage(line, "system"), 1300 + i * 1700);
+      });
+    }
 
     // Dragon King epilogue — climax of the main story
     if (enemy.id === "dragon_king") {
