@@ -62,7 +62,7 @@ export function showSpecializationModal() {
       if (!spec) return;
       modal.remove();
       playSound("level_up");
-      addMessage(formatText(t('specChosenMsg'), { emoji: spec.emoji, name: spec.name, desc: spec.desc }), "stat");
+      addMessage(formatText(t('specChosenMsg'), { emoji: spec.emoji, name: spec.name, desc: spec.desc }), "milestone"); // SPEC-1212
       showToast(`${spec.emoji} ${spec.name}`);
       const after = calculateTotalStats(gameState.player, gameState.equipment);
       const diffs = statDiffLines(before, after);

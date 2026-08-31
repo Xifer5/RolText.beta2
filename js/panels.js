@@ -15,6 +15,7 @@ const CLASS_AVATARS = {
   mage:    "img/avatar_mage.webp",
   rogue:   "img/avatar_rogue.webp",
 };
+import { resolveIconSrc } from "./utils.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { renderMinimap } from "./minimap.js";
@@ -143,45 +144,100 @@ function renderAttributes() {
 }
 
 // ── 🛡️ EQUIPMENT ────────────────────────────────────────
+// SPEC-1214 — paper doll de equipamiento (revisión 2026-08-31): reemplaza
+// la lista vertical de 8 filas de texto por un retrato central con los 8
+// slots como íconos alrededor (mismo patrón visual que el inventario en
+// grilla, SPEC-1213) — nombre/stats/desequipar viven en un panel de detalle
+// que se abre al hacer clic en un slot, no en la celda misma.
+let selectedEquipSlot = null;
+
+const EQUIP_SLOTS = [
+  { id: "head",      label: "Cabeza",        emoji: "🪖" },
+  { id: "armor",     label: "Armadura",      emoji: "🥋" },
+  { id: "rightHand", label: "Mano derecha",  emoji: "⚔️" },
+  { id: "arms",      label: "Brazos",        emoji: "🦾" },
+  null, // centro: retrato del personaje, no un slot
+  { id: "leftHand",  label: "Mano izquierda",emoji: "🛡️" },
+  { id: "boots",     label: "Botas",         emoji: "👢" },
+  { id: "ring",      label: "Anillo",        emoji: "💍" },
+  { id: "accessory", label: "Accesorio",     emoji: "✨" }
+];
+
+function equipIconHTML(icon, fallbackEmoji, size) {
+  const src = resolveIconSrc(icon);
+  if (src) return `<img src="${src}" width="${size}" height="${size}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${fallbackEmoji}'}))">`;
+  return `<span style="font-size:${Math.round(size * 0.7)}px">${icon || fallbackEmoji}</span>`;
+}
+
+function renderEquipDetail() {
+  const box = document.getElementById("equipDollDetail");
+  if (!box) return;
+  if (!selectedEquipSlot) {
+    box.innerHTML = `<p class="muted" style="text-align:center">${t('equipmentEmptyHint')}</p>`;
+    return;
+  }
+  const slotDef = EQUIP_SLOTS.find(s => s?.id === selectedEquipSlot);
+  const item = gameState.equipment?.[selectedEquipSlot];
+  if (!item) {
+    box.innerHTML = `<p class="muted" style="text-align:center">${slotDef.emoji} ${slotDef.label} — ${t('emptySlot')}</p>`;
+    return;
+  }
+  const attrs = [];
+  if (item.attack) attrs.push(`ATK +${item.attack}`);
+  if (item.defense) attrs.push(`DEF +${item.defense}`);
+  if (item.magic) attrs.push(`MAG +${item.magic}`);
+  if (item.strength) attrs.push(`STR +${item.strength}`);
+  if (item.agility) attrs.push(`AGI +${item.agility}`);
+  if (item.intelligence) attrs.push(`INT +${item.intelligence}`);
+  if (item.hpBonus) attrs.push(`MaxHP +${item.hpBonus}`);
+
+  box.innerHTML = `
+    <div class="equip-detail-row">
+      <div class="equip-detail-icon">${equipIconHTML(item.icon, slotDef.emoji, 40)}</div>
+      <div class="equip-detail-info">
+        <span class="equip-item-name">${localizeText(item.name)}</span>
+        ${attrs.length ? `<span class="equip-attrs">${attrs.join(" · ")}</span>` : ""}
+      </div>
+      <button class="btn small outlined" data-unequip="${selectedEquipSlot}">✕</button>
+    </div>
+  `;
+  box.querySelector("[data-unequip]")?.addEventListener("click", () => {
+    const curItem = gameState.equipment[selectedEquipSlot];
+    if (!curItem) return;
+    if (!gameState.inventory[curItem.id]) gameState.inventory[curItem.id] = 0;
+    gameState.inventory[curItem.id]++;
+    gameState.equipment[selectedEquipSlot] = null;
+    applyDerivedMaxes();
+    addMessage(formatText('equipmentUnequipMessage', { item: localizeText(curItem.name) }), "system");
+    updateUI();
+    renderEquipment(); // re-render completo (stats resumen + doll + detalle)
+  });
+}
+
 function renderEquipment() {
   const eq = gameState.equipment || {};
   const p = gameState.player;
   const derived = calculateTotalStats(p, eq);
+  const cls = CLASS_DEFINITIONS[p.class];
 
-  const SLOTS = [
-    { id: "head",      label: "Cabeza",       emoji: "🪖" },
-    { id: "rightHand", label: "Mano derecha", emoji: "⚔️" },
-    { id: "leftHand",  label: "Mano izquierda",emoji: "🛡️" },
-    { id: "armor",     label: "Armadura",     emoji: "🥋" },
-    { id: "arms",      label: "Brazos",       emoji: "🦾" },
-    { id: "boots",     label: "Botas",        emoji: "👢" },
-    { id: "ring",      label: "Anillo",       emoji: "💍" },
-    { id: "accessory", label: "Accesorio",    emoji: "✨" }
-  ];
-
-  const slotRows = SLOTS.map(slot => {
-    const item = eq[slot.id];
-    const attrs = [];
-    if (item) {
-      if (item.attack) attrs.push(`ATK +${item.attack}`);
-      if (item.defense) attrs.push(`DEF +${item.defense}`);
-      if (item.magic) attrs.push(`MAG +${item.magic}`);
-      if (item.strength) attrs.push(`STR +${item.strength}`);
-      if (item.agility) attrs.push(`AGI +${item.agility}`);
-      if (item.intelligence) attrs.push(`INT +${item.intelligence}`);
-      if (item.hpBonus) attrs.push(`MaxHP +${item.hpBonus}`);
+  const dollCells = EQUIP_SLOTS.map(slot => {
+    if (!slot) {
+      // Centro: mismo patrón img+fallback emoji que el resto de la app (ver
+      // renderAttributes) — nunca romper si falta el archivo de avatar.
+      return `
+        <div class="doll-portrait">
+          ${cls && CLASS_AVATARS[p.class] ? `<img src="${CLASS_AVATARS[p.class]}" alt="${cls.name}" class="doll-portrait-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
+          <span class="doll-portrait-emoji" style="${cls && CLASS_AVATARS[p.class] ? 'display:none' : ''}">${cls ? cls.emoji : '⚔️'}</span>
+        </div>`;
     }
+    const item = eq[slot.id];
+    const active = selectedEquipSlot === slot.id;
     return `
-      <div class="equip-slot ${item ? 'filled' : 'empty'}">
-        <span class="equip-emoji">${slot.emoji}</span>
-        <div class="equip-info">
-          <span class="equip-slot-label">${slot.label}</span>
-          <span class="equip-item-name">${item ? localizeText(item.name) : t('emptySlot')}</span>
-          ${attrs.length ? `<span class="equip-attrs">${attrs.join(" · ")}</span>` : ""}
-        </div>
-        ${item ? `<button class="btn small outlined" data-unequip="${slot.id}">✕</button>` : ""}
-      </div>
-    `;
+      <button type="button" class="doll-slot ${item ? 'filled' : 'empty'} ${active ? 'active' : ''}"
+              data-slot="${slot.id}" title="${slot.label}${item ? ': ' + localizeText(item.name) : ''}"
+              aria-label="${slot.label}${item ? ': ' + localizeText(item.name) : ''}">
+        ${item ? equipIconHTML(item.icon, slot.emoji, 32) : `<span class="doll-slot-emoji">${slot.emoji}</span>`}
+      </button>`;
   }).join("");
 
   openPanel(t('equipmentPanelTitle'), `
@@ -192,28 +248,19 @@ function renderEquipment() {
         <div class="equip-sum-stat">✨ ${derived.magic}<small>MAG</small></div>
         <div class="equip-sum-stat">❤️ ${derived.maxHp}<small>HP máx</small></div>
       </div>
-      <div class="equip-slots">${slotRows}</div>
-      <p class="muted" style="text-align:center;margin-top:var(--sp-4)">${t('equipmentEmptyHint')}</p>
+      <div class="paperdoll-grid">${dollCells}</div>
+      <div class="doll-detail" id="equipDollDetail"></div>
     </div>
   `);
 
-  // Wire unequip buttons
-  document.querySelectorAll("[data-unequip]").forEach(btn => {
+  document.querySelectorAll(".doll-slot").forEach(btn => {
     btn.addEventListener("click", () => {
-      const slot = btn.dataset.unequip;
-      if (gameState.equipment[slot]) {
-        const item = gameState.equipment[slot];
-        // return to inventory
-        if (!gameState.inventory[item.id]) gameState.inventory[item.id] = 0;
-        gameState.inventory[item.id]++;
-        gameState.equipment[slot] = null;
-        applyDerivedMaxes();
-        addMessage(formatText('equipmentUnequipMessage', { item: localizeText(item.name) }), "system");
-        updateUI();
-        renderEquipment(); // re-render
-      }
+      selectedEquipSlot = btn.dataset.slot;
+      document.querySelectorAll(".doll-slot").forEach(b => b.classList.toggle("active", b.dataset.slot === selectedEquipSlot));
+      renderEquipDetail();
     });
   });
+  renderEquipDetail();
 }
 
 // ── 📖 SPELLBOOK ─────────────────────────────────────────

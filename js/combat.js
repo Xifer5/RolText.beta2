@@ -223,7 +223,12 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
       setTimeout(() => { flash.classList.remove("active"); flash.classList.add("hidden"); }, 1450);
     }
     if (enemyType === "dragon_king") {
-      setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 900);
+      // SPEC-1215 — callback directo a la intro reescrita (2026-08-28): la
+      // voz misteriosa de la Fiesta de las Primeras Nieves ("Devuélveme...
+      // mi nombre") se paga acá, explícitamente, antes de la pregunta que
+      // ya existía. Sin esto el jugador nunca conecta ambos momentos.
+      setTimeout(() => addMessage(t("dragonKingNameEcho"), "system"), 300);
+      setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 1400);
     }
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");

@@ -1203,6 +1203,22 @@ button:focus-visible,
   padding: 8px 12px;
   border-radius: 0 var(--r-sm) var(--r-sm) 0;
 }
+/* SPEC-1212 — "cosas importantes más vistosas" en el log: .stat (recompensas
+   de rutina tras cada combate, puntos de stat gastados) apenas se distingue
+   del texto plano hoy; .milestone (logro, level-up, especialización, tier
+   de maestría) son eventos raros de progresión real y se merecen leerse
+   como tales, no perderse en el scroll. */
+.story .stat,
+.story [data-type="stat"] { border-left-color: var(--md-primary); font-weight: 600; }
+.story .milestone,
+.story [data-type="milestone"] {
+  border-left-color: var(--md-primary);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--md-primary) 16%, transparent), transparent);
+  color: var(--md-primary);
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
 
 /* ═══════════════════════════════════════════════════════════
    RIGHT SIDEBAR — 50/50 Combate(o Navegación) + Mapa
@@ -1974,45 +1990,16 @@ button:focus-visible,
 .inventory-grid.detail-open {
   grid-template-columns: 2fr 3fr;
 }
-/* M3 list-detail: con el panel de detalle abierto la fila solo selecciona
-   (ya dispara showItemDetails() al click, ver inventory.js) — las acciones
-   reales (Usar/Equipar) viven en el panel de detalle. Ocultar los botones
-   de la fila evita que dos columnas auto + el ícono coman todo el ancho de
-   la columna angostada y colapsen el nombre a 0px (partiendo cada letra). */
-.inventory-grid.detail-open #inventoryList li {
-  grid-template-columns: auto 1fr;
-}
-.inventory-grid.detail-open #inventoryList li .btn.tiny {
-  display: none;
-}
 .inventory-detail-col {
   overflow-y: auto;
   max-height: 60vh;
 }
 .item-detail-header { margin-top: 12px; }
 .inv-equipment-section { margin-top: 20px; }
-.inv-item-namewrap { display: flex; flex-direction: column; min-width: 0; flex: 1; gap: 2px; }
-/* M3 — jerarquía título/soporte dentro de la columna 1fr de #inventoryList li.
-   attrEl vive ACÁ (segunda línea), no como columna de grid propia — ver
-   inventory.js SPEC-1112. */
-.inv-item-name {
-  font-weight: 600;
-  color: var(--md-on-surface);
-  overflow-wrap: break-word;
-}
-.inv-item-qty {
-  font-size: 11px;
-  color: var(--md-on-surface-variant);
-}
-.inv-item-attrs {
-  font-size: 12px;
-  color: var(--md-on-surface-variant);
-  overflow-wrap: break-word;
-}
-/* M3 — filas de la tienda (#shopBuyList/#shopSellList, ver shop.js) sin estas
-   reglas: .shop-compare-chip son 3 <span> inline sin separador en el DOM, así
-   que sin display/gap propios el navegador los pegaba uno contra otro
-   ("ATK +4DEF 0MAG 0") — mismo layout que .inv-item-namewrap/.equipment-compare. */
+/* M3 — filas de la tienda (#shopBuyList/#shopSellList, ver shop.js) necesitan
+   display/gap propios: .shop-compare-chip son 3 <span> inline sin separador
+   en el DOM, así que sin esto el navegador los pegaba uno contra otro
+   ("ATK +4DEF 0MAG 0"). */
 .shop-row-icon {
   width: 56px;
   height: 56px;
@@ -2125,7 +2112,6 @@ button:focus-visible,
   color: var(--md-on-surface-variant);
   margin-bottom: 10px;
 }
-#inventoryList,
 #shopBuyList,
 #shopSellList,
 #equipmentList,
@@ -2135,7 +2121,6 @@ button:focus-visible,
   flex-direction: column;
   gap: 8px;
 }
-#inventoryList li,
 #shopBuyList li,
 #shopSellList li,
 .equipment-slots-list li {
@@ -2152,21 +2137,81 @@ button:focus-visible,
   cursor: pointer;
   transition: transform var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease);
 }
-#inventoryList li:hover,
 #shopBuyList li:hover,
 #shopSellList li:hover { background: var(--md-surface-c-high); transform: translateY(-1px); }
+
+/* SPEC-1213 — grilla de íconos del inventario: reemplaza las filas de texto
+   altas (ver historial git) por celdas cuadradas compactas. Nombre/stats/
+   acciones viven en el panel de detalle (showItemDetails() en inventory.js),
+   que ya se poblaba independiente de esta lista — no hay lógica duplicada
+   que reconciliar. */
+#inventoryList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+#inventoryList li.inv-item {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 6px;
+  background: var(--md-surface-c-low);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--md-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease);
+}
+#inventoryList li.inv-item:hover { background: var(--md-surface-c-high); transform: translateY(-2px); }
 #inventoryList li.active {
   background: var(--md-surface-c-highest);
   border-color: var(--md-primary);
   box-shadow: 0 0 0 1px rgba(236,197,111,.12);
 }
+/* Los mensajes de "sin objetos" siguen siendo <li> dentro de #inventoryList
+   (inventory.js los agrega ahí) — sin esto quedarían aplastados en una
+   celda cuadrada de 56px en vez de ocupar el ancho completo. */
+#inventoryList li.inventory-empty,
+#inventoryList li.empty-list-row {
+  grid-column: 1 / -1;
+  aspect-ratio: auto;
+  cursor: default;
+}
+.inv-item-qty-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--md-on-primary);
+  background: var(--md-primary);
+  padding: 0 5px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+/* Punto discreto en la esquina opuesta para distinguir ítems de misión de
+   un vistazo, sin volver a necesitar una etiqueta de texto en la celda. */
+.quest-item::before {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-heal);
+}
 .inv-icon {
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
+  width: 100%;
+  height: 100%;
+  max-width: 44px;
+  max-height: 44px;
   display: grid;
   place-items: center;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--md-surface-c);
   border: 1px solid var(--md-outline-variant);
 }
@@ -2177,7 +2222,7 @@ button:focus-visible,
   display: block;
   object-fit: contain;
   text-align: center;
-  font-size: 24px;
+  font-size: 22px;
 }
 .inventory-detail-col {
   min-height: 320px;
@@ -3075,39 +3120,58 @@ button:focus-visible,
   text-transform: uppercase;
   color: var(--md-on-surface-variant);
 }
-.equip-slots {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.equip-slot {
+/* SPEC-1214 — paper doll: retrato central + 8 slots como íconos alrededor,
+   en el mismo orden de lectura que EQUIP_SLOTS (panels.js) — por eso el
+   grid no necesita grid-area explícito, el orden del DOM ya arma la cruz. */
+.paperdoll-grid {
   display: grid;
-  grid-template-columns: 36px 1fr auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 280px;
+  margin: 0 auto 16px;
+}
+.doll-portrait {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--md-surface-c-high);
+  border: 2px solid var(--md-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.doll-portrait-img { width: 100%; height: 100%; object-fit: cover; }
+.doll-portrait-emoji { font-size: 32px; }
+.doll-slot {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--md-surface-c-low);
+  border: 1px solid var(--md-outline-variant);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: transform var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease);
+}
+.doll-slot:hover { background: var(--md-surface-c-high); transform: translateY(-2px); }
+.doll-slot.filled { border-color: var(--md-primary); background: var(--md-surface-c-high); }
+.doll-slot.empty { opacity: .55; border-style: dashed; }
+.doll-slot.active { box-shadow: 0 0 0 2px var(--md-primary); }
+.doll-slot-emoji { font-size: 20px; }
+.doll-detail { min-height: 56px; }
+.equip-detail-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
   background: var(--md-surface-c-low);
-  border: 1px solid var(--md-outline-variant);
+  border: 1px solid var(--md-primary);
   border-radius: var(--r-md);
 }
-.equip-slot.filled {
-  background: var(--md-surface-c-high);
-  border-color: var(--md-primary);
-}
-.equip-slot.empty {
-  opacity: .65;
-  border-style: dashed;
-}
-.equip-emoji { font-size: 22px; }
-.equip-info { display: flex; flex-direction: column; gap: 2px; }
-.equip-slot-label {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--md-on-surface-variant);
-}
+.equip-detail-icon { display: flex; align-items: center; justify-content: center; }
+.equip-detail-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .equip-item-name {
   font-family: var(--font-title);
   font-size: 14px;

@@ -78,7 +78,7 @@ export function grantMasteryXP(damageType, amount = 5) {
   if (tierUp) {
     const label = DAMAGE_TYPES[tierUp.type] || tierUp.type;
     const msg = formatText(t('masteryTierUp'), { type: label, tier: `${tierUp.tier.emoji} ${tierUp.tier.title}` });
-    addMessage(msg, "stat");
+    addMessage(msg, "milestone"); // SPEC-1212: subir de tier de maestría es un hito, no un mensaje de rutina
     showToast(msg);
     playSound("level_up");
   }

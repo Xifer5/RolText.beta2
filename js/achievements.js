@@ -31,7 +31,7 @@ export function checkAchievements() {
     try {
       if (ach.check()) {
         gameState.achievements[ach.id] = true;
-        addMessage(formatText(t('achievementUnlocked'), { title: localizeText(ach.title) }), "stat");
+        addMessage(formatText(t('achievementUnlocked'), { title: localizeText(ach.title) }), "milestone"); // SPEC-1212
         showAchievementToast(ach);
       }
     } catch(e) {}

@@ -112,11 +112,19 @@ export function renderInventory() {
     if (!matchesSearch || !matchesType) continue;
 
     foundItems += 1;
+    // SPEC-1213 — grilla de íconos (revisión 2026-08-31): antes cada fila
+    // mostraba ícono+nombre+stats+botón en ~80px de alto, forzando scroll
+    // constante con un inventario lleno. Todo ese contenido YA se muestra
+    // completo en el panel de detalle al hacer clic (showItemDetails() lo
+    // arma independiente de esta fila) — la celda de grilla solo necesita
+    // ícono + cantidad; el nombre queda como tooltip nativo (title).
     const li = document.createElement("li");
     li.className = item.type === "quest" ? "inv-item quest-item" : "inv-item";
     li.tabIndex = 0;
+    li.dataset.itemId = itemId;
     li.setAttribute("role", "button");
-    li.setAttribute("aria-label", `Ver detalles de ${localizeText(item.name)}`);
+    li.setAttribute("aria-label", `${localizeText(item.name)} ×${qty}`);
+    li.title = `${localizeText(item.name)} ×${qty}`;
     li.addEventListener("click", () => showItemDetails(itemId, item));
     li.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
@@ -125,98 +133,18 @@ export function renderInventory() {
       }
     });
 
-    // icon
     const iconDiv = document.createElement('div');
     iconDiv.className = 'inv-icon';
-    // Support image filenames or objects — createIconElement returns an element
-    // Render icon with a slightly smaller image padding so there is whitespace around it
-    // match shop icon size for uniform presentation
-    const iconEl = createIconElement(item.icon || (item.type === 'consumable' ? '🧪' : (item.type === 'weapon' ? '⚔️' : (item.type === 'armor' ? '🛡️' : '✨'))), 56);
+    const iconEl = createIconElement(item.icon || (item.type === 'consumable' ? '🧪' : (item.type === 'weapon' ? '⚔️' : (item.type === 'armor' ? '🛡️' : '✨'))), 40);
     iconDiv.appendChild(iconEl);
-
-    const nameWrap = document.createElement('div');
-    nameWrap.className = 'inv-item-namewrap';
-    const name = document.createElement('div');
-    name.className = 'inv-item-name';
-    name.textContent = localizeText(item.name);
-    const qtyBadge = document.createElement('div');
-    qtyBadge.className = 'inv-item-qty';
-    qtyBadge.textContent = `x${qty}`;
-    nameWrap.appendChild(name);
-    nameWrap.appendChild(qtyBadge);
-
-    // attributes summary
-    const attrs = [];
-    if (item.attack) attrs.push(`ATK +${item.attack}`);
-    if (item.defense) attrs.push(`DEF +${item.defense}`);
-    if (item.intelligence) attrs.push(`INT +${item.intelligence}`);
-    if (item.strength) attrs.push(`STR +${item.strength}`);
-    if (item.agility) attrs.push(`AGI +${item.agility}`);
-    if (item.magic) attrs.push(`MAG +${item.magic}`);
-    // direct flat HP bonus applied to MAX HP
-    if (item.hpBonus) attrs.push(`MaxHP +${item.hpBonus}`);
-
-    // include restorative attributes such as restoreHp/restoreMp and other relevant fields
-    if (item.restoreHp) attrs.push(`HP +${item.restoreHp}`);
-    if (item.restoreMp) attrs.push(`MP +${item.restoreMp}`);
-    if (item.potency && item.effect) attrs.push(`${item.effect.replace('_',' ').toUpperCase()}: ${item.potency}`);
-
-    const attrEl = document.createElement('div');
-    attrEl.className = 'inv-item-attrs';
-    attrEl.textContent = attrs.join(' | ');
-    // SPEC-1112: attrEl vive DENTRO de nameWrap (segunda línea, misma
-    // columna 1fr) en vez de ser una columna de grid propia — como columna
-    // separada competía por ancho con la columna del nombre y la aplastaba
-    // a 0px cuando el texto de stats era largo, dejando nombre y stats
-    // literalmente superpuestos (ver errores/registro_de_errores.md).
-    if (attrs.length) nameWrap.appendChild(attrEl);
-
-    // action button — items sin uso ni slot (materiales de crafteo) no
-    // tienen acción propia: mostrar un "Info" deshabilitado ACÁ, además del
-    // botón "Info" real de abajo, era un botón fantasma duplicado.
-    // "scroll" es consumible tanto como "consumable" (CONSUMABLE_TYPES ya
-    // los agrupa así para el filtro) — antes solo se chequeaba 'consumable'
-    // literal, así que los pergaminos no tenían botón "Usar" en ningún lado.
-    const isConsumable = CONSUMABLE_TYPES.has(item.type);
-    const isEquippable = !!item.slot;
-    const isQuest = item.type === 'quest';
-    let btn = null;
-    if (isConsumable || isEquippable || isQuest) {
-      btn = document.createElement('button');
-      btn.className = 'btn tiny';
-      if (isConsumable) {
-        btn.textContent = t('btnUse');
-        btn.onclick = (e) => { e.stopPropagation(); useItem(itemId, item); };
-      } else if (isEquippable) {
-        btn.textContent = t('btnEquip');
-        btn.className = 'btn tiny equip-btn';
-        btn.onclick = (e) => { e.stopPropagation(); equipItem(itemId, item); };
-      } else {
-        btn.textContent = t('missionTag');
-        btn.disabled = true;
-        btn.title = t('missionTagTooltip');
-      }
-    }
-
-    const info = document.createElement('button');
-    info.className = 'btn tiny secondary';
-    info.textContent = t('btnInfo');
-    info.onclick = (e) => { e.stopPropagation(); showItemDetails(itemId, item); };
-
-    li.tabIndex = 0;
-    li.dataset.itemId = itemId;
-    li.addEventListener('click', () => showItemDetails(itemId, item));
-    li.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        showItemDetails(itemId, item);
-      }
-    });
-
     li.appendChild(iconDiv);
-    li.appendChild(nameWrap);
-    if (btn) li.appendChild(btn);
-    li.appendChild(info);
+
+    if (qty > 1) {
+      const qtyBadge = document.createElement('div');
+      qtyBadge.className = 'inv-item-qty-badge';
+      qtyBadge.textContent = `×${qty}`;
+      li.appendChild(qtyBadge);
+    }
 
     if (selectedInventoryItemId === itemId) {
       li.classList.add('active');

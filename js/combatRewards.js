@@ -86,11 +86,17 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       setTimeout(() => addMessage(t("dragonKingThanks"),  "system"), 1200);
       setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 2800);
       setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
-      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 6200);
+      // SPEC-1215 — complejidad moral (revisión 2026-08-28): Asterion no es
+      // solo víctima del olvido, también estuvo a punto de imponerle al
+      // mundo una paz absoluta. Se inserta ACÁ, entre el giro del vacío y
+      // el epílogo esperanzador, para que la esperanza final se sienta
+      // ganada (conociendo lo bueno Y lo malo) en vez de ingenua.
+      setTimeout(() => addMessage(t("dragonKingTwist3"),  "system"), 6000);
+      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 7600);
       // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
       // SPEC-1003: la crónica se escribe tras cerrar el resto de endCombat (kills ya contadas)
       setTimeout(() => recordRun("victory"), 100);
-      setTimeout(() => showEnding(), 7800);
+      setTimeout(() => showEnding(), 9200);
     }
 
     // Record kill for bestiary
@@ -163,7 +169,7 @@ export function levelUp() {
   if (profileRole) profileRole.textContent = `${t('levelBadgePrefix')} ${p.level} ${(p.className || "").toUpperCase()}`;
 
   playSound("level_up");
-  addMessage(formatText(t('levelUp'), { level: p.level }), "stat");
+  addMessage(formatText(t('levelUp'), { level: p.level }), "milestone"); // SPEC-1212
 
   // SPEC-1209 — visibilidad de build: los 5 puntos de stat todavía no están
   // gastados, así que lo único que cambió DE VERDAD en este instante es
@@ -175,7 +181,7 @@ export function levelUp() {
 
   // Especialización disponible a partir de nivel 10
   if (canSpecialize(p)) {
-    addMessage(t('specUnlockedMsg'), "stat");
+    addMessage(t('specUnlockedMsg'), "milestone"); // SPEC-1212
     setTimeout(() => showSpecializationModal(), 1500);
   }
 
