@@ -1416,6 +1416,117 @@ export const TRAVEL_EVENTS = [
         }
       }
     ]
+  },
+
+  // ── Eventos cruzados (revisión 2026-08-28, ítem #5) — a diferencia de los
+  // eventos clase/stat de SPEC-1107 (una sola condición abre la vía segura),
+  // estos combinan 2 ejes distintos a propósito (clase+ítem, origen+decisión,
+  // decisión+clase). Acotado: 3 ejemplos concretos, NO un sistema general de
+  // combinaciones — cada uno es una pieza de contenido escrita a mano. ────
+  {
+    id: "sealed_tomb_dagger",
+    icon: "🗝️",
+    title: { en: "The Sealed Tomb", es: "La tumba sellada" },
+    text: { en: "An ancient tomb, sealed with an intricate lock that time itself couldn't fully rust shut.", es: "Una tumba antigua, sellada con un cerrojo intrincado que ni el tiempo pudo oxidar del todo." },
+    biomes: ["ruin", "catacomb"],
+    choices: [
+      {
+        label: { en: "Force the lock", es: "Forzar la cerradura" },
+        icon: "🔓",
+        apply() {
+          const p = gameState.player;
+          // Cruce clase + ítem: el Pícaro con la daga goblin abre sin riesgo —
+          // ni la clase sola ni el ítem solo alcanzan, hace falta la combinación.
+          const hasKnack = p.class === "rogue" && (gameState.inventory?.goblin_dagger ?? 0) > 0;
+          if (hasKnack || Math.random() < 0.5) {
+            const gold = 25 + Math.floor(Math.random() * 21);
+            p.gold = (p.gold ?? 0) + gold;
+            const msg = hasKnack
+              ? { en: `The curved tip of your goblin dagger fits where no key should. The tomb opens without waking anything. +${gold} gold`, es: `La punta curva de tu daga goblin encaja donde ninguna llave debería. La tumba se abre sin despertar nada. +${gold} oro` }
+              : { en: `The lock finally gives. Ancient grave goods, untouched. +${gold} gold`, es: `La cerradura finalmente cede. Ofrendas funerarias intactas. +${gold} oro` };
+            return msg;
+          }
+          const dmg = 10 + Math.floor(Math.random() * 8);
+          p.hp = Math.max(1, (p.hp ?? 0) - dmg);
+          return { en: `A dart trap fires as the lock breaks. −${dmg} HP`, es: `Una trampa de dardos se dispara al romperse la cerradura. −${dmg} HP` };
+        }
+      },
+      {
+        label: { en: "Leave it be", es: "Dejarla en paz" },
+        icon: "🙏",
+        apply() {
+          return { en: "Some locks exist for a reason.", es: "Algunos cerrojos existen por algo." };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "mercenary_underground_job",
+    icon: "🪙",
+    followUp: true,
+    condition: () => hasFlag("origin_mercenary") && hasFlag("purse_taken") && !hasFlag("merc_job_seen"),
+    title: { en: "An Old Guild Contact", es: "Un contacto del gremio" },
+    text: { en: "A fellow mercenary sizes you up. \"Heard you kept a purse that wasn't yours. Good. Means you're not squeamish. I've got work that pays well for someone who isn't.\"", es: "Un mercenario te mide con la mirada. «Escuché que te quedaste con una bolsa que no era tuya. Bien. Significa que no sos aprensivo. Tengo trabajo que paga bien para alguien que no lo sea.»" },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Take the job", es: "Aceptar el trabajo" },
+        icon: "💰",
+        apply() {
+          setFlag("merc_job_seen");
+          const gold = 35 + Math.floor(Math.random() * 21);
+          gameState.player.gold = (gameState.player.gold ?? 0) + gold;
+          return { en: `No questions asked, no questions answered. +${gold} gold`, es: `Sin preguntas de un lado, sin respuestas del otro. +${gold} oro` };
+        }
+      },
+      {
+        label: { en: "\"I've got enough on my conscience\"", es: "«Ya tengo suficiente en la conciencia»" },
+        icon: "🚶",
+        apply() {
+          setFlag("merc_job_seen");
+          gameState.player.experience = (gameState.player.experience ?? 0) + 25;
+          return { en: "He shrugs and doesn't ask twice. Some lines you draw for yourself, not for anyone watching. +25 XP", es: "Se encoge de hombros y no insiste. Algunas líneas las trazás para vos, no para quien mira. +25 XP" };
+        }
+      }
+    ]
+  },
+
+  {
+    id: "kestrel_arcane_trail",
+    icon: "✨",
+    followUp: true,
+    condition: () => hasFlag("rival_resolved_ally") && !hasFlag("kestrel_trail_seen"),
+    title: { en: "A Familiar Mark", es: "Una marca conocida" },
+    text: { en: "A trace of fresh arcane dust on the stone — the same pattern Kestrel used to mark seals she'd already checked.", es: "Un rastro de polvo arcano reciente sobre la piedra — el mismo patrón que Kestrel usaba para marcar sellos que ya había revisado." },
+    biomes: null,
+    choices: [
+      {
+        label: { en: "Follow the mark", es: "Seguir la marca" },
+        icon: "🔍",
+        apply() {
+          setFlag("kestrel_trail_seen");
+          const p = gameState.player;
+          // Cruce clase + relación con Kestrel: el Mago reconoce la técnica
+          // arcana al instante; cualquier otra clase la sigue igual, más a ciegas.
+          const recognizes = p.class === "mage";
+          p.experience = (p.experience ?? 0) + (recognizes ? 30 : 15);
+          if (recognizes) {
+            p.mp = Math.min(p.maxMp, (p.mp ?? 0) + 15);
+            return { en: "You recognize the weave instantly — her technique, unmistakable. She was here, and left this for you on purpose. +15 MP, +30 XP", es: "Reconocés el tejido al instante — su técnica, inconfundible. Estuvo acá, y dejó esto para vos a propósito. +15 MP, +30 XP" };
+          }
+          return { en: "You don't fully understand the markings, but you follow them anyway — they lead somewhere worth going. +15 XP", es: "No terminás de entender las marcas, pero las seguís igual — llevan a algún lado que vale la pena. +15 XP" };
+        }
+      },
+      {
+        label: { en: "Not your business", es: "No es asunto tuyo" },
+        icon: "🚶",
+        apply() {
+          setFlag("kestrel_trail_seen");
+          return { en: "Whatever she's doing now, it's hers to do.", es: "Lo que sea que esté haciendo ahora, es cosa suya." };
+        }
+      }
+    ]
   }
 
 ];

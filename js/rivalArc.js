@@ -10,6 +10,7 @@ import { addMessage } from "./story.js";
 import { showTravelEvent } from "./travelEvents.js";
 import { getQuestStatus } from "./quests.js";
 import { computeEndingTone } from "./endings.js";
+import { getVictories } from "./metaProgress.js";
 
 const flags = () => (gameState.worldFlags ??= {});
 const setFlag = k => { flags()[k] = true; };
@@ -74,12 +75,26 @@ const ENCOUNTER_1_BASE_TEXT = {
   es: "Un desconocido te corta el paso en el pueblo, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
 };
 
+// SPEC-1211 — voz narrativa ampliada (revisión 2026-08-28, ítem #6): Kestrel
+// reacciona a que esta NO es tu primera vuelta (New Game+, ver
+// metaProgress.js). Solo en el primer encuentro — es un guiño de
+// reconocimiento al arrancar la relación, no algo que repetir en las 3
+// apariciones. Sin beat en la primera partida (getVictories()===0), mismo
+// patrón null-safe que CLASS_BEATS/ORIGIN_BEATS/TONE_BEATS.
+const NG_BEATS = {
+  returning: {
+    en: "She studies you a beat too long. \"Do I know you? No — but I'd swear I've done this dance with you before.\"",
+    es: "Te mira un segundo de más. \"¿Nos conocemos? No... pero juraría que ya bailé esto con vos antes.\""
+  }
+};
+
 export const RIVAL_ENCOUNTER_1 = {
   id: "rival_encounter_1",
   icon: "🗡️",
   title: { en: "An Unexpected Rival", es: "Un rival inesperado" },
   get text() {
-    return withBeat(ENCOUNTER_1_BASE_TEXT, CLASS_BEATS[gameState.player?.class]);
+    const withClass = withBeat(ENCOUNTER_1_BASE_TEXT, CLASS_BEATS[gameState.player?.class]);
+    return withBeat(withClass, getVictories() > 0 ? NG_BEATS.returning : null);
   },
   biomes: null,
   choices: [

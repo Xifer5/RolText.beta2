@@ -5372,6 +5372,20 @@ kbd {
   color: var(--md-on-surface-variant);
 }
 
+/* SPEC-1210 — telegraph narrativo: va ANTES del consejo táctico, tono de
+   amenaza (rojo tenue) en vez del gris neutro del consejo. Sin cursiva
+   para distinguirse a simple vista de .enemy-intent-advice. */
+.enemy-intent-telegraph {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--md-error);
+}
+
 /* ── Maestría de armas (stats modal) ── */
 .mastery-section { margin-top: var(--sp-5); text-align: left; }
 .mastery-section-title {

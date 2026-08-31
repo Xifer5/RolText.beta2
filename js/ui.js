@@ -38,6 +38,21 @@ export const INTENT_ADVICE_KEYS = {
   overload:     "adviceOverload",
   freeze_magic: "adviceFreezeMagic"
 };
+
+// SPEC-1210 — telegraph narrativo (revisión 2026-08-28, ítem #7): una línea
+// atmosférica antes del consejo táctico, solo para las 3 mecánicas de boss
+// forzadas por contador de turno (las más "algo enorme viene" del juego).
+// Acotado a propósito a estas 3 — power_attack/magic/regen/enrage/defend ya
+// son legibles solo con el consejo táctico existente, no necesitan además
+// una frase de clima. A diferencia del advice táctico, esta línea SÍ se
+// muestra en Imposible (solo se oculta si el boss directamente disfraza el
+// intent) — avisa que algo grande viene sin decir cómo contrarrestarlo,
+// coherente con "sin piedad" en vez de directamente no avisar nada.
+export const INTENT_TELEGRAPH_KEYS = {
+  devour:       "telegraphDevour",
+  overload:     "telegraphOverload",
+  freeze_magic: "telegraphFreezeMagic"
+};
 import { showSpecializationModal } from "./specModal.js";
 
 // ── IMÁGENES DE UBICACIÓN — EDITABLE ─────────────────────────────────
@@ -398,6 +413,7 @@ export function updateUI() {
       const enemyDef = gameState.currentEnemy.defense || 0;
       // SPEC-0802: chip de intent — próxima acción telegrafiada (❓ si el jefe la oculta)
       let intentChip = "";
+      let intentTelegraph = "";
       let intentAdvice = "";
       const nextAction = gameState.currentEnemy.nextAction;
       if (nextAction) {
@@ -408,6 +424,10 @@ export function updateUI() {
           `<span class="enemy-intent-chip" role="img" ` +
           `aria-label="${t("intentChipAria")}: ${label}" ` +
           `data-tooltip="${t("intentChipAria")}">${meta.icon} ${label}</span>`;
+        // SPEC-1210: telegraph narrativo — se muestra incluso en Imposible
+        // (avisa que algo grande viene, no cómo pararlo).
+        const telegraphKey = hidden ? null : INTENT_TELEGRAPH_KEYS[nextAction];
+        if (telegraphKey) intentTelegraph = `<span class="enemy-intent-telegraph">${t(telegraphKey)}</span>`;
         // SPEC-0904: recomendación contextual según lo telegrafiado.
         // SPEC-1203: en Imposible se suprime (el chip de intent sigue
         // mostrando QUÉ va a hacer el enemigo, pero no CÓMO contrarrestarlo
@@ -422,6 +442,7 @@ export function updateUI() {
         `<span class="enemy-stat-badge">🛡 <b>${enemyDef}</b></span>` +
         intentChip +
         `</span>` +
+        intentTelegraph +
         intentAdvice;
     }
     const ePct = Math.max(0, Math.round((gameState.currentEnemy.hp / gameState.currentEnemy.maxHp) * 100));
