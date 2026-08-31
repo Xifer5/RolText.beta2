@@ -418,12 +418,15 @@
 
 <!-- INVENTORY -->
 <div id="inventoryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="inventory-title">
-  <div class="modal-content">
+  <div class="modal-content inventory-modal-content">
     <div class="modal-header">
-      <h2 id="inventory-title" data-i18n="inventoryTitle">🎒 Inventario</h2>
+      <div class="inventory-heading">
+        <span class="inventory-heading-kicker">Equipo del aventurero</span>
+        <h2 id="inventory-title" data-i18n="inventoryTitle">🎒 Inventario</h2>
+      </div>
       <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
     </div>
-    <p class="modal-gold"><span data-i18n="inventoryGold">Oro</span>: <span id="inventoryGold" class="gold-accent">0</span> 🪙</p>
+    <p class="modal-gold inventory-gold"><span data-i18n="inventoryGold">Oro</span>: <span id="inventoryGold" class="gold-accent">0</span> 🪙</p>
     <div class="inventory-filter-row">
       <div class="m3-input-container inventory-search-group">
         <input id="inventorySearchInput" type="search" placeholder="Buscar objetos..." autocomplete="off" aria-label="Buscar inventario" data-i18n-attr="placeholder" data-i18n="invSearchPlaceholder" data-i18n-aria="invSearchLabel">
@@ -443,7 +446,10 @@
     </div>
     <div class="inventory-grid">
       <div class="inventory-list-col">
-        <h3 data-i18n="itemsSectionTitle">Objetos</h3>
+        <div class="inventory-section-heading">
+          <div><span class="section-eyebrow">Mochila</span><h3 data-i18n="itemsSectionTitle">Objetos</h3></div>
+          <span class="inventory-section-hint">Selecciona para comparar</span>
+        </div>
         <div id="inventoryFilters" class="inv-filter-bar" role="group" aria-label="Filtrar inventario" data-i18n-attr="aria-label" data-i18n="invFilterBarLabel">
           <button class="inv-filter-chip active" data-filter="all" aria-pressed="true" data-i18n="invFilterAll">Todos</button>
           <button class="inv-filter-chip" data-filter="consumable" aria-pressed="false" data-i18n="invFilterConsumables">Consumibles</button>
@@ -454,18 +460,38 @@
         <ul id="inventoryList" role="listbox"></ul>
       </div>
       <div class="inventory-detail-col" id="inventoryDetail">
-        <h3 id="invDetailTitle" data-i18n="invDetailEquipment">Equipamiento</h3>
         <div id="invEquipOverview">
-          <ul id="equipmentList" role="list" class="equipment-slots-list">
-            <li><span class="equip-slot-icon">🪖</span><span class="equip-slot-label" data-i18n="slotHead">Cabeza</span><span id="equip-head" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">⚔️</span><span class="equip-slot-label" data-i18n="slotRightHand">Mano D.</span><span id="equip-rightHand" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🛡️</span><span class="equip-slot-label" data-i18n="slotLeftHand">Mano I.</span><span id="equip-leftHand" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🥋</span><span class="equip-slot-label" data-i18n="slotArmor">Armadura</span><span id="equip-armor" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">🦾</span><span class="equip-slot-label" data-i18n="slotArms">Brazos</span><span id="equip-arms" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">👢</span><span class="equip-slot-label" data-i18n="slotBoots">Botas</span><span id="equip-boots" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">💍</span><span class="equip-slot-label" data-i18n="slotRing">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></li>
-            <li><span class="equip-slot-icon">✨</span><span class="equip-slot-label" data-i18n="slotAccessory">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></li>
-          </ul>
+          <h3 id="invDetailTitle" class="equipment-banner-title" data-i18n="invDetailEquipment">Equipamiento</h3>
+          <section class="equipment-stage" aria-labelledby="equipment-character-name">
+            <div class="equipment-character">
+              <div class="equipment-avatar-frame">
+                <img id="equipmentCharacterAvatar" class="equipment-character-avatar" alt="" hidden>
+                <span id="equipmentCharacterFallback" class="equipment-character-fallback" aria-hidden="true">⚔️</span>
+              </div>
+              <span class="equipment-character-kicker">Build actual</span>
+              <strong id="equipment-character-name">Aventurero</strong>
+              <span id="equipmentCharacterRole">Nivel 1 · Aventurero</span>
+            </div>
+            <ul id="equipmentList" role="list" class="equipment-slots-list">
+              <li data-slot="head"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotHead">Cabeza</span><span id="equip-head" class="equip-val">Vacío</span></span></li>
+              <li data-slot="rightHand"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotRightHand">Mano D.</span><span id="equip-rightHand" class="equip-val">Vacío</span></span></li>
+              <li data-slot="leftHand"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotLeftHand">Mano I.</span><span id="equip-leftHand" class="equip-val">Vacío</span></span></li>
+              <li data-slot="armor"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotArmor">Armadura</span><span id="equip-armor" class="equip-val">Vacío</span></span></li>
+              <li data-slot="arms"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotArms">Brazos</span><span id="equip-arms" class="equip-val">Vacío</span></span></li>
+              <li data-slot="boots"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotBoots">Botas</span><span id="equip-boots" class="equip-val">Vacío</span></span></li>
+              <li data-slot="ring"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotRing">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></span></li>
+              <li data-slot="accessory"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotAccessory">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></span></li>
+            </ul>
+            <div class="equipment-vitals" aria-label="Recursos y estadísticas del personaje">
+              <div class="equipment-vital hp"><span>HP</span><div class="equipment-vital-track"><i id="equipmentHpBar"></i></div><strong id="equipmentHpText">0 / 0</strong></div>
+              <div class="equipment-vital mp"><span>MP</span><div class="equipment-vital-track"><i id="equipmentMpBar"></i></div><strong id="equipmentMpText">0 / 0</strong></div>
+              <dl class="equipment-stat-strip">
+                <div><dt>ATK</dt><dd id="equipmentAttack">0</dd></div>
+                <div><dt>DEF</dt><dd id="equipmentDefense">0</dd></div>
+                <div><dt>MAG</dt><dd id="equipmentMagic">0</dd></div>
+              </dl>
+            </div>
+          </section>
         </div>
         <div class="item-detail hidden" id="itemDetailCard">
           <button id="detailCloseBtn" class="btn-ghost small" data-i18n="detailClose">← Volver</button>

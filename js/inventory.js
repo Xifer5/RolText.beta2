@@ -6,6 +6,7 @@ import { createIconElement } from "./utils.js";
 import { addMessage } from "./story.js";
 import { updateUI, renderStatsModal } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { buildEquipmentView } from "./equipmentView.js";
 
 let selectedInventoryItemId = null;
 let inventoryFilterText = "";
@@ -161,21 +162,23 @@ export function renderInventory() {
     list.appendChild(empty);
   }
 
-  // Equipment
-  const equipSlots = [
-    { id: "equip-rightHand", slot: "rightHand" },
-    { id: "equip-leftHand", slot: "leftHand" },
-    { id: "equip-armor", slot: "armor" },
-    { id: "equip-boots", slot: "boots" },
-    { id: "equip-arms", slot: "arms" },
-    { id: "equip-ring", slot: "ring" },
-    { id: "equip-head", slot: "head" },
-    { id: "equip-accessory", slot: "accessory" }
-  ];
-  equipSlots.forEach(({ id, slot }) => {
+  // SPEC-1217 — resumen visual de build reutilizando avatar e iconos reales.
+  const equipmentView = buildEquipmentView(gameState.player, gameState.equipment);
+  equipmentView.slots.forEach(({ id, slot, item, emptyIcon }) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = localizeText(gameState.equipment[slot]?.name) || t('emptySlot');
+    if (el) el.textContent = localizeText(item?.name) || t('emptySlot');
+    const row = document.querySelector(`#equipmentList [data-slot="${slot}"]`);
+    if (row) {
+      row.classList.toggle('is-equipped', !!item);
+      row.title = item ? localizeText(item.name) : `${row.querySelector('.equip-slot-label')?.textContent || slot}: ${t('emptySlot')}`;
+      const art = row.querySelector('.equip-slot-art');
+      if (art) {
+        art.innerHTML = '';
+        art.appendChild(createIconElement(item?.icon || emptyIcon, 44));
+      }
+    }
   });
+  renderEquipmentCharacter(equipmentView);
 
   if (!gameState.inventory[selectedInventoryItemId]) {
     selectedInventoryItemId = null;
@@ -192,6 +195,32 @@ export function renderInventory() {
   if (!selectedInventoryItemId) {
     document.querySelectorAll('#inventoryList li.active').forEach(li => li.classList.remove('active'));
   }
+}
+
+function renderEquipmentCharacter(view) {
+  const avatar = document.getElementById('equipmentCharacterAvatar');
+  const fallback = document.getElementById('equipmentCharacterFallback');
+  if (avatar) {
+    avatar.hidden = !view.avatar;
+    if (view.avatar) avatar.src = view.avatar;
+    avatar.alt = view.avatar ? `${view.name}, ${view.role}` : '';
+  }
+  if (fallback) {
+    fallback.hidden = !!view.avatar;
+    fallback.textContent = view.fallback;
+  }
+  const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+  setText('equipment-character-name', view.name);
+  setText('equipmentCharacterRole', view.role);
+  setText('equipmentHpText', `${view.hp} / ${view.maxHp}`);
+  setText('equipmentMpText', `${view.mp} / ${view.maxMp}`);
+  setText('equipmentAttack', view.stats.attack);
+  setText('equipmentDefense', view.stats.defense);
+  setText('equipmentMagic', view.stats.magic);
+  const hpBar = document.getElementById('equipmentHpBar');
+  const mpBar = document.getElementById('equipmentMpBar');
+  if (hpBar) hpBar.style.width = `${view.hpPercent}%`;
+  if (mpBar) mpBar.style.width = `${view.mpPercent}%`;
 }
 
 function buildEquipmentComparison(item) {
@@ -333,7 +362,7 @@ function showItemDetails(itemId, item) {
       equipBtn.textContent = t('btnEquip');
       equipBtn.onclick = () => {
         const ok = equipItem(itemId, item);
-        if (ok) showItemDetails(itemId);
+        if (ok) showItemDetails(itemId, item);
       };
     }
   }
