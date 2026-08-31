@@ -1,7 +1,6 @@
 import { gameState, initializeGame } from "./state.js";
 import { addMessage } from "./story.js";
 import { renderShop } from "./shop.js";
-import { renderCrafting } from "./crafting.js";
 import { renderInventory } from "./inventory.js";
 import { calculateMagicAttack, calculateTotalStats, increaseStat } from "./stats.js";
 import { latestSlotId, readSlot, listSlots } from "./saveSystem.js";
@@ -1173,10 +1172,6 @@ export function setupUIListeners() {
   });
   document.getElementById("location-shop-btn")?.addEventListener("click", openShopAtCurrentLocation);
   document.getElementById("closeShopBtn")?.addEventListener("click",  () => document.getElementById("shopModal")?.classList.add("hidden"));
-
-  // Crafting
-  document.getElementById("craftBtn")?.addEventListener("click", () => { renderCrafting(); document.getElementById("craftingModal")?.classList.remove("hidden"); });
-  document.getElementById("closeCraftingBtn")?.addEventListener("click", () => document.getElementById("craftingModal")?.classList.add("hidden"));
 
   // Stats
   document.getElementById("statsBtn")?.addEventListener("click", () => { renderStatsModal(); document.getElementById("statsModal")?.classList.remove("hidden"); });

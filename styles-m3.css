@@ -1965,7 +1965,7 @@ button:focus-visible,
 .inventory-search-group select:focus {
   outline: none;
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 3px rgba(236,197,111,.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 12%, transparent);
 }
 .inventory-empty {
   padding: 18px;
@@ -2004,7 +2004,7 @@ button:focus-visible,
   width: 56px;
   height: 56px;
   min-width: 56px;
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   object-fit: contain;
   background: var(--md-surface-c);
   border: 1px solid var(--md-outline-variant);
@@ -2071,7 +2071,7 @@ button:focus-visible,
   min-height: 36px;
   padding: 6px 14px;
   border: 1px solid var(--md-outline);
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--md-on-surface-variant);
   font-family: inherit;
@@ -2179,7 +2179,7 @@ button:focus-visible,
 #inventoryList li.active {
   background: var(--md-surface-c-highest);
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 1px rgba(236,197,111,.12);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 12%, transparent);
 }
 /* Los mensajes de "sin objetos" siguen siendo <li> dentro de #inventoryList
    (inventory.js los agrega ahí) — sin esto quedarían aplastados en una
@@ -2222,7 +2222,7 @@ button:focus-visible,
   max-height: 44px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--md-surface-c);
   border: 1px solid var(--md-outline-variant);
 }
@@ -2516,73 +2516,6 @@ button:focus-visible,
 }
 
 /* NPC modal */
-.npc-modal-content { max-width: 520px; }
-.npc-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.npc-portrait {
-  width: 56px; height: 56px;
-  border-radius: 999px;
-  background: var(--md-primary-container);
-  color: var(--md-on-primary-container);
-  display: grid;
-  place-items: center;
-  font-size: 28px;
-}
-.npc-name {
-  font-family: var(--font-title);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--md-primary);
-}
-.npc-role {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--md-on-surface-variant);
-}
-.npc-lore {
-  background: var(--md-surface-c-low);
-  border-radius: var(--r-md);
-  padding: 12px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.6;
-  font-style: italic;
-  color: var(--md-on-surface-variant);
-  margin-bottom: 12px;
-}
-.npc-quest-section {
-  background: var(--md-surface-c-low);
-  border-radius: var(--r-md);
-  padding: 12px;
-  margin-bottom: 12px;
-}
-/* .npc-quest-badge consolidado mas abajo junto a sus variantes de estado
-   (.active/.completed/.locked/.inactive/.ready) — ver seccion NPC SYSTEM. */
-.npc-quest-title {
-  font-family: var(--font-title);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--md-on-surface);
-}
-.npc-dialogue {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.6;
-  margin-top: 8px;
-  color: var(--md-on-surface);
-}
-.npc-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
 /* Main Menu */
 .main-menu-content {
   max-width: 420px;
@@ -2811,7 +2744,7 @@ button:focus-visible,
 #playerNameInput:focus {
   outline: none;
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 3px rgba(236,197,111,.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 18%, transparent);
 }
 
 .class-select-grid { gap: 12px !important; }
@@ -3690,6 +3623,26 @@ button:focus-visible,
   overflow-y: auto;
   max-height: 480px;
 }
+/* Forja (crafting) — .craft-body nunca tuvo override movil: la columna fija
+   de 240px + la de detalle desbordaban/aplastaban cualquier viewport angosto
+   (nadie lo habia notado porque el panel recien se conecto a un boton real
+   de nav — ver commit que agrego #craftBtn/#craftingModal cleanup). Se apila
+   como el resto de los master-detail del archivo (mismo umbral 680px que
+   .inventory-grid). Tiene que ir DESPUES de la regla base de arriba: misma
+   especificidad (.craft-body), y en CSS gana la que este mas abajo en el
+   archivo sin importar si esta dentro de un @media — si esto se hubiera
+   puesto antes de la regla base, la base la habria pisado igual. */
+@media (max-width: 680px) {
+  .craft-body {
+    grid-template-columns: 1fr;
+  }
+  .craft-list {
+    max-height: 240px;
+  }
+  .craft-detail {
+    max-height: none;
+  }
+}
 .craft-empty {
   display: grid;
   place-items: center;
@@ -3971,7 +3924,7 @@ button:focus-visible,
 .mm-grid > [data-current="true"] {
   background: var(--md-primary);
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 2px rgba(236,197,111,.4), 0 0 12px rgba(236,197,111,.5);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 40%, transparent), 0 0 12px color-mix(in srgb, var(--gold) 50%, transparent);
   z-index: 3;
 }
 .mm-grid > .mm-visited {
@@ -4313,14 +4266,14 @@ button:focus-visible,
   background: var(--md-primary);
   color: var(--md-on-primary);
   border-color: var(--md-primary);
-  box-shadow: 0 0 0 2px rgba(236,197,111,.4), 0 0 12px rgba(236,197,111,.5);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 40%, transparent), 0 0 12px color-mix(in srgb, var(--gold) 50%, transparent);
   z-index: 3;
   animation: lmmPulse 2s ease-in-out infinite;
 }
 .lmm-current .lmm-icon { font-size: 20px; }
 @keyframes lmmPulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(236,197,111,.4), 0 0 12px rgba(236,197,111,.5); }
-  50%      { box-shadow: 0 0 0 3px rgba(236,197,111,.6), 0 0 18px rgba(236,197,111,.7); }
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 40%, transparent), 0 0 12px color-mix(in srgb, var(--gold) 50%, transparent); }
+  50%      { box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 60%, transparent), 0 0 18px color-mix(in srgb, var(--gold) 70%, transparent); }
 }
 /* Quest log */
 .ql-tabs {
@@ -4472,7 +4425,12 @@ button:focus-visible,
 .npc-talk-btn.hidden { display: none !important; }
 
 /* ── NPC Modal ─────────────────────────────────────────────────── */
-.npc-modal-content { max-width: 500px; }
+/* min-width, no bare max-width: por orden de cascada esta regla pisaba el
+   max-width:none del modal-content mobile (linea ~1810) en la banda
+   500-680px, recapando el modal contra el patron full-width del resto. */
+@media (min-width: 681px) {
+  .npc-modal-content { max-width: 500px; }
+}
 
 .npc-header {
   display: flex;
@@ -5511,7 +5469,7 @@ kbd {
 .spec-card-desc { font-size: 12px; color: var(--c-muted); line-height: 1.4; }
 .spec-badge {
   display: flex; align-items: center; gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4); border-radius: 12px;
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md);
   border: 1.5px solid var(--md-primary, #d0bcff);
   background: color-mix(in srgb, var(--md-primary, #d0bcff) 12%, transparent);
 }
