@@ -2149,7 +2149,18 @@ button:focus-visible,
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  align-content: start;
   gap: 8px;
+  /* SPEC-1216 — la grilla por sí sola no alcanza con un inventario grande:
+     .modal-content entero escala con el contenido (max-height:90vh en la
+     regla base), así que con muchos ítems la barra de búsqueda y los chips
+     de filtro terminaban arriba del scroll, fuera de vista, exactamente el
+     mismo problema de "mucho scroll arriba/abajo" que la grilla debía
+     resolver. Mismo max-height que ya usa .inventory-detail-col (línea
+     ~1993) para que ambas columnas se sientan del mismo alto. */
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 2px; /* deja lugar a la scrollbar sin tapar la última columna */
 }
 #inventoryList li.inv-item {
   position: relative;
