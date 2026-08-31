@@ -8,6 +8,7 @@ import { updateUI } from "./ui.js";
 import { showToast } from "./toast.js";
 import { playSound } from "./sounds.js";
 import { saveGame } from "./saveSystem.js";
+import { calculateTotalStats, statDiffLines, formatStatDiff } from "./stats.js";
 import { t, formatText } from "./i18n.js";
 
 export function showSpecializationModal() {
@@ -51,12 +52,21 @@ export function showSpecializationModal() {
 
   modal.querySelectorAll("[data-spec]").forEach(btn => {
     btn.addEventListener("click", () => {
+      // SPEC-1209 — visibilidad de build: las especializaciones dan bonos
+      // porcentuales/condicionales difíciles de leer desde la descripción
+      // sola (ej. "+20% HP máximo" del Tanque). Diffear las stats derivadas
+      // reales antes/después es la forma más honesta de mostrar el efecto,
+      // sin escribir una explicación a mano por cada una de las 9 specs.
+      const before = calculateTotalStats(gameState.player, gameState.equipment);
       const spec = chooseSpecialization(btn.dataset.spec);
       if (!spec) return;
       modal.remove();
       playSound("level_up");
       addMessage(formatText(t('specChosenMsg'), { emoji: spec.emoji, name: spec.name, desc: spec.desc }), "stat");
       showToast(`${spec.emoji} ${spec.name}`);
+      const after = calculateTotalStats(gameState.player, gameState.equipment);
+      const diffs = statDiffLines(before, after);
+      if (diffs.length) showToast(formatStatDiff(diffs), "stat"); // encolado tras el toast de arriba
       updateUI();
       setTimeout(() => saveGame(), 600);
     });

@@ -2,7 +2,7 @@ import "./helpers/domStub.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const { calculateTotalStats, calculateMagicAttack, applyDerivedMaxes, migratePermanentBonuses } = await import("../js/stats.js");
+const { calculateTotalStats, calculateMagicAttack, applyDerivedMaxes, migratePermanentBonuses, statDiffLines, formatStatDiff, increaseStat } = await import("../js/stats.js");
 // namespace, no destructuring: resetState() reasigna gameState y el snapshot quedaría obsoleto
 const state = await import("../js/state.js");
 
@@ -114,4 +114,55 @@ test("regresión: recalcular tras gastar un punto de stat ya no borra los level-
   p().strength += 1;            // lo que hace increaseStat antes de recalcular
   applyDerivedMaxes();
   assert.equal(p().maxHp, withLevels + 2); // +2 por STR, sin perder los +30
+});
+
+// ── statDiffLines / formatStatDiff — SPEC-1209, visibilidad de build ──
+
+test("statDiffLines: solo devuelve las stats que realmente cambiaron", () => {
+  const before = calculateTotalStats(basePlayer(), {});
+  const after = calculateTotalStats({ ...basePlayer(), strength: 12 }, {});
+  const diffs = statDiffLines(before, after);
+  assert.equal(diffs.length, 2); // attack y maxHp cambian con STR; defense/magic/maxMp no
+  const byKey = Object.fromEntries(diffs.map(d => [d.key, d]));
+  assert.equal(byKey.attack.before, 10);
+  assert.equal(byKey.attack.after, 12);
+  assert.equal(byKey.attack.delta, 2);
+  assert.equal(byKey.maxHp.delta, 4); // +2 STR × 2
+});
+
+test("statDiffLines: +1 AGI que no mueve floor(agi/2) no genera diff falso", () => {
+  // agility par → +1 sigue dando el mismo floor(agi/2)
+  const before = calculateTotalStats({ ...basePlayer(), agility: 8 }, {});
+  const after = calculateTotalStats({ ...basePlayer(), agility: 9 }, {});
+  const diffs = statDiffLines(before, after);
+  assert.equal(diffs.length, 0);
+});
+
+test("statDiffLines: sin cambios reales, devuelve array vacío", () => {
+  const s = calculateTotalStats(basePlayer(), {});
+  assert.deepEqual(statDiffLines(s, s), []);
+});
+
+test("formatStatDiff: formatea antes→después con signo en el delta", () => {
+  const diffs = [{ key: "attack", icon: "⚔️", before: 10, after: 14, delta: 4 }];
+  assert.equal(formatStatDiff(diffs), "⚔️ 10→14 (+4)");
+});
+
+test("increaseStat: gasta el punto y aplica exactamente +1 al atributo elegido", () => {
+  state.resetState();
+  const p = () => state.gameState.player;
+  p().statPoints = 3;
+  const str0 = p().strength;
+  assert.equal(increaseStat("strength"), true);
+  assert.equal(p().strength, str0 + 1);
+  assert.equal(p().statPoints, 2);
+});
+
+test("increaseStat: sin puntos disponibles, no muta nada y devuelve false", () => {
+  state.resetState();
+  const p = () => state.gameState.player;
+  p().statPoints = 0;
+  const str0 = p().strength;
+  assert.equal(increaseStat("strength"), false);
+  assert.equal(p().strength, str0);
 });

@@ -6,7 +6,7 @@
  * Cero dependencia de otros módulos combat-* — hoja del árbol de imports.
  */
 import { gameState } from "./state.js";
-import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
+import { calculateTotalStats, applyDerivedMaxes, statDiffLines, formatStatDiff } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI, showFloatingText } from "./ui.js";
 import { getLoot } from "./lootTables.js";
@@ -143,6 +143,7 @@ export function endCombat(victory, fled = false, enemyFled = false) {
 
 export function levelUp() {
   const p = gameState.player;
+  const before = calculateTotalStats(p, gameState.equipment); // SPEC-1209: visibilidad de build
   p.level = (p.level || 1) + 1;
   p.experience = Math.max(0, (p.experience || 0) - (p.nextLevelXp || 100));
   p.nextLevelXp = Math.floor((p.nextLevelXp || 100) * 1.5);
@@ -163,6 +164,14 @@ export function levelUp() {
 
   playSound("level_up");
   addMessage(formatText(t('levelUp'), { level: p.level }), "stat");
+
+  // SPEC-1209 — visibilidad de build: los 5 puntos de stat todavía no están
+  // gastados, así que lo único que cambió DE VERDAD en este instante es
+  // maxHp/maxMp (el bono de clase por nivel). El resto se muestra al gastar
+  // cada punto (ver increaseStat() en stats.js).
+  const after = calculateTotalStats(p, gameState.equipment);
+  const diffs = statDiffLines(before, after);
+  if (diffs.length) showToast(formatStatDiff(diffs), "stat");
 
   // Especialización disponible a partir de nivel 10
   if (canSpecialize(p)) {

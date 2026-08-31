@@ -5,6 +5,7 @@ import { t, formatText } from "./i18n.js";
 import { updateUI } from "./ui.js";
 import { CLASS_BASE_RESISTANCES, ITEM_RESISTANCES } from "./damageTypes.js";
 import { getActiveSpec } from "./specializations.js";
+import { showToast } from "./toast.js";
 
 /**
  * Calcula estadísticas derivadas a partir de los atributos base y equipo.
@@ -77,6 +78,31 @@ export function calculateMagicAttack(stats) {
   return Math.round((stats.magic ?? 0) * 1.5);
 }
 
+// SPEC-1209 — visibilidad de build (revisión 2026-08-28, ítem #4): antes,
+// subir un stat o elegir especialización solo mostraba el punto invertido,
+// nunca el efecto real en combate ("Antes: daño mágico 14. Ahora: 18.").
+// Diffea snapshots de calculateTotalStats() y devuelve solo lo que cambió
+// de verdad — evita ruido cuando p.ej. +1 AGI no mueve la defensa por el
+// redondeo hacia abajo de floor(agilidad/2).
+const STAT_DIFF_FIELDS = [
+  { key: "attack",  icon: "⚔️" },
+  { key: "defense", icon: "🛡️" },
+  { key: "magic",   icon: "🔮" },
+  { key: "maxHp",   icon: "❤️" },
+  { key: "maxMp",   icon: "💧" }
+];
+
+export function statDiffLines(before, after) {
+  return STAT_DIFF_FIELDS
+    .map(f => ({ ...f, before: before[f.key] ?? 0, after: after[f.key] ?? 0 }))
+    .filter(f => f.before !== f.after)
+    .map(f => ({ ...f, delta: f.after - f.before }));
+}
+
+export function formatStatDiff(diffs) {
+  return diffs.map(d => `${d.icon} ${d.before}→${d.after} (${d.delta > 0 ? "+" : ""}${d.delta})`).join("   ");
+}
+
 /**
  * Única vía para sincronizar player.maxHp/maxMp con la fórmula derivada.
  * Llamar tras cualquier cambio que afecte los máximos (stats, equipo, bonos permanentes).
@@ -113,6 +139,8 @@ export function increaseStat(statName) {
   }
   if (!["strength", "agility", "intelligence"].includes(statName)) return false;
 
+  const before = calculateTotalStats(gameState.player, gameState.equipment);
+
   gameState.player.statPoints -= 1;
   gameState.player[statName] = (gameState.player[statName] || 0) + 1;
 
@@ -120,6 +148,10 @@ export function increaseStat(statName) {
   applyDerivedMaxes();
 
   addMessage(formatText("statIncreased", { stat: statName.toUpperCase(), value: gameState.player[statName] }), "stat");
+
+  const after = calculateTotalStats(gameState.player, gameState.equipment);
+  const diffs = statDiffLines(before, after);
+  if (diffs.length) showToast(formatStatDiff(diffs), "stat");
   return true;
 }
 

@@ -3,6 +3,18 @@
 // (state → stats → ui → …) necesita que los globals existan al evaluarse.
 const noop = () => {};
 
+// Código como toast.js agenda setTimeout de varios segundos (duración real de
+// UI) que no importan en un test — pero por default mantienen vivo el proceso
+// de `node --test` hasta que disparan, sumando segundos muertos a la suite.
+// unref() no cambia el delay ni cancela nada: solo le dice a Node que no
+// cuente ese timer para decidir si el proceso sigue vivo.
+const _origSetTimeout = globalThis.setTimeout;
+globalThis.setTimeout = (fn, ms, ...args) => {
+  const id = _origSetTimeout(fn, ms, ...args);
+  id?.unref?.();
+  return id;
+};
+
 function makeElement() {
   return {
     style: {},
@@ -46,6 +58,14 @@ globalThis.document = {
   activeElement: null,
 };
 
+// Global "pelado", no solo window.*: varios módulos (ej. toast.js) llaman
+// requestAnimationFrame(...) directo sin el prefijo window. — sin esto,
+// cualquier código que dispare un toast durante un test revienta con
+// "requestAnimationFrame is not defined" (encontrado real al testear
+// increaseStat(), que ahora muestra un toast de diff de stats — SPEC-1209).
+globalThis.requestAnimationFrame = (cb) => setTimeout(cb, 0);
+globalThis.cancelAnimationFrame = (id) => clearTimeout(id);
+
 globalThis.window = {
   addEventListener: noop,
   removeEventListener: noop,
@@ -54,7 +74,7 @@ globalThis.window = {
   innerWidth: 1280,
   innerHeight: 800,
   matchMedia: () => ({ matches: false, addEventListener: noop, removeEventListener: noop }),
-  requestAnimationFrame: (cb) => setTimeout(cb, 0),
+  requestAnimationFrame: globalThis.requestAnimationFrame,
   setTimeout,
   clearTimeout,
 };
