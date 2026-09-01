@@ -232,6 +232,8 @@ export const QUEST_DATA = {
       ],
       completed: [
         { en: "Yes… I can feel it. An echo of joy. Of play. Of an age when everything was alive.", es: "Sí… puedo sentirlo. Un eco de alegría. De juego. De una época en que todo estaba vivo." },
+        { en: "This was the last memory I had of his voice. Now it belongs to the key in your hands, not to me anymore.", es: "Este era el último recuerdo que tenía de su voz. Ahora le pertenece a la llave que llevas, no a mí." },
+        { en: "Tell me... was he kind?", es: "Dime... ¿era bondadoso?" },
         { en: "Take this Garden Key. The Forgotten Vault holds more of his memories. Perhaps they will show you how to reach him.", es: "Toma esta Llave del Jardín. La Bóveda Olvidada guarda más de sus recuerdos. Quizás te muestren cómo llegar a él." }
       ]
     }

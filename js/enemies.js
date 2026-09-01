@@ -788,7 +788,13 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["construct_eye", "ancient_relic"],
+    // deathMessage NO se toca: mq_04_la_verdad lo cita textual en "completed".
+    introLine: "—Identidad no reconocida. Protocolo de purga: iniciado.",
     deathMessage: "Asterion no destruye el mundo. El mundo lo está matando. Busca... la Puerta del Dragón...",
+    epilogueLines: [
+      "Los ocho sellos no guardan el poder de Asterion. Guardan los recuerdos que la humanidad le arrancó. Sin ellos, el dragón no sabe quién fue — solo siente sus emociones separadas: hambre, hielo, miedo, ira.",
+      "Antes de que el Constructo termine de hablar, una descarga arcana lo hace pedazos. El rastro de esa magia se pierde hacia la Torre del Castillo."
+    ],
     img: "img/enemies/ancient_construct.webp",
   },
   swamp_abomination: {
@@ -805,7 +811,12 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["abomination_core", "inferno_blade"],
+    introLine: "—Quedate... Aquí nadie te decepciona... Aquí nadie se va...",
     deathMessage: "Ya no hay... esperanza... para mí...",
+    epilogueLines: [
+      "Por un instante, miles de voces recuperan su nombre. Entre ellas, una que suena antigua, casi ceremonial: «No salvamos el mundo. Solo hicimos que olvidara nuestro crimen.»",
+      "Esa voz pertenecía a la fundadora de la Orden del Primer Canto — la misma orden a la que Elara ha servido toda su vida."
+    ],
     img: "img/enemies/swamp_abomination.webp",
   },
 
@@ -862,7 +873,12 @@ export const enemyData = {
     experience: 800,
     gold: 120,
     drops: ["wyrm_tail", "glacial_core"],
+    introLine: "—Vendrá... mañana...",
     deathMessage: "Mil años... esperando... que alguien volviera...",
+    epilogueLines: [
+      "En el centro de la tundra, un recuerdo se abre: un niño llamado Cael prometió volver para ver las estrellas junto a Asterion. Volvió siendo anciano, pero unos soldados le impidieron llegar. Asterion nunca lo supo.",
+      "El hielo se resquebraja y libera un amanecer que llevaba mil años detenido."
+    ],
     img: "img/enemies/frost_wyrm.webp",
   },
 
