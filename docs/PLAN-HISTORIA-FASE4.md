@@ -126,42 +126,92 @@ Rey Dragón → secuencia de victoria → modal de final).
 
 ---
 
-## Fase 2: Questline de Eryndel
+## Fase 2: Questline de Eryndel ✅ HECHA (2026-09-01)
 
 ### Alcance
 Convertir su "pierde memoria con cada boss" de una frase de lore a un sistema
-activo: un contador que avanza con cada boss de zona derrotado (reusa
-`recordBossKill()` de `bestiary.js`, ya existe), reflejado en diálogo nuevo
-cada vez que el jugador vuelve a hablar con ella — sin quest nueva obligatoria,
-expandiendo lo que ya existe en `mq_03_ecos`.
+activo: un contador que avanza con cada boss de zona derrotado.
 
-### Archivos afectados
-`js/npcs.js` (más `lore`/estados de diálogo), `js/quests.js` (`mq_03_ecos`
-gana pasos opcionales o diálogo post-completado), posible módulo nuevo pequeño
-`js/eryndelArc.js` si el contador de memoria necesita lógica propia (mismo
-criterio de extracción que `echoIntro.js`/`rivalArc.js`), `js/i18n.js`.
+### Implementación real (más simple que lo previsto — cero contador nuevo)
+`gameState.stats.enemiesDefeated` (que `recordEnemyKill()` en `bestiary.js`
+ya mantenía) alcanzó sin agregar ningún contador propio. `js/eryndelArc.js`
+(nuevo, módulo puro sin efectos secundarios): `zoneBossesDefeatedCount()`
+filtra ese objeto contra los 7 IDs de jefe de zona reales (excluyendo
+mini-bosses/Kestrel/Valdris/dragon_king, que también cuentan como "boss" en
+`bestiary.js` pero no son a lo que se refiere el documento), y
+`eryndelMemoryKey()` mapea el conteo a 4 umbrales (1-2/3-4/5-6/7) → clave
+i18n.
 
-### Riesgo
-Bajo-medio — reusa `bestiary.js` y el sistema de diálogo por estado que ya
-existe, sin combate nuevo ni cambios estructurales.
+**Hallazgo importante que cambió el plan**: `openNpcModal()` en `ui.js`
+elige el diálogo de la PRIMERA misión no completada del NPC (`npc.questIds`
+en orden) — si hubiera agregado más líneas al array `dialogues.completed` de
+`mq_03_ecos` (como preveía el plan original), esas líneas nunca se habrían
+visto mientras `collect_fairy_dust` (la otra misión de Eryndel) siguiera sin
+completar. Se resolvió igual que el precedente ya existente para Elara
+(`elaraEchoPerception`, absorber el eco): una línea dinámica anexada
+directamente a `npc.lore` en `ui.js`, independiente de qué misión esté
+activa. **`js/quests.js` NO se tocó.**
+
+### Archivos afectados (reales)
+`js/eryndelArc.js` (nuevo), `js/ui.js` (1 línea de import + 4 de lógica en
+`openNpcModal`), `js/i18n.js` (4 claves × 2 idiomas),
+`tests/eryndelArc.test.mjs` (nuevo, 4 tests). NO se tocó `js/npcs.js` ni
+`js/quests.js`.
+
+### Riesgo real
+Bajo, como se esperaba — cero combate, cero estado nuevo persistido (reusa
+`enemiesDefeated` que ya se guarda/carga). Verificado en vivo: con 3 jefes
+de zona simulados, la línea de memoria (umbral 2) apareció correctamente
+anexada al lore de Eryndel, con su misión "El Polvo de las Hadas" todavía en
+progreso — confirma que el bypass del problema de "primera misión no
+completada" funciona.
 
 ---
 
-## Fase 3: Questline de Pyrax — la prueba de las 3 llaves
+## Fase 3: Questline de Pyrax — la prueba de las 3 llaves ✅ HECHA (2026-09-01)
 
 ### Alcance
-Antes de abrir la Puerta del Dragón, un modal de elección de 3 pasos (llave
-arcana = conocimiento, llave del jardín = compasión, llave dracónica = valor
-ante la pérdida) usando el sistema de `travelEvents.js` ya existente — sin UI
-nueva, sin combate nuevo.
+Antes de abrir la Puerta del Dragón, 3 momentos de elección (llave arcana =
+conocimiento, llave del jardín = compasión, llave dracónica = valor ante la
+pérdida) usando el sistema de `travelEvents.js` ya existente.
 
-### Archivos afectados
-`js/quests.js` (extensión de `mq_05_el_ultimo_sueno`), `js/travelEvents.js`
-(un nuevo evento con 3 choices), `js/i18n.js`.
+### Implementación real
+`js/pyraxArc.js` (nuevo, mismo patrón que `echoIntro.js`/`valdrisArc.js`):
+como `travelEvents.js` solo soporta UN choice por evento (no un wizard de 3
+pasos en un solo modal), el "trial de 3 pasos" se armó como 3 eventos
+`showTravelEvent()` CONSECUTIVOS, encadenados vía el mismo mecanismo
+`pixel:travelEventClosed` que ya usan `echoIntro.js`/`valdrisArc.js`. Cada
+paso tiene 2 opciones (ambas "pasan" la prueba, solo cambia el tono de la
+respuesta — 100% narrativo, cero rama mecánica) para dar algo de agencia sin
+inventar un sistema de puntaje nuevo. Dispara la primera vez que el jugador
+llega a `volcano_4` (ubicación real de Pyrax) tras completar
+`mq_04_la_verdad`.
 
-### Riesgo
-Bajo — es 100% reuso de infraestructura ya probada (`echoIntro.js`,
-`rivalArc.js` ya demostraron este patrón funcionando).
+**Robustez agregada que el plan original no prevía**: `travelEventModal`
+tiene un atajo de ESC (`ui.js`) que cierra el modal SIN disparar
+`pixel:travelEventClosed` — si el jugador lo usara a mitad del trial (entre
+el paso 1 y 2, por ejemplo), un diseño ingenuo habría dejado
+`pyrax_trial_step` trabado para siempre (nunca más dispara el trial, nunca
+avanza). `maybeStartPyraxTrial()` es RESUMIBLE: si hay un `pyrax_trial_step`
+guardado, la próxima llegada a `volcano_4` retoma ESE paso en vez de
+negarse a disparar o reiniciar desde cero — verificado con test dedicado.
+
+No otorga ningún ítem/flag mecánico nuevo (no reemplaza `dragon_key` ni
+`defeat_dark_lord`, que siguen siendo el gate real de `inferno_1`) — es
+capa narrativa pura sobre el gate que ya existía.
+
+### Archivos afectados (reales)
+`js/pyraxArc.js` (nuevo), `js/movement.js` (1 hook), `js/main.js` (1 setup
+call), `js/i18n.js` (contenido vía objetos `{en,es}` inline en el propio
+módulo, no vía `t()` — mismo patrón que `echoIntro.js`/`rivalArc.js` para
+eventos de `travelEvents.js`), `tests/pyraxArc.test.mjs` (nuevo, 6 tests).
+NO se tocó `js/quests.js` ni `js/travelEvents.js` (se usa su API pública tal
+cual, sin extenderla).
+
+### Riesgo real
+Bajo, como se esperaba. Suite 247/247. Verificado en vivo el flujo completo
+de 3 pasos encadenados automáticamente, con `pyrax_trial_resolved=true` y
+`pyrax_trial_step` limpio al finalizar.
 
 ---
 

@@ -18,6 +18,7 @@ import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
 import { applyRest, activeModifiers, MODIFIERS } from "./modifiers.js";
 import { getTimeLabel } from "./timeOfDay.js";
+import { eryndelMemoryKey } from "./eryndelArc.js";
 
 // SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
 // import circular ui.js<->combat.js solo para una constante chica.
@@ -796,7 +797,15 @@ function openNpcModal(npc) {
   // SPEC-1104: absorber el eco → percepción distinta de NPCs (solo Elara)
   const echoLine = (npc.id === "elara" && gameState.worldFlags?.echo_absorbed)
     ? " " + t("elaraEchoPerception") : "";
-  document.getElementById("npcLore").textContent  = npc.lore + echoLine;
+  // SPEC-1219 (Fase 2): Eryndel comenta su propia memoria menguante según
+  // cuántos jefes de zona ya cayeron — independiente de qué questId del NPC
+  // se esté mostrando (evita el problema de que el modal solo muestra el
+  // diálogo de la PRIMERA misión no completada de Eryndel, así que agregar
+  // más líneas al array "completed" de mq_03_ecos no sería visible mientras
+  // collect_fairy_dust siga activa).
+  const memoryKey = npc.id === "eryndel" ? eryndelMemoryKey(gameState) : null;
+  const memoryLine = memoryKey ? t(memoryKey) : "";
+  document.getElementById("npcLore").textContent  = npc.lore + echoLine + memoryLine;
 
   // Support both questId (singular) and questIds (array) — pick the first
   // implemented quest that's actually startable right now (not completed,

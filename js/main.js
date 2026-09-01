@@ -14,6 +14,7 @@ import { initAudio, preloadSounds } from "./sounds.js";
 import { setupTravelEventModal } from "./travelEvents.js";
 import { setupEchoIntro } from "./echoIntro.js";
 import { setupValdrisArc } from "./valdrisArc.js";
+import { setupPyraxArc } from "./pyraxArc.js";
 import { renderLocalMinimap } from "./localMinimap.js";
 import { showIntro } from "./intro.js";
 import { setupFocusTrap } from "./focusTrap.js";
@@ -45,6 +46,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupTravelEventModal();
   setupEchoIntro();
   setupValdrisArc();
+  setupPyraxArc();
   setupFocusTrap();
 
   // Pre-carga sonidos tras primera interacción del usuario
