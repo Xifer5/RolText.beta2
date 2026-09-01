@@ -61,20 +61,43 @@ export function rollForcedBossAction(enemy) {
     if (enemy.turnsSinceFreeze >= 3) return "freeze_magic";
     enemy.turnsSinceFreeze++;
   }
+  // SPEC-1219 (Fase 4 del plan docs/PLAN-HISTORIA-FASE4.md) — Dragon King,
+  // fases 2/3 del clímax: reusan el forzado de cave_devourer/ancient_construct
+  // tal cual, solo gateado por enemy.bossPhase en vez de enemy.id. La fase 1
+  // reusa la guardia de forest_titan (hasGuard, ver startCombat() en
+  // combat.js); la fase 4 no fuerza nada nuevo, queda a pura agresión (ver
+  // enemyAI.js case "boss_phased").
+  if (enemy.id === "dragon_king") {
+    if (enemy.bossPhase === 2) {
+      enemy.turnsSinceDevour = enemy.turnsSinceDevour ?? 0;
+      if (enemy.turnsSinceDevour >= 2) return "devour";
+      enemy.turnsSinceDevour++;
+    }
+    if (enemy.bossPhase === 3) {
+      enemy.turnsSinceOverload = enemy.turnsSinceOverload ?? 0;
+      if (enemy.turnsSinceOverload >= 3) return "overload";
+      enemy.turnsSinceOverload++;
+    }
+  }
   return null;
 }
 
-// SPEC-1101 — Dragon King: mensaje de flavor al escalar de fase. Nunca
-// retrocede si el HP sube (no hay regen en dragon_king, pero por si acaso).
+// SPEC-1101/1219 — Dragon King: mensaje de flavor al escalar de fase (ahora
+// 4 en vez de 3, ver plan docs/PLAN-HISTORIA-FASE4.md). Nunca retrocede si
+// el HP sube (no hay regen en dragon_king, pero por si acaso). Cada
+// escalada de fase también apaga la guardia de fase 1 (hasGuard) para
+// dragon_king específicamente — forest_titan, el otro usuario de hasGuard,
+// no tiene fases y no se ve afectado por esta condición.
 export function updateBossPhase(enemy) {
   if (ENEMY_COMBAT_DATA[enemy.id]?.behavior !== "boss_phased") return;
   const hpRatio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 1;
-  const phase = hpRatio > 0.66 ? 1 : hpRatio > 0.33 ? 2 : 3;
+  const phase = hpRatio > 0.75 ? 1 : hpRatio > 0.5 ? 2 : hpRatio > 0.25 ? 3 : 4;
   const prev = enemy.bossPhase || 1;
   if (phase > prev) {
     enemy.bossPhase = phase;
     addMessage(formatText(t(`dragonKingPhase${phase}`), { enemy: enemy.type }), "combat");
     shakeScreen();
+    if (enemy.id === "dragon_king") enemy.hasGuard = false;
   } else if (!enemy.bossPhase) {
     enemy.bossPhase = 1;
   }

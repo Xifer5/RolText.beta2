@@ -215,7 +215,7 @@ de 3 pasos encadenados automáticamente, con `pyrax_trial_resolved=true` y
 
 ---
 
-## Fase 4: Clímax de 4 fases
+## Fase 4: Clímax de 4 fases ✅ HECHA (2026-09-01)
 
 ### Alcance
 Extender `updateBossPhase()`/`behavior: "boss_phased"` de 3 a 4 fases para
@@ -225,17 +225,58 @@ jugador — callback jugable real, reusando `bossMechanics.js` en vez de
 inventar 8 mecánicas nuevas desde cero.
 
 ### Decisión (RESUELTA 2026-09-01)
-**Secuencia fija**, siempre las mismas 4 mecánicas en el mismo orden — no
-depende de qué jefes de zona venció el jugador. Ejemplo de secuencia (a
-confirmar en el detalle de implementación): Fase 1 guardia (Titán del
-Bosque) → Fase 2 devorar (Devorador) → Fase 3 sobrecarga (Constructo) → Fase
-4 quemadura final. Prioriza balance y testeo simple sobre fidelidad total al
-"recorrido propio" del documento.
+**Secuencia fija**, siempre las mismas 4 mecánicas en el mismo orden.
+Implementada tal cual se planeó: Fase 1 (>75% HP) guardia (Titán del
+Bosque) → Fase 2 (50-75%) devorar (Devorador) → Fase 3 (25-50%) sobrecarga
+(Constructo) → Fase 4 (≤25%) quemadura final / pura agresión, sin mecánica
+forzada nueva.
 
-### Archivos afectados
-`js/bossMechanics.js`, `js/combat.js`, `js/enemies.js` (entrada de
-`dragon_king`), `js/i18n.js` (texto por fase), `tests/` (cobertura de la
-lógica de selección de fase, sin DOM).
+### Implementación real
+- `bossMechanics.js`: `updateBossPhase()` cambia los umbrales de 3 a 4
+  (0.75/0.5/0.25 en vez de 0.66/0.33) y ahora también apaga
+  `enemy.hasGuard` para `dragon_king` al escalar de fase 1 a 2+.
+  `rollForcedBossAction()` gana 2 ramas para `dragon_king` que REUSAN el
+  contador de `cave_devourer` (fase 2 → "devour" al 3er turno) y de
+  `ancient_construct` (fase 3 → "overload" al 4to turno), gateadas por
+  `enemy.bossPhase` en vez de `enemy.id` — cero mecánica nueva, solo
+  reapuntar la existente.
+- `combat.js`: `startCombat()` ahora inicializa `hasGuard: true` también
+  para `dragon_king` (antes solo `forest_titan`), y la secuencia de intro
+  del Rey Dragón suma un 3er mensaje (`dragonKingPhase1`, a los 2600ms,
+  DESPUÉS del diálogo dramático existente) anunciando la guardia de fase 1.
+- `enemyAI.js`: el caso `"boss_phased"` de `decideNextAction()` pasa de 3 a
+  4 tramos de HP, con los MISMOS umbrales que `updateBossPhase` a
+  propósito (si se desincronizan, el "tramo de relleno" de ataques
+  aleatorios no coincidiría con la fase narrativa/mecánica real). Fases 2 y
+  3 comparten el mismo tramo de relleno (ya están dominadas por
+  devour/overload forzado, no valía la pena tunear 2 tramos separados).
+- `i18n.js`: 4 claves (`dragonKingPhase1..4`, en/es) con texto que nombra
+  explícitamente al jefe de zona que cada fase evoca (Titán/Devorador/
+  Constructo), para que el callback se sienta también en el texto, no solo
+  en la mecánica.
+
+### Bug real encontrado y corregido durante la verificación en vivo
+El primer intento de `dragonKingPhase1` usaba `addMessage(t(...))` sin
+`formatText()` — el placeholder `{{enemy}}` se mostraba crudo en el log
+("Las garras de {{enemy}} se clavan..."). Corregido a
+`addMessage(formatText(t(...), { enemy: ... }), ...)`, igual que las otras
+3 fases en `bossMechanics.js`. Encontrado en vivo, no por test — ningún
+test unitario cubre el texto renderizado final con interpolación real.
+
+### Archivos afectados (reales)
+`js/bossMechanics.js`, `js/combat.js`, `js/enemyAI.js`, `js/i18n.js`,
+`tests/bossMechanics.test.mjs` (nuevo, 6 tests), `tests/enemyAI.test.mjs`
+(+1 test para los 4 tramos). NO se tocó `js/enemies.js` (la entrada de
+`dragon_king` no necesitó ningún campo nuevo, todo el estado de fase vive
+en memoria del combate, no en su definición estática).
+
+### Riesgo real
+Alto, como se esperaba — pero contenido: verificado en vivo el combate
+completo (HP forzado por consola para cruzar cada umbral), las 4 fases
+dispararon en orden con su mensaje y mecánica correctos (guardia visible en
+fase 1, "Dragon intenta devorarte" en fase 2, sobrecarga en fase 3,
+agresión final en fase 4), y el epílogo + modal de final post-victoria
+siguieron funcionando sin cambios. Suite 254/254.
 
 ### Riesgo
 Alto — es la pieza de mecánica de combate más grande de todo el plan. Puede

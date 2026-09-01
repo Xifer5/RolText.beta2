@@ -201,7 +201,9 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
     isMiniBoss: isBoss && isMiniBossId(enemyType),
     // SPEC-1101: estado propio por-boss, en memoria (no toca el save, mismo
     // patrón que nextAction/enraged/isDefending)
-    hasGuard: enemyType === "forest_titan",
+    // SPEC-1219 (Fase 4): dragon_king empieza su fase 1 con la misma
+    // guardia que forest_titan — updateBossPhase() la apaga al escalar.
+    hasGuard: enemyType === "forest_titan" || enemyType === "dragon_king",
     guardBroken: 0,
     turnsSinceDevour: 0,
     turnsSinceOverload: 0,
@@ -232,6 +234,12 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
       // ya existía. Sin esto el jugador nunca conecta ambos momentos.
       setTimeout(() => addMessage(t("dragonKingNameEcho"), "system"), 300);
       setTimeout(() => addMessage(t("dragonKingQuestion"), "system"), 1400);
+      // SPEC-1219 (Fase 4 del plan): fase 1 del clímax (guardia, callback a
+      // forest_titan) anunciada acá, DESPUÉS del diálogo dramático — si
+      // updateBossPhase() la disparara en su primer roll (síncrono, dentro
+      // de rollEnemyIntent() al final de startCombat()) aparecería ANTES de
+      // "¿el mundo aún recuerda mi nombre?", rompiendo el orden narrativo.
+      setTimeout(() => addMessage(formatText(t("dragonKingPhase1"), { enemy: gameState.currentEnemy.type }), "combat"), 2600);
     } else if (base.introLine) {
       // SPEC-1218 — historia mejorada, Acto I: linea de combate opcional por
       // enemigo (forest_titan/cave_devourer/mountain_colossus por ahora).

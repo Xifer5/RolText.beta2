@@ -75,6 +75,18 @@ test("boss: mezcla 40/25/20/15 con fallbacks", () => {
   assert.equal(decideNextAction({ ...e, lastAction: "defend" }, rngOf(0.9)), "attack");
 });
 
+test("boss_phased: 4 tramos de HP (75/50/25) alineados con updateBossPhase (SPEC-1219)", () => {
+  const e = { ...base, behavior: "boss_phased", magicAttack: 10, maxHp: 100 };
+  // Fase 1 (>75%): puede defender
+  assert.equal(decideNextAction({ ...e, hp: 80 }, rngOf(0.95)), "defend");
+  // Fases 2-3 (25-75%): mismo tramo de relleno, nunca defiende
+  assert.equal(decideNextAction({ ...e, hp: 60 }, rngOf(0.95)), "magic");
+  assert.equal(decideNextAction({ ...e, hp: 30 }, rngOf(0.95)), "magic");
+  // Fase 4 (<=25%): más agresivo, tampoco defiende
+  assert.equal(decideNextAction({ ...e, hp: 10 }, rngOf(0.95)), "magic");
+  assert.equal(decideNextAction({ ...e, hp: 10 }, rngOf(0.1)), "attack");
+});
+
 test("standard/sin behavior: 30% magia si tiene, si no ataque", () => {
   assert.equal(decideNextAction({ ...base, magicAttack: 5 }, rngOf(0.29)), "magic");
   assert.equal(decideNextAction({ ...base, magicAttack: 5 }, rngOf(0.31)), "attack");

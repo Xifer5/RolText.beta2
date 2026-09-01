@@ -79,24 +79,29 @@ export function decideNextAction(e, rng = Math.random) {
       return e.lastAction !== "defend" ? "defend" : "attack";
     }
 
-    // SPEC-1101 — Dragon King: 3 fases por umbral de HP, cada una más
-    // agresiva (mismo patrón de hpRatio que "berserker", sin tocar la
-    // narrativa pre/post ya implementada en combat.js). No telegrafía
-    // "defend" en fase 3 — un jefe agonizante no se cubre.
+    // SPEC-1101/1219 — Dragon King: 4 fases por umbral de HP (ver
+    // docs/PLAN-HISTORIA-FASE4.md), cada una más agresiva (mismo patrón de
+    // hpRatio que "berserker", sin tocar la narrativa pre/post ya
+    // implementada en combat.js). Los umbrales coinciden con
+    // updateBossPhase()/bossMechanics.js a propósito — si se cambian ahí,
+    // cambiar acá también. Fases 2 y 3 comparten el mismo tramo de relleno
+    // porque rollForcedBossAction() ya las domina con devour/overload
+    // forzado; no vale la pena tunear 2 tramos de "relleno" por separado.
+    // No telegrafía "defend" en fase 4 — un jefe agonizante no se cubre.
     case "boss_phased": {
       const r = rng();
-      if (hpRatio > 0.66) { // Fase 1
+      if (hpRatio > 0.75) { // Fase 1 — guardia del Titán
         if (r < 0.45) return "attack";
         if (r < 0.70) return "power_attack";
         if (r < 0.90) return canMagic ? "magic" : "power_attack";
         return e.lastAction !== "defend" ? "defend" : "attack";
       }
-      if (hpRatio > 0.33) { // Fase 2
+      if (hpRatio > 0.25) { // Fases 2-3 — devorar/sobrecarga (forzadas aparte)
         if (r < 0.30) return "attack";
         if (r < 0.65) return "power_attack";
         return canMagic ? "magic" : "power_attack";
       }
-      // Fase 3
+      // Fase 4 — quemadura final
       if (r < 0.20) return "attack";
       if (r < 0.60) return "power_attack";
       return canMagic ? "magic" : "power_attack";
