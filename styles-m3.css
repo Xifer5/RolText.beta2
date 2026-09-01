@@ -72,6 +72,14 @@
   --r-lg:  16px;
   --r-xl:  28px;
 
+  /* SPEC-1217/1220 — tokens del componente de equipamiento compartido
+     (Inventario + panel "Equipo" del menú). Vivían solo dentro de
+     #inventoryModal; movidos a :root para que equipmentStageHTML() se vea
+     igual sin importar en qué modal se inyecte. */
+  --equip-parchment: color-mix(in srgb, var(--md-surface-c-high) 90%, #d69a48 10%);
+  --equip-wood: color-mix(in srgb, var(--md-primary-container) 72%, #5a2e20 28%);
+  --equip-ring: color-mix(in srgb, var(--md-primary) 70%, #ffd98a 30%);
+
   --ease:        cubic-bezier(.2,0,0,1);
   --ease-spring: cubic-bezier(.34,1.56,.64,1);
   --ease-dec:    cubic-bezier(0,0,0,1); /* M3 decelerated — usado por sheetSlideUp y el panel de detalle del inventario */
@@ -3037,72 +3045,14 @@ button:focus-visible,
 }
 
 /* ── EQUIPMENT panel ─────────────────────────────────── */
-.equip-summary {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.equip-sum-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 12px 6px;
-  background: var(--md-surface-c-low);
-  border-radius: var(--r-md);
-  font-family: var(--font-title);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--md-on-surface);
-}
-.equip-sum-stat small {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--md-on-surface-variant);
-}
-/* SPEC-1214 — paper doll: retrato central + 8 slots como íconos alrededor,
-   en el mismo orden de lectura que EQUIP_SLOTS (panels.js) — por eso el
-   grid no necesita grid-area explícito, el orden del DOM ya arma la cruz. */
-.paperdoll-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 10px;
-  max-width: 280px;
-  margin: 0 auto 16px;
-}
-.doll-portrait {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--md-surface-c-high);
-  border: 2px solid var(--md-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.doll-portrait-img { width: 100%; height: 100%; object-fit: cover; }
-.doll-portrait-emoji { font-size: 32px; }
-.doll-slot {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--md-surface-c-low);
-  border: 1px solid var(--md-outline-variant);
-  border-radius: var(--r-lg);
-  cursor: pointer;
-  transition: transform var(--md-dur-short3) var(--ease), background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease);
-}
-.doll-slot:hover { background: var(--md-surface-c-high); transform: translateY(-2px); }
-.doll-slot.filled { border-color: var(--md-primary); background: var(--md-surface-c-high); }
-.doll-slot.empty { opacity: .55; border-style: dashed; }
-.doll-slot.active { box-shadow: 0 0 0 2px var(--md-primary); }
-.doll-slot-emoji { font-size: 20px; }
+/* SPEC-1220 — .equip-summary/.equip-sum-stat (resumen ATK/DEF/MAG/HP máx.
+   propio del panel viejo) quedaron sin uso: equipmentStageHTML() ya trae su
+   propio .equipment-stat-strip + barras de HP/MP equivalentes. */
+/* SPEC-1220 — el "paper doll" de SPEC-1214 (.paperdoll-grid/.doll-slot/
+   .doll-portrait) fue reemplazado por el mismo componente equipmentStageHTML
+   que ya usa el Inventario (ver equipmentView.js) — clases eliminadas, sin
+   reemplazo 1:1 necesario. .doll-detail/.equip-detail-* siguen en uso: son
+   el panel de detalle/desequipar que se abre debajo al hacer clic un slot. */
 .doll-detail { min-height: 56px; }
 .equip-detail-row {
   display: grid;
@@ -5578,11 +5528,6 @@ kbd {
    Fantasía visual apoyada en roles/tokens M3 y assets existentes.
    Todo queda encapsulado para convivir con la hoja local modificada.
    ═══════════════════════════════════════════════════════════ */
-#inventoryModal {
-  --equip-parchment: color-mix(in srgb, var(--md-surface-c-high) 90%, #d69a48 10%);
-  --equip-wood: color-mix(in srgb, var(--md-primary-container) 72%, #5a2e20 28%);
-  --equip-ring: color-mix(in srgb, var(--md-primary) 70%, #ffd98a 30%);
-}
 #inventoryModal .inventory-modal-content {
   container-name: inventory-modal;
   container-type: inline-size;
@@ -5782,19 +5727,23 @@ kbd {
   font: 700 clamp(18px, 2vw, 24px)/1.15 var(--font-title);
   overflow-wrap: anywhere;
 }
-#equipmentCharacterRole {
+#equipmentCharacterRole,
+.equipment-character-role {
   margin-top: 5px;
   color: var(--md-on-surface-variant);
   font: 600 11px/1.4 var(--font-ui);
 }
-#inventoryModal .equipment-slots-list {
+/* SPEC-1220 — de-escopadas de #inventoryModal: el panel "Equipo" del menú
+   (#panelModal) ahora inyecta el mismo equipmentStageHTML() y necesita
+   exactamente estas reglas para verse igual. */
+.equipment-slots-list {
   grid-area: slots;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-content: stretch;
   gap: 10px;
 }
-#inventoryModal .equipment-slots-list li {
+.equipment-slots-list li {
   grid-template-columns: 54px minmax(0, 1fr);
   gap: 10px;
   min-height: 76px;
@@ -5803,9 +5752,22 @@ kbd {
   background: var(--md-surface-c-low);
   cursor: default;
 }
-#inventoryModal .equipment-slots-list li.is-equipped {
+.equipment-slots-list li.is-equipped {
   border-color: color-mix(in srgb, var(--md-primary) 58%, var(--md-outline-variant));
   background: color-mix(in srgb, var(--md-primary-container) 28%, var(--md-surface-c-low));
+}
+/* Solo el panel "Equipo" del menú marca los slots como interactivos (ver
+   equipmentStageHTML({interactive:true}) en panels.js) — el inventario los
+   deja pasivos, el equipar/desequipar vive en el flujo de la Mochila. */
+.equipment-slots-list li[role="button"] { cursor: pointer; }
+.equipment-slots-list li[role="button"]:hover,
+.equipment-slots-list li[role="button"]:focus-visible {
+  border-color: var(--md-primary);
+  outline: none;
+}
+.equipment-slots-list li.slot-selected {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 35%, transparent);
 }
 .equip-slot-art {
   position: relative;
@@ -5854,7 +5816,7 @@ kbd {
   letter-spacing: .08em;
   text-transform: uppercase;
 }
-#inventoryModal .equip-val {
+.equip-val {
   overflow: hidden;
   color: var(--md-on-surface);
   font: 600 12px/1.3 var(--font-ui);
@@ -5948,8 +5910,8 @@ kbd {
   #inventoryModal .inventory-list-col,
   #inventoryModal .inventory-detail-col { padding: 12px; }
   #inventoryModal #inventoryList { max-height: 310px; }
-  #inventoryModal .equipment-slots-list { grid-template-columns: 1fr 1fr; }
-  #inventoryModal .equipment-slots-list li { min-height: 68px; grid-template-columns: 46px minmax(0, 1fr); }
+  .equipment-slots-list { grid-template-columns: 1fr 1fr; }
+  .equipment-slots-list li { min-height: 68px; grid-template-columns: 46px minmax(0, 1fr); }
   .equip-slot-art { width: 46px; height: 46px; }
   .equip-slot-art .item-icon-img, .equip-slot-art img { width: 38px; height: 38px; }
   .equipment-vitals { grid-template-columns: 1fr; }
@@ -5957,7 +5919,7 @@ kbd {
   #inventoryModal .inventory-grid.detail-open .inventory-list-col { display: none; }
 }
 @media (max-width: 430px) {
-  #inventoryModal .equipment-slots-list { grid-template-columns: 1fr; }
+  .equipment-slots-list { grid-template-columns: 1fr; }
   .equipment-stat-strip { width: 100%; }
   .equipment-stat-strip div { flex: 1; }
   .inventory-section-hint { display: none; }

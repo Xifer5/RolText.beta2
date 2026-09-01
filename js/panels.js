@@ -16,6 +16,7 @@ const CLASS_AVATARS = {
   rogue:   "img/avatar_rogue.webp",
 };
 import { resolveIconSrc } from "./utils.js";
+import { buildEquipmentView, equipmentStageHTML } from "./equipmentView.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { renderMinimap } from "./minimap.js";
@@ -144,30 +145,14 @@ function renderAttributes() {
 }
 
 // ── 🛡️ EQUIPMENT ────────────────────────────────────────
-// SPEC-1214 — paper doll de equipamiento (revisión 2026-08-31): reemplaza
-// la lista vertical de 8 filas de texto por un retrato central con los 8
-// slots como íconos alrededor (mismo patrón visual que el inventario en
-// grilla, SPEC-1213) — nombre/stats/desequipar viven en un panel de detalle
-// que se abre al hacer clic en un slot, no en la celda misma.
+// SPEC-1220 (revisión 2026-09-01): el panel de Equipo del menú ahora reusa
+// el MISMO componente visual que el Inventario (equipmentStageHTML en
+// equipmentView.js, SPEC-1217/1219) en vez de su propio "paper doll" con
+// CSS duplicada — mismo diseño, un solo lugar que lo define. La única
+// diferencia entre las 2 superficies: acá los slots son clickeables (abren
+// un detalle con botón de desequipar debajo); el inventario los deja
+// pasivos porque el equipar/desequipar ya vive en el flujo de la Mochila.
 let selectedEquipSlot = null;
-
-const EQUIP_SLOTS = [
-  { id: "head",      label: "Cabeza",        emoji: "🪖" },
-  { id: "armor",     label: "Armadura",      emoji: "🥋" },
-  { id: "rightHand", label: "Mano derecha",  emoji: "⚔️" },
-  { id: "arms",      label: "Brazos",        emoji: "🦾" },
-  null, // centro: retrato del personaje, no un slot
-  { id: "leftHand",  label: "Mano izquierda",emoji: "🛡️" },
-  { id: "boots",     label: "Botas",         emoji: "👢" },
-  { id: "ring",      label: "Anillo",        emoji: "💍" },
-  { id: "accessory", label: "Accesorio",     emoji: "✨" }
-];
-
-function equipIconHTML(icon, fallbackEmoji, size) {
-  const src = resolveIconSrc(icon);
-  if (src) return `<img src="${src}" width="${size}" height="${size}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${fallbackEmoji}'}))">`;
-  return `<span style="font-size:${Math.round(size * 0.7)}px">${icon || fallbackEmoji}</span>`;
-}
 
 function renderEquipDetail() {
   const box = document.getElementById("equipDollDetail");
@@ -176,10 +161,11 @@ function renderEquipDetail() {
     box.innerHTML = `<p class="muted" style="text-align:center">${t('equipmentEmptyHint')}</p>`;
     return;
   }
-  const slotDef = EQUIP_SLOTS.find(s => s?.id === selectedEquipSlot);
-  const item = gameState.equipment?.[selectedEquipSlot];
+  const view = buildEquipmentView(gameState.player, gameState.equipment);
+  const slotDef = view.slots.find(s => s.slot === selectedEquipSlot);
+  const item = slotDef?.item;
   if (!item) {
-    box.innerHTML = `<p class="muted" style="text-align:center">${slotDef.emoji} ${slotDef.label} — ${t('emptySlot')}</p>`;
+    box.innerHTML = `<p class="muted" style="text-align:center">${slotDef?.emptyIcon || ''} ${slotDef?.label || selectedEquipSlot} — ${t('emptySlot')}</p>`;
     return;
   }
   const attrs = [];
@@ -193,7 +179,7 @@ function renderEquipDetail() {
 
   box.innerHTML = `
     <div class="equip-detail-row">
-      <div class="equip-detail-icon">${equipIconHTML(item.icon, slotDef.emoji, 40)}</div>
+      <div class="equip-detail-icon">${resolveIconSrc(item.icon) ? `<img src="${resolveIconSrc(item.icon)}" width="40" height="40" alt="">` : `<span style="font-size:28px">${item.icon || slotDef.emptyIcon}</span>`}</div>
       <div class="equip-detail-info">
         <span class="equip-item-name">${localizeText(item.name)}</span>
         ${attrs.length ? `<span class="equip-attrs">${attrs.join(" · ")}</span>` : ""}
@@ -210,54 +196,29 @@ function renderEquipDetail() {
     applyDerivedMaxes();
     addMessage(formatText('equipmentUnequipMessage', { item: localizeText(curItem.name) }), "system");
     updateUI();
-    renderEquipment(); // re-render completo (stats resumen + doll + detalle)
+    renderEquipment(); // re-render completo (stage + detalle)
   });
 }
 
 function renderEquipment() {
-  const eq = gameState.equipment || {};
-  const p = gameState.player;
-  const derived = calculateTotalStats(p, eq);
-  const cls = CLASS_DEFINITIONS[p.class];
-
-  const dollCells = EQUIP_SLOTS.map(slot => {
-    if (!slot) {
-      // Centro: mismo patrón img+fallback emoji que el resto de la app (ver
-      // renderAttributes) — nunca romper si falta el archivo de avatar.
-      return `
-        <div class="doll-portrait">
-          ${cls && CLASS_AVATARS[p.class] ? `<img src="${CLASS_AVATARS[p.class]}" alt="${cls.name}" class="doll-portrait-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">` : ''}
-          <span class="doll-portrait-emoji" style="${cls && CLASS_AVATARS[p.class] ? 'display:none' : ''}">${cls ? cls.emoji : '⚔️'}</span>
-        </div>`;
-    }
-    const item = eq[slot.id];
-    const active = selectedEquipSlot === slot.id;
-    return `
-      <button type="button" class="doll-slot ${item ? 'filled' : 'empty'} ${active ? 'active' : ''}"
-              data-slot="${slot.id}" title="${slot.label}${item ? ': ' + localizeText(item.name) : ''}"
-              aria-label="${slot.label}${item ? ': ' + localizeText(item.name) : ''}">
-        ${item ? equipIconHTML(item.icon, slot.emoji, 32) : `<span class="doll-slot-emoji">${slot.emoji}</span>`}
-      </button>`;
-  }).join("");
+  const view = buildEquipmentView(gameState.player, gameState.equipment);
 
   openPanel(t('equipmentPanelTitle'), `
     <div class="equip-panel">
-      <div class="equip-summary">
-        <div class="equip-sum-stat">⚔️ ${derived.attack}<small>ATK</small></div>
-        <div class="equip-sum-stat">🛡️ ${derived.defense}<small>DEF</small></div>
-        <div class="equip-sum-stat">✨ ${derived.magic}<small>MAG</small></div>
-        <div class="equip-sum-stat">❤️ ${derived.maxHp}<small>HP máx</small></div>
-      </div>
-      <div class="paperdoll-grid">${dollCells}</div>
+      ${equipmentStageHTML(view, { interactive: true })}
       <div class="doll-detail" id="equipDollDetail"></div>
     </div>
   `);
 
-  document.querySelectorAll(".doll-slot").forEach(btn => {
-    btn.addEventListener("click", () => {
-      selectedEquipSlot = btn.dataset.slot;
-      document.querySelectorAll(".doll-slot").forEach(b => b.classList.toggle("active", b.dataset.slot === selectedEquipSlot));
+  document.querySelectorAll("#panelModalBody .equipment-slots-list li[data-slot]").forEach(li => {
+    li.classList.toggle("slot-selected", li.dataset.slot === selectedEquipSlot);
+    li.addEventListener("click", () => {
+      selectedEquipSlot = li.dataset.slot;
+      document.querySelectorAll("#panelModalBody .equipment-slots-list li").forEach(x => x.classList.toggle("slot-selected", x === li));
       renderEquipDetail();
+    });
+    li.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); li.click(); }
     });
   });
   renderEquipDetail();
