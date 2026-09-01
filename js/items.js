@@ -1538,6 +1538,28 @@ export const allItems = {
     price: 70
   },
 
+  corrupted_grimoire: {
+    id: "corrupted_grimoire",
+    name: { en: "Corrupted Grimoire", es: "Grimorio Corrompido" },
+    type: "material",
+    rarity: "rare",
+    price: 60,
+    icon: "./img/tome.webp"
+  },
+
+  valdris_seal: {
+    id: "valdris_seal",
+    name: { en: "Valdris's Seal", es: "Sello de Valdris" },
+    type: "accessory",
+    slot: "accessory",
+    rarity: "legendary",
+    magic: 8,
+    intelligence: 4,
+    price: 220,
+    description: { en: "The Archmage's Seal. +8 Magic, +4 Intelligence", es: "El Sello del Archimago. +8 Magia, +4 Inteligencia" },
+    icon: "./img/runeBlack.webp"
+  },
+
   tundra_emblem: {
     id: "tundra_emblem",
     name: { en: "Tundra Emblem", es: "Emblema de la Tundra" },

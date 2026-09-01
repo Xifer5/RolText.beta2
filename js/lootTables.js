@@ -261,6 +261,11 @@ export const bossLoot = {
     { item: "wyrm_tail", chance: 1.00, rarity: RARITY.EPIC },
     { item: "tundra_emblem", chance: 0.20, rarity: RARITY.LEGENDARY },
   ],
+
+  valdris_corrupted: [
+    { item: "corrupted_grimoire", chance: 1.00, rarity: RARITY.RARE },
+    { item: "valdris_seal", chance: 0.25, rarity: RARITY.LEGENDARY },
+  ],
 };
 
 

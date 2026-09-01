@@ -77,6 +77,14 @@ const ENEMY_LORE = {
     },
     weakness: { en: "Unknown", es: "Desconocida" },
     reward: { en: "Throne of the world", es: "Trono del mundo" }
+  },
+  valdris_corrupted: {
+    lore: {
+      en: "Once the Archmage of Griffon Keep. He studied the eight seals for years, convinced he alone could hold their power safely. The magic he absorbed consumed him first.",
+      es: "Alguna vez fue el Archimago del Castillo Griffon. Estudió los ocho sellos durante años, convencido de que solo él podía contener su poder sin riesgo. La magia que absorbió lo consumió a él primero."
+    },
+    weakness: { en: "Holy light", es: "Luz sagrada" },
+    reward: { en: "Corrupted grimoire", es: "Grimorio corrompido" }
   }
 };
 

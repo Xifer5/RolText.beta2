@@ -150,6 +150,10 @@ export const ENEMY_COMBAT_DATA = {
   // SPEC-1101: 3 fases por umbral de HP (ver enemyAI.js decideNextAction
   // caso "boss_phased") — la narrativa pre/post sigue intacta en combat.js.
   dragon_king: { resistances: { fire: 80, dark: 50, physical: 30, ice: -20, light: -30, holy: -20 }, attackDamageType: "fire", behavior: "boss_phased" },
+  // SPEC-1219 — Valdris: archimago corrompido, mismo patron "mage" que
+  // ancient_construct (magia por sobre fisico), resistente a lo arcano/
+  // oscuro que absorbio, debil a lo sagrado como cualquier corrupcion.
+  valdris_corrupted: { resistances: { magic: 30, dark: 20, holy: -30, light: -20 }, attackDamageType: "magic", magicDamageType: "dark", behavior: "mage" },
 };
 
 // ── Resistencias base por clase ─────────────────────────

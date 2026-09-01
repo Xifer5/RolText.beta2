@@ -13,6 +13,7 @@ import { setupKeyboard } from "./keyboard.js";
 import { initAudio, preloadSounds } from "./sounds.js";
 import { setupTravelEventModal } from "./travelEvents.js";
 import { setupEchoIntro } from "./echoIntro.js";
+import { setupValdrisArc } from "./valdrisArc.js";
 import { renderLocalMinimap } from "./localMinimap.js";
 import { showIntro } from "./intro.js";
 import { setupFocusTrap } from "./focusTrap.js";
@@ -43,6 +44,7 @@ window.addEventListener("DOMContentLoaded", () => {
   setupKeyboard();
   setupTravelEventModal();
   setupEchoIntro();
+  setupValdrisArc();
   setupFocusTrap();
 
   // Pre-carga sonidos tras primera interacción del usuario

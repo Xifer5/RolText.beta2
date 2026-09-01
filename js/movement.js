@@ -13,6 +13,7 @@ import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
 import { maybeStartEchoIntro } from "./echoIntro.js";
 import { maybeStartRivalEncounter } from "./rivalArc.js";
+import { maybeStartValdrisEncounter } from "./valdrisArc.js";
 import { advanceTime, getTimeTransitionMessage } from "./timeOfDay.js";
 
 let _movesSinceLastBoss = 0;
@@ -149,6 +150,12 @@ export function handleMove(direction) {
 
   // ── SPEC-1108: Kestrel, el rival recurrente — 3 encuentros guionizados ──
   if (maybeStartRivalEncounter(nextId)) {
+    updateUI();
+    return; // mismo patrón: el modal gestiona isProcessingMove
+  }
+
+  // ── SPEC-1219: Valdris, confrontación antes del Rey Dragón ──────────
+  if (maybeStartValdrisEncounter(nextId)) {
     updateUI();
     return; // mismo patrón: el modal gestiona isProcessingMove
   }

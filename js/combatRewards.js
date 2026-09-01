@@ -88,6 +88,23 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       });
     }
 
+    // SPEC-1219 — Valdris cae ANTES del Rey Dragón (Fase 1 del plan
+    // docs/PLAN-HISTORIA-FASE4.md, ver también valdrisArc.js). Encadena
+    // directo al combate final sin volver a explorar — mismo criterio que
+    // echoTrials.js: no se inventa un "combate seguro" entre ambos, el
+    // jugador debe llegar preparado. El deathMessage corto ya se mostró
+    // arriba (bloque genérico de todo boss); esto agrega el cierre
+    // narrativo propio + el disparo manual del Rey Dragón.
+    if (enemy.id === "valdris_corrupted") {
+      gameState.worldFlags.valdris_defeated = true;
+      setTimeout(() => addMessage(t("valdrisDefeatLine1"), "system"), 1200);
+      setTimeout(() => addMessage(t("valdrisDefeatLine2"), "system"), 3000);
+      setTimeout(() => addMessage(t("valdrisChainToDragon"), "system"), 4800);
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: "dragon_king", isBoss: true } }));
+      }, 6200);
+    }
+
     // Dragon King epilogue — climax of the main story
     if (enemy.id === "dragon_king") {
       gameState.mainQuestCompleted = true;
@@ -100,13 +117,13 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       // el epílogo esperanzador, para que la esperanza final se sienta
       // ganada (conociendo lo bueno Y lo malo) en vez de ingenua.
       setTimeout(() => addMessage(t("dragonKingTwist3"),  "system"), 6000);
-      // SPEC-1218 — Valdris como antagonista ambiguo (fase aditiva de la
-      // "historia mejorada", Acto III): NO hay pelea nueva ni NPC nuevo, solo
-      // este cierre narrativo. Se ubica DESPUÉS del twist moral de Asterion
-      // (Twist3) y ANTES del epílogo esperanzador — Valdris queda sin
-      // resolución limpia a propósito (ni villano confirmado ni redimido),
-      // coherente con "Voz culta, lógica y paternal" del documento y con las
-      // líneas ya sembradas en mq_02/mq_04/mq_05 (quests.js).
+      // SPEC-1218/1219 — cierre de Valdris (revisado en Fase 1 del plan
+      // docs/PLAN-HISTORIA-FASE4.md: pasó de "ambiguo solo por diálogo" a
+      // pelea real justo antes de esta, ver valdrisArc.js/enemies.js). Se
+      // ubica DESPUÉS del twist moral de Asterion (Twist3) y ANTES del
+      // epílogo esperanzador — Valdris queda sin resolución limpia a
+      // propósito (ni villano confirmado ni redimido), coherente con "voz
+      // culta, lógica y paternal" del documento.
       setTimeout(() => addMessage(t("dragonKingValdrisReveal"), "system"), 7600);
       setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 9200);
       // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)

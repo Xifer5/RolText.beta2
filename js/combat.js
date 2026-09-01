@@ -84,6 +84,9 @@ const ENEMY_STATUS_EFFECTS = {
   // "slash" en damageTypes.js), no acumula stacks (mismo patrón que quemadura).
   jungle_tiger:      { type: "bleed",  chance: 0.35, damage: 5,  turns: 3 },
   pirate_captain:    { type: "bleed",  chance: 0.30, damage: 6,  turns: 3 },
+  // SPEC-1219 — Valdris: arcano puro, mismo status que otros hechiceros
+  // (vampire/medusa) en vez de inventar un efecto nuevo para esta pelea.
+  valdris_corrupted: { type: "stun",   chance: 0.25, turns: 1 },
 };
 
 export function setupCombat() {

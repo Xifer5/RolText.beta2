@@ -551,6 +551,28 @@ export const enemyData = {
     img: "img/enemies/thief.webp",
   },
 
+  // SPEC-1219 — Valdris, antagonista real (Fase 1 del plan
+  // docs/PLAN-HISTORIA-FASE4.md). Se pelea justo antes de dragon_king (ver
+  // valdrisArc.js + combatRewards.js, que encadena el combate del Rey
+  // Dragón inmediatamente después de esta victoria). Stats entre el último
+  // boss del Acto II (frost_wyrm ~hp880/atk44) y dragon_king (hp3000/atk100):
+  // mago puro, magicAttack por encima de su ataque físico.
+  valdris_corrupted: {
+    isBoss: true,
+    type: "Valdris",
+    levelRequirement: 10,
+    hp: 1600,
+    maxHp: 1600,
+    attack: 55,
+    defense: 28,
+    magicAttack: 70,
+    experience: 1500,
+    gold: 400,
+    introLine: "—¡Solo quería protegerlos de lo que él podía volver a ser!",
+    deathMessage: "Solo... quería ser yo quien lo sostuviera con cuidado...",
+    img: "img/enemies/valdris_corrupted.webp",
+  },
+
   dragon_king: {
     isBoss: true,
     type: "Dragon",
