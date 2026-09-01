@@ -1,5 +1,14 @@
 # Plan de Trabajo: Historia Mejorada — Fase 4 (sistemas nuevos)
 
+## ✅ PLAN CERRADO (2026-09-01) — 5/5 fases hechas
+
+Las 5 fases de este plan quedaron implementadas, verificadas en vivo y
+pusheadas en una sola sesión: Fase 1 (Valdris), Fase 2 (Eryndel), Fase 3
+(Pyrax), Fase 4 (clímax de 4 fases), Fase 5 (finales estructurales). Suite
+final: 260/260. Con esto, el documento "historia mejorada" está
+COMPLETAMENTE implementado — no queda contenido narrativo del documento
+externo sin llevar al juego.
+
 ## Objetivo
 
 Implementar el resto del documento externo "historia mejorada" que todavía no
@@ -278,13 +287,9 @@ fase 1, "Dragon intenta devorarte" en fase 2, sobrecarga en fase 3,
 agresión final en fase 4), y el epílogo + modal de final post-victoria
 siguieron funcionando sin cambios. Suite 254/254.
 
-### Riesgo
-Alto — es la pieza de mecánica de combate más grande de todo el plan. Puede
-alterar el balance ya calibrado del combate final si no se prueba a fondo.
-
 ---
 
-## Fase 5: Reemplazo de los 3 finales por tono por los 3 finales estructurales
+## Fase 5: Reemplazo de los 3 finales por tono por los 3 finales estructurales ✅ HECHA (2026-09-01)
 
 ### Alcance
 Reemplazar `light`/`gray`/`dark` por Constelación/Nuevo Guardián/Edad de los
@@ -295,27 +300,70 @@ no como un cómputo derivado de decisiones pasadas como hoy.
 ### Decisión (RESUELTA 2026-09-01)
 **Elección real nueva**, la opción más fiel al documento. Modal de elección
 (reusa `travelEvents.js`) tras vencer al Rey Dragón: "¿Qué hacés con el
-Corazón?" → 3 opciones (devolver los recuerdos / tomar la corona / destruir
-el corazón) → se graba `gameState.finalChoiceId` → `showEnding()` lee ESE
-campo en vez de (o adicional a) `computeEndingTone()`.
+Corazón?" → 3 opciones → se graba `gameState.worldFlags.finalChoiceId` →
+`getEndingContent()` lee ESE campo.
 
-Queda pendiente de definir en el detalle de implementación, no en este plan:
-- Fallback en `runLog.js` para crónicas viejas sin `finalChoiceId`.
-- Qué pasa con `MORAL_DECISIONS`/`CLASS_BEAT_KEYS` existentes (¿se descartan
-  o se combinan con la elección estructural?).
-- Comportamiento en Pruebas del Eco / NG+ (nunca llegan a `dragon_king` en
-  el primer caso; en NG+ debería poder volver a elegir).
+**Decisión de alcance adicional (RESUELTA, 2da ronda de AskUserQuestion)**:
+el log de combate NO branchea por la elección — todos ven el mismo mensaje
+"el Corazón asciende en miles de estrellas" (`dragonKingEpilogue`) sin
+importar qué elijan. Solo el MODAL de victoria (título + texto) cambia.
+Menos volumen de texto, a cambio de aceptar esa pequeña tensión narrativa
+si el jugador elige otra cosa que no sea "devolver los recuerdos".
 
-### Archivos afectados
-`js/endings.js` (la reescritura central), `js/runLog.js` (compatibilidad con
-registros viejos), `js/combatRewards.js` (disparo de la elección), `index.html`
-(estructura del modal si cambia de forma), `js/i18n.js` (reemplazo casi total
-de las claves `ending*`), `tests/` (si existen tests de `endings.js`, hay que
-revisar/actualizar).
+### Las 3 preguntas que quedaban abiertas — resueltas por investigación, sin necesitar decisión nueva
+1. **Fallback en `runLog.js`**: NO HIZO FALTA NINGUNO. `buildRunRecord()`
+   ya congela `endingTitleKey` como STRING en el JSON persistido al momento
+   de la victoria — nunca se recalcula. Una crónica vieja simplemente
+   guarda el string `"endingTitleLight"` para siempre, sin importar qué
+   cambie después en `endings.js`. Cero riesgo de compatibilidad real.
+2. **`MORAL_DECISIONS`/`CLASS_BEAT_KEYS`**: se MANTUVIERON, sin descartar
+   nada. La elección decide el final "grande" (título + texto principal);
+   el tono acumulado (`computeEndingTone()`, sin cambios) sigue aportando
+   la frase de sabor por clase, apendeada debajo — verificado en vivo (ver
+   abajo). Ambos sistemas conviven en la misma respuesta de
+   `getEndingContent()`.
+3. **Pruebas del Eco / NG+**: no necesitaron ningún código nuevo. Echo
+   Trials nunca pelea contra `dragon_king` (confirmado en `echoTrials.js`:
+   no está en `TRIAL_BOSSES`), y "Nuevo Juego" ya resetea `worldFlags`, así
+   que la elección se vuelve a presentar sola en cada partida nueva de NG+.
 
-### Riesgo
-El más alto de todo el plan — es la única fase que toca compatibilidad de
-datos persistidos (saves + crónica), no solo contenido nuevo.
+### Implementación real
+- `js/endings.js`: `STRUCTURAL_ENDINGS` mapea 3 `finalChoiceId` a sus
+  claves de título/texto. `getEndingContent()` las usa SI `flags.finalChoiceId`
+  existe; si no (ej. `showGameOver()`, que nunca llega a esta elección),
+  cae al cómputo por tono de siempre — mismo comportamiento que antes de
+  esta fase, cero regresión.
+- `js/finalChoice.js` (nuevo): `FINAL_CHOICE_EVENT`, mismo patrón que
+  `echoIntro.js`/`valdrisArc.js`/`pyraxArc.js` — evento de
+  `travelEvents.js` con 3 choices, cada uno graba
+  `worldFlags.finalChoiceId` y devuelve texto de resultado propio.
+- `js/combatRewards.js`: el bloque de `dragon_king` ahora muestra el
+  evento de elección DESPUÉS de todo el log narrativo existente (a los
+  10800ms, en el lugar donde antes se llamaba `showEnding()` directo), y
+  usa un listener `{ once: true }` de `pixel:travelEventClosed` para recién
+  ahí llamar `recordRun("victory")` + `showEnding()` — así la Crónica graba
+  el final REALMENTE elegido, no solo el tono acumulado.
+- `js/i18n.js`: 6 claves nuevas (`endingTitle/Text` × Constellation/
+  Guardian/MortalAge, en/es).
+- **NO se tocó `index.html`** — se reusa el modal `travelEventModal` que ya
+  existe, no el modal de `endingModal` (ese no cambió de forma, solo el
+  contenido que recibe).
+- **NO se tocó `js/runLog.js`** — no hizo falta ningún cambio, ver arriba.
+
+### Archivos afectados (reales)
+`js/endings.js`, `js/finalChoice.js` (nuevo), `js/combatRewards.js`,
+`js/i18n.js`, `tests/endings.test.mjs` (+5 tests), `tests/runLog.test.mjs`
+(+1 test). NO se tocó `index.html`, `js/runLog.js`.
+
+### Riesgo real
+Alto en teoría, bajo en la práctica — el riesgo de compatibilidad que
+motivaba la calificación "el más alto de todo el plan" resultó ser un
+no-problema real una vez investigado (ver las 3 preguntas arriba). Suite
+260/260. Verificado en vivo: combate completo contra `dragon_king`, modal
+de elección con las 3 opciones, elección "tomar la corona" → modal de
+victoria mostró "👑 El Nuevo Guardián" con su texto estructural completo Y
+la frase de sabor de clase (Pícaro) apendeada debajo — confirma que ambos
+sistemas conviven sin conflicto, tal como se diseñó.
 
 ---
 

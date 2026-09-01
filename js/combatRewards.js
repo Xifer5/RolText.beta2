@@ -21,6 +21,8 @@ import { getDifficultyConfig } from "./difficulty.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { showSpecializationModal } from "./specModal.js";
 import { consumeEchoReward } from "./echoIntro.js";
+import { showTravelEvent } from "./travelEvents.js";
+import { FINAL_CHOICE_EVENT } from "./finalChoice.js";
 import { modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
 import { showEnding, MORAL_DECISIONS } from "./endings.js";
 import { recordRun } from "./runLog.js";
@@ -126,10 +128,22 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       // culta, lógica y paternal" del documento.
       setTimeout(() => addMessage(t("dragonKingValdrisReveal"), "system"), 7600);
       setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 9200);
-      // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
-      // SPEC-1003: la crónica se escribe tras cerrar el resto de endCombat (kills ya contadas)
-      setTimeout(() => recordRun("victory"), 100);
-      setTimeout(() => showEnding(), 10800);
+      // SPEC-1219 (Fase 5) — elección real del jugador: qué hacer con el
+      // Corazón, determina el final ESTRUCTURAL (ver finalChoice.js/
+      // endings.js). Decisión de alcance confirmada con el usuario: el log
+      // de arriba NO branchea (todos ven "el Corazón asciende en miles de
+      // estrellas" sin importar la elección) — menos volumen de texto, a
+      // cambio de esa leve tensión narrativa si el jugador elige otra cosa.
+      // recordRun() se corre HASTA DESPUÉS de la elección (no a los 100ms
+      // como antes de esta fase) para que la Crónica guarde el final
+      // realmente elegido, no solo el tono acumulado.
+      setTimeout(() => {
+        showTravelEvent(FINAL_CHOICE_EVENT);
+        window.addEventListener("pixel:travelEventClosed", () => {
+          recordRun("victory");
+          showEnding();
+        }, { once: true });
+      }, 10800);
     }
 
     // Record kill for bestiary

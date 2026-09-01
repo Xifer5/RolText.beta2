@@ -29,6 +29,12 @@ test("buildRunRecord: victoria captura clase, origen, dificultad, tono y decisio
   assert.ok(r.timestamp);
 });
 
+test("buildRunRecord: con finalChoiceId, la Crónica guarda el título del final estructural elegido (SPEC-1219)", () => {
+  gameState.worldFlags = { finalChoiceId: "take_crown" };
+  const r = buildRunRecord(gameState, "victory");
+  assert.equal(r.endingTitleKey, "endingTitleGuardian");
+});
+
 test("buildRunRecord: derrota sin título de final pero con decisiones contadas", () => {
   gameState.worldFlags = { purse_taken: true };
   const r = buildRunRecord(gameState, "defeat");

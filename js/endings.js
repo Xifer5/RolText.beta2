@@ -50,15 +50,33 @@ const CLASS_BEAT_KEYS = {
   rogue:   { light: "endingBeatRogueLight",   gray: "endingBeatRogueGray",   dark: "endingBeatRogueDark" }
 };
 
-/** Contenido del final: claves de título/texto por tono + recap de decisiones tomadas. */
+// SPEC-1219 (Fase 5 del plan docs/PLAN-HISTORIA-FASE4.md) — los 3 finales
+// ESTRUCTURALMENTE distintos del documento "historia mejorada", elegidos
+// por el jugador en vivo (ver finalChoice.js) en vez de calculados desde
+// decisiones pasadas. Capa AGREGADA sobre el sistema de tono existente, no
+// un reemplazo: cuando el jugador ya eligió (flags.finalChoiceId set),
+// titleKey/textKey vienen de acá; si no (ej. showGameOver(), que nunca
+// llega a esta elección — la derrota no tiene "corazón" que decidir),
+// getEndingContent() sigue cayendo al cómputo por tono de siempre. El tono
+// y classBeatKey se calculan IGUAL en ambos casos: la elección decide el
+// final "grande", el tono acumulado sigue aportando la frase de sabor por
+// clase debajo — ninguno reemplaza al otro.
+const STRUCTURAL_ENDINGS = {
+  return_memories: { titleKey: "endingTitleConstellation", textKey: "endingTextConstellation" },
+  take_crown:       { titleKey: "endingTitleGuardian",      textKey: "endingTextGuardian" },
+  destroy_heart:    { titleKey: "endingTitleMortalAge",     textKey: "endingTextMortalAge" }
+};
+
+/** Contenido del final: claves de título/texto (por elección si existe, si no por tono) + recap de decisiones tomadas. */
 export function getEndingContent(flags = {}) {
   const { score, tone } = computeEndingTone(flags);
   const cap = tone.charAt(0).toUpperCase() + tone.slice(1);
+  const structural = STRUCTURAL_ENDINGS[flags.finalChoiceId];
   return {
     score,
     tone,
-    titleKey: `endingTitle${cap}`,
-    textKey: `endingText${cap}`,
+    titleKey: structural?.titleKey ?? `endingTitle${cap}`,
+    textKey: structural?.textKey ?? `endingText${cap}`,
     classBeatKey: CLASS_BEAT_KEYS[gameState.player?.class]?.[tone] ?? null,
     recapKeys: MORAL_DECISIONS.filter(d => flags[d.flag]).map(d => d.recapKey),
     rivalRecap: getRivalRecap(flags)
