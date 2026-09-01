@@ -260,6 +260,7 @@ export const QUEST_DATA = {
       ],
       completed: [
         { en: "'Asterion is not destroying the world. The world is killing him.' I knew it.", es: "'Asterion no destruye el mundo. El mundo lo está matando.' Lo sabía." },
+        { en: "When I too understand his memories, I will be able to make sure no one repeats this mistake. Not the dragon. Not us.", es: "Cuando yo también comprenda sus recuerdos, podré asegurarme de que nadie vuelva a cometer este error. Ni el dragón. Ni nosotros." },
         { en: "The Dragon Gate exists. Seek Pyrax at the Eternal Volcano — he has guarded that door since the first eruption.", es: "La Puerta del Dragón existe. Busca a Pyrax en el Volcán Eterno — él ha custodiado esa puerta desde la primera erupción." }
       ]
     }
@@ -282,7 +283,8 @@ export const QUEST_DATA = {
         { en: "You will need the three keys — Arcane, Garden, Dragon. Only then will the Throne open.", es: "Necesitarás las tres llaves — Arcana, Jardín, Dragón. Solo entonces se abrirá el Trono." }
       ],
       active: [
-        { en: "Beyond the Infernal Threshold lies the Dragon King's Throne. Carry the three keys.", es: "Más allá del Umbral del Infierno está el Trono del Rey Dragón. Lleva las tres llaves." }
+        { en: "Beyond the Infernal Threshold lies the Dragon King's Throne. Carry the three keys.", es: "Más allá del Umbral del Infierno está el Trono del Rey Dragón. Lleva las tres llaves." },
+        { en: "You will not find a king behind that door. You will find everything a king was unable to forgive himself for.", es: "No hallarás un rey detrás de esa puerta. Hallarás todo aquello que un rey fue incapaz de perdonarse." }
       ],
       completed: [
         { en: "You have seen it. You have heard it. The dragon's last dream… is over.", es: "Lo has visto. Lo has escuchado. El último sueño del dragón… ha terminado." },

@@ -100,11 +100,19 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       // el epílogo esperanzador, para que la esperanza final se sienta
       // ganada (conociendo lo bueno Y lo malo) en vez de ingenua.
       setTimeout(() => addMessage(t("dragonKingTwist3"),  "system"), 6000);
-      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 7600);
+      // SPEC-1218 — Valdris como antagonista ambiguo (fase aditiva de la
+      // "historia mejorada", Acto III): NO hay pelea nueva ni NPC nuevo, solo
+      // este cierre narrativo. Se ubica DESPUÉS del twist moral de Asterion
+      // (Twist3) y ANTES del epílogo esperanzador — Valdris queda sin
+      // resolución limpia a propósito (ni villano confirmado ni redimido),
+      // coherente con "Voz culta, lógica y paternal" del documento y con las
+      // líneas ya sembradas en mq_02/mq_04/mq_05 (quests.js).
+      setTimeout(() => addMessage(t("dragonKingValdrisReveal"), "system"), 7600);
+      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 9200);
       // SPEC-1001: el final refleja tus decisiones (el modal estaba huérfano — nadie lo abría)
       // SPEC-1003: la crónica se escribe tras cerrar el resto de endCombat (kills ya contadas)
       setTimeout(() => recordRun("victory"), 100);
-      setTimeout(() => showEnding(), 9200);
+      setTimeout(() => showEnding(), 10800);
     }
 
     // Record kill for bestiary
