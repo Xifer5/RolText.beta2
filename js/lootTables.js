@@ -163,6 +163,8 @@ export const biomeLoot = {
     // SPEC-1226: Inferno_elemental (enemies.js `drops`) prometía fire_robe
     // junto a flame_staff -- solo flame_staff era alcanzable en otro lado.
     { item: "fire_robe", chance: 0.06, rarity: RARITY.EPIC },
+    // SPEC-1226 (fase 2): item completo, nunca conectado a ningún loot.
+    { item: "pyro_core", chance: 0.10, rarity: RARITY.RARE },
     { item: "flame_staff", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "plate_armor", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "ring_of_inferno", chance: 0.10, rarity: RARITY.LEGENDARY },
@@ -234,6 +236,9 @@ export const biomeLoot = {
     { item: "treasure_map", chance: 0.30, rarity: RARITY.EPIC },
     { item: "ancient_guardian_core", chance: 0.10, rarity: RARITY.LEGENDARY },
     { item: "treasure_guardian_heart", chance: 0.10, rarity: RARITY.LEGENDARY },
+    // SPEC-1226 (fase 2): sibling de ancient_guardian_core, mismo bioma,
+    // nunca conectado -- item completo, solo faltaba enlazarlo.
+    { item: "treasure_guardian_core", chance: 0.12, rarity: RARITY.EPIC },
     { item: "royal_sword", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "royal_armor", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "saint_grial", chance: 0.05, rarity: RARITY.EPIC },
@@ -257,19 +262,25 @@ export const biomeLoot = {
 // Loot específico de bosses y mini-bosses
 // -----------------------------------------------------
 export const bossLoot = {
+  // SPEC-1226 (fase 2): "inferno_blade" aparecía en el `drops` de estos 4
+  // jefes de zona además de inferno_dragon -- una espada legendaria
+  // universal que cualquier jefe de zona puede soltar como bonus raro.
   forest_titan: [
     { item: "titan_branch", chance: 1.00, rarity: RARITY.RARE },
     { item: "forest_emblem", chance: 0.25, rarity: RARITY.EPIC },
+    { item: "inferno_blade", chance: 0.05, rarity: RARITY.LEGENDARY },
   ],
 
   cave_devourer: [
     { item: "devourer_fang", chance: 1.00, rarity: RARITY.RARE },
     { item: "earthbreaker_core", chance: 0.15, rarity: RARITY.EPIC },
+    { item: "inferno_blade", chance: 0.05, rarity: RARITY.LEGENDARY },
   ],
 
   mountain_colossus: [
     { item: "colossus_heart", chance: 1.00, rarity: RARITY.RARE },
     { item: "mountain_emblem", chance: 0.25, rarity: RARITY.EPIC },
+    { item: "inferno_blade", chance: 0.05, rarity: RARITY.LEGENDARY },
   ],
 
   ancient_construct: [
@@ -280,11 +291,14 @@ export const bossLoot = {
   swamp_abomination: [
     { item: "abomination_core", chance: 1.00, rarity: RARITY.RARE },
     { item: "plague_emblem", chance: 0.20, rarity: RARITY.EPIC },
+    { item: "inferno_blade", chance: 0.05, rarity: RARITY.LEGENDARY },
   ],
 
   inferno_dragon: [
     { item: "inferno_eye", chance: 1.00, rarity: RARITY.EPIC },
     { item: "inferno_emblem", chance: 0.15, rarity: RARITY.LEGENDARY },
+    { item: "inferno_blade", chance: 0.05, rarity: RARITY.LEGENDARY },
+    { item: "dragon_scale_armor", chance: 0.10, rarity: RARITY.EPIC },
   ],
 
   frost_wyrm: [
@@ -323,7 +337,44 @@ export const enemyLoot = {
   ],
   slime: [
     { item: "slime_gel", chance: 0.50, rarity: RARITY.COMMON }
-  ]
+  ],
+
+  // SPEC-1226 (fase 2): enemies.js `drops` prometía estos items específicos
+  // por enemigo -- nunca existieron ni estaban conectados a ningún lado.
+  vampire: [
+    { item: "elixir_potion", chance: 0.15, rarity: RARITY.RARE }
+  ],
+  genie: [
+    { item: "ring_of_wisdom", chance: 0.10, rarity: RARITY.RARE },
+    { item: "magic_lamp", chance: 0.05, rarity: RARITY.EPIC }
+  ],
+  gremlin: [
+    { item: "dagger", chance: 0.20, rarity: RARITY.UNCOMMON }
+  ],
+  dwarf_warrior: [
+    { item: "war_hammer", chance: 0.15, rarity: RARITY.RARE }
+  ],
+  pegasus: [
+    { item: "light_armor", chance: 0.15, rarity: RARITY.UNCOMMON }
+  ],
+  tent: [
+    { item: "healing_staff", chance: 0.15, rarity: RARITY.UNCOMMON }
+  ],
+  dark_knight: [
+    { item: "dark_sword", chance: 0.12, rarity: RARITY.RARE },
+    { item: "dark_shield", chance: 0.12, rarity: RARITY.RARE }
+  ],
+  sand_worm: [
+    { item: "desert_armor", chance: 0.15, rarity: RARITY.RARE }
+  ],
+  lava_golem: [
+    { item: "lava_sword", chance: 0.12, rarity: RARITY.RARE },
+    { item: "fire_shield", chance: 0.12, rarity: RARITY.RARE }
+  ],
+  pyro_elemental: [
+    { item: "pyro_staff", chance: 0.12, rarity: RARITY.RARE },
+    { item: "flame_robe", chance: 0.12, rarity: RARITY.RARE }
+  ],
 };
 
 

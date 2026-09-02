@@ -1790,6 +1790,122 @@ export const allItems = {
     defense: 5, price: 90, icon: "🧊",
   },
 
+  // SPEC-1226 (fase 2) — el resto de enemies.js `drops` sin conectar no
+  // referenciaba ningún ítem existente en absoluto (a diferencia de las
+  // dos fases anteriores, acá no había NADA que reconectar). Se autoraron
+  // desde cero, siguiendo el mismo enemigo/tema que ya prometía cada uno.
+  elixir_potion: {
+    id: "elixir_potion",
+    name: { en: "Elixir Potion", es: "Poción Elixir" },
+    description: { en: "A draining brew. Restores 40 HP and 20 MP.", es: "Un brebaje drenante. Restaura 40 HP y 20 MP." },
+    restoreHp: 40, restoreMp: 20, type: "consumable", rarity: "rare", price: 50, icon: "🧉",
+  },
+  ring_of_wisdom: {
+    id: "ring_of_wisdom",
+    name: { en: "Ring of Wisdom", es: "Anillo de Sabiduría" },
+    description: { en: "+8 INT, +15 MP", es: "+8 INT, +15 MP" },
+    type: "ring", rarity: "rare", slot: "ring",
+    intelligence: 8, mp: 15, price: 140, icon: "💍",
+  },
+  magic_lamp: {
+    id: "magic_lamp",
+    name: { en: "Magic Lamp", es: "Lámpara Mágica" },
+    description: { en: "+6 INT, +6 MAG", es: "+6 INT, +6 MAG" },
+    type: "accessory", rarity: "epic", slot: "accessory",
+    intelligence: 6, magic: 6, price: 180, icon: "🪔",
+  },
+  dagger: {
+    id: "dagger",
+    name: { en: "Dagger", es: "Daga" },
+    description: { en: "A quick blade. +9 ATK, +3 AGI", es: "Una hoja veloz. +9 ATK, +3 AGI" },
+    type: "weapon", rarity: "uncommon", slot: "rightHand",
+    attack: 9, agility: 3, price: 60, icon: "🗡️",
+  },
+  war_hammer: {
+    id: "war_hammer",
+    name: { en: "War Hammer", es: "Martillo de Guerra" },
+    description: { en: "A heavy hammer. +24 ATK, +5 STR", es: "Un martillo pesado. +24 ATK, +5 FUE" },
+    type: "weapon", rarity: "rare", slot: "rightHand",
+    attack: 24, strength: 5, price: 150, icon: "🔨",
+  },
+  light_armor: {
+    id: "light_armor",
+    name: { en: "Light Armor", es: "Armadura Ligera" },
+    description: { en: "Light as a feather. +4 DEF, +3 AGI", es: "Ligera como una pluma. +4 DEF, +3 AGI" },
+    type: "armor", rarity: "uncommon", slot: "armor",
+    defense: 4, agility: 3, price: 85, icon: "🪶",
+  },
+  healing_staff: {
+    id: "healing_staff",
+    name: { en: "Healing Staff", es: "Báculo Curativo" },
+    description: { en: "+5 INT, +8 MAG", es: "+5 INT, +8 MAG" },
+    type: "weapon", rarity: "uncommon", slot: "rightHand",
+    intelligence: 5, magic: 8, price: 110, icon: "🌿",
+  },
+  dark_sword: {
+    id: "dark_sword",
+    name: { en: "Dark Sword", es: "Espada Oscura" },
+    description: { en: "+22 ATK, +5 MAG", es: "+22 ATK, +5 MAG" },
+    type: "weapon", rarity: "rare", slot: "rightHand",
+    attack: 22, magic: 5, price: 160, icon: "🗡️",
+  },
+  dark_shield: {
+    id: "dark_shield",
+    name: { en: "Dark Shield", es: "Escudo Oscuro" },
+    description: { en: "+9 DEF", es: "+9 DEF" },
+    type: "shield", rarity: "rare", slot: "leftHand",
+    defense: 9, price: 140, icon: "🛡️",
+  },
+  desert_armor: {
+    id: "desert_armor",
+    name: { en: "Desert Armor", es: "Armadura del Desierto" },
+    description: { en: "+7 DEF", es: "+7 DEF" },
+    type: "armor", rarity: "rare", slot: "armor",
+    defense: 7, price: 120, icon: "🏜️",
+  },
+  lava_sword: {
+    id: "lava_sword",
+    name: { en: "Lava Sword", es: "Espada de Lava" },
+    description: { en: "+23 ATK", es: "+23 ATK" },
+    type: "weapon", rarity: "rare", slot: "rightHand",
+    attack: 23, price: 155, icon: "🔥",
+  },
+  fire_shield: {
+    id: "fire_shield",
+    name: { en: "Fire Shield", es: "Escudo de Fuego" },
+    description: { en: "+9 DEF", es: "+9 DEF" },
+    type: "shield", rarity: "rare", slot: "leftHand",
+    defense: 9, price: 140, icon: "🔥",
+  },
+  pyro_staff: {
+    id: "pyro_staff",
+    name: { en: "Pyro Staff", es: "Báculo Pirótico" },
+    description: { en: "+6 INT, +14 MAG", es: "+6 INT, +14 MAG" },
+    type: "weapon", rarity: "rare", slot: "rightHand",
+    intelligence: 6, magic: 14, price: 150, icon: "🔥",
+  },
+  flame_robe: {
+    id: "flame_robe",
+    name: { en: "Flame Robe", es: "Túnica Flamígera" },
+    description: { en: "+6 DEF, +8 MAG", es: "+6 DEF, +8 MAG" },
+    type: "armor", rarity: "rare", slot: "armor",
+    defense: 6, magic: 8, price: 145, icon: "👘",
+  },
+  inferno_blade: {
+    id: "inferno_blade",
+    name: { en: "Inferno Blade", es: "Hoja del Infierno" },
+    description: { en: "A legendary weapon carried by zone guardians. +38 ATK, +8 STR", es: "Un arma legendaria que portan los guardianes de zona. +38 ATK, +8 FUE" },
+    type: "weapon", rarity: "legendary", slot: "rightHand",
+    attack: 38, strength: 8, price: 320, icon: "⚔️",
+  },
+  dragon_scale_armor: {
+    id: "dragon_scale_armor",
+    name: { en: "Dragon Scale Armor", es: "Armadura de Escamas de Dragón" },
+    description: { en: "+14 DEF", es: "+14 DEF" },
+    type: "armor", rarity: "epic", slot: "armor",
+    defense: 14, price: 220, icon: "🐉",
+  },
+
   // ── Pergaminos de habilidad (SPEC-0607) ──────────────
   scroll_of_rally: {
     id: "scroll_of_rally",
@@ -1915,6 +2031,15 @@ export const shopInventories = {
     "ring_strength",
     "ring_agility",
     "ring_intelligence",
+    // SPEC-1226 (fase 2): 6 items con definición completa que nunca
+    // aparecían en ninguna tienda ni tabla de loot -- variantes baratas
+    // extra por ranura para el surtido básico del pueblo.
+    "boots_leather",
+    "arms_bracelet",
+    "ring_silver",
+    "helmet_leather",
+    "hat",
+    "emblem_hero",
   ],
   // castle quartermaster has stronger gear (higher level / pricier)
   castle_shop: [

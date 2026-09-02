@@ -27,41 +27,23 @@ test("ancient_core (mq_03_ecos) es obtenible en el bioma garden, no solo en ruin
 
 // SPEC-1226 — enemies.js's `drops` field es dato decorativo NUNCA leído por
 // ningún código real (confirmado: ni combatRewards.js ni ningún otro
-// archivo lo consulta). Pero representa la intención original del autor
-// sobre qué debería soltar cada enemigo. De los ids que ahí aparecen, solo
-// nos importan los que corresponden a un ítem REAL en allItems -- el resto
-// son ids que nunca se llegaron a autorar (o typos, ej. "saint_grail" vs
-// el item real "saint_grial") y no hay nada que "conectar" ahí sin
-// inventar contenido nuevo. Test genérico (no hardcodea la lista): todo
-// item REAL que aparece en el `drops` de un enemigo debe ser obtenible en
-// algún lado -- si mañana se agrega un enemigo nuevo con `drops` sin
-// conectar, esto lo atrapa solo.
-test("SPEC-1226: todo item REAL (existe en allItems) listado en enemies.js `drops` es obtenible en algún sistema de loot real", () => {
+// archivo lo consulta), pero representa la intención original del autor
+// sobre qué debería soltar cada enemigo. Tras autorar los 16 ids que no
+// correspondían a ningún ítem (fase 2) y conectar los 12 que sí existían
+// pero no estaban en ningún loot (fase 1), TODO lo que `drops` promete
+// debe ahora ser: (a) un ítem real, y (b) obtenible en algún sistema real.
+test("SPEC-1226: todo item listado en enemies.js `drops` existe en allItems Y es obtenible en algún sistema de loot real", () => {
   const obtainable = allObtainableItems();
-  const missing = [];
+  const missingItem = [];
+  const missingLoot = [];
   for (const [enemyId, e] of Object.entries(enemyData)) {
     for (const item of e.drops ?? []) {
-      if (allItems[item] && !obtainable.has(item)) missing.push(`${enemyId} -> ${item}`);
+      if (!allItems[item]) missingItem.push(`${enemyId} -> ${item}`);
+      else if (!obtainable.has(item)) missingLoot.push(`${enemyId} -> ${item}`);
     }
   }
-  assert.deepEqual(missing, [], `items reales prometidos por 'drops' sin ninguna fuente real:\n${missing.join("\n")}`);
-});
-
-test("SPEC-1226: documenta (sin fallar) los ids de 'drops' que no corresponden a ningún ítem real -- candidatos a limpiar o autorar", () => {
-  const phantom = new Set();
-  for (const e of Object.values(enemyData)) {
-    for (const item of e.drops ?? []) {
-      if (!allItems[item]) phantom.add(item);
-    }
-  }
-  // Este test documenta el estado conocido -- si la lista cambia (se
-  // autora el item o se limpia el 'drops'), actualizar aquí a propósito.
-  assert.deepEqual([...phantom].sort(), [
-    "dagger", "dark_shield", "dark_sword", "desert_armor", "dragon_scale_armor",
-    "elixir_potion", "fire_shield", "flame_robe", "healing_staff", "inferno_blade",
-    "lava_sword", "light_armor", "magic_lamp", "pyro_staff", "ring_of_wisdom",
-    "saint_grail", "war_hammer"
-  ].sort());
+  assert.deepEqual(missingItem, [], `ids de 'drops' sin ítem real en allItems:\n${missingItem.join("\n")}`);
+  assert.deepEqual(missingLoot, [], `items reales prometidos por 'drops' sin ninguna fuente real:\n${missingLoot.join("\n")}`);
 });
 
 // SPEC-1226 — el bug inverso, y más grave: 16 ids en biomeLoot/enemyLoot/

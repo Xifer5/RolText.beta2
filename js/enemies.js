@@ -589,7 +589,7 @@ export const enemyData = {
     magicAttack: 50,
     experience: 3000,
     gold: 1000,
-    drops: ["saint_grail", "excalibur", "dragon_heart"],
+    drops: ["saint_grial", "excalibur", "dragon_heart"],
     deathMessage: "Gracias... por recordarme.",
     img: "img/enemies/dragon_king.webp",
   },
