@@ -12,7 +12,7 @@ import { gameState } from "./state.js";
 import { calculateTotalStats, calculateMagicAttack } from "./stats.js";
 import { addMessage } from "./story.js";
 import { showFloatingText, shakeScreen, updateUI } from "./ui.js";
-import { SKILLS_BY_CLASS } from "./classes.js";
+import { SKILLS_BY_CLASS, LEARNABLE_SKILLS, hasLearnedSkill } from "./classes.js";
 import { playSound } from "./sounds.js";
 import { t, formatText, pickVariant } from "./i18n.js";
 import { getMasteryBonus } from "./mastery.js";
@@ -294,7 +294,13 @@ export async function playerMagic() {
 export async function useSkill(skillId) {
   const p = gameState.player;
   const skills = SKILLS_BY_CLASS[p.class] || [];
-  const skill = skills.find(s => s.id === skillId);
+  // SPEC-1224: fix real -- getAvailableSkills() (classes.js) ya mezclaba las
+  // habilidades universales aprendidas (pergaminos: rally/power_strike/
+  // arcane_bolt) para MOSTRAR los botones, pero useSkill() nunca las buscaba
+  // acá, así que ejecutarlas caía siempre en skillNotFound sin gastar MP ni
+  // hacer nada -- el jugador las veía, las clickeaba, y no pasaba nada.
+  const skill = skills.find(s => s.id === skillId)
+    || (hasLearnedSkill(gameState, skillId) ? LEARNABLE_SKILLS[skillId] : null);
   if (!skill) { addMessage(t('skillNotFound'), "system"); return; }
   if (p.level < skill.levelReq) { addMessage(formatText(t('skillLevelRequired'), { level: skill.levelReq }), "system"); return; }
   const spec = getActiveSpec();
@@ -331,6 +337,14 @@ export async function useSkill(skillId) {
   if (result.heal) {
     p.hp = Math.min(p.maxHp, (p.hp || 0) + result.heal);
     showFloatingText(`+${result.heal}`, window.innerWidth/2-60, window.innerHeight/2-40, "#4ade80", "1.8em", "heal");
+  }
+
+  // SPEC-1224: "Reagruparse" promete "elimina un estado negativo activo" en
+  // su descripción, pero nada leía este flag -- se curaba de HP pero nunca
+  // limpiaba el debuff.
+  if (result.removeOneDebuff && gameState.activeDebuffs) {
+    const debuffKeys = Object.keys(gameState.activeDebuffs);
+    if (debuffKeys.length) delete gameState.activeDebuffs[debuffKeys[0]];
   }
 
   // Apply buffs

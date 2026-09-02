@@ -58,7 +58,11 @@ export const biomeBosses = {
 // componen en movement.js y llegan acá como un único multiplicador.
 export const AMBUSH_CHANCE_MULT = 1.5;
 
-export function trySpawnBoss(biomeId, ambushMult = 1) {
+// SPEC-1224: bossBiasMult sube la chance de que, DADO que algo apareció,
+// sea el boss principal y no un mini-boss -- ambushMult solo afecta si
+// algo aparece, no CUÁL. Sin esto, una misión "ve a cazar a X" nunca
+// cambiaba realmente las chances de toparse con X en particular.
+export function trySpawnBoss(biomeId, ambushMult = 1, bossBiasMult = 1) {
   const biome = biomeBosses[biomeId];
   if (!biome) return null;
 
@@ -66,7 +70,8 @@ export function trySpawnBoss(biomeId, ambushMult = 1) {
   if (Math.random() > biome.spawnChance * ambushMult) return null;
 
   // Seleccionar boss o mini-boss
-  const isBoss = Math.random() < 0.3; // 30% de probabilidad de ser el boss principal
+  const bossChance = Math.min(0.9, 0.3 * bossBiasMult); // 30% base de ser el boss principal
+  const isBoss = Math.random() < bossChance;
 
   if (isBoss) {
     return biome.boss;

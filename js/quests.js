@@ -302,6 +302,17 @@ export function getQuestStatus(questId) {
   return gameState.quests?.[questId] ?? "inactive";
 }
 
+// SPEC-1224: ¿hay una misión activa de tipo "kill" apuntando a este enemigo?
+// Usado por movement.js para aumentar la chance de encontrar al jefe de
+// zona correspondiente mientras el jugador lo está cazando por misión (ej.
+// mq_02_los_sellos de Valdris → forest_titan). Genérico a propósito: cubre
+// cualquier misión "kill" futura sin tocar movement.js de nuevo.
+export function hasActiveKillQuestFor(enemyId) {
+  return Object.values(QUEST_DATA).some(q =>
+    q.type === "kill" && q.enemy === enemyId && getQuestStatus(q.id) === "active"
+  );
+}
+
 /** Activa una misión (inactive → active) */
 export function activateQuest(questId) {
   if (!gameState.quests) gameState.quests = {};

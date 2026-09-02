@@ -7,8 +7,9 @@ import { allItems } from "./items.js";
 import { playSound, playMusic } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
-import { trySpawnBoss, AMBUSH_CHANCE_MULT } from "./biomeBosses.js";
+import { trySpawnBoss, AMBUSH_CHANCE_MULT, biomeBosses } from "./biomeBosses.js";
 import { biomes } from "./biomes.js";
+import { hasActiveKillQuestFor } from "./quests.js";
 import { showMiniBossReunion } from "./miniBossReunion.js";
 import { t, formatText, localizeText, pickVariant } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
@@ -25,6 +26,11 @@ const TIME_CYCLE_MOVES = 6; // SPEC-0701: movimientos entre cambios de día/noch
 // SPEC-1104: liberar el eco en el bosque → protección del bosque (-50%,
 // solo bioma forest); se compone con AMBUSH_CHANCE_MULT si ambos aplican.
 const FOREST_PROTECTION_MULT = 0.5;
+// SPEC-1224: misión activa de "ir a cazar a X" -- sube tanto la chance
+// general de encuentro con jefe como (sobre todo) la chance de que sea
+// justo ese jefe y no un mini-boss del mismo bioma.
+const QUEST_BOSS_AMBUSH_MULT = 1.3;
+const QUEST_BOSS_BIAS_MULT = 2.0;
 
 // ── ZONAS BLOQUEADAS ──────────────────────────────────────────────
 // La primera vez que el jugador intenta entrar, consume el ítem-llave.
@@ -203,7 +209,18 @@ export function handleMove(direction) {
     // bosque → protección del bosque (solo bioma forest). Se componen.
     let ambushMult = gameState.worldFlags?.purse_taken ? AMBUSH_CHANCE_MULT : 1;
     if (biome === "forest" && gameState.worldFlags?.echo_freed) ambushMult *= FOREST_PROTECTION_MULT;
-    const bossId = trySpawnBoss(biome, ambushMult);
+
+    // SPEC-1224: ¿el jugador tiene una misión activa pidiéndole cazar al
+    // jefe de ESTE bioma? (ej. mq_02_los_sellos de Valdris → forest_titan
+    // en el bioma forest). Si sí, sube ambas probabilidades.
+    let bossBiasMult = 1;
+    const zoneBoss = biomeBosses[biome]?.boss;
+    if (zoneBoss && hasActiveKillQuestFor(zoneBoss)) {
+      ambushMult *= QUEST_BOSS_AMBUSH_MULT;
+      bossBiasMult = QUEST_BOSS_BIAS_MULT;
+    }
+
+    const bossId = trySpawnBoss(biome, ambushMult, bossBiasMult);
     if (bossId) {
       const spareFlag = "spared_" + bossId;
       if (gameState.worldFlags?.[spareFlag] && !gameState.worldFlags?.[spareFlag + "_resolved"]) {

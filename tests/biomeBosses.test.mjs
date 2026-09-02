@@ -57,3 +57,44 @@ test("SPEC-1104: ambushMult<1 (protección del bosque) hace más difícil el spa
 test("trySpawnBoss: bioma desconocido siempre null, sin importar ambushMult", () => {
   assert.equal(trySpawnBoss("no_existe", 999), null);
 });
+
+// SPEC-1224: bossBiasMult -- ambushMult solo decide SI algo aparece; esto
+// decide QUÉ aparece (boss principal vs. mini-boss), dado que algo aparece.
+test("SPEC-1224: sin bossBiasMult (default 1), el umbral boss-vs-mini sigue siendo 30%", () => {
+  const orig = Math.random;
+  try {
+    let call = 0;
+    // 1er random() = roll de aparición (bajo, siempre pasa); 2do = boss-vs-mini
+    Math.random = () => { call++; return call === 1 ? 0.01 : 0.29; };
+    assert.equal(trySpawnBoss("forest"), "forest_titan"); // 0.29 < 0.30
+    call = 0;
+    Math.random = () => { call++; return call === 1 ? 0.01 : 0.31; };
+    assert.notEqual(trySpawnBoss("forest"), "forest_titan"); // 0.31 > 0.30 -> mini-boss
+  } finally {
+    Math.random = orig;
+  }
+});
+
+test("SPEC-1224: bossBiasMult=2 sube el umbral boss-vs-mini a 60% (misión activa cazando a ese jefe)", () => {
+  const orig = Math.random;
+  try {
+    let call = 0;
+    Math.random = () => { call++; return call === 1 ? 0.01 : 0.5; };
+    assert.notEqual(trySpawnBoss("forest", 1, 1), "forest_titan", "sin bias, 0.5 > 0.30 -> mini-boss");
+    call = 0;
+    assert.equal(trySpawnBoss("forest", 1, 2), "forest_titan", "con bias x2 (umbral 60%), 0.5 < 0.60 -> boss");
+  } finally {
+    Math.random = orig;
+  }
+});
+
+test("SPEC-1224: bossBiasMult se topea en 90% (nunca queda 100% garantizado)", () => {
+  const orig = Math.random;
+  try {
+    let call = 0;
+    Math.random = () => { call++; return call === 1 ? 0.01 : 0.95; };
+    assert.notEqual(trySpawnBoss("forest", 1, 100), "forest_titan", "0.95 > 0.90 (tope) -> sigue pudiendo ser mini-boss");
+  } finally {
+    Math.random = orig;
+  }
+});

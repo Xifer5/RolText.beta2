@@ -3,7 +3,7 @@ import "./helpers/domStub.mjs";
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { gameState, resetState } from "../js/state.js";
-import { rollRumors, RUMOR_POOL, RUMOR_COUNT, getQuestStatus, QUEST_DATA } from "../js/quests.js";
+import { rollRumors, RUMOR_POOL, RUMOR_COUNT, getQuestStatus, QUEST_DATA, hasActiveKillQuestFor } from "../js/quests.js";
 import { allItems } from "../js/items.js";
 
 beforeEach(() => resetState());
@@ -17,6 +17,23 @@ test("RUMOR_POOL: los 6 ids son misiones secundarias reales, ninguna principal",
     assert.ok(!id.startsWith("mq_"), `${id} es una misión principal, no debería estar en el pool de rumores`);
     assert.equal(QUEST_DATA[id].prerequisiteQuest, undefined, `${id} no debería depender de otra misión`);
   }
+});
+
+// SPEC-1224 — usada por movement.js para subir la chance de encontrar al
+// jefe de zona correspondiente mientras una misión pide cazarlo.
+test("hasActiveKillQuestFor: false sin ninguna misión kill activa", () => {
+  assert.equal(hasActiveKillQuestFor("forest_titan"), false);
+});
+
+test("hasActiveKillQuestFor: true cuando mq_02_los_sellos (Valdris → forest_titan) está activa", () => {
+  gameState.quests = { mq_02_los_sellos: "active" };
+  assert.equal(hasActiveKillQuestFor("forest_titan"), true);
+  assert.equal(hasActiveKillQuestFor("cave_devourer"), false, "no debe afectar a otros jefes");
+});
+
+test("hasActiveKillQuestFor: false si la misión kill existe pero está completed/inactive, no activa", () => {
+  gameState.quests = { mq_02_los_sellos: "completed" };
+  assert.equal(hasActiveKillQuestFor("forest_titan"), false);
 });
 
 test("rollRumors activa exactamente RUMOR_COUNT misiones distintas", () => {
