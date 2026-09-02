@@ -397,9 +397,24 @@ export const dictionaries = {
     bossAppears: "💀 {{enemy}} appears!! A formidable foe approaches!",
     enemyAppears: "⚔️ {{enemy}} appears!",
     attackEnemy: "You attack {{enemy}} for {{damage}}{{extra}}{{crit}}",
+    // SPEC-1222: variantes de sabor para el texto más repetido del juego
+    // (un turno de combate normal). pickVariant() en i18n.js las sortea;
+    // deben conservar EXACTAMENTE los mismos {{tokens}} que la clave base.
+    attackEnemyVariants: [
+      "You attack {{enemy}} for {{damage}}{{extra}}{{crit}}",
+      "Your blade finds {{enemy}}'s guard for {{damage}}{{extra}}{{crit}}",
+      "You drive the strike home on {{enemy}} — {{damage}}{{extra}}{{crit}}",
+      "A solid hit connects with {{enemy}} for {{damage}}{{extra}}{{crit}}"
+    ],
     doubleStrike: "double strike",
     notEnoughMana: "Not enough mana.",
     castMagic: "You cast a spell for {{damage}} magical damage.",
+    castMagicVariants: [
+      "You cast a spell for {{damage}} magical damage.",
+      "Arcane energy surges from your hands for {{damage}} magical damage.",
+      "Your spell tears through the air, dealing {{damage}} magical damage.",
+      "A burst of magic strikes for {{damage}} magical damage."
+    ],
     skillNotFound: "Skill not found.",
     skillLevelRequired: "You need level {{level}}.",
     noMana: "No mana.",
@@ -444,6 +459,12 @@ export const dictionaries = {
     physicalAttackLabel: "attack",
     powerAttackLabel: "power attack",
     enemyUsedAttack: "{{enemy}} uses {{attack}} and deals {{damage}} damage.",
+    enemyUsedAttackVariants: [
+      "{{enemy}} uses {{attack}} and deals {{damage}} damage.",
+      "{{enemy}} lashes out with {{attack}}, dealing {{damage}} damage.",
+      "{{attack}} from {{enemy}} lands hard for {{damage}} damage.",
+      "{{enemy}} strikes with {{attack}} — {{damage}} damage."
+    ],
     intentAttack: "Attack",
     intentPowerAttack: "Power attack",
     intentMagic: "Magic",
@@ -1007,9 +1028,21 @@ export const dictionaries = {
     bossAppears: "💀 {{enemy}} aparece!! ¡Un enemigo formidable se aproxima!",
     enemyAppears: "⚔️ {{enemy}} aparece!",
     attackEnemy: "Atacas a {{enemy}} por {{damage}}{{extra}}{{crit}}",
+    attackEnemyVariants: [
+      "Atacas a {{enemy}} por {{damage}}{{extra}}{{crit}}",
+      "Tu golpe atraviesa la guardia de {{enemy}} por {{damage}}{{extra}}{{crit}}",
+      "Conectas un golpe certero contra {{enemy}}: {{damage}}{{extra}}{{crit}}",
+      "El ataque impacta de lleno en {{enemy}} por {{damage}}{{extra}}{{crit}}"
+    ],
     doubleStrike: "golpe doble",
     notEnoughMana: "No tienes maná suficiente.",
     castMagic: "Lanzas un hechizo por {{damage}} daño mágico.",
+    castMagicVariants: [
+      "Lanzas un hechizo por {{damage}} daño mágico.",
+      "La energía arcana estalla en tus manos por {{damage}} daño mágico.",
+      "Tu hechizo cruza el aire y causa {{damage}} daño mágico.",
+      "Una ráfaga de magia golpea por {{damage}} daño mágico."
+    ],
     skillNotFound: "Habilidad no encontrada.",
     skillLevelRequired: "Necesitas nivel {{level}}.",
     noMana: "Sin maná.",
@@ -1054,6 +1087,12 @@ export const dictionaries = {
     physicalAttackLabel: "ataque",
     powerAttackLabel: "golpe fuerte",
     enemyUsedAttack: "{{enemy}} usa {{attack}} y te causa {{damage}} de daño.",
+    enemyUsedAttackVariants: [
+      "{{enemy}} usa {{attack}} y te causa {{damage}} de daño.",
+      "{{enemy}} arremete con {{attack}}, causando {{damage}} de daño.",
+      "{{attack}} de {{enemy}} impacta con fuerza: {{damage}} de daño.",
+      "{{enemy}} golpea con {{attack}} — {{damage}} de daño."
+    ],
     intentAttack: "Ataque",
     intentPowerAttack: "Golpe fuerte",
     intentMagic: "Magia",
@@ -1236,6 +1275,20 @@ export function localizeText(source) {
     return source[currentLocale] ?? source[defaultLocale] ?? Object.values(source)[0] ?? "";
   }
   return source;
+}
+
+// SPEC-1222: sortea una variante de sabor entre `${baseKey}Variants` (si
+// existe y tiene entradas) en vez del texto fijo de `baseKey` — mismo
+// espíritu que pickLocationDescription() en movement.js, pero sobre el
+// diccionario de i18n en vez de arrays {en,es}. Sin variantes, cae al
+// texto de siempre (nunca deja el log sin mensaje).
+export function pickVariant(baseKey) {
+  const variantsKey = `${baseKey}Variants`;
+  const pool = dictionaries[currentLocale]?.[variantsKey] || dictionaries[defaultLocale]?.[variantsKey];
+  if (Array.isArray(pool) && pool.length) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return t(baseKey);
 }
 
 export function formatText(key, replacements = {}) {

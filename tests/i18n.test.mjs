@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const { dictionaries } = await import("../js/i18n.js");
+const { dictionaries, pickVariant } = await import("../js/i18n.js");
 const html = readFileSync(join(root, "index.html"), "utf8");
 
 const en = dictionaries.en, es = dictionaries.es;
@@ -48,4 +48,41 @@ test("los textos ES no contienen 'Dragon King' (es Rey Dragón)", () => {
     if (typeof v === "string" && v.includes("Dragon King")) offenders.push(`i18n es.${k}`);
   }
   assert.deepEqual(offenders, [], `fugas EN en ES:\n${offenders.join("\n")}`);
+});
+
+// SPEC-1222 — pickVariant(): variantes de sabor para el texto de combate
+// más repetido del juego (un ataque normal), sorteadas por i18n.js en vez
+// de un texto fijo único.
+function tokensOf(str) {
+  return [...str.matchAll(/\{\{(.*?)\}\}/g)].map(m => m[1]).sort();
+}
+
+test("pickVariant: sortea del pool *Variants cuando existe", () => {
+  const seen = new Set();
+  for (let i = 0; i < 30; i++) seen.add(pickVariant("attackEnemy"));
+  assert.ok(seen.size > 1, "debería devolver más de una variante distinta en 30 sorteos");
+  for (const s of seen) assert.ok(es.attackEnemyVariants.includes(s));
+});
+
+test("pickVariant: sin pool *Variants, cae al texto fijo de la clave base", () => {
+  assert.equal(pickVariant("navAttributes"), es.navAttributes);
+});
+
+test("todas las *Variants existen en EN y ES, con las mismas claves {{token}} que su clave base", () => {
+  const problems = [];
+  for (const [locale, dict] of [["en", en], ["es", es]]) {
+    for (const key of Object.keys(dict)) {
+      if (!key.endsWith("Variants")) continue;
+      const baseKey = key.slice(0, -"Variants".length);
+      if (!(baseKey in dict)) { problems.push(`${locale}.${key}: no existe ${locale}.${baseKey}`); continue; }
+      const baseTokens = tokensOf(dict[baseKey]).join(",");
+      for (const variant of dict[key]) {
+        const variantTokens = tokensOf(variant).join(",");
+        if (variantTokens !== baseTokens) {
+          problems.push(`${locale}.${key}: "${variant}" tiene tokens [${variantTokens}], esperaba [${baseTokens}]`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(problems, [], problems.join("\n"));
 });

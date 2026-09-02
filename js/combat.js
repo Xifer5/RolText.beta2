@@ -23,7 +23,7 @@ import { enemyData } from "./enemies.js";
 import { calculateTotalStats } from "./stats.js";
 import { addMessage } from "./story.js";
 import { updateUI, showFloatingText, shakeScreen } from "./ui.js";
-import { t, formatText } from "./i18n.js";
+import { t, formatText, pickVariant } from "./i18n.js";
 import { playSound, playMusic } from "./sounds.js";
 import { getDifficultyConfig } from "./difficulty.js";
 import { getActiveSpec } from "./specializations.js";
@@ -491,7 +491,7 @@ export async function enemyTurn() {
   const attackLabel = useMagic ? t('magicAttackLabel')
     : action === "power_attack" ? t('powerAttackLabel')
     : t('physicalAttackLabel');
-  addMessage(formatText(t('enemyUsedAttack'), { enemy: enemy.type, attack: attackLabel, damage: finalDmg }), "combat");
+  addMessage(formatText(pickVariant('enemyUsedAttack'), { enemy: enemy.type, attack: attackLabel, damage: finalDmg }), "combat");
   showFloatingText(`-${finalDmg}`, window.innerWidth/2-80, window.innerHeight/2, "#fca5a5", "1.8em");
   shakeScreen();
 
