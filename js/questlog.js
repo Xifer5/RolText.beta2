@@ -1,4 +1,4 @@
-import { QUEST_DATA, getQuestStatus, checkQuestCondition, isQuestLocked } from "./quests.js";
+import { QUEST_DATA, getQuestStatus, checkQuestCondition, isQuestLocked, getQuestDialogue } from "./quests.js";
 import { NPC_DATA } from "./npcs.js";
 import { gameState } from "./state.js";
 import { allItems } from "./items.js";
@@ -66,8 +66,13 @@ function _questCard(q) {
                    : status === "active"  ? t("qlStatusActive")
                    :                        t("qlStatusAvailable");
 
+  // SPEC-1224: la misión "en curso" (active) se puede expandir con clic
+  // para ver el diálogo completo (adónde ir, de qué se trata) — reusa
+  // getQuestDialogue(), el mismo texto ya autorado que muestra openNpcModal.
+  const expandable = status === "active";
+
   return `
-  <div class="ql-card ${status}">
+  <div class="ql-card ${status}${expandable ? " ql-expandable" : ""}" data-quest-id="${q.id}">
     <div class="ql-card-header">
       <div class="ql-npc-badge">
         <span class="ql-npc-emoji">${npc?.emoji ?? "❓"}</span>
@@ -76,9 +81,10 @@ function _questCard(q) {
       </div>
       <span class="npc-quest-badge ${badgeClass}">${badgeLabel}</span>
     </div>
-    <div class="ql-title">${localizeText(q.title)}</div>
+    <div class="ql-title">${localizeText(q.title)}${expandable ? `<span class="ql-expand-hint">${t("qlDetailHint")}</span>` : ""}</div>
     ${progress}
     <div class="ql-reward">${reward}</div>
+    ${expandable ? `<div class="ql-detail" hidden></div>` : ""}
   </div>`;
 }
 
@@ -165,5 +171,24 @@ export function setupQuestLogTabs() {
       btn.classList.add("active");
       renderQuestLog(btn.dataset.tab);
     });
+  });
+
+  // SPEC-1224: delegado sobre #ql-body (sobrevive a los re-render de
+  // renderQuestLog(), no hay que re-enganchar tras cada cambio de tab).
+  const body = document.getElementById("ql-body");
+  body?.addEventListener("click", (e) => {
+    const card = e.target.closest(".ql-expandable");
+    if (!card) return;
+    const detail = card.querySelector(".ql-detail");
+    if (!detail) return;
+    const opening = detail.hasAttribute("hidden");
+    if (opening) {
+      const lines = getQuestDialogue(card.dataset.questId);
+      detail.innerHTML = lines.map(l => `<p>${l}</p>`).join("");
+      detail.removeAttribute("hidden");
+    } else {
+      detail.setAttribute("hidden", "");
+    }
+    card.classList.toggle("ql-expanded", opening);
   });
 }

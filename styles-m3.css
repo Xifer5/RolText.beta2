@@ -2720,6 +2720,17 @@ button:focus-visible,
   flex-direction: column;
   gap: 8px;
 }
+/* SPEC-1224: .te-result/.te-continue no tenían ninguna regla propia --
+   tras elegir, el texto de resultado quedaba pegado directo al botón
+   "Continuar →" sin heredar ni el espaciado ni la tipografía de .te-text. */
+.te-result {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--md-on-surface);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.te-continue { display: block; width: 100%; }
 
 /* ═══════════════════════════════════════════════════════════
    CHARACTER SELECT
@@ -4297,6 +4308,28 @@ button:focus-visible,
   color: var(--md-on-surface);
   margin-bottom: 8px;
 }
+/* SPEC-1224: misión activa expandible con clic — muestra el diálogo
+   completo (de qué se trata, adónde ir) reusando getQuestDialogue(). */
+.ql-expandable { cursor: pointer; }
+.ql-expandable:hover { border-color: var(--md-primary); }
+.ql-expand-hint {
+  float: right;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--md-primary);
+}
+.ql-expand-hint::before { content: "▾ "; }
+.ql-expanded .ql-expand-hint::before { content: "▴ "; }
+.ql-detail {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--md-outline-variant);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--md-on-surface-variant);
+}
+.ql-detail p { margin: 0 0 8px; }
+.ql-detail p:last-child { margin-bottom: 0; }
 .ql-progress {
   display: flex;
   align-items: center;
