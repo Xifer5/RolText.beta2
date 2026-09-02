@@ -57,11 +57,27 @@ test("SPEC-1226: documenta (sin fallar) los ids de 'drops' que no corresponden a
   // Este test documenta el estado conocido -- si la lista cambia (se
   // autora el item o se limpia el 'drops'), actualizar aquí a propósito.
   assert.deepEqual([...phantom].sort(), [
-    "big_health_potion", "dagger", "dark_shield", "dark_sword", "desert_armor", "dragon_scale_armor",
+    "dagger", "dark_shield", "dark_sword", "desert_armor", "dragon_scale_armor",
     "elixir_potion", "fire_shield", "flame_robe", "healing_staff", "inferno_blade",
     "lava_sword", "light_armor", "magic_lamp", "pyro_staff", "ring_of_wisdom",
     "saint_grail", "war_hammer"
   ].sort());
+});
+
+// SPEC-1226 — el bug inverso, y más grave: 16 ids en biomeLoot/enemyLoot/
+// bossLoot/shopInventories nunca tuvieron un ítem real en allItems (el
+// mismo patrón exacto ya visto una vez con fairy_dust, SPEC-1109). Un
+// jugador que los recibía quedaba con un ítem sin nombre/ícono/definición
+// real en su inventario. Test genérico: TODA entrada de cualquier tabla de
+// loot/tienda debe apuntar a un ítem que exista de verdad.
+test("SPEC-1226: toda entrada de biomeLoot/enemyLoot/bossLoot/shopInventories apunta a un ítem real en allItems", () => {
+  const missing = [];
+  const check = (id, src) => { if (!allItems[id]) missing.push(`${src} -> ${id}`); };
+  for (const [k, list] of Object.entries(biomeLoot)) for (const d of list) check(d.item, `biomeLoot.${k}`);
+  for (const [k, list] of Object.entries(enemyLoot)) for (const d of list) check(d.item, `enemyLoot.${k}`);
+  for (const [k, list] of Object.entries(bossLoot)) for (const d of list) check(d.item, `bossLoot.${k}`);
+  for (const [k, list] of Object.entries(shopInventories)) for (const id of list) check(id, `shopInventories.${k}`);
+  assert.deepEqual(missing, [], `entradas de loot/tienda sin ítem real en allItems:\n${missing.join("\n")}`);
 });
 
 test("toda misión 'collect' pide un ítem obtenible en algún loot de bioma/enemigo/boss o alguna tienda", () => {

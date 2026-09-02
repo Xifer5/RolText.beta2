@@ -1694,6 +1694,102 @@ export const allItems = {
     icon: "./img/infernoGem.webp",
   },
 
+  // SPEC-1226 — mismo bug real que fairy_dust (SPEC-1109, ver comentario más
+  // arriba): estos 16 ids ya estaban referenciados en lootTables.js (con su
+  // propia chance/rareza definida ahí) pero nunca existieron en allItems.
+  // Un jugador que los recibiera quedaba con un ítem sin nombre/ícono real.
+  // Se usan íconos emoji (no webp nuevos) siguiendo el mismo precedente.
+  flower_petals: {
+    id: "flower_petals",
+    name: { en: "Flower Petals", es: "Pétalos de Flor" },
+    type: "material", rarity: "common", price: 4, icon: "🌸",
+  },
+  elven_bow: {
+    id: "elven_bow",
+    name: { en: "Elven Bow", es: "Arco Élfico" },
+    description: { en: "A finely crafted elven bow. +14 ATK, +4 AGI", es: "Un arco élfico finamente elaborado. +14 ATK, +4 AGI" },
+    type: "weapon", rarity: "uncommon", slot: "rightHand",
+    attack: 14, agility: 4, price: 90, icon: "🏹",
+  },
+  nature_essence: {
+    id: "nature_essence",
+    name: { en: "Nature Essence", es: "Esencia Natural" },
+    type: "material", rarity: "rare", price: 25, icon: "🍃",
+  },
+  ancient_idol: {
+    id: "ancient_idol",
+    name: { en: "Ancient Idol", es: "Ídolo Antiguo" },
+    type: "material", rarity: "epic", price: 60, icon: "🗿",
+  },
+  gorilla_heart: {
+    id: "gorilla_heart",
+    name: { en: "Gorilla Heart", es: "Corazón de Gorila" },
+    type: "material", rarity: "rare", price: 24, icon: "❤️",
+  },
+  big_health_potion: {
+    id: "big_health_potion",
+    name: { en: "Big Health Potion", es: "Poción Grande de Salud" },
+    description: { en: "Restores 60 HP.", es: "Restaura 60 HP." },
+    restoreHp: 60, type: "consumable", rarity: "uncommon", price: 24, icon: "🧪",
+  },
+  big_mana_potion: {
+    id: "big_mana_potion",
+    name: { en: "Big Mana Potion", es: "Poción Grande de Maná" },
+    description: { en: "Restores 30 MP.", es: "Restaura 30 MP." },
+    restoreMp: 30, type: "consumable", rarity: "common", price: 20, icon: "🔷",
+  },
+  dark_essence: {
+    id: "dark_essence",
+    name: { en: "Dark Essence", es: "Esencia Oscura" },
+    type: "material", rarity: "uncommon", price: 16, icon: "🌑",
+  },
+  dark_robe: {
+    id: "dark_robe",
+    name: { en: "Dark Robe", es: "Túnica Oscura" },
+    description: { en: "A robe woven with shadow. +4 INT, +5 DEF", es: "Una túnica tejida con sombras. +4 INT, +5 DEF" },
+    type: "armor", rarity: "uncommon", slot: "armor",
+    intelligence: 4, defense: 5, price: 95, icon: "🥋",
+  },
+  shadow_heart: {
+    id: "shadow_heart",
+    name: { en: "Shadow Heart", es: "Corazón de Sombra" },
+    type: "material", rarity: "epic", price: 55, icon: "🖤",
+  },
+  soul_fragment: {
+    id: "soul_fragment",
+    name: { en: "Soul Fragment", es: "Fragmento de Alma" },
+    type: "material", rarity: "rare", price: 30, icon: "👻",
+  },
+  sandstone_fragment: {
+    id: "sandstone_fragment",
+    name: { en: "Sandstone Fragment", es: "Fragmento de Arenisca" },
+    type: "material", rarity: "uncommon", price: 14, icon: "🪨",
+  },
+  linchorn_scale: {
+    id: "linchorn_scale",
+    name: { en: "Linchorn Scale", es: "Escama de Linchorn" },
+    type: "material", rarity: "rare", price: 28, icon: "🦄",
+  },
+  desert_essence: {
+    id: "desert_essence",
+    name: { en: "Desert Essence", es: "Esencia del Desierto" },
+    type: "material", rarity: "epic", price: 58, icon: "🏜️",
+  },
+  pharaohs_scepter: {
+    id: "pharaohs_scepter",
+    name: { en: "Pharaoh's Scepter", es: "Cetro del Faraón" },
+    description: { en: "A scepter of ancient royalty. +15 MAG, +15 INT, +10 ATK", es: "Un cetro de la realeza antigua. +15 MAG, +15 INT, +10 ATK" },
+    type: "weapon", rarity: "legendary", slot: "rightHand",
+    magic: 15, intelligence: 15, attack: 10, price: 280, icon: "🏺",
+  },
+  ice_armor: {
+    id: "ice_armor",
+    name: { en: "Ice Armor", es: "Armadura de Hielo" },
+    description: { en: "Armor forged from eternal ice. +5 DEF", es: "Armadura forjada de hielo eterno. +5 DEF" },
+    type: "armor", rarity: "uncommon", slot: "armor",
+    defense: 5, price: 90, icon: "🧊",
+  },
+
   // ── Pergaminos de habilidad (SPEC-0607) ──────────────
   scroll_of_rally: {
     id: "scroll_of_rally",
