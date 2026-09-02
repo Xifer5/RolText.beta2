@@ -64,7 +64,7 @@ export async function playerDefend() {
   // 2 para sobrevivir hasta el chequeo de defenseMult (mismo patrón que
   // buffTurns:3 en useSkill, que en la práctica cubre 1 ataque enemigo).
   gameState.activeBuffs.defend_stance = Math.max(gameState.activeBuffs.defend_stance || 0, 2);
-  addMessage(t('combatDefendMsg'), "combat");
+  addMessage(pickVariant('combatDefendMsg'), "combat");
   playSound("defend");
 
   tickBuffs();
@@ -373,10 +373,10 @@ export async function tryFlee() {
     playSound("flee");
     // SPEC-1103: rasgo "Ladrón" — roba oro cuando el jugador huye con éxito
     applyThiefGoldSteal(gameState.currentEnemy);
-    addMessage(t('fleeSuccess'), "system");
+    addMessage(pickVariant('fleeSuccess'), "system");
     endCombat(false, true);
   } else {
-    addMessage(t('fleeFail'), "system");
+    addMessage(pickVariant('fleeFail'), "system");
     await delay(500); await enemyTurn();
   }
 }

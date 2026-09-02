@@ -51,6 +51,12 @@ export const dictionaries = {
     combatBreakGuardAria: "Break Guard (key 6)",
     combatStunned: "You are stunned and lose your turn.",
     combatDefendMsg: "🛡️ You brace for the next attack — incoming damage halved.",
+    combatDefendMsgVariants: [
+      "🛡️ You brace for the next attack — incoming damage halved.",
+      "🛡️ You raise your guard, ready to absorb the blow.",
+      "🛡️ You plant your feet and steel yourself for what's coming.",
+      "🛡️ You tighten your stance, bracing for impact."
+    ],
     enemyStunnedByPlayer: "💫 Critical hit stuns {{enemy}}!",
     enemyStunned: "{{enemy}} is stunned and loses its turn!",
     combatStatusEffectsDefeat: "You are defeated by lingering effects...",
@@ -419,7 +425,19 @@ export const dictionaries = {
     skillLevelRequired: "You need level {{level}}.",
     noMana: "No mana.",
     fleeSuccess: "You flee combat.",
+    fleeSuccessVariants: [
+      "You flee combat.",
+      "You break away and put distance between you and the fight.",
+      "You turn and run, leaving the battle behind.",
+      "You slip away before the enemy can react."
+    ],
     fleeFail: "You fail to escape...",
+    fleeFailVariants: [
+      "You fail to escape...",
+      "You can't find an opening to escape...",
+      "The enemy cuts off your retreat...",
+      "You stumble — no chance to escape this turn..."
+    ],
     traitFurious: "Furious",
     traitThief: "Thief",
     traitAncient: "Ancient",
@@ -507,6 +525,12 @@ export const dictionaries = {
     statusEffectEnds: "✨ The {{label}} dissipates.",
     onlyInCombat: "You can only use skills in combat.",
     victoryRewards: "Victory! +{{xp}} XP, +{{gold}} gold.",
+    victoryRewardsVariants: [
+      "Victory! +{{xp}} XP, +{{gold}} gold.",
+      "The enemy falls. You gain +{{xp}} XP and +{{gold}} gold.",
+      "Victory is yours — +{{xp}} XP, +{{gold}} gold collected.",
+      "The fight is over. +{{xp}} XP, +{{gold}} gold in your pocket."
+    ],
     victorySaved: "💾 Victory saved",
     zoneBossVictoryToast: "🏆 {{enemy}} has fallen — the zone breathes again.",
     bossDiesMessage: '💬 "{{message}}"',
@@ -628,6 +652,12 @@ export const dictionaries = {
     questRewardXp: "+{{xp}} XP for completing \"{{title}}\".",
     questRewardGold: "+{{gold}} gold rewarded.",
     levelUp: "⭐ LEVEL UP! You are now level {{level}}. +5 stat points.",
+    levelUpVariants: [
+      "⭐ LEVEL UP! You are now level {{level}}. +5 stat points.",
+      "⭐ You feel stronger — level {{level}} reached! +5 stat points.",
+      "⭐ Growth! You've reached level {{level}}. +5 stat points.",
+      "⭐ Level {{level}}! Your training pays off. +5 stat points."
+    ],
     statIncreased: "{{stat}} increased to {{value}}.",
   },
   es: {
@@ -682,6 +712,12 @@ export const dictionaries = {
     combatBreakGuardAria: "Romper Guardia (tecla 6)",
     combatStunned: "Estás aturdido y pierdes tu turno.",
     combatDefendMsg: "🛡️ Te preparas para el próximo golpe — el daño entrante se reduce a la mitad.",
+    combatDefendMsgVariants: [
+      "🛡️ Te preparas para el próximo golpe — el daño entrante se reduce a la mitad.",
+      "🛡️ Levantas tu guardia, listo para absorber el impacto.",
+      "🛡️ Afirmas los pies y te preparas para lo que viene.",
+      "🛡️ Tensas tu postura, listo para el golpe."
+    ],
     enemyStunnedByPlayer: "💫 ¡El golpe crítico aturde a {{enemy}}!",
     enemyStunned: "¡{{enemy}} está aturdido y pierde su turno!",
     combatStatusEffectsDefeat: "Te derrotan los efectos persistentes...",
@@ -1047,7 +1083,19 @@ export const dictionaries = {
     skillLevelRequired: "Necesitas nivel {{level}}.",
     noMana: "Sin maná.",
     fleeSuccess: "Huyes del combate.",
+    fleeSuccessVariants: [
+      "Huyes del combate.",
+      "Te alejas y pones distancia entre tú y la pelea.",
+      "Das media vuelta y corres, dejando el combate atrás.",
+      "Escapas antes de que el enemigo pueda reaccionar."
+    ],
     fleeFail: "No consigues escapar...",
+    fleeFailVariants: [
+      "No consigues escapar...",
+      "No encuentras un hueco por donde huir...",
+      "El enemigo te corta la retirada...",
+      "Tropiezas — sin oportunidad de escapar este turno..."
+    ],
     traitFurious: "Furioso",
     traitThief: "Ladrón",
     traitAncient: "Antiguo",
@@ -1135,6 +1183,12 @@ export const dictionaries = {
     statusEffectEnds: "✨ El {{label}} se disipa.",
     onlyInCombat: "Solo puedes usar habilidades en combate.",
     victoryRewards: "¡Victoria! +{{xp}} XP, +{{gold}} de oro.",
+    victoryRewardsVariants: [
+      "¡Victoria! +{{xp}} XP, +{{gold}} de oro.",
+      "El enemigo cae. Ganas +{{xp}} XP y +{{gold}} de oro.",
+      "La victoria es tuya — +{{xp}} XP, +{{gold}} de oro recolectados.",
+      "La pelea terminó. +{{xp}} XP, +{{gold}} de oro en tu bolsa."
+    ],
     victorySaved: "💾 Victoria guardada",
     zoneBossVictoryToast: "🏆 {{enemy}} ha caído — la zona vuelve a respirar.",
     bossDiesMessage: '💬 "{{message}}"',
@@ -1254,6 +1308,12 @@ export const dictionaries = {
     questRewardXp: "✨ +{{xp}} XP por completar \"{{title}}\".",
     questRewardGold: "🪙 +{{gold}} de oro como recompensa.",
     levelUp: "⭐ ¡SUBISTE DE NIVEL! Ahora eres nivel {{level}}. +5 puntos de estadística.",
+    levelUpVariants: [
+      "⭐ ¡SUBISTE DE NIVEL! Ahora eres nivel {{level}}. +5 puntos de estadística.",
+      "⭐ Te sientes más fuerte — ¡nivel {{level}} alcanzado! +5 puntos de estadística.",
+      "⭐ ¡Progreso! Alcanzaste el nivel {{level}}. +5 puntos de estadística.",
+      "⭐ ¡Nivel {{level}}! Tu entrenamiento da frutos. +5 puntos de estadística."
+    ],
     statIncreased: "{{stat}} aumentó a {{value}}.",
   }
 };

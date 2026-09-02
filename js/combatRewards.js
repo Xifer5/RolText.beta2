@@ -16,7 +16,7 @@ import { checkAchievements } from "./achievements.js";
 import { saveGame } from "./saveSystem.js";
 import { playSound, playMusic } from "./sounds.js";
 import { showToast } from "./toast.js";
-import { t, formatText, localizeText } from "./i18n.js";
+import { t, formatText, localizeText, pickVariant } from "./i18n.js";
 import { getDifficultyConfig } from "./difficulty.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { showSpecializationModal } from "./specModal.js";
@@ -57,7 +57,7 @@ export function endCombat(victory, fled = false, enemyFled = false) {
     gameState.player.experience = (gameState.player.experience || 0) + xp;
     gameState.player.gold = (gameState.player.gold || 0) + gold;
 
-    addMessage(formatText(t('victoryRewards'), { xp, gold }), "stat");
+    addMessage(formatText(pickVariant('victoryRewards'), { xp, gold }), "stat");
 
     // SPEC-1105: Caballero Sagrado — cura al matar un enemigo
     // SPEC-1106: Espada Voraz — cura al matar (fuente independiente, vía equipo)
@@ -183,7 +183,7 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       levelUp();
     }
   } else if (fled) {
-    addMessage(t('fleeSuccess'), "system");
+    addMessage(pickVariant('fleeSuccess'), "system");
   }
 
   checkAchievements();
@@ -216,7 +216,7 @@ export function levelUp() {
   if (profileRole) profileRole.textContent = `${t('levelBadgePrefix')} ${p.level} ${(p.className || "").toUpperCase()}`;
 
   playSound("level_up");
-  addMessage(formatText(t('levelUp'), { level: p.level }), "milestone"); // SPEC-1212
+  addMessage(formatText(pickVariant('levelUp'), { level: p.level }), "milestone"); // SPEC-1212
 
   // SPEC-1209 — visibilidad de build: los 5 puntos de stat todavía no están
   // gastados, así que lo único que cambió DE VERDAD en este instante es
