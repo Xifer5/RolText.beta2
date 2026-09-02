@@ -58,6 +58,9 @@ export const biomeLoot = {
     // un bioma sin relación con esta misión. El jugador no tenía forma real
     // de completarla salvo tropezar con él por accidente en otra zona.
     { item: "ancient_core", chance: 0.06, rarity: RARITY.EPIC },
+    // SPEC-1226: imp (enemies.js `drops: ["gown"]`) nunca conectado a
+    // ningún sistema real de loot.
+    { item: "gown", chance: 0.20, rarity: RARITY.UNCOMMON },
     { item: "hammer", chance: 0.30, rarity: RARITY.COMMON },
     { item: "elven_bow", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "mana_potion", chance: 0.25, rarity: RARITY.UNCOMMON },
@@ -133,6 +136,14 @@ export const biomeLoot = {
     { item: "tiger_blade", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "gorilla_heart", chance: 0.10, rarity: RARITY.RARE },
     { item: "ancient_idol", chance: 0.03, rarity: RARITY.EPIC },
+    // SPEC-1226: vine_serpent/gorilla_warrior (enemies.js `drops`, nunca
+    // conectado a ningún sistema real) prometían estos 3 -- solo el resto
+    // de su lista (nature_robe) era alcanzable en otro lado.
+    { item: "vine_whip", chance: 0.08, rarity: RARITY.RARE },
+    { item: "giant_club", chance: 0.06, rarity: RARITY.EPIC },
+    { item: "jungle_armor", chance: 0.06, rarity: RARITY.EPIC },
+    // SPEC-1226: jungle_tiger (enemies.js `drops`) prometía esto también.
+    { item: "leather_armor", chance: 0.22, rarity: RARITY.UNCOMMON },
     { item: "nature_robe", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "bless_staff", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "arcane_robe", chance: 0.25, rarity: RARITY.UNCOMMON },
@@ -149,6 +160,9 @@ export const biomeLoot = {
     { item: "dragon_scale", chance: 0.07, rarity: RARITY.EPIC },
     { item: "heart_of_inferno", chance: 0.02, rarity: RARITY.LEGENDARY },
     { item: "burnt_book", chance: 0.05, rarity: RARITY.EPIC },
+    // SPEC-1226: Inferno_elemental (enemies.js `drops`) prometía fire_robe
+    // junto a flame_staff -- solo flame_staff era alcanzable en otro lado.
+    { item: "fire_robe", chance: 0.06, rarity: RARITY.EPIC },
     { item: "flame_staff", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "plate_armor", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "ring_of_inferno", chance: 0.10, rarity: RARITY.LEGENDARY },
@@ -181,6 +195,16 @@ export const biomeLoot = {
     { item: "ancient_relic", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "runestone", chance: 0.10, rarity: RARITY.RARE },
     { item: "fungus_core", chance: 0.25, rarity: RARITY.UNCOMMON },
+    // SPEC-1226: pirate_captain/mermaid/sea_serpent (enemies.js `drops`)
+    // prometían estos 5 -- solo water_staff (sibling de aqua_robe) era
+    // alcanzable en otro lado.
+    { item: "captain_sword", chance: 0.06, rarity: RARITY.EPIC },
+    { item: "captain_coat", chance: 0.06, rarity: RARITY.EPIC },
+    { item: "ocean_staff", chance: 0.06, rarity: RARITY.EPIC },
+    { item: "coral_robe", chance: 0.06, rarity: RARITY.EPIC },
+    { item: "aqua_robe", chance: 0.06, rarity: RARITY.EPIC },
+    // SPEC-1226: pirate (enemies.js `drops`) prometía esto también.
+    { item: "leather_armor", chance: 0.22, rarity: RARITY.UNCOMMON },
     { item: "trident", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "sea_armor", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "serpent_sword", chance: 0.25, rarity: RARITY.UNCOMMON },
@@ -266,6 +290,17 @@ export const bossLoot = {
   frost_wyrm: [
     { item: "wyrm_tail", chance: 1.00, rarity: RARITY.EPIC },
     { item: "tundra_emblem", chance: 0.20, rarity: RARITY.LEGENDARY },
+  ],
+
+  // SPEC-1226: dragon_king (enemies.js `drops: ["saint_grail", "excalibur",
+  // "dragon_heart"]`) no tenía NINGUNA entrada en bossLoot. "saint_grail" es
+  // un typo de "saint_grial" (el item real, ya obtenible en otro lado) y
+  // "dragon_heart" ya está en biomeLoot.inferno -- pero excalibur (arma
+  // absurdamente poderosa, +50 ATK/+20 a todo/+50 HP máx) no existía en
+  // NINGÚN sistema real. El jefe final del juego no tenía su recompensa
+  // insignia conectada a nada.
+  dragon_king: [
+    { item: "excalibur", chance: 0.30, rarity: RARITY.LEGENDARY },
   ],
 
   valdris_corrupted: [
