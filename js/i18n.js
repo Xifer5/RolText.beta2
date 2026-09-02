@@ -414,12 +414,12 @@ export const dictionaries = {
     ],
     doubleStrike: "double strike",
     notEnoughMana: "Not enough mana.",
-    castMagic: "You cast a spell for {{damage}} magical damage.",
+    castMagic: "You cast a spell for {{damage}} magical damage.{{crit}}",
     castMagicVariants: [
-      "You cast a spell for {{damage}} magical damage.",
-      "Arcane energy surges from your hands for {{damage}} magical damage.",
-      "Your spell tears through the air, dealing {{damage}} magical damage.",
-      "A burst of magic strikes for {{damage}} magical damage."
+      "You cast a spell for {{damage}} magical damage.{{crit}}",
+      "Arcane energy surges from your hands for {{damage}} magical damage.{{crit}}",
+      "Your spell tears through the air, dealing {{damage}} magical damage.{{crit}}",
+      "A burst of magic strikes for {{damage}} magical damage.{{crit}}"
     ],
     skillNotFound: "Skill not found.",
     skillLevelRequired: "You need level {{level}}.",
@@ -557,14 +557,38 @@ export const dictionaries = {
     usingKey: "You use the {{item}} to open the path.",
     travelTo: "You travel {{direction}} to {{location}}.",
     restHint: "💤 You can rest here (Rest button).",
+    restHintVariants: [
+      "💤 You can rest here (Rest button).",
+      "💤 This is a safe place to rest and recover (Rest button).",
+      "💤 You could catch your breath here (Rest button).",
+      "💤 A quiet spot — good place to rest (Rest button)."
+    ],
     shopHint: "🛒 Shop available (Shop button).",
+    shopHintVariants: [
+      "🛒 Shop available (Shop button).",
+      "🛒 There's a shop nearby (Shop button).",
+      "🛒 You could stock up here (Shop button).",
+      "🛒 A merchant is close by (Shop button)."
+    ],
     restReward: "You rest and recover {{hp}} HP and {{mp}} MP.",
     restoredText: "Restored!",
     restChipLabel: "💤 Rest",
     timeDayLabel: "☀️ Day",
     timeNightLabel: "🌙 Night",
     timeToNightMsg: "🌙 The sun sets. Darkness engulfs the world... the undead awaken.",
+    timeToNightMsgVariants: [
+      "🌙 The sun sets. Darkness engulfs the world... the undead awaken.",
+      "🌙 Shadows stretch and swallow the light. Night has come.",
+      "🌙 The last light fades. Something stirs in the dark.",
+      "🌙 Stars emerge one by one as the world falls silent."
+    ],
     timeToDayMsg: "☀️ Dawn breaks. Sunlight dispels the shadows. A new day begins.",
+    timeToDayMsgVariants: [
+      "☀️ Dawn breaks. Sunlight dispels the shadows. A new day begins.",
+      "☀️ The horizon glows gold as night retreats.",
+      "☀️ Morning light spills over the land. The world wakes up.",
+      "☀️ Darkness fades. A new day begins, whether the world is ready or not."
+    ],
     modLabel: "Run modifiers (optional)",
     modNoneLine: "No modifiers — standard rules.",
     modXpBonusLine: "Reward: +{{xp}}% XP.",
@@ -1072,12 +1096,12 @@ export const dictionaries = {
     ],
     doubleStrike: "golpe doble",
     notEnoughMana: "No tienes maná suficiente.",
-    castMagic: "Lanzas un hechizo por {{damage}} daño mágico.",
+    castMagic: "Lanzas un hechizo por {{damage}} daño mágico.{{crit}}",
     castMagicVariants: [
-      "Lanzas un hechizo por {{damage}} daño mágico.",
-      "La energía arcana estalla en tus manos por {{damage}} daño mágico.",
-      "Tu hechizo cruza el aire y causa {{damage}} daño mágico.",
-      "Una ráfaga de magia golpea por {{damage}} daño mágico."
+      "Lanzas un hechizo por {{damage}} daño mágico.{{crit}}",
+      "La energía arcana estalla en tus manos por {{damage}} daño mágico.{{crit}}",
+      "Tu hechizo cruza el aire y causa {{damage}} daño mágico.{{crit}}",
+      "Una ráfaga de magia golpea por {{damage}} daño mágico.{{crit}}"
     ],
     skillNotFound: "Habilidad no encontrada.",
     skillLevelRequired: "Necesitas nivel {{level}}.",
@@ -1215,14 +1239,38 @@ export const dictionaries = {
     usingKey: "🗝️ Usas {{item}} para abrir el paso.",
     travelTo: "Viajas hacia el {{direction}} hasta {{location}}.",
     restHint: "💤 Puedes descansar aquí (botón Rest).",
+    restHintVariants: [
+      "💤 Puedes descansar aquí (botón Rest).",
+      "💤 Este es un lugar seguro para descansar y recuperarte (botón Rest).",
+      "💤 Podrías tomarte un respiro aquí (botón Rest).",
+      "💤 Un lugar tranquilo — buen sitio para descansar (botón Rest)."
+    ],
     shopHint: "🛒 Tienda disponible (botón Shop).",
+    shopHintVariants: [
+      "🛒 Tienda disponible (botón Shop).",
+      "🛒 Hay una tienda cerca (botón Shop).",
+      "🛒 Podrías abastecerte aquí (botón Shop).",
+      "🛒 Un mercader está cerca (botón Shop)."
+    ],
     restReward: "Descansas y recuperas {{hp}} HP y {{mp}} MP.",
     restoredText: "¡Restaurado!",
     restChipLabel: "💤 Descanso",
     timeDayLabel: "☀️ Día",
     timeNightLabel: "🌙 Noche",
     timeToNightMsg: "🌙 El sol se pone. La oscuridad envuelve el mundo... Los no-muertos despiertan.",
+    timeToNightMsgVariants: [
+      "🌙 El sol se pone. La oscuridad envuelve el mundo... Los no-muertos despiertan.",
+      "🌙 Las sombras se estiran y devoran la luz. Ha llegado la noche.",
+      "🌙 La última luz se apaga. Algo se remueve en la oscuridad.",
+      "🌙 Las estrellas aparecen una a una mientras el mundo enmudece."
+    ],
     timeToDayMsg: "☀️ Amanece. La luz del sol disipa las sombras. Un nuevo día comienza.",
+    timeToDayMsgVariants: [
+      "☀️ Amanece. La luz del sol disipa las sombras. Un nuevo día comienza.",
+      "☀️ El horizonte se tiñe de oro mientras la noche se retira.",
+      "☀️ La luz de la mañana se derrama sobre la tierra. El mundo despierta.",
+      "☀️ La oscuridad se desvanece. Un nuevo día comienza, esté el mundo listo o no."
+    ],
     modLabel: "Modificadores de partida (opcional)",
     modNoneLine: "Sin modificadores — reglas estándar.",
     modXpBonusLine: "Recompensa: +{{xp}}% XP.",

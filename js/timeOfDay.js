@@ -3,7 +3,7 @@
 //  SPEC-0701
 // ══════════════════════════════════════════════════════
 import { gameState } from "./state.js";
-import { t } from "./i18n.js";
+import { t, pickVariant } from "./i18n.js";
 
 // ── Reglas por enemigo ──────────────────────────────────
 // nightOnly: solo aparece de noche
@@ -105,5 +105,5 @@ export function getTimeDamageMultiplier(damageType) {
 
 // Mensaje narrativo al cambiar de hora
 export function getTimeTransitionMessage(newTime) {
-  return newTime === "night" ? t("timeToNightMsg") : t("timeToDayMsg");
+  return newTime === "night" ? pickVariant("timeToNightMsg") : pickVariant("timeToDayMsg");
 }

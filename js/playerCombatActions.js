@@ -255,7 +255,7 @@ export async function playerMagic() {
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
   playSound("hit");
-  addMessage(formatText(pickVariant('castMagic'), { damage: dmg }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : "") + (isMagicCrit ? " 💥 ¡CRÍTICO!" : ""), isMagicCrit ? "combat-crit" : "combat");
+  addMessage(formatText(pickVariant('castMagic'), { damage: dmg, crit: isMagicCrit ? " 💥 ¡CRÍTICO!" : "" }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : ""), isMagicCrit ? "combat-crit" : "combat");
   maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
   showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", damageFloatType(isMagicCrit, magicType, getEffectiveResistances(enemy)));
