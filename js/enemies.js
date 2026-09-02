@@ -722,6 +722,10 @@ export const enemyData = {
     gold: 800,
     drops: ["inferno_blade", "dragon_scale_armor"],
     deathMessage: "Mi... ira... se apaga...",
+    // SPEC-1223: narrador oculto, línea 7/7 — la más personal, sin introLine
+    // previo del que heredar tono (este jefe no tenía uno). Última línea
+    // antes del silencio total en el Rey Dragón.
+    narratorLine: "Ya casi no queda distancia entre lo que cuento y lo que soy. Si llegás hasta el final de este camino, vas a entender por qué he estado tan callado sobre quién habla en verdad.",
     img: "img/enemies/inferno_dragon.webp",
   },
 
@@ -747,6 +751,8 @@ export const enemyData = {
     // deathMessage NO se toca: mq_02_los_sellos lo cita textual en su dialogo
     // "completed" (quests.js) — cambiarlo desincroniza esa cita.
     introLine: "—Quedaos... Esta vez, quedaos...",
+    // SPEC-1223: narrador oculto, línea 1/7 — el más distante de los siete.
+    narratorLine: "El bosque guarda silencio mientras avanzas. Algo muy viejo duerme bajo estas raíces — y sueña, todavía, con ser libre.",
     deathMessage: "El dragón... está llorando...",
     epilogueLines: [
       "El dragón no está despertando. Está soñando que aún vive.",
@@ -769,6 +775,8 @@ export const enemyData = {
     gold: 120,
     drops: ["devourer_fang", "inferno_blade"],
     introLine: "—Silencio... No quiero oír otra vez la sentencia...",
+    // SPEC-1223: narrador oculto, línea 2/7 — primer desliz sutil (habla en primera persona de algo que "escuchó").
+    narratorLine: "Estas cuevas han tragado gritos durante mil años. Yo... los he escuchado todos. No sé por qué lo recuerdo tan bien.",
     deathMessage: "No... quería... que me olvidaran...",
     epilogueLines: [
       "En lo más profundo de la caverna, una inscripción tallada tiembla bajo tus dedos: «Ocho no fueron las cadenas que el dragón creó. Ocho fueron las cadenas con que lo atamos.» Junto a ella, un emblema — idéntico al medallón que Elara lleva siempre al cuello."
@@ -790,6 +798,8 @@ export const enemyData = {
     gold: 120,
     drops: ["earthbreaker_core", "inferno_blade"],
     introLine: "—No puedo caer. Lo juré. No puedo...",
+    // SPEC-1223: narrador oculto, línea 3/7 — el desliz explícito del pitch original.
+    narratorLine: "Asterion levantó estas montañas con sus propias... No. Eso solo lo cuentan las leyendas. ¿O no?",
     deathMessage: "Seguí... de pie... hasta el final...",
     epilogueLines: [
       "Por un instante, su recuerdo se abre ante ti: Asterion frente a ejércitos humanos, su voz haciendo temblar las montañas. «Si vuestra libertad solo sirve para mataros, os libraré de ella.»"
@@ -812,6 +822,8 @@ export const enemyData = {
     drops: ["construct_eye", "ancient_relic"],
     // deathMessage NO se toca: mq_04_la_verdad lo cita textual en "completed".
     introLine: "—Identidad no reconocida. Protocolo de purga: iniciado.",
+    // SPEC-1223: narrador oculto, línea 4/7 — más incómodo, admite haber aprendido algo que ya no recuerda de dónde.
+    narratorLine: "Este lugar sabe mentir con hechos verdaderos. Lo sé porque yo también aprendí a hacerlo, hace mucho tiempo — aunque ya no recuerdo de quién aprendí.",
     deathMessage: "Asterion no destruye el mundo. El mundo lo está matando. Busca... la Puerta del Dragón...",
     epilogueLines: [
       "Los ocho sellos no guardan el poder de Asterion. Guardan los recuerdos que la humanidad le arrancó. Sin ellos, el dragón no sabe quién fue — solo siente sus emociones separadas: hambre, hielo, miedo, ira.",
@@ -834,6 +846,8 @@ export const enemyData = {
     gold: 120,
     drops: ["abomination_core", "inferno_blade"],
     introLine: "—Quedate... Aquí nadie te decepciona... Aquí nadie se va...",
+    // SPEC-1223: narrador oculto, línea 5/7 — confunde su propia voz entre las voces atrapadas.
+    narratorLine: "Tantas voces atrapadas aquí, todas suplicando ser escuchadas. A veces, en medio del pantano, olvido cuál de esas voces era la mía.",
     deathMessage: "Ya no hay... esperanza... para mí...",
     epilogueLines: [
       "Por un instante, miles de voces recuperan su nombre. Entre ellas, una que suena antigua, casi ceremonial: «No salvamos el mundo. Solo hicimos que olvidara nuestro crimen.»",
@@ -896,6 +910,8 @@ export const enemyData = {
     gold: 120,
     drops: ["wyrm_tail", "glacial_core"],
     introLine: "—Vendrá... mañana...",
+    // SPEC-1223: narrador oculto, línea 6/7 — casi confiesa que cuenta el tiempo "desde adentro".
+    narratorLine: "Mil años de espera. Sé exactamente cuánto pesa esa cifra. La cuento desde adentro, no desde afuera — y no sé desde cuándo dejé de notar la diferencia.",
     deathMessage: "Mil años... esperando... que alguien volviera...",
     epilogueLines: [
       "En el centro de la tundra, un recuerdo se abre: un niño llamado Cael prometió volver para ver las estrellas junto a Asterion. Volvió siendo anciano, pero unos soldados le impidieron llegar. Asterion nunca lo supo.",

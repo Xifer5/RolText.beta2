@@ -240,12 +240,24 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
       // de rollEnemyIntent() al final de startCombat()) aparecería ANTES de
       // "¿el mundo aún recuerda mi nombre?", rompiendo el orden narrativo.
       setTimeout(() => addMessage(formatText(t("dragonKingPhase1"), { enemy: gameState.currentEnemy.type }), "combat"), 2600);
-    } else if (base.introLine) {
-      // SPEC-1218 — historia mejorada, Acto I: linea de combate opcional por
-      // enemigo (forest_titan/cave_devourer/mountain_colossus por ahora).
-      // Generico a proposito: cualquier boss futuro puede sumar introLine
-      // sin tocar este archivo de nuevo.
-      setTimeout(() => addMessage(base.introLine, "system"), 600);
+    } else {
+      if (base.introLine) {
+        // SPEC-1218 — historia mejorada, Acto I: linea de combate opcional por
+        // enemigo (forest_titan/cave_devourer/mountain_colossus por ahora).
+        // Generico a proposito: cualquier boss futuro puede sumar introLine
+        // sin tocar este archivo de nuevo.
+        setTimeout(() => addMessage(base.introLine, "system"), 600);
+      }
+      // SPEC-1223: narrador oculto — línea propia, tipo "milestone" (se
+      // distingue visualmente sin nombrar al narrador), solo en el PRIMER
+      // encuentro contra cada jefe de zona (no se repite en reintentos tras
+      // huir/perder). inferno_dragon no tiene introLine, por eso este bloque
+      // vive fuera del `if (base.introLine)` — dispara igual, más temprano.
+      if (base.narratorLine && !gameState.worldFlags?.["narrator_seen_" + enemyType]) {
+        if (!gameState.worldFlags) gameState.worldFlags = {};
+        gameState.worldFlags["narrator_seen_" + enemyType] = true;
+        setTimeout(() => addMessage(base.narratorLine, "milestone"), base.introLine ? 1700 : 700);
+      }
     }
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");
