@@ -44,6 +44,10 @@ export const biomes = {
         when: () => !!gameState.worldFlags?.echo_freed
       },
     ],
+    // SPEC-1223: narrador oculto, línea única en la primera vista del bioma
+    // (ver pickLocationDescription/movement.js — se muestra una sola vez,
+    // gateada por worldFlags, distinta de las descripciones de arriba).
+    narratorLine: { en: "This forest breathes like something asleep, not something growing.", es: "Este bosque respira como algo que duerme, no como algo que crece." },
     modifiers: {
       visibility: -1.5,
       magicBonus: 1,
@@ -69,6 +73,7 @@ export const biomes = {
         when: () => zoneBossesDefeatedCount(gameState) > 0
       },
     ],
+    narratorLine: { en: "There's too much beauty here to be an accident. Someone planted it on purpose — or someone remembers it too fondly.", es: "Hay demasiada belleza aquí para ser un accidente. Alguien la sembró a propósito — o alguien la recuerda con demasiado cariño." },
     modifiers: {
       visibility: -1.0,
       magicBonus: 2,
@@ -129,6 +134,7 @@ export const biomes = {
         when: () => gameState.stats?.enemiesDefeated?.cave_devourer > 0
       },
     ],
+    narratorLine: { en: "These walls aren't silent. They're just waiting for someone else to speak first.", es: "Estas paredes no son silenciosas. Solo están esperando que alguien más hable primero." },
     modifiers: {
       visibility: 0.7,
       magicBonus: +2,
@@ -155,6 +161,7 @@ export const biomes = {
         when: () => gameState.stats?.enemiesDefeated?.mountain_colossus > 0
       },
     ],
+    narratorLine: { en: "The air up here tastes like broken promises. I don't know how I know that, but I do.", es: "El aire aquí arriba sabe a promesas rotas. No sé por qué lo sé, pero lo sé." },
     modifiers: {
       visibility: 1.2,
       magicBonus: -2,
@@ -179,6 +186,7 @@ export const biomes = {
         when: () => gameState.stats?.enemiesDefeated?.ancient_construct > 0
       },
     ],
+    narratorLine: { en: "Nothing is built this large without someone, once, fearing they'd lose it all.", es: "Nada se construye tan grande sin que alguien, alguna vez, haya temido perderlo todo." },
     modifiers: {
       visibility: 0.9,
       magicBonus: +4,
@@ -204,6 +212,7 @@ export const biomes = {
         when: () => gameState.stats?.enemiesDefeated?.swamp_abomination > 0
       },
     ],
+    narratorLine: { en: "The swamp remembers everything that sinks into it. I wish I could say the same about myself.", es: "El pantano recuerda todo lo que se hunde en él. Ojalá pudiera decir lo mismo de mí." },
     modifiers: {
       visibility: 0.6,
       magicBonus: +1,
@@ -230,6 +239,7 @@ export const biomes = {
         when: () => !!gameState.worldFlags?.pyrax_trial_resolved
       },
     ],
+    narratorLine: { en: "The fire here doesn't destroy out of rage. It destroys because it forgot how to do anything else.", es: "El fuego aquí no destruye por rabia. Destruye porque ya no sabe hacer otra cosa." },
     modifiers: {
       visibility: 1.0,
       magicBonus: +3,
@@ -256,6 +266,7 @@ export const biomes = {
         when: () => gameState.stats?.enemiesDefeated?.frost_wyrm > 0
       },
     ],
+    narratorLine: { en: "The cold preserves what time should have carried away. Sometimes I wonder what it's preserving of me.", es: "El frío conserva lo que el tiempo debería haberse llevado. A veces me pregunto qué está conservando de mí." },
     modifiers: {
       visibility: 1.1,
       magicBonus: -1,
@@ -354,6 +365,9 @@ export const biomes = {
     description: [
       { en: "This is the Inferno — the final test for the worthy.", es: "Este es el Infierno: la prueba final para los dignos." },
     ],
+    // SPEC-1223: última línea del narrador antes del silencio total en
+    // dragon_king — la más personal de las nueve.
+    narratorLine: { en: "There's no turning back from here. I know that better than anyone — I can't go back to what I was, either.", es: "Ya no hay vuelta atrás desde aquí. Lo sé mejor que nadie — yo tampoco puedo volver a lo que fui." },
     modifiers: {
       visibility: -2,
       magicBonus: +3,

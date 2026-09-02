@@ -261,6 +261,16 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
     }
   } else {
     addMessage(formatText(t('enemyAppears'), { enemy: gameState.currentEnemy.type }), "combat");
+    // SPEC-1223: humor seco puntual — 3-4 enemigos comunes elegidos a mano
+    // (nunca genérico/por frecuencia), mismo gating de "primer encuentro"
+    // que las narratorLine de jefe de zona. Nunca puede coincidir con un
+    // momento emocional importante: estos son enemigos base sin ningún
+    // peso narrativo propio.
+    if (base.narratorLine && !gameState.worldFlags?.["narrator_seen_" + enemyType]) {
+      if (!gameState.worldFlags) gameState.worldFlags = {};
+      gameState.worldFlags["narrator_seen_" + enemyType] = true;
+      setTimeout(() => addMessage(base.narratorLine, "milestone"), 700);
+    }
   }
   playSound("combat_start");
   playMusic("combat");

@@ -12,6 +12,8 @@ export const enemyData = {
     experience: 10,
     gold: 5,
     drops: ["mana_potion"],
+    // SPEC-1223: humor seco, primer encuentro (mismo gating que narratorLine de jefe).
+    narratorLine: "El slime te mira. Vos lo mirás a él. Ninguno de los dos parece muy convencido de que esto vaya a ser una pelea memorable.",
     img: "img/enemies/slime.webp",
   },
   fungedBeast: {
@@ -36,6 +38,7 @@ export const enemyData = {
     experience: 20,
     gold: 8,
     drops: ["sword"],
+    narratorLine: "El goblin blande su arma como si el destino del mundo dependiera de este callejón. Nadie le avisó que no es así.",
     img: "img/enemies/goblin.webp",
   },
   wolf: {
@@ -60,6 +63,7 @@ export const enemyData = {
     experience: 22,
     gold: 12,
     drops: ["ring_agility"],
+    narratorLine: "El ladrón te evalúa de arriba abajo, calculando cuánto valés. A juzgar por su cara, la respuesta no lo entusiasma.",
     img: "img/enemies/thief.webp",
   },
   guard: {
@@ -260,6 +264,7 @@ export const enemyData = {
     img: "img/enemies/vampire.webp",
   },
   squeletor: {
+    narratorLine: "El esqueleto alza su arma con una convicción que, técnicamente, no debería tener: le faltan la mayoría de los músculos necesarios para sostenerla.",
     type: "Squeletor",
     levelRequirement: 2,
     hp: 70,

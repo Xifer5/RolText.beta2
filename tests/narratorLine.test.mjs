@@ -8,6 +8,8 @@ import { setTimeout as sleep } from "node:timers/promises";
 import { gameState, resetState } from "../js/state.js";
 import { enemyData } from "../js/enemies.js";
 import { startCombat } from "../js/combat.js";
+import { biomes } from "../js/biomes.js";
+import { handleMove } from "../js/movement.js";
 
 // domStub.mjs stubea document.getElementById() -> null siempre, así que
 // addMessage() (story.js) hace early-return y nunca llena gameState.messages.
@@ -67,4 +69,56 @@ test("startCombat: dragon_king nunca agrega ninguna narratorLine de jefe de zona
     gameState.messages.some(m => m.text === enemyData[id]?.narratorLine)
   );
   assert.equal(anyNarratorLine, false);
+});
+
+// SPEC-1223 (fase 2) — narrador oculto en la primera vista de cada bioma.
+const NARRATOR_BIOME_IDS = ["forest", "garden", "cave", "mountain", "ruin", "swamp", "volcano", "tundra", "inferno"];
+
+test("los 9 biomas con narratorLine tienen texto en/es no vacío y ninguno menciona 'Eco'", () => {
+  for (const id of NARRATOR_BIOME_IDS) {
+    const line = biomes[id]?.narratorLine;
+    assert.ok(line?.en && line?.es, `biomes.${id}.narratorLine debe tener en/es`);
+    assert.doesNotMatch(line.en, /echo/i, `biomes.${id}.narratorLine.en no debe mencionar "Echo"`);
+    assert.doesNotMatch(line.es, /eco/i, `biomes.${id}.narratorLine.es no debe mencionar "Eco"`);
+  }
+});
+
+test("handleMove: la línea de narrador de bioma se muestra una sola vez, aunque el bioma tenga varias ubicaciones", () => {
+  window.worldMap = {
+    town: { id: "town", biome: "town", name: "Town", exits: { north: "test_forest_a" }, description: [] },
+    test_forest_a: { id: "test_forest_a", biome: "forest", name: "Forest A", exits: { south: "town", east: "test_forest_b" }, description: [] },
+    test_forest_b: { id: "test_forest_b", biome: "forest", name: "Forest B", exits: { west: "test_forest_a" }, description: [] },
+  };
+  gameState.currentLocationId = "town";
+  gameState.visitedLocations = { town: true };
+
+  handleMove("north"); // town -> test_forest_a (primera vez en bioma forest)
+  handleMove("east");  // test_forest_a -> test_forest_b (mismo bioma, ya visto)
+
+  const forestNarratorMsgs = gameState.messages.filter(m => m.text === biomes.forest.narratorLine.es);
+  assert.equal(forestNarratorMsgs.length, 1, "debe aparecer una sola vez, sin importar cuántas ubicaciones del mismo bioma se visiten");
+  assert.equal(gameState.worldFlags.narrator_seen_biome_forest, true);
+});
+
+// SPEC-1223 (fase 2) — humor seco en 3-4 encuentros comunes puntuales.
+const HUMOR_ENEMY_IDS = ["slime", "goblin", "thief", "squeletor"];
+
+test("los 4 enemigos comunes con humor tienen narratorLine y ninguno menciona 'Eco'", () => {
+  for (const id of HUMOR_ENEMY_IDS) {
+    assert.ok(enemyData[id]?.narratorLine, `${id} debería tener narratorLine`);
+    assert.doesNotMatch(enemyData[id].narratorLine, /eco/i, `${id}.narratorLine no debe mencionar "Eco"`);
+  }
+});
+
+test("startCombat (enemigo común, no-boss): la línea de humor dispara una sola vez en el primer encuentro", async () => {
+  startCombat("slime", false);
+  assert.equal(gameState.worldFlags.narrator_seen_slime, true);
+  await sleep(1000);
+  const firstEncounter = gameState.messages.filter(m => m.text === enemyData.slime.narratorLine);
+  assert.equal(firstEncounter.length, 1);
+
+  startCombat("slime", false); // reencuentro con otro slime — no debe repetirse
+  await sleep(1000);
+  const afterSecond = gameState.messages.filter(m => m.text === enemyData.slime.narratorLine);
+  assert.equal(afterSecond.length, 1, "no debe repetirse en encuentros posteriores contra el mismo tipo de enemigo");
 });

@@ -8,6 +8,7 @@ import { playSound, playMusic } from "./sounds.js";
 import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
 import { trySpawnBoss, AMBUSH_CHANCE_MULT } from "./biomeBosses.js";
+import { biomes } from "./biomes.js";
 import { showMiniBossReunion } from "./miniBossReunion.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
@@ -134,6 +135,17 @@ export function handleMove(direction) {
   const rawDesc = pickLocationDescription(newLoc.description);
   const desc = localizeText(rawDesc);
   if (desc) addMessage(desc, "narrative");
+
+  // SPEC-1223: narrador oculto — línea única en la primera vez que se pisa
+  // cada bioma, gateada por worldFlags (nunca se repite), mismo tipo de log
+  // "milestone" que las narratorLine de jefes de zona para verse consistente.
+  const biomeId = newLoc.biome;
+  const biomeNarratorLine = biomes[biomeId]?.narratorLine;
+  if (biomeNarratorLine && !gameState.worldFlags?.["narrator_seen_biome_" + biomeId]) {
+    if (!gameState.worldFlags) gameState.worldFlags = {};
+    gameState.worldFlags["narrator_seen_biome_" + biomeId] = true;
+    addMessage(localizeText(biomeNarratorLine), "milestone");
+  }
 
   // Record visit for journal/bestiary
   recordLocationVisit();
