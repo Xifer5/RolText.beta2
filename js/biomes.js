@@ -6,6 +6,16 @@
 // - Probabilidad de encuentro
 // - Frases para descripciones dinámicas
 // - Modificadores opcionales (clima, visión, penalidades)
+//
+// SPEC-1221 — algunas entradas de `description` llevan un `when(gameState)`
+// opcional: son callbacks sutiles a la historia (jefe de zona ya vencido,
+// decisión tomada, trial resuelto), invisibles hasta que la condición se
+// cumple. movement.js filtra por `when` antes de elegir al azar — ver
+// pickLocationDescription(). Sin esto, el texto ambiental (lo que el
+// jugador más ve en todo el juego, en cada movimiento) nunca reflejaba nada
+// de lo que ya construimos en la historia mejorada.
+import { gameState } from "./state.js";
+import { zoneBossesDefeatedCount } from "./eryndelArc.js";
 
 export const biomes = {
   forest: {
@@ -23,6 +33,16 @@ export const biomes = {
       { en: "The animals and plants are really wild. What is happening in the forest?", es: "Los animales y plantas son muy salvajes. ¿Qué está pasando en el bosque?" },
       { en: "The air is filled with the scent of pine and earth.", es: "El aire está impregnado con el aroma de pino y tierra húmeda." },
       { en: "All the nature here is beautiful and wild.", es: "Toda la naturaleza aquí es hermosa y salvaje." },
+      {
+        en: "The forest breathes differently now that the Titan has fallen, as if it could finally sleep.",
+        es: "El bosque respira distinto desde que el Titán cayó, como si por fin pudiera dormir.",
+        when: () => gameState.stats?.enemiesDefeated?.forest_titan > 0
+      },
+      {
+        en: "A flicker of light brushes past you between the trees — or maybe it was only the wind.",
+        es: "Un eco de luz roza tus pasos entre los árboles — o quizás fue solo el viento.",
+        when: () => !!gameState.worldFlags?.echo_freed
+      },
     ],
     modifiers: {
       visibility: -1.5,
@@ -43,6 +63,11 @@ export const biomes = {
       { en: "How could such beauty be so dangerous?", es: "¿Cómo puede tanta belleza ser tan peligrosa?" },
       { en: "Are the flowers whispering? Maybe there's something inside the garden.", es: "¿Están susurrando las flores? Quizás hay algo dentro del jardín." },
       { en: "There is a beautiful waterfall. Something is shining inside it.", es: "Hay una hermosa cascada. Algo brilla dentro de ella." },
+      {
+        en: "Eryndel once said the dragon made stars bloom here. It's hard to picture — and yet the garden seems to remember it.",
+        es: "Eryndel dijo una vez que el dragón hacía florecer las estrellas aquí. Cuesta imaginarlo, y sin embargo el jardín parece recordarlo.",
+        when: () => zoneBossesDefeatedCount(gameState) > 0
+      },
     ],
     modifiers: {
       visibility: -1.0,
@@ -98,6 +123,11 @@ export const biomes = {
       { en: "Water dripping echoes endlessly.", es: "El goteo de agua resuena sin fin." },
       { en: "Shadows dance along the rocky surfaces.", es: "Las sombras danzan sobre las superficies rocosas." },
       { en: "A distant growl makes you tense up.", es: "Un gruñido lejano te pone en alerta." },
+      {
+        en: "The caverns no longer twist your own words back at you. Something, at last, stopped being afraid to listen.",
+        es: "Las cavernas ya no te devuelven tus propias palabras deformadas. Algo, por fin, dejó de tener miedo de escuchar.",
+        when: () => gameState.stats?.enemiesDefeated?.cave_devourer > 0
+      },
     ],
     modifiers: {
       visibility: 0.7,
@@ -119,6 +149,11 @@ export const biomes = {
       { en: "You see massive figures moving in the distance.", es: "Ves figuras masivas moviéndose a lo lejos." },
       { en: "The air is filled with the scent of sulfur and brimstone.", es: "El aire está impregnado de azufre y piedra caliza." },
       { en: "The ground is covered in loose, unstable rock.", es: "El suelo está cubierto de roca suelta e inestable." },
+      {
+        en: "The clans of the Peaks still tell the story of whoever brought down the Colossus without betraying anyone.",
+        es: "Los clanes de las Cumbres cuentan, todavía, la historia de quien hizo caer al Coloso sin traicionar a nadie.",
+        when: () => gameState.stats?.enemiesDefeated?.mountain_colossus > 0
+      },
     ],
     modifiers: {
       visibility: 1.2,
@@ -138,6 +173,11 @@ export const biomes = {
       { en: "Blue runes glow faintly on broken walls.", es: "Runas azules brillan tenuemente en las paredes rotas." },
       { en: "The air feels charged with forgotten magic.", es: "El aire parece cargado de magia olvidada." },
       { en: "Whispers echo from nowhere.", es: "Susurros resuenan de la nada." },
+      {
+        en: "Eldrast's faceless statues seem, for a moment, a little less empty.",
+        es: "Las estatuas sin rostro de Eldrast parecen, por un instante, menos vacías.",
+        when: () => gameState.stats?.enemiesDefeated?.ancient_construct > 0
+      },
     ],
     modifiers: {
       visibility: 0.9,
@@ -158,6 +198,11 @@ export const biomes = {
       { en: "A foul smell fills the humid air.", es: "Un olor nauseabundo llena el aire húmedo." },
       { en: "Something splashes nearby… too large to be a frog.", es: "Algo salpica cerca... demasiado grande para ser una rana." },
       { en: "The smell is so strong it makes you feel sick.", es: "El olor es tan intenso que te revuelve el estómago." },
+      {
+        en: "The swamp no longer whispers with a thousand borrowed voices. Only the silence of what was finally heard remains.",
+        es: "El pantano ya no susurra con miles de voces prestadas. Solo queda el silencio de lo que por fin fue escuchado.",
+        when: () => gameState.stats?.enemiesDefeated?.swamp_abomination > 0
+      },
     ],
     modifiers: {
       visibility: 0.6,
@@ -179,6 +224,11 @@ export const biomes = {
       { en: "Ash falls like snow around you.", es: "La ceniza cae como nieve a tu alrededor." },
       { en: "The ground trembles with volcanic activity.", es: "El suelo tiembla con la actividad volcánica." },
       { en: "Fire — you are walking over fire!", es: "¡Fuego! ¡Estás caminando sobre fuego!" },
+      {
+        en: "Pyrax no longer blocks the way. He only watches, like someone who's already made peace with whatever waits beyond.",
+        es: "Pyrax ya no bloquea el paso. Solo observa, como quien ya hizo las paces con lo que sea que espera más allá.",
+        when: () => !!gameState.worldFlags?.pyrax_trial_resolved
+      },
     ],
     modifiers: {
       visibility: 1.0,
@@ -200,6 +250,11 @@ export const biomes = {
       { en: "Your breath freezes in the air.", es: "Tu aliento se congela en el aire." },
       { en: "Icy winds carry distant howls.", es: "Los vientos helados traen aullidos lejanos." },
       { en: "Ice and cold is all you can feel.", es: "Hielo y frío es todo lo que puedes sentir." },
+      {
+        en: "The dawn you freed still feels new here, as if the tundra didn't quite know what to do with the light.",
+        es: "El amanecer que liberaste todavía se siente nuevo aquí, como si la tundra no supiera qué hacer con la luz.",
+        when: () => gameState.stats?.enemiesDefeated?.frost_wyrm > 0
+      },
     ],
     modifiers: {
       visibility: 1.1,

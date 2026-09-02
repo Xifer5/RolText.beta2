@@ -51,6 +51,21 @@ const ZONE_GATES = {
   }
 };
 
+// SPEC-1221 — algunas líneas de biomes.js llevan un `when(gameState)`
+// opcional (callback sutil a la historia: jefe de zona vencido, decisión
+// tomada, trial resuelto). Se filtran ANTES de sortear, para que las
+// condicionadas entren al mismo pool aleatorio que las genéricas en vez de
+// tener su propio sorteo aparte (evita que "compitan" de forma rara con
+// probabilidades desiguales entre biomas con distinta cantidad de líneas
+// condicionadas). Si NINGUNA condición se cumple, cae al array completo
+// sin filtrar — nunca deja al jugador sin descripción de ubicación.
+export function pickLocationDescription(description) {
+  if (!Array.isArray(description)) return description;
+  const pool = description.filter(d => !d.when || d.when());
+  const list = pool.length ? pool : description;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
 export function setupMovement() {
   window.addEventListener("pixel:move", (e) => {
     const dir = e.detail?.direction;
@@ -116,9 +131,7 @@ export function handleMove(direction) {
     direction: dirLabel(direction),
     location: localizeText(newLoc.name)
   }), "narrative");
-  const rawDesc = Array.isArray(newLoc.description)
-    ? newLoc.description[Math.floor(Math.random() * newLoc.description.length)]
-    : newLoc.description;
+  const rawDesc = pickLocationDescription(newLoc.description);
   const desc = localizeText(rawDesc);
   if (desc) addMessage(desc, "narrative");
 
