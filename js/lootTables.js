@@ -52,6 +52,12 @@ export const biomeLoot = {
     { item: "flower_petals", chance: 0.40, rarity: RARITY.COMMON },
     { item: "fairy_dust", chance: 0.30, rarity: RARITY.UNCOMMON },
     { item: "nature_essence", chance: 0.10, rarity: RARITY.RARE },
+    // SPEC-1225: mq_03_ecos (Eryndel, "Ecos del Pasado") pide este item y su
+    // propio diálogo dice "las criaturas que custodian este jardín lo
+    // portan" -- pero ancient_core solo existía en la tabla de "ruins",
+    // un bioma sin relación con esta misión. El jugador no tenía forma real
+    // de completarla salvo tropezar con él por accidente en otra zona.
+    { item: "ancient_core", chance: 0.06, rarity: RARITY.EPIC },
     { item: "hammer", chance: 0.30, rarity: RARITY.COMMON },
     { item: "elven_bow", chance: 0.25, rarity: RARITY.UNCOMMON },
     { item: "mana_potion", chance: 0.25, rarity: RARITY.UNCOMMON },
