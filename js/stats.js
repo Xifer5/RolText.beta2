@@ -24,6 +24,11 @@ export function calculateTotalStats(player, equipment = {}) {
   let defenseFromItems = 0;
   let magicFromItems = 0;
   let hpBonusSum = stats.hpBonus || 0;
+  // SPEC-1228: bug real -- ~10 ítems (báculos/varitas/anillos, ej. staff/
+  // wand/ring_silver/ring_of_inferno) traen un campo `mp` en su definición,
+  // pero nunca se sumaba a ningún lado: el jugador equipaba "+X MP" y no
+  // pasaba nada mecánicamente, solo INT/MAG (que sí se aplicaban).
+  let mpBonusSum = 0;
 
   // Apply equipment bonuses (aggregate attribute + direct bonuses)
   for (const slot in equipment) {
@@ -38,6 +43,7 @@ export function calculateTotalStats(player, equipment = {}) {
     defenseFromItems += it.defense || 0;
     magicFromItems += it.magic || 0;
     if (it.hpBonus) hpBonusSum += it.hpBonus || 0;
+    if (it.mp) mpBonusSum += it.mp || 0;
   }
 
   // Derived stats now calculated from final attributes + direct item bonuses
@@ -53,7 +59,7 @@ export function calculateTotalStats(player, equipment = {}) {
   const maxHpBonus = getActiveSpec()?.bonuses?.maxHpBonus;
   if (maxHpBonus) stats.maxHp = Math.floor(stats.maxHp * (1 + maxHpBonus));
   const mpPerInt = (player.class === "mage") ? 15 : 5;
-  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + classBonusMp + (player.permanentMpBonus || 0);
+  stats.maxMp = 20 + ((stats.intelligence || 0) * mpPerInt) + mpBonusSum + classBonusMp + (player.permanentMpBonus || 0);
 
   // Asegurar integridad
   stats.hp = Math.min(player.hp ?? stats.maxHp, stats.maxHp);

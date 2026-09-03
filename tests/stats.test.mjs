@@ -32,6 +32,23 @@ test("el equipo suma atributos y bonos directos", () => {
   assert.equal(s.maxHp, 80 + 12 * 2 + 10);
 });
 
+// SPEC-1228 — bug real: ~10 ítems (báculos/varitas/anillos) traen un campo
+// `mp` en su definición junto a intelligence/magic, pero calculateTotalStats()
+// nunca lo sumaba a maxMp -- el jugador equipaba "+X MP" y solo pasaba lo de
+// INT/MAG, el maná máximo no se movía.
+test("el equipo con campo `mp` (báculos/varitas/anillos) SÍ suma a maxMp", () => {
+  // basePlayer() es warrior -> mpPerInt = 5. +3 INT ya sube maxMp por su
+  // cuenta (15); lo que se está probando es el `+5` extra del campo `mp`,
+  // que antes del fix no se sumaba en absoluto.
+  const base = calculateTotalStats(basePlayer(), {});
+  const eqSinMp = { rightHand: { id: "staff_test", intelligence: 3, magic: 5 } };
+  const eqConMp = { rightHand: { id: "staff_test", intelligence: 3, magic: 5, mp: 5 } };
+  const withoutMpField = calculateTotalStats(basePlayer(), eqSinMp);
+  const withMpField = calculateTotalStats(basePlayer(), eqConMp);
+  assert.equal(withoutMpField.maxMp, base.maxMp + 3 * 5, "el bono de maxMp por INT sí debía funcionar ya");
+  assert.equal(withMpField.maxMp, withoutMpField.maxMp + 5, "el campo `mp` del ítem debe sumar aparte, no ignorarse");
+});
+
 test("resistencias: clase base + item propio + tabla ITEM_RESISTANCES", () => {
   const eq = {
     armor: { id: "chainmail" },                       // tabla: pierce 15
