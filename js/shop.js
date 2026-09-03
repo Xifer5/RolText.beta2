@@ -99,13 +99,22 @@ function makeShopItem(item, mode, qty, price) {
   return li;
 }
 
-function buildShopCompare(item) {
+export function buildShopCompare(item) {
   const currentStats = calculateTotalStats(gameState.player, gameState.equipment);
   const nextStats = calculateTotalStats(gameState.player, { ...gameState.equipment, [item.slot]: item });
+  // SPEC-1227: antes solo miraba ATK/DEF/MAG -- un ítem sin nada equipado
+  // (o cualquier ítem cuyo aporte real vive en HP/MP máx, ej. hpBonus) daba
+  // delta 0 en esos 3 y la comparación desaparecía por completo, aunque el
+  // ítem sí otorgara algo real. Ahora cubre los 5 stats derivados que
+  // calculateTotalStats() realmente expone, con o sin equipo previo (sin
+  // nada equipado, currentStats ya es la base del jugador -- el delta
+  // sigue siendo exacto, solo que "vs nada" en vez de "vs otro ítem").
   const stats = [
     ["ATK", "attack"],
     ["DEF", "defense"],
-    ["MAG", "magic"]
+    ["MAG", "magic"],
+    ["HP", "maxHp"],
+    ["MP", "maxMp"]
   ].map(([label, key]) => ({ label, delta: (nextStats[key] || 0) - (currentStats[key] || 0) }));
   if (stats.every(s => s.delta === 0)) return null;
 
