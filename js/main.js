@@ -62,6 +62,11 @@ window.addEventListener("DOMContentLoaded", () => {
     if (!gameState.player.class) {
       setTimeout(() => {
         showCharacterSelect(() => {
+          // SPEC-1227: resumen corto del prólogo en el log -- el intro
+          // completo vive solo en el modal visual y no deja rastro si se
+          // salta o se cierra; esto le da contexto mínimo al jugador que
+          // arranca a jugar sin haberlo leído completo.
+          addMessage(t('prologueSummary'), "narrative");
           addMessage(t('adventureBeginMessage'), "system");
           setTimeout(() => maybeShowHint("welcome_move"), 600);
         });
@@ -75,6 +80,7 @@ window.addEventListener("pixel:newGame", () => {
   sessionStorage.removeItem("introSeen");
   showIntro(() => {
     showCharacterSelect(() => {
+      addMessage(t('prologueSummary'), "narrative");
       addMessage(t('adventureBeginMessage'), "system");
       setTimeout(() => maybeShowHint("welcome_move"), 600);
     });
