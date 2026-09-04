@@ -5112,14 +5112,15 @@ kbd {
 .comic-layout-wide-top    .comic-panel:first-child { grid-column: 1 / -1; }
 .comic-layout-tall-left   { grid-template-columns: 55% 1fr; grid-template-rows: 1fr 1fr; }
 .comic-layout-tall-left   .comic-panel:first-child { grid-row: 1 / -1; }
-.comic-layout-wide-bottom { grid-template-rows: 1fr 1fr 48%; grid-template-columns: 1fr 1fr; }
-/* SPEC-1230: sin grid-row explícito, el auto-placement metía este panel
-   en la 2da fila (1fr, ~163px) en vez de la 3ra (48%, la más grande) --
-   la fila 48% quedaba completamente vacía, un vacío negro enorme debajo
-   del panel. wide-top/tall-left no tenían este bug: ahí el primer hijo
-   ocupa la fila/columna 1 por orden natural de auto-placement; acá el
-   panel que se agranda es el ÚLTIMO, así que necesita su fila a mano. */
-.comic-layout-wide-bottom .comic-panel:last-child  { grid-column: 1 / -1; grid-row: 3; }
+.comic-layout-wide-bottom { grid-template-rows: 1fr 48%; grid-template-columns: 1fr 1fr; }
+/* SPEC-1230/1231: la plantilla tenía 3 filas (1fr 1fr 48%) para solo 2 filas
+   de contenido real -- los 2 paneles chicos comparten la fila 1, el panel
+   grande es la última fila. La 2da fila "1fr" nunca tenía contenido (nada
+   se auto-ubicaba ahí) pero igual reservaba una porción entera de alto,
+   dejando un vacío negro enorme entre los paneles chicos y el grande. Se
+   redujo a 2 filas reales; wide-top/tall-left no tenían este problema
+   porque ya declaraban exactamente sus 2 filas de contenido. */
+.comic-layout-wide-bottom .comic-panel:last-child  { grid-column: 1 / -1; grid-row: 2; }
 .comic-layout-full        { grid-template-columns: 1fr; }
 
 /* ── Panel individual ──────────────────────────────────── */
