@@ -58,6 +58,37 @@
   --c-heal:     #7BD389;
   --c-error:    var(--md-error);
   --c-skill:    #C9B6FF;
+  --c-critical: #dc2626;
+
+  /* SPEC-1229: estados de combate/debuff -- colores fijos (no cambian
+     entre temas, igual que los de arriba), antes repetidos como hex
+     crudo en 3-5 lugares distintos cada uno (chips de buff/debuff,
+     botones de combate, indicadores de intención del enemigo). */
+  --c-freeze:   #93C5FD; /* congelado/aturdido/postura defensiva */
+  --c-burn:     #FDBA74; /* quemado/romper guardia */
+  --c-bleed:    #FCA5A5;
+  --c-spell:    #80DEEA; /* botón de magia en combate */
+  --c-mercy:    #6EE7B7; /* perdonar */
+
+  /* Rareza de ítems/logros -- antes repetidos crudos en rarity-*,
+     craft-rarity-tag y ach-badge/ach-card por separado. Epic reusa
+     --c-skill (mismo valor exacto, ya existía). */
+  --c-uncommon:    #A8D0B5;
+  --c-rare:        #93B5F0;
+  --c-uncommon-on: #0A2918;
+  --c-rare-on:     #0A1F3D;
+  --c-epic-on:     #2A1B4F;
+
+  /* Texto flotante de combate (showFloatingText) */
+  --c-resisted:   #9CA3AF;
+  --c-vulnerable: #FB923C;
+  --c-levelup:    #fbbf24;
+
+  /* Toasts (simple-toast) */
+  --c-toast-success:  #4ade80;
+  --c-toast-error:    #ef4444;
+  --c-toast-warn:     #f59e0b;
+  --c-toast-decision: #c084fc;
 
   /* Tipografía M3 + display fantasy */
   --font-display: 'Cinzel Decorative', 'Cinzel', serif;
@@ -828,7 +859,7 @@ button:focus-visible,
 }
 .risk-danger {
   background: rgba(251, 146, 60, .2);
-  color: #FDBA74;
+  color: var(--c-burn);
 }
 .risk-deadly {
   background: var(--md-error-container);
@@ -847,10 +878,10 @@ button:focus-visible,
 /* buff-chip — buffs/debuffs del jugador */
 .buff-chip { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .buff-chip.debuff-poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
-.buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: #FDBA74; }
-.buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: #93C5FD; }
-.buff-chip.debuff-bleed  { background: rgba(239,68,68,.18); color: #FCA5A5; }
-.buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: #93C5FD; }
+.buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: var(--c-burn); }
+.buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: var(--c-freeze); }
+.buff-chip.debuff-bleed  { background: rgba(239,68,68,.18); color: var(--c-bleed); }
+.buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: var(--c-freeze); }
 .location-actions {
   position: absolute;
   top: 54px;
@@ -974,8 +1005,8 @@ button:focus-visible,
   white-space: nowrap;
 }
 .edebuff.poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
-.edebuff.burn   { background: rgba(251,146,60,.18); color: #FDBA74; }
-.edebuff.frozen { background: rgba(147,197,253,.18); color: #93C5FD; }
+.edebuff.burn   { background: rgba(251,146,60,.18); color: var(--c-burn); }
+.edebuff.frozen { background: rgba(147,197,253,.18); color: var(--c-freeze); }
 .enemy-hp-row {
   display: flex;
   align-items: center;
@@ -1341,13 +1372,13 @@ button:focus-visible,
   color: var(--md-on-error-container);
   border-color: transparent;
 }
-.combat-btn.magic   { color: #80DEEA; }
+.combat-btn.magic   { color: var(--c-spell); }
 .combat-btn.item    { color: var(--c-heal); }
 .combat-btn.flee    { color: var(--md-on-surface-variant); }
-.combat-btn.defend  { color: #93C5FD; }
-.combat-btn.break-guard { color: #FDBA74; }
+.combat-btn.defend  { color: var(--c-freeze); }
+.combat-btn.break-guard { color: var(--c-burn); }
 .combat-btn.interrupt   { color: var(--c-skill); }
-.combat-btn.mercy       { color: #6EE7B7; }
+.combat-btn.mercy       { color: var(--c-mercy); }
 .combat-btn .key-hint,
 .combat-btn kbd {
   position: absolute;
@@ -1753,10 +1784,10 @@ button:focus-visible,
      achicar los 4 botones existentes en una sola fila ya justa de espacio. */
   .mob-bar-combat { flex-wrap: wrap; }
   .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
-  .mob-defend { color: #93C5FD; }
-  .mob-break-guard { color: #FDBA74; }
+  .mob-defend { color: var(--c-freeze); }
+  .mob-break-guard { color: var(--c-burn); }
   .mob-interrupt   { color: var(--c-skill); }
-  .mob-mercy       { color: #6EE7B7; }
+  .mob-mercy       { color: var(--c-mercy); }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
     border-color: var(--md-primary);
@@ -3368,12 +3399,12 @@ button:focus-visible,
   box-shadow: var(--elev-3);
   max-width: 100%;
 }
-.simple-toast-success { border-left-color: #4ade80; }
-.simple-toast-error   { border-left-color: #ef4444; }
-.simple-toast-warn    { border-left-color: #f59e0b; }
-.simple-toast-decision { border-left-color: #c084fc; } /* SPEC-1110 */
+.simple-toast-success { border-left-color: var(--c-toast-success); }
+.simple-toast-error   { border-left-color: var(--c-toast-error); }
+.simple-toast-warn    { border-left-color: var(--c-toast-warn); }
+.simple-toast-decision { border-left-color: var(--c-toast-decision); } /* SPEC-1110 */
 .simple-toast-boss {
-  border-left-color: #f59e0b;
+  border-left-color: var(--c-toast-warn);
   font-weight: 700;
   background: rgba(245,158,11,.10);
 } /* SPEC-1110: recap ceremonial de boss de zona */
@@ -3707,9 +3738,9 @@ button:focus-visible,
   border-radius: 999px;
 }
 .rarity-common,    .craft-rarity-tag.rarity-common    { background: var(--md-surface-c-highest); color: var(--md-on-surface-variant); }
-.rarity-uncommon,  .craft-rarity-tag.rarity-uncommon  { background: rgba(123,211,137,.18); color: #A8D0B5; }
-.rarity-rare,      .craft-rarity-tag.rarity-rare      { background: rgba(111,168,255,.18); color: #93B5F0; }
-.rarity-epic,      .craft-rarity-tag.rarity-epic      { background: rgba(201,182,255,.18); color: #C9B6FF; }
+.rarity-uncommon,  .craft-rarity-tag.rarity-uncommon  { background: rgba(123,211,137,.18); color: var(--c-uncommon); }
+.rarity-rare,      .craft-rarity-tag.rarity-rare      { background: rgba(111,168,255,.18); color: var(--c-rare); }
+.rarity-epic,      .craft-rarity-tag.rarity-epic      { background: rgba(201,182,255,.18); color: var(--c-skill); }
 .rarity-legendary, .craft-rarity-tag.rarity-legendary { background: rgba(236,197,111,.22); color: var(--md-primary); }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4081,9 +4112,9 @@ button:focus-visible,
   border-color: var(--md-primary);
   box-shadow: 0 0 16px rgba(236,197,111,.15);
 }
-.ach-card.ach-rarity-epic.unlocked     { border-color: #C9B6FF; }
-.ach-card.ach-rarity-rare.unlocked     { border-color: #93B5F0; }
-.ach-card.ach-rarity-uncommon.unlocked { border-color: #A8D0B5; }
+.ach-card.ach-rarity-epic.unlocked     { border-color: var(--c-skill); }
+.ach-card.ach-rarity-rare.unlocked     { border-color: var(--c-rare); }
+.ach-card.ach-rarity-uncommon.unlocked { border-color: var(--c-uncommon); }
 
 .ach-icon {
   font-size: 28px;
@@ -4116,9 +4147,9 @@ button:focus-visible,
   border-radius: 999px;
 }
 .ach-badge.ach-rarity-legendary { background: var(--md-primary); color: var(--md-on-primary); }
-.ach-badge.ach-rarity-epic      { background: #C9B6FF; color: #2A1B4F; }
-.ach-badge.ach-rarity-rare      { background: #93B5F0; color: #0A1F3D; }
-.ach-badge.ach-rarity-uncommon  { background: #A8D0B5; color: #0A2918; }
+.ach-badge.ach-rarity-epic      { background: var(--c-skill); color: var(--c-epic-on); }
+.ach-badge.ach-rarity-rare      { background: var(--c-rare); color: var(--c-rare-on); }
+.ach-badge.ach-rarity-uncommon  { background: var(--c-uncommon); color: var(--c-uncommon-on); }
 .ach-badge.ach-rarity-common    { background: var(--md-surface-c-highest); color: var(--md-on-surface-variant); }
 
 /* ═══════════════════════════════════════════════════════════
@@ -4692,12 +4723,12 @@ kbd {
    resistanceAdviceFor(), distinto de crítico/heal ya existentes */
 .floating-text.resisted {
   font-size: 1.3em;
-  color: #9CA3AF;
+  color: var(--c-resisted);
   opacity: .9;
   text-shadow: 0 2px 6px rgba(0,0,0,.4);
 }
 .floating-text.vulnerable {
-  color: #FB923C;
+  color: var(--c-vulnerable);
   text-shadow:
     0 0 16px rgba(251,146,60,.55),
     0 2px 6px rgba(0,0,0,.45);
@@ -4709,7 +4740,7 @@ kbd {
    o se corta a mitad de camino (mismo límite que ya rozaba .critical). */
 .floating-text.levelup {
   font-size: 2.6em;
-  color: #fbbf24;
+  color: var(--c-levelup);
   text-shadow:
     0 0 24px rgba(251,191,36,.7),
     0 2px 8px rgba(0,0,0,.5);
@@ -4824,7 +4855,7 @@ kbd {
   50%     { filter: brightness(1.5); }
 }
 .vital-bar-wrap.hp-critical .hp-bar {
-  background: #dc2626 !important;
+  background: var(--c-critical) !important;
   animation: hpCritPulse .75s ease-in-out infinite;
 }
 @keyframes hpCritPulse {
@@ -5155,7 +5186,7 @@ kbd {
   text-align: center;
 }
 .name-letter {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: clamp(22px, 4vw, 42px);
   color: #c8a96e;
   opacity: 0;
@@ -5188,7 +5219,7 @@ kbd {
 }
 .cp-caption-text {
   margin: 0;
-  font-family: 'EB Garamond', Georgia, serif;
+  font-family: var(--font-body);
   font-size: clamp(15px, 2.2vw, 18px);
   line-height: 1.6;
   color: #e8dcc8;
@@ -5208,7 +5239,7 @@ kbd {
   padding: 24px;
 }
 .intro-logo {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: clamp(18px, 4vw, 40px);
   font-weight: 700;
   color: #c8a96e;
@@ -5217,7 +5248,7 @@ kbd {
   animation: logo-glow 3s ease-in-out infinite;
 }
 .intro-subtitle {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
   font-size: clamp(13px, 2vw, 20px);
   color: #a08060;
   letter-spacing: .15em;
@@ -5242,7 +5273,7 @@ kbd {
 .intro-page-counter {
   font-size: 12px;
   color: rgba(255,255,255,.4);
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
   letter-spacing: .05em;
   flex: 1;
   text-align: center;
@@ -5255,7 +5286,7 @@ kbd {
   border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-title);
   letter-spacing: .04em;
   padding: 8px 20px;
   min-height: 36px;
@@ -5424,7 +5455,8 @@ kbd {
 }
 .mastery-bar {
   height: 100%; border-radius: 3px;
-  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  /* mismo par gold->amber que .floating-text.levelup/.simple-toast-warn */
+  background: linear-gradient(90deg, var(--c-levelup), var(--c-toast-warn));
   transition: width var(--md-dur-medium2) var(--ease);
 }
 .mastery-xp { font-size: 11px; color: var(--c-muted); white-space: nowrap; }
