@@ -313,6 +313,17 @@ export function hasActiveKillQuestFor(enemyId) {
   );
 }
 
+// SPEC-1233: mismo patrón que hasActiveKillQuestFor, pero para misiones
+// "collect". Usado por lootTables.js para subir la chance de drop del ítem
+// pedido mientras la misión está activa (ej. mq_03_ecos de Eryndel →
+// ancient_core en garden/ruins) -- antes de aceptar la misión, el ítem
+// dropea a su tasa normal; al aceptarla, sube. Genérico a propósito.
+export function hasActiveCollectQuestFor(itemId) {
+  return Object.values(QUEST_DATA).some(q =>
+    q.type === "collect" && q.item === itemId && getQuestStatus(q.id) === "active"
+  );
+}
+
 /** Activa una misión (inactive → active) */
 export function activateQuest(questId) {
   if (!gameState.quests) gameState.quests = {};

@@ -1,5 +1,12 @@
 // lootTables.js
 // Sistema de loot escalable para Pixel Quest Echoes
+import { hasActiveCollectQuestFor } from "./quests.js";
+
+// SPEC-1233: mientras una misión "collect" activa pide un ítem, su chance de
+// drop sube por este factor -- evita que el jugador quede varado por mala
+// suerte en un ítem de bajo % que traba el progreso de la historia (mismo
+// espíritu que QUEST_BOSS_BIAS_MULT en movement.js, SPEC-1224, para jefes).
+const QUEST_ITEM_BIAS_MULT = 3;
 
 // -----------------------------------------------------
 // Rarezas
@@ -381,7 +388,7 @@ export const enemyLoot = {
 // -----------------------------------------------------
 // Función principal: obtener loot según contexto
 // -----------------------------------------------------
-export function getLoot(enemyId, biomeId) {
+export function getLoot(enemyId, biomeId, rng = Math.random) {
   const drops = [];
 
   // 1. Loot específico del enemigo
@@ -399,13 +406,17 @@ export function getLoot(enemyId, biomeId) {
     drops.push(...bossLoot[enemyId]);
   }
 
-  // 4. Filtrar por probabilidad con una ligera mejora de drop para hacer el loot más entretenido
-  const awarded = drops.filter(drop => Math.random() <= Math.min(1, drop.chance * 1));
+  // 4. Filtrar por probabilidad. SPEC-1233: si una misión "collect" activa
+  // pide este ítem, su chance sube por QUEST_ITEM_BIAS_MULT.
+  const awarded = drops.filter(drop => {
+    const mult = hasActiveCollectQuestFor(drop.item) ? QUEST_ITEM_BIAS_MULT : 1;
+    return rng() <= Math.min(1, drop.chance * mult);
+  });
 
   // 5. Garantizar al menos un ítem si no se obtiene nada por azar
   if (awarded.length === 0 && drops.length) {
     const guaranteed = drops.filter(drop => drop.rarity === RARITY.COMMON);
-    awarded.push(guaranteed.length ? guaranteed[Math.floor(Math.random() * guaranteed.length)] : drops[Math.floor(Math.random() * drops.length)]);
+    awarded.push(guaranteed.length ? guaranteed[Math.floor(rng() * guaranteed.length)] : drops[Math.floor(rng() * drops.length)]);
   }
 
   // 6. Devolver lista de items ganados
