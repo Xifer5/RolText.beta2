@@ -26,6 +26,7 @@ export const allItems = {
   healing_elixir: {
     id: "healing_elixir",
     name: { en: "Healing Elixir", es: "Elixir de Curación" },
+    description: { en: "Restores 60 HP.", es: "Restaura 60 HP." },
     type: "consumable",
     rarity: "rare",
     restoreHp: 60,
@@ -36,6 +37,7 @@ export const allItems = {
   mana_elixir: {
     id: "mana_elixir",
     name: { en: "Mana Elixir", es: "Elixir de Maná" },
+    description: { en: "Restores 50 MP.", es: "Restaura 50 MP." },
     type: "consumable",
     rarity: "uncommon",
     restoreMp: 50,
@@ -45,6 +47,7 @@ export const allItems = {
   greater_elixir: {
     id: "greater_elixir",
     name: { en: "Greater Elixir", es: "Elixir Superior" },
+    description: { en: "Restores 100 HP and 50 MP.", es: "Restaura 100 HP y 50 MP." },
     type: "consumable",
     rarity: "rare",
     restoreHp: 100,
@@ -85,6 +88,7 @@ export const allItems = {
   goblin_dagger: {
     id: "goblin_dagger",
     name: { en: "Goblin Dagger", es: "Daga Goblin" },
+    description: { en: "A crude blade favored by goblins. +3 ATK", es: "Una hoja tosca favorecida por los goblins. +3 ATK" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
@@ -125,6 +129,7 @@ export const allItems = {
   vine_whip: {
     id: "vine_whip",
     name: { en: "Vine Whip", es: "Látigo de Vid" },
+    description: { en: "A whip woven from living vines. +7 ATK", es: "Un látigo tejido con vides vivas. +7 ATK" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -134,6 +139,7 @@ export const allItems = {
   giant_club: {
     id: "giant_club",
     name: { en: "Giant Club", es: "Maza Gigante" },
+    description: { en: "A club too heavy for most to lift. +8 ATK", es: "Una maza demasiado pesada para la mayoría. +8 ATK" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -144,6 +150,7 @@ export const allItems = {
   cutlass: {
     id: "cutlass",
     name: { en: "Cutlass", es: "Alfanje" },
+    description: { en: "A curved blade favored by sailors. +9 ATK", es: "Una hoja curva favorecida por marineros. +9 ATK" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -153,6 +160,7 @@ export const allItems = {
   trident: {
     id: "trident",
     name: { en: "Trident", es: "Tridente" },
+    description: { en: "A three-pronged spear forged for the sea. +10 ATK", es: "Una lanza de tres puntas forjada para el mar. +10 ATK" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -163,6 +171,7 @@ export const allItems = {
   tiger_blade: {
     id: "tiger_blade",
     name: { en: "Tiger Blade", es: "Hoja del Tigre" },
+    description: { en: "A blade said to strike as fast as a tiger. +12 ATK", es: "Una hoja que dicen golpea tan rápido como un tigre. +12 ATK" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -174,6 +183,7 @@ export const allItems = {
   captain_sword: {
     id: "captain_sword",
     name: { en: "Captain Sword", es: "Espada del Capitán" },
+    description: { en: "The blade carried by a ship's captain. +13 ATK", es: "La hoja que porta el capitán de un barco. +13 ATK" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -184,6 +194,7 @@ export const allItems = {
   serpent_sword: {
     id: "serpent_sword",
     name: { en: "Serpent Sword", es: "Espada Serpiente" },
+    description: { en: "A blade that curves like a striking serpent. +14 ATK", es: "Una hoja que se curva como una serpiente al atacar. +14 ATK" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -194,6 +205,7 @@ export const allItems = {
   crystal_blade: {
     id: "crystal_blade",
     name: { en: "Crystal Blade", es: "Hoja de Cristal" },
+    description: { en: "A blade grown from raw crystal. +15 ATK, +3 MAG", es: "Una hoja formada de cristal puro. +15 ATK, +3 MAG" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -207,6 +219,7 @@ export const allItems = {
   royal_sword: {
     id: "royal_sword",
     name: { en: "Royal Sword", es: "Espada Real" },
+    description: { en: "A ceremonial blade fit for royalty. +25 ATK", es: "Una hoja ceremonial digna de la realeza. +25 ATK" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -217,6 +230,7 @@ export const allItems = {
   katana: {
     id: "katana",
     name: { en: "Katana", es: "Katana" },
+    description: { en: "A finely balanced curved blade. +20 ATK", es: "Una hoja curva de equilibrio exquisito. +20 ATK" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
@@ -227,6 +241,7 @@ export const allItems = {
   demon_blade: {
     id: "demon_blade",
     name: { en: "Demon Blade", es: "Hoja del Demonio" },
+    description: { en: "A blade forged in fire, said to hunger. +25 ATK", es: "Una hoja forjada en fuego que, dicen, tiene hambre. +25 ATK" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -264,6 +279,7 @@ export const allItems = {
   iron_sword: {
     id: "iron_sword",
     name: { en: "Iron Sword", es: "Espada de Hierro" },
+    description: { en: "A sword forged from solid iron. +6 ATK", es: "Una espada forjada en hierro sólido. +6 ATK" },
     type: "weapon",
     rarity: "uncommon",
     slot: "rightHand",
@@ -276,6 +292,7 @@ export const allItems = {
   dragon_king_sword: {
     id: "dragon_king_sword",
     name: { en: "Dragon King Sword", es: "Espada del Rey Dragón" },
+    description: { en: "The blade wielded by the Dragon King himself. +50 ATK", es: "La hoja que empuñó el mismísimo Rey Dragón. +50 ATK" },
     type: "weapon",
     rarity: "legendary",
     slot: "rightHand",
@@ -335,6 +352,7 @@ export const allItems = {
   water_staff: {
     id: "water_staff",
     name: { en: "Water Staff", es: "Báculo de Agua" },
+    description: { en: "A staff carved from driftwood, humming with the sea's magic. +10 INT, +14 MAG", es: "Un báculo tallado en madera de mar que resuena con la magia del océano. +10 INT, +14 MAG" },
     type: "weapon",
     rarity: "rare",
     slot: "rightHand",
@@ -347,6 +365,7 @@ export const allItems = {
   ocean_staff: {
     id: "ocean_staff",
     name: { en: "Ocean Staff", es: "Báculo del Océano" },
+    description: { en: "A staff that channels the depths of the ocean. +15 INT, +20 MAG", es: "Un báculo que canaliza las profundidades del océano. +15 INT, +20 MAG" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -359,6 +378,7 @@ export const allItems = {
   flame_staff: {
     id: "flame_staff",
     name: { en: "Flame Staff", es: "Báculo de Llamas" },
+    description: { en: "A staff wreathed in eternal flame. +20 INT, +30 MAG", es: "Un báculo envuelto en llamas eternas. +20 INT, +30 MAG" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -371,6 +391,7 @@ export const allItems = {
   spirit_staff: {
     id: "spirit_staff",
     name: { en: "Spirit Staff", es: "Báculo del Espíritu" },
+    description: { en: "A staff that channels the voices of restless spirits. +15 INT, +10 MAG", es: "Un báculo que canaliza las voces de espíritus inquietos. +15 INT, +10 MAG" },
     type: "weapon",
     rarity: "epic",
     slot: "rightHand",
@@ -736,6 +757,7 @@ export const allItems = {
   ring_of_inferno: {
     id: "ring_of_inferno",
     name: { en: "Ring of Inferno", es: "Anillo del Infierno" },
+    description: { en: "A ring forged in the heart of the inferno, radiating power in every form. +15 STR, +15 AGI, +15 INT, +15 ATK, +15 MAG, +15 MP, +15 HP", es: "Un anillo forjado en el corazón del infierno que irradia poder en todas sus formas. +15 FUE, +15 AGI, +15 INT, +15 ATK, +15 MAG, +15 MP, +15 HP" },
     type: "ring",
     slot: "ring",
     rarity: "legendary",
@@ -920,6 +942,7 @@ export const allItems = {
   leather_armor: {
     id: "leather_armor",
     name: { en: "Leather Armor", es: "Armadura de Cuero" },
+    description: { en: "Simple armor stitched from tanned leather. +2 DEF", es: "Armadura sencilla cosida en cuero curtido. +2 DEF" },
     type: "armor",
     rarity: "uncommon",
     slot: "armor",
@@ -940,6 +963,7 @@ export const allItems = {
   dark_armor: {
     id: "dark_armor",
     name: { en: "Dark Armor", es: "Armadura Oscura" },
+    description: { en: "Armor woven from living shadow. +20 DEF", es: "Armadura tejida con sombra viviente. +20 DEF" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -950,6 +974,7 @@ export const allItems = {
   jungle_armor: {
     id: "jungle_armor",
     name: { en: "Jungle Armor", es: "Armadura de la Jungla" },
+    description: { en: "Armor woven from jungle vines and hide. +8 DEF", es: "Armadura tejida con vides y cuero de la jungla. +8 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -970,6 +995,7 @@ export const allItems = {
   sea_armor: {
     id: "sea_armor",
     name: { en: "Sea Armor", es: "Armadura Marina" },
+    description: { en: "Armor scaled like a creature of the deep. +12 DEF", es: "Armadura escamada como una criatura de las profundidades. +12 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -980,6 +1006,7 @@ export const allItems = {
   captain_coat: {
     id: "captain_coat",
     name: { en: "Captain Coat", es: "Abrigo del Capitán" },
+    description: { en: "The coat worn by a ship's captain. +13 DEF", es: "El abrigo que porta el capitán de un barco. +13 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -990,6 +1017,7 @@ export const allItems = {
   royal_armor: {
     id: "royal_armor",
     name: { en: "Royal Armor", es: "Armadura Real" },
+    description: { en: "Ceremonial armor fit for royalty. +18 DEF", es: "Armadura ceremonial digna de la realeza. +18 DEF" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -1010,6 +1038,7 @@ export const allItems = {
   stone_armor: {
     id: "stone_armor",
     name: { en: "Stone Armor", es: "Armadura de Piedra" },
+    description: { en: "Armor as unyielding as stone. +14 DEF", es: "Armadura tan inquebrantable como la piedra. +14 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1021,6 +1050,7 @@ export const allItems = {
   dragon_king_armor: {
     id: "dragon_king_armor",
     name: { en: "Dragon King Armor", es: "Armadura del Rey Dragón" },
+    description: { en: "The armor worn by the Dragon King himself. +50 DEF", es: "La armadura que vistió el mismísimo Rey Dragón. +50 DEF" },
     type: "armor",
     rarity: "legendary",
     slot: "armor",
@@ -1065,6 +1095,7 @@ export const allItems = {
   aqua_robe: {
     id: "aqua_robe",
     name: { en: "Aqua Robe", es: "Túnica Aqua" },
+    description: { en: "A robe woven with threads of living water. +12 INT, +6 DEF", es: "Una túnica tejida con hilos de agua viva. +12 INT, +6 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1076,6 +1107,7 @@ export const allItems = {
   coral_robe: {
     id: "coral_robe",
     name: { en: "Coral Robe", es: "Túnica de Coral" },
+    description: { en: "A robe grown from living coral. +10 INT, +8 DEF", es: "Una túnica formada de coral vivo. +10 INT, +8 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1087,6 +1119,7 @@ export const allItems = {
   fire_robe: {
     id: "fire_robe",
     name: { en: "Fire Robe", es: "Túnica de Fuego" },
+    description: { en: "A robe that burns but never turns to ash. +14 INT, +9 DEF", es: "Una túnica que arde sin nunca convertirse en cenizas. +14 INT, +9 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1098,6 +1131,7 @@ export const allItems = {
   nature_robe: {
     id: "nature_robe",
     name: { en: "Nature Robe", es: "Túnica de la Naturaleza" },
+    description: { en: "A robe woven from living roots and leaves. +12 INT, +6 DEF", es: "Una túnica tejida con raíces y hojas vivas. +12 INT, +6 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1110,6 +1144,7 @@ export const allItems = {
   ethereal_robe: {
     id: "ethereal_robe",
     name: { en: "Ethereal Robe", es: "Túnica Etérea" },
+    description: { en: "A robe that seems to fade in and out of this world. +14 INT, +8 DEF", es: "Una túnica que parece desvanecerse dentro y fuera de este mundo. +14 INT, +8 DEF" },
     type: "armor",
     rarity: "epic",
     slot: "armor",
@@ -1136,6 +1171,7 @@ export const allItems = {
   dragon_king_crown: {
     id: "dragon_king_crown",
     name: { en: "Dragon King Crown", es: "Corona del Rey Dragón" },
+    description: { en: "The crown worn by the Dragon King himself. +25 STR, +25 AGI, +25 INT", es: "La corona que portó el mismísimo Rey Dragón. +25 FUE, +25 AGI, +25 INT" },
     type: "accessory",
     slot: "accessory",
     rarity: "legendary",
@@ -1155,6 +1191,7 @@ export const allItems = {
   herb: {
     id: "herb",
     name: { en: "Healing Herb", es: "Hierba Curativa" },
+    description: { en: "A common herb known for its healing properties.", es: "Una hierba común conocida por sus propiedades curativas." },
     type: "material",
     rarity: "common",
     price: 5,
@@ -1164,6 +1201,7 @@ export const allItems = {
   wolf_pelt: {
     id: "wolf_pelt",
     name: { en: "Wolf Pelt", es: "Piel de Lobo" },
+    description: { en: "The pelt of a slain wolf, useful for crafting.", es: "La piel de un lobo caído, útil para craftear." },
     type: "material",
     rarity: "uncommon",
     price: 8,
@@ -1173,6 +1211,7 @@ export const allItems = {
   fungus_core: {
     id: "fungus_core",
     name: { en: "Fungus Core", es: "Núcleo Fúngico" },
+    description: { en: "A pulsing fungal core, still warm to the touch.", es: "Un núcleo fúngico palpitante, todavía tibio al tacto." },
     type: "material",
     rarity: "rare",
     price: 18,
@@ -1192,6 +1231,7 @@ export const allItems = {
   bat_wing: {
     id: "bat_wing",
     name: { en: "Bat Wing", es: "Ala de Murciélago" },
+    description: { en: "The wing of a cave-dwelling bat.", es: "El ala de un murciélago de las cavernas." },
     type: "material",
     rarity: "common",
     price: 8,
@@ -1201,6 +1241,7 @@ export const allItems = {
   crystal_shard: {
     id: "crystal_shard",
     name: { en: "Crystal Shard", es: "Fragmento de Cristal" },
+    description: { en: "A shard of crystal that hums faintly with energy.", es: "Un fragmento de cristal que resuena tenuemente con energía." },
     type: "material",
     rarity: "rare",
     price: 20,
@@ -1210,6 +1251,7 @@ export const allItems = {
   golem_fragment: {
     id: "golem_fragment",
     name: { en: "Golem Fragment", es: "Fragmento de Gólem" },
+    description: { en: "A fragment chipped from a golem's stone hide.", es: "Un fragmento arrancado de la piel de piedra de un gólem." },
     type: "material",
     rarity: "epic",
     price: 35,
@@ -1219,6 +1261,7 @@ export const allItems = {
   ice_crystal: {
     id: "ice_crystal",
     name: { en: "Ice Crystal", es: "Cristal de Hielo" },
+    description: { en: "A crystal of eternal ice that never melts.", es: "Un cristal de hielo eterno que jamás se derrite." },
     type: "material",
     rarity: "uncommon",
     price: 15,
@@ -1231,6 +1274,7 @@ export const allItems = {
   fairy_dust: {
     id: "fairy_dust",
     name: { en: "Fairy Dust", es: "Polvo de Hadas" },
+    description: { en: "A shimmering dust left behind by fairies.", es: "Un polvo resplandeciente que dejan las hadas a su paso." },
     type: "material",
     rarity: "uncommon",
     price: 15,
@@ -1240,6 +1284,7 @@ export const allItems = {
   wyvern_scale: {
     id: "wyvern_scale",
     name: { en: "Wyvern Scale", es: "Escama de Wyvern" },
+    description: { en: "A tough scale shed by a wyvern.", es: "Una escama resistente desprendida de un wyvern." },
     type: "material",
     rarity: "rare",
     price: 35,
@@ -1249,6 +1294,7 @@ export const allItems = {
   giant_bone: {
     id: "giant_bone",
     name: { en: "Giant Bone", es: "Hueso Gigante" },
+    description: { en: "A massive bone from a fallen giant.", es: "Un hueso descomunal de un gigante caído." },
     type: "material",
     rarity: "rare",
     price: 25,
@@ -1258,6 +1304,7 @@ export const allItems = {
   ancient_relic: {
     id: "ancient_relic",
     name: { en: "Ancient Relic", es: "Reliquia Antigua" },
+    description: { en: "A relic from an age long forgotten.", es: "Una reliquia de una era largamente olvidada." },
     type: "material",
     rarity: "epic",
     price: 50,
@@ -1267,6 +1314,7 @@ export const allItems = {
   enchanted_dust: {
     id: "enchanted_dust",
     name: { en: "Enchanted Dust", es: "Polvo Encantado" },
+    description: { en: "A fine dust infused with lingering enchantment.", es: "Un polvo fino imbuido de un encantamiento persistente." },
     type: "material",
     rarity: "uncommon",
     price: 12,
@@ -1276,6 +1324,7 @@ export const allItems = {
   runestone: {
     id: "runestone",
     name: { en: "Runestone", es: "Piedra Rúnica" },
+    description: { en: "A stone etched with runes of forgotten meaning.", es: "Una piedra grabada con runas de significado olvidado." },
     type: "material",
     rarity: "rare",
     price: 30,
@@ -1285,6 +1334,7 @@ export const allItems = {
   ancient_core: {
     id: "ancient_core",
     name: { en: "Ancient Core", es: "Núcleo Antiguo" },
+    description: { en: "A core that still holds a faint memory from ages past.", es: "Un núcleo que aún guarda un tenue recuerdo de eras pasadas." },
     type: "material",
     rarity: "epic",
     price: 40,
@@ -1294,6 +1344,7 @@ export const allItems = {
   arcane_relic: {
     id: "arcane_relic",
     name: { en: "Arcane Relic", es: "Reliquia Arcana" },
+    description: { en: "A relic humming with raw arcane power.", es: "Una reliquia que resuena con poder arcano puro." },
     type: "material",
     rarity: "legendary",
     price: 100,
@@ -1303,6 +1354,7 @@ export const allItems = {
   poison_gland: {
     id: "poison_gland",
     name: { en: "Poison Gland", es: "Glándula Venenosa" },
+    description: { en: "A gland swollen with venom.", es: "Una glándula hinchada de veneno." },
     type: "material",
     rarity: "common",
     price: 6,
@@ -1312,6 +1364,7 @@ export const allItems = {
   acid_sac: {
     id: "acid_sac",
     name: { en: "Acid Sac", es: "Saco Ácido" },
+    description: { en: "A sac filled with corrosive acid.", es: "Un saco lleno de ácido corrosivo." },
     type: "material",
     rarity: "uncommon",
     price: 10,
@@ -1321,6 +1374,7 @@ export const allItems = {
   necrotic_bone: {
     id: "necrotic_bone",
     name: { en: "Necrotic Bone", es: "Hueso Necrótico" },
+    description: { en: "A bone tainted with necrotic energy.", es: "Un hueso contaminado con energía necrótica." },
     type: "material",
     rarity: "rare",
     price: 22,
@@ -1330,6 +1384,7 @@ export const allItems = {
   toxic_heart: {
     id: "toxic_heart",
     name: { en: "Toxic Heart", es: "Corazón Tóxico" },
+    description: { en: "A heart that beats with pure toxin.", es: "Un corazón que late con veneno puro." },
     type: "material",
     rarity: "epic",
     price: 45,
@@ -1339,6 +1394,7 @@ export const allItems = {
   magma_fragment: {
     id: "magma_fragment",
     name: { en: "Magma Fragment", es: "Fragmento de Magma" },
+    description: { en: "A fragment of hardened magma, still warm.", es: "Un fragmento de magma endurecido, aún tibio." },
     type: "material",
     rarity: "uncommon",
     price: 18,
@@ -1348,6 +1404,7 @@ export const allItems = {
   pyro_core: {
     id: "pyro_core",
     name: { en: "Pyro Core", es: "Núcleo Pirótico" },
+    description: { en: "A core that burns without ever being consumed.", es: "Un núcleo que arde sin consumirse jamás." },
     type: "material",
     rarity: "rare",
     price: 28,
@@ -1357,6 +1414,7 @@ export const allItems = {
   dragon_scale: {
     id: "dragon_scale",
     name: { en: "Dragon Scale", es: "Escama de Dragón" },
+    description: { en: "A scale shed by a dragon.", es: "Una escama desprendida de un dragón." },
     type: "material",
     rarity: "epic",
     price: 75,
@@ -1366,6 +1424,7 @@ export const allItems = {
   heart_of_inferno: {
     id: "heart_of_inferno",
     name: { en: "Heart of the Inferno", es: "Corazón del Infierno" },
+    description: { en: "A heart forged in the deepest fires of the inferno.", es: "Un corazón forjado en los fuegos más profundos del infierno." },
     type: "material",
     rarity: "legendary",
     price: 150,
@@ -1375,6 +1434,7 @@ export const allItems = {
   frost_shard: {
     id: "frost_shard",
     name: { en: "Frost Shard", es: "Fragmento Helado" },
+    description: { en: "A shard of ice so cold it burns.", es: "Un fragmento de hielo tan frío que quema." },
     type: "material",
     rarity: "uncommon",
     price: 14,
@@ -1384,6 +1444,7 @@ export const allItems = {
   ice_essence: {
     id: "ice_essence",
     name: { en: "Ice Essence", es: "Esencia de Hielo" },
+    description: { en: "The distilled essence of eternal winter.", es: "La esencia destilada de un invierno eterno." },
     type: "material",
     rarity: "rare",
     price: 24,
@@ -1393,6 +1454,7 @@ export const allItems = {
   glacial_core: {
     id: "glacial_core",
     name: { en: "Glacial Core", es: "Núcleo Glacial" },
+    description: { en: "A core of ancient, unyielding ice.", es: "Un núcleo de hielo antiguo e inquebrantable." },
     type: "material",
     rarity: "epic",
     price: 60,
@@ -1407,6 +1469,7 @@ export const allItems = {
   titan_branch: {
     id: "titan_branch",
     name: { en: "Titan Branch", es: "Rama Titán" },
+    description: { en: "A branch torn from a forest titan.", es: "Una rama arrancada de un titán del bosque." },
     type: "material",
     rarity: "rare",
     price: 40,
@@ -1430,6 +1493,7 @@ export const allItems = {
   devourer_fang: {
     id: "devourer_fang",
     name: { en: "Devourer Fang", es: "Colmillo del Devorador" },
+    description: { en: "A fang torn from something that should not exist.", es: "Un colmillo arrancado de algo que no debería existir." },
     type: "material",
     rarity: "rare",
     price: 45,
@@ -1439,6 +1503,7 @@ export const allItems = {
   earthbreaker_core: {
     id: "earthbreaker_core",
     name: { en: "Earthbreaker Core", es: "Núcleo Rompetierras" },
+    description: { en: "A core that once powered something that shattered the earth.", es: "Un núcleo que alguna vez alimentó a algo que resquebrajó la tierra." },
     type: "material",
     rarity: "epic",
     price: 100,
@@ -1448,6 +1513,7 @@ export const allItems = {
   colossus_heart: {
     id: "colossus_heart",
     name: { en: "Colossus Heart", es: "Corazón del Coloso" },
+    description: { en: "The heart of a fallen colossus.", es: "El corazón de un coloso caído." },
     type: "material",
     rarity: "rare",
     price: 55,
@@ -1470,6 +1536,7 @@ export const allItems = {
   construct_eye: {
     id: "construct_eye",
     name: { en: "Construct Eye", es: "Ojo del Constructo" },
+    description: { en: "The eye of an ancient construct.", es: "El ojo de un constructo antiguo." },
     type: "material",
     rarity: "rare",
     price: 50
@@ -1491,6 +1558,7 @@ export const allItems = {
   abomination_core: {
     id: "abomination_core",
     name: { en: "Abomination Core", es: "Núcleo de la Abominación" },
+    description: { en: "A core pulled from something twisted beyond recognition.", es: "Un núcleo extraído de algo deformado más allá de todo reconocimiento." },
     type: "material",
     rarity: "rare",
     price: 48
@@ -1512,6 +1580,7 @@ export const allItems = {
   inferno_eye: {
     id: "inferno_eye",
     name: { en: "Inferno Eye", es: "Ojo del Infierno" },
+    description: { en: "An eye that still burns with infernal fire.", es: "Un ojo que aún arde con fuego infernal." },
     type: "material",
     rarity: "epic",
     price: 85
@@ -1533,6 +1602,7 @@ export const allItems = {
   wyrm_tail: {
     id: "wyrm_tail",
     name: { en: "Frost Wyrm Tail", es: "Cola del Wyrm Helado" },
+    description: { en: "The tail of a frost wyrm.", es: "La cola de un wyrm helado." },
     type: "material",
     rarity: "epic",
     price: 70
@@ -1541,6 +1611,7 @@ export const allItems = {
   corrupted_grimoire: {
     id: "corrupted_grimoire",
     name: { en: "Corrupted Grimoire", es: "Grimorio Corrompido" },
+    description: { en: "A grimoire whose pages writhe with corruption.", es: "Un grimorio cuyas páginas se retuercen de corrupción." },
     type: "material",
     rarity: "rare",
     price: 60,
@@ -1605,6 +1676,7 @@ export const allItems = {
   rusty_coin: {
     id: "rusty_coin",
     name: { en: "Rusty Coin", es: "Moneda Oxidada" },
+    description: { en: "An old, rusted coin from a forgotten era.", es: "Una moneda vieja y oxidada de una era olvidada." },
     type: "material",
     rarity: "common",
     price: 5,
@@ -1614,6 +1686,7 @@ export const allItems = {
   slime_gel: {
     id: "slime_gel",
     name: { en: "Slime Gel", es: "Gel de Slime" },
+    description: { en: "A gelatinous residue left behind by a slime.", es: "Un residuo gelatinoso que deja un slime." },
     type: "material",
     rarity: "common",
     price: 4,
@@ -1621,6 +1694,7 @@ export const allItems = {
   golden_key: {
     id: "golden_key",
     name: { en: "Golden Key", es: "Llave Dorada" },
+    description: { en: "A golden key that opens something valuable.", es: "Una llave dorada que abre algo valioso." },
     type: "key_item",
     rarity: "rare",
     price: 100,
@@ -1638,6 +1712,7 @@ export const allItems = {
   treasure_map: {
     id: "treasure_map",
     name: { en: "Treasure Map", es: "Mapa del Tesoro" },
+    description: { en: "A map marked with the location of buried treasure.", es: "Un mapa marcado con la ubicación de un tesoro enterrado." },
     type: "key_item",
     rarity: "uncommon",
     price: 50,
@@ -1656,6 +1731,7 @@ export const allItems = {
   ancient_guardian_core: {
     id: "ancient_guardian_core",
     name: { en: "Ancient Guardian Core", es: "Núcleo del Guardián Antiguo" },
+    description: { en: "A core torn from an ancient guardian's chest.", es: "Un núcleo arrancado del pecho de un guardián antiguo." },
     type: "material",
     rarity: "legendary",
     price: 200,
@@ -1664,6 +1740,7 @@ export const allItems = {
   treasure_guardian_core: {
     id: "treasure_guardian_core",
     name: { en: "Treasure Guardian Core", es: "Núcleo del Guardián del Tesoro" },
+    description: { en: "A core torn from a treasure guardian's chest.", es: "Un núcleo arrancado del pecho de un guardián del tesoro." },
     type: "material",
     rarity: "epic",
     price: 120,
@@ -1672,6 +1749,7 @@ export const allItems = {
   treasure_guardian_heart: {
     id: "treasure_guardian_heart",
     name: { en: "Treasure Guardian Heart", es: "Corazón del Guardián del Tesoro" },
+    description: { en: "The heart of a fallen treasure guardian.", es: "El corazón de un guardián del tesoro caído." },
     type: "material",
     rarity: "rare",
     price: 80,
@@ -1680,6 +1758,7 @@ export const allItems = {
   dragon_heart: {
     id: "dragon_heart",
     name: { en: "Dragon Heart", es: "Corazón de Dragón" },
+    description: { en: "The still-warm heart of a dragon.", es: "El corazón, aún tibio, de un dragón." },
     type: "material",
     rarity: "legendary",
     price: 250,
@@ -1688,6 +1767,7 @@ export const allItems = {
   inferno_gem: {
     id: "inferno_gem",
     name: { en: "Inferno Gem", es: "Gema del Infierno" },
+    description: { en: "A gem forged in the fires of the inferno.", es: "Una gema forjada en los fuegos del infierno." },
     type: "material",
     rarity: "legendary",
     price: 220,
@@ -1702,6 +1782,7 @@ export const allItems = {
   flower_petals: {
     id: "flower_petals",
     name: { en: "Flower Petals", es: "Pétalos de Flor" },
+    description: { en: "Soft petals gathered from garden flowers.", es: "Pétalos suaves recogidos de flores del jardín." },
     type: "material", rarity: "common", price: 4, icon: "🌸",
   },
   elven_bow: {
@@ -1714,16 +1795,19 @@ export const allItems = {
   nature_essence: {
     id: "nature_essence",
     name: { en: "Nature Essence", es: "Esencia Natural" },
+    description: { en: "The distilled essence of untamed nature.", es: "La esencia destilada de la naturaleza salvaje." },
     type: "material", rarity: "rare", price: 25, icon: "🍃",
   },
   ancient_idol: {
     id: "ancient_idol",
     name: { en: "Ancient Idol", es: "Ídolo Antiguo" },
+    description: { en: "A small idol carved in a forgotten age.", es: "Un pequeño ídolo tallado en una era olvidada." },
     type: "material", rarity: "epic", price: 60, icon: "🗿",
   },
   gorilla_heart: {
     id: "gorilla_heart",
     name: { en: "Gorilla Heart", es: "Corazón de Gorila" },
+    description: { en: "The powerful heart of a gorilla.", es: "El corazón poderoso de un gorila." },
     type: "material", rarity: "rare", price: 24, icon: "❤️",
   },
   big_health_potion: {
@@ -1741,6 +1825,7 @@ export const allItems = {
   dark_essence: {
     id: "dark_essence",
     name: { en: "Dark Essence", es: "Esencia Oscura" },
+    description: { en: "An essence that seems to swallow the light around it.", es: "Una esencia que parece devorar la luz a su alrededor." },
     type: "material", rarity: "uncommon", price: 16, icon: "🌑",
   },
   dark_robe: {
@@ -1753,26 +1838,31 @@ export const allItems = {
   shadow_heart: {
     id: "shadow_heart",
     name: { en: "Shadow Heart", es: "Corazón de Sombra" },
+    description: { en: "The heart of something that lives in shadow.", es: "El corazón de algo que habita en la sombra." },
     type: "material", rarity: "epic", price: 55, icon: "🖤",
   },
   soul_fragment: {
     id: "soul_fragment",
     name: { en: "Soul Fragment", es: "Fragmento de Alma" },
+    description: { en: "A fragment of a soul, still restless.", es: "Un fragmento de un alma, todavía inquieta." },
     type: "material", rarity: "rare", price: 30, icon: "👻",
   },
   sandstone_fragment: {
     id: "sandstone_fragment",
     name: { en: "Sandstone Fragment", es: "Fragmento de Arenisca" },
+    description: { en: "A fragment of wind-worn sandstone.", es: "Un fragmento de arenisca desgastada por el viento." },
     type: "material", rarity: "uncommon", price: 14, icon: "🪨",
   },
   linchorn_scale: {
     id: "linchorn_scale",
     name: { en: "Linchorn Scale", es: "Escama de Linchorn" },
+    description: { en: "A scale from a linchorn, iridescent even in shadow.", es: "Una escama de linchorn, iridiscente incluso en la sombra." },
     type: "material", rarity: "rare", price: 28, icon: "🦄",
   },
   desert_essence: {
     id: "desert_essence",
     name: { en: "Desert Essence", es: "Esencia del Desierto" },
+    description: { en: "The distilled essence of the scorching desert.", es: "La esencia destilada del desierto abrasador." },
     type: "material", rarity: "epic", price: 58, icon: "🏜️",
   },
   pharaohs_scepter: {
