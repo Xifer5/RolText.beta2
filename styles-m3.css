@@ -5833,7 +5833,12 @@ kbd {
   place-items: center;
   border-radius: 50%;
   background: var(--gold);
-  color: #2b1810;
+  /* SPEC-1229: --gold es var(--md-primary), que SÍ cambia entre temas
+     (dorado claro en oscuro, marrón oscuro en claro) -- un color de texto
+     fijo acá se volvía casi ilegible en tema claro. var(--md-on-primary)
+     es el rol M3 exacto para esto, y es lo que usa cualquier otro fondo
+     var(--md-primary)/var(--gold) del resto del archivo. */
+  color: var(--md-on-primary);
   font-size: 10px;
   font-weight: 900;
   line-height: 1;
