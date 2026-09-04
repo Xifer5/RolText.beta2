@@ -125,6 +125,22 @@ let _typing    = false;
 let _typeTimer = null;
 let _onFinish  = null;
 
+// SPEC-1230: #topbar (y el HUD/nav móvil) desbordan unos ~115px más allá
+// del viewport en ciertos anchos de escritorio (bug de layout preexistente,
+// separado de la intro) — normalmente queda oculto detrás del propio juego,
+// pero contra el fondo negro de la intro esa tira se veía flotando encima
+// de todo pese a que .intro-screen ya tiene z-index:9000 (el problema no es
+// de apilamiento, esos elementos literalmente se salen de la caja de la
+// intro). Ocultarlos mientras la intro está activa es más simple y seguro
+// que perseguir el overflow del topbar en este momento.
+const PERSISTENT_CHROME_IDS = ["topbar", "mobile-status-hud", "mobile-bottom-nav"];
+
+function _hidePersistentChrome(hide) {
+  for (const id of PERSISTENT_CHROME_IDS) {
+    document.getElementById(id)?.classList.toggle("hidden", hide);
+  }
+}
+
 // ── API pública ───────────────────────────────────────────────
 export function showIntro(onFinish) {
   // ?intro en la URL fuerza mostrar la intro (útil para pruebas)
@@ -139,6 +155,7 @@ export function showIntro(onFinish) {
   if (!screen) { _finish(); return; }
 
   screen.classList.remove("hidden");
+  _hidePersistentChrome(true);
   _wireControls();
   _loadPage(0);
 }
@@ -412,6 +429,7 @@ function _finish() {
   sessionStorage.setItem("introSeen", "1");
   const screen = document.getElementById("introScreen");
   if (screen) screen.classList.add("hidden");
+  _hidePersistentChrome(false);
   try { playMusic("none"); } catch(e) {}
   _onFinish?.();
 }
