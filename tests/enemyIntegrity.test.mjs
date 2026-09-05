@@ -9,6 +9,7 @@ import { biomeBosses } from "../js/biomeBosses.js";
 import { biomeCandidateMap } from "../js/mapgen.js";
 import { worldMap } from "../js/worldMap.js";
 import { ENEMY_COMBAT_DATA } from "../js/damageTypes.js";
+import { biomes } from "../js/biomes.js";
 
 const realBiomeIds = new Set(Object.values(worldMap).map(loc => loc.biome).filter(Boolean));
 
@@ -49,6 +50,22 @@ test("mapgen: todo candidato de biomeCandidateMap existe en enemyData", () => {
   for (const [biomeKey, candidates] of Object.entries(biomeCandidateMap)) {
     for (const id of candidates) {
       assert.ok(enemyData[id], `candidato '${id}' de biomeCandidateMap.${biomeKey} no existe en enemyData`);
+    }
+  }
+});
+
+// Bug real: biomes.js's volcano.enemies tenía "inferno_elemental" (minúscula)
+// mientras enemyData/damageTypes/mapgen/timeOfDay usan "Inferno_elemental"
+// (con mayúscula) en TODO el resto del código -- combat.js mezcla
+// getBiome(loc.biome)?.enemies con loc.enemies para armar el pool de
+// encuentro (línea ~131-133), así que ese typo de casing rompía el combate
+// con "Error: enemigo desconocido" apenas el RNG elegía ese candidato. El
+// test de biomeCandidateMap de arriba NO cubría esto porque es una fuente
+// de datos distinta (biomes.js, no mapgen.js).
+test("biomes.js: todo enemigo del array .enemies de cada bioma existe en enemyData", () => {
+  for (const [biomeKey, data] of Object.entries(biomes)) {
+    for (const id of data.enemies ?? []) {
+      assert.ok(enemyData[id], `enemigo '${id}' de biomes.${biomeKey}.enemies no existe en enemyData (¿typo de casing?)`);
     }
   }
 });

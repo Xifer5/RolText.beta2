@@ -226,7 +226,7 @@ export const biomes = {
     name: "Volcanic Region",
     minLevel: 10,
     encounterRate: 0.50,
-    enemies: ["diablo", "dragon", "vine_serpent", "inferno_elemental"],
+    enemies: ["diablo", "dragon", "vine_serpent", "Inferno_elemental"],
     description: [
       { en: "Heat waves distort the air.", es: "Las ondas de calor distorsionan el aire." },
       { en: "Streams of lava crackle nearby.", es: "Torrentes de lava crepitan cerca." },
