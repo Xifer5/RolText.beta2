@@ -435,6 +435,24 @@ export function isQuestLocked(questId) {
     && getQuestStatus(q.prerequisiteQuest) !== "completed";
 }
 
+// SPEC-1234: un NPC con varias questIds (ej. Pyrax: defeat_dark_lord +
+// mq_05_el_ultimo_sueno) solo puede mostrar/accionar UNA por vez en su
+// modal. Prioriza la primera id que ya sea accionable (no completada, no
+// bloqueada); si todas están completadas o bloqueadas, cae a la primera no
+// completada para mostrar al menos su diálogo "locked" coherente. Extraído
+// de ui.js's openNpcModal para poder testear el orden sin DOM -- el orden
+// de `ids` importa: la id sin prerequisiteQuest siempre gana el primer
+// find() hasta completarse, así que quests SIN prerequisito deben ir
+// primero en npcs.js si además son la única fuente de un ítem/gate real
+// (ver bug real: defeat_dark_lord quedaba inalcanzable detrás de
+// mq_05_el_ultimo_sueno una vez esta se desbloqueaba).
+export function pickNpcQuestId(ids) {
+  const knownIds = ids.filter(id => !!QUEST_DATA[id]);
+  return knownIds.find(id => getQuestStatus(id) !== "completed" && !isQuestLocked(id))
+    ?? knownIds.find(id => getQuestStatus(id) !== "completed")
+    ?? knownIds[0] ?? ids[0];
+}
+
 /** Líneas de diálogo según estado actual de la misión */
 export function getQuestDialogue(questId) {
   const q = QUEST_DATA[questId];

@@ -9,7 +9,7 @@ import { getNpcAt } from "./npcs.js";
 import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
-import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest, isQuestLocked } from "./quests.js";
+import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest, isQuestLocked, pickNpcQuestId } from "./quests.js";
 import { allItems } from "./items.js";
 import { enemyData } from "./enemies.js";
 import { t, formatText, localizeText } from "./i18n.js";
@@ -807,16 +807,13 @@ function openNpcModal(npc) {
   const memoryLine = memoryKey ? t(memoryKey) : "";
   document.getElementById("npcLore").textContent  = npc.lore + echoLine + memoryLine;
 
-  // Support both questId (singular) and questIds (array) — pick the first
-  // implemented quest that's actually startable right now (not completed,
-  // not locked behind an unfinished prerequisiteQuest); if every quest is
-  // locked/completed, fall back to the first non-completed one so the NPC
-  // still shows *something* coherent (e.g. its locked dialogue).
+  // Support both questId (singular) and questIds (array) — pickNpcQuestId
+  // (quests.js, SPEC-1234) elige la primera implementada que sea startable
+  // right now (not completed, not locked behind an unfinished
+  // prerequisiteQuest); si todas están locked/completed, cae a la primera
+  // no completada para que el NPC igual muestre algo coherente.
   const ids = npc.questId ? [npc.questId] : (npc.questIds || []);
-  const knownIds = ids.filter(id => !!QUEST_DATA[id]);
-  const questId = knownIds.find(id => getQuestStatus(id) !== "completed" && !isQuestLocked(id))
-    ?? knownIds.find(id => getQuestStatus(id) !== "completed")
-    ?? knownIds[0] ?? ids[0];
+  const questId = pickNpcQuestId(ids);
   // SPEC-1114: NPCs sin ninguna misión asignada (ej. mentor_aldric,
   // weaponsmith_garrett — entrenadores) no tienen questId real. Antes se
   // seguía de largo con questId=undefined y se armaba una sección de misión

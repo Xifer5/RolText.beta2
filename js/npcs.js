@@ -69,7 +69,15 @@ export const NPC_DATA = {
     locationId: "volcano_4",
     role: "Centinela del Volcán Eterno",
     color: "#f97316",
-    questIds: ["mq_05_el_ultimo_sueno", "defeat_dark_lord"],
+    // SPEC-1234: defeat_dark_lord primero -- es la única fuente real de
+    // dragon_key (ver ZONE_GATES.inferno_1 en movement.js) y no tiene
+    // prerequisiteQuest, así que openNpcModal's picker (prioriza la primera
+    // id no completada/no bloqueada) SIEMPRE la mostraba a ella hasta
+    // completarla. Con mq_05_el_ultimo_sueno primero, una vez terminada
+    // mq_04_la_verdad el picker saltaba directo a mq_05 y defeat_dark_lord
+    // quedaba inalcanzable para siempre -- el jugador no podía conseguir la
+    // dragon_key y la Puerta del Dragón quedaba sellada sin salida.
+    questIds: ["defeat_dark_lord", "mq_05_el_ultimo_sueno"],
     lore: "Un elemental de fuego que vigila la Puerta del Dragón desde la primera erupción. Fue el último ser en ver a Asterion antes de que cerrara los ojos. Sabe que el dragón no murió de maldad. Murió de olvido."
   },
 

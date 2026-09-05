@@ -3,8 +3,9 @@ import "./helpers/domStub.mjs";
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { gameState, resetState } from "../js/state.js";
-import { rollRumors, RUMOR_POOL, RUMOR_COUNT, getQuestStatus, QUEST_DATA, hasActiveKillQuestFor } from "../js/quests.js";
+import { rollRumors, RUMOR_POOL, RUMOR_COUNT, getQuestStatus, QUEST_DATA, hasActiveKillQuestFor, pickNpcQuestId } from "../js/quests.js";
 import { allItems } from "../js/items.js";
+import { NPC_DATA } from "../js/npcs.js";
 
 beforeEach(() => resetState());
 
@@ -34,6 +35,34 @@ test("hasActiveKillQuestFor: true cuando mq_02_los_sellos (Valdris → forest_ti
 test("hasActiveKillQuestFor: false si la misión kill existe pero está completed/inactive, no activa", () => {
   gameState.quests = { mq_02_los_sellos: "completed" };
   assert.equal(hasActiveKillQuestFor("forest_titan"), false);
+});
+
+// SPEC-1234 — bug real: Pyrax tenía questIds: [mq_05_el_ultimo_sueno,
+// defeat_dark_lord]. defeat_dark_lord es la ÚNICA fuente de dragon_key
+// (ZONE_GATES.inferno_1 en movement.js) y no tiene prerequisiteQuest, así
+// que apenas mq_04_la_verdad se completaba, el picker saltaba a mostrar
+// mq_05 (ya no locked, no completed) y defeat_dark_lord quedaba
+// inalcanzable para siempre -- la Puerta del Dragón quedaba sellada sin
+// forma de conseguir la llave.
+test("pickNpcQuestId: la quest sin prerequisito gana mientras no esté completada, sin importar el estado de la otra", () => {
+  gameState.quests = {}; // nada empezado todavía
+  assert.equal(pickNpcQuestId(["defeat_dark_lord", "mq_05_el_ultimo_sueno"]), "defeat_dark_lord");
+
+  gameState.quests = { mq_04_la_verdad: "completed" }; // mq_05 ya desbloqueada
+  assert.equal(pickNpcQuestId(["defeat_dark_lord", "mq_05_el_ultimo_sueno"]), "defeat_dark_lord",
+    "defeat_dark_lord debe seguir ganando -- si no, queda inalcanzable para siempre");
+
+  gameState.quests = { mq_04_la_verdad: "completed", defeat_dark_lord: "completed" };
+  assert.equal(pickNpcQuestId(["defeat_dark_lord", "mq_05_el_ultimo_sueno"]), "mq_05_el_ultimo_sueno",
+    "una vez completada defeat_dark_lord, el picker debe pasar a la siguiente");
+});
+
+test("npcs.js: Pyrax lista defeat_dark_lord antes que mq_05_el_ultimo_sueno (orden real usado por el picker)", () => {
+  assert.deepEqual(NPC_DATA.pyrax.questIds, ["defeat_dark_lord", "mq_05_el_ultimo_sueno"]);
+});
+
+test("pickNpcQuestId: sin ninguna id conocida, cae a la primera id cruda (no revienta)", () => {
+  assert.equal(pickNpcQuestId(["id_que_no_existe"]), "id_que_no_existe");
 });
 
 test("rollRumors activa exactamente RUMOR_COUNT misiones distintas", () => {
