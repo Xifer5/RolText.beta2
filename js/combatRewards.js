@@ -27,6 +27,7 @@ import { modifierXpMult, scarceGoldMult, filterLoot } from "./modifiers.js";
 import { showEnding, MORAL_DECISIONS } from "./endings.js";
 import { recordRun } from "./runLog.js";
 import { maybeShowHint } from "./onboarding.js";
+import { maybeStartValdrisEncounter } from "./valdrisArc.js";
 
 // SPEC-1103: enemyFled=true cuando un enemigo con rasgo "Cobarde" huyó solo —
 // el mensaje ya lo emitió checkCowardFlee(); acá solo evita confundirlo con
@@ -90,6 +91,17 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       });
     }
 
+    // SPEC-1236 — el duelo "competidor" de Kestrel (rivalArc.js) pasa en el
+    // mismo umbral que Valdris (inferno_1). Los caminos "aliado"/"traidor"
+    // (sin combate) encadenan a Valdris desde rivalArc.js al cerrarse su
+    // modal; este es el ÚNICO camino que dispara un combate real primero,
+    // así que se encadena acá, después de que ESE combate termina -- si se
+    // encadenara desde rivalArc.js como los otros dos, Valdris aparecería
+    // encima del duelo antes de que arrancara.
+    if (enemy.id === "kestrel_rival") {
+      setTimeout(() => maybeStartValdrisEncounter("inferno_1"), 1200);
+    }
+
     // SPEC-1219 — Valdris cae ANTES del Rey Dragón (Fase 1 del plan
     // docs/PLAN-HISTORIA-FASE4.md, ver también valdrisArc.js). Encadena
     // directo al combate final sin volver a explorar — mismo criterio que
@@ -99,26 +111,39 @@ export function endCombat(victory, fled = false, enemyFled = false) {
     // narrativo propio + el disparo manual del Rey Dragón.
     if (enemy.id === "valdris_corrupted") {
       gameState.worldFlags.valdris_defeated = true;
+      // SPEC-1235 — pacing: el usuario reportó que la cadena narrativa (esto
+      // + el epílogo del Rey Dragón de abajo) pasaba demasiado rápido para
+      // leerla, mucho menos para llegar preparado a tomar la elección final.
+      // Los delays originales (1200/1800/1800/1400) alcanzaban para frases
+      // cortas, no para párrafos de 2-3 oraciones como valdrisDefeatLine1/2.
+      // Se espacian según largo aproximado del texto, no todos igual.
       setTimeout(() => addMessage(t("valdrisDefeatLine1"), "system"), 1200);
-      setTimeout(() => addMessage(t("valdrisDefeatLine2"), "system"), 3000);
-      setTimeout(() => addMessage(t("valdrisChainToDragon"), "system"), 4800);
+      setTimeout(() => addMessage(t("valdrisDefeatLine2"), "system"), 4400);
+      setTimeout(() => addMessage(t("valdrisChainToDragon"), "system"), 7000);
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: "dragon_king", isBoss: true } }));
-      }, 6200);
+      }, 9600);
     }
 
     // Dragon King epilogue — climax of the main story
     if (enemy.id === "dragon_king") {
       gameState.mainQuestCompleted = true;
+      // SPEC-1235 — mismo pacing que valdris_corrupted arriba: deltas de
+      // ~1600ms alcanzaban para dragonKingThanks (una frase corta) pero no
+      // para dragonKingTwist2/Twist3/ValdrisReveal, párrafos de 2-3
+      // oraciones. Se espacian según largo aproximado, y se deja el mayor
+      // colchón antes de FINAL_CHOICE_EVENT -- el jugador necesita haber
+      // terminado de leer el epílogo, no solo el texto en sí, antes de que
+      // aparezca una decisión.
       setTimeout(() => addMessage(t("dragonKingThanks"),  "system"), 1200);
-      setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 2800);
-      setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 4400);
+      setTimeout(() => addMessage(t("dragonKingTwist1"),  "system"), 3400);
+      setTimeout(() => addMessage(t("dragonKingTwist2"),  "system"), 7000);
       // SPEC-1215 — complejidad moral (revisión 2026-08-28): Asterion no es
       // solo víctima del olvido, también estuvo a punto de imponerle al
       // mundo una paz absoluta. Se inserta ACÁ, entre el giro del vacío y
       // el epílogo esperanzador, para que la esperanza final se sienta
       // ganada (conociendo lo bueno Y lo malo) en vez de ingenua.
-      setTimeout(() => addMessage(t("dragonKingTwist3"),  "system"), 6000);
+      setTimeout(() => addMessage(t("dragonKingTwist3"),  "system"), 11500);
       // SPEC-1218/1219 — cierre de Valdris (revisado en Fase 1 del plan
       // docs/PLAN-HISTORIA-FASE4.md: pasó de "ambiguo solo por diálogo" a
       // pelea real justo antes de esta, ver valdrisArc.js/enemies.js). Se
@@ -126,8 +151,8 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       // epílogo esperanzador — Valdris queda sin resolución limpia a
       // propósito (ni villano confirmado ni redimido), coherente con "voz
       // culta, lógica y paternal" del documento.
-      setTimeout(() => addMessage(t("dragonKingValdrisReveal"), "system"), 7600);
-      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 9200);
+      setTimeout(() => addMessage(t("dragonKingValdrisReveal"), "system"), 15500);
+      setTimeout(() => addMessage(t("dragonKingEpilogue"),"system"), 18700);
       // SPEC-1219 (Fase 5) — elección real del jugador: qué hacer con el
       // Corazón, determina el final ESTRUCTURAL (ver finalChoice.js/
       // endings.js). Decisión de alcance confirmada con el usuario: el log
@@ -143,7 +168,7 @@ export function endCombat(victory, fled = false, enemyFled = false) {
           recordRun("victory");
           showEnding();
         }, { once: true });
-      }, 10800);
+      }, 22500);
     }
 
     // Record kill for bestiary

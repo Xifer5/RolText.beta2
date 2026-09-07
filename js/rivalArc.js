@@ -5,12 +5,23 @@
 // MORAL_DECISIONS); la 3ra resuelve la relación: aliado (score≥1, ayuda
 // antes del jefe final), competidor (score===0, duelo directo) o traidor
 // (score≤-1, te roba y desaparece).
+//
+// SPEC-1236 — el usuario reportó que en su partida solo vio a Kestrel al
+// final: los encuentros 1/2 originalmente exigían estar parado EXACTO en
+// "town"/"garden_1" cuando se cumplía la condición, algo que no siempre
+// pasa naturalmente (quests "visit" se completan hablando con el NPC, no
+// necesariamente de vuelta en esa sala). Se sacó el requisito de sala para
+// 1/2 -- disparan en la PRÓXIMA llegada a cualquier lado una vez cumplida
+// la condición, garantizando que se vean pronto. El encuentro 3 SÍ sigue
+// atado a inferno_1 a propósito (es el cuello de botella obligatorio del
+// final, no depende de que el jugador "pase por ahí de nuevo" por azar).
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { showTravelEvent } from "./travelEvents.js";
 import { getQuestStatus } from "./quests.js";
 import { computeEndingTone } from "./endings.js";
 import { getVictories } from "./metaProgress.js";
+import { maybeStartValdrisEncounter } from "./valdrisArc.js";
 
 const flags = () => (gameState.worldFlags ??= {});
 const setFlag = k => { flags()[k] = true; };
@@ -70,9 +81,12 @@ const TONE_BEATS = {
   }
 };
 
+// SPEC-1236: texto sin referencia a "en el pueblo" -- ya no está atado a esa
+// sala específica, así que la frase debe funcionar en cualquier lugar donde
+// el jugador esté parado al completar mq_01.
 const ENCOUNTER_1_BASE_TEXT = {
-  en: "A stranger blocks your path in town, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Trade notes, or keep your secrets?\"",
-  es: "Un desconocido te corta el paso en el pueblo, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
+  en: "A stranger steps into your path, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Trade notes, or keep your secrets?\"",
+  es: "Un desconocido te corta el paso, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
 };
 
 // SPEC-1211 — voz narrativa ampliada (revisión 2026-08-28, ítem #6): Kestrel
@@ -173,6 +187,7 @@ export function rivalResolutionEvent() {
         icon: "✨",
         apply() {
           setFlag("rival_resolved_ally");
+          setFlag("rival_chain_valdris_pending"); // SPEC-1236: ver maybeChainValdrisAfterRival()
           const p = gameState.player;
           p.hp = p.maxHp;
           if (!gameState.activeBuffs) gameState.activeBuffs = {};
@@ -194,6 +209,7 @@ export function rivalResolutionEvent() {
         icon: "😠",
         apply() {
           setFlag("rival_resolved_traitor");
+          setFlag("rival_chain_valdris_pending"); // SPEC-1236: ver maybeChainValdrisAfterRival()
           const p = gameState.player;
           const stolen = Math.max(1, Math.floor((p.gold || 0) * 0.20));
           p.gold = Math.max(0, (p.gold || 0) - stolen);
@@ -223,14 +239,17 @@ export function rivalResolutionEvent() {
 }
 
 /** Llamar al llegar a una zona. true = un encuentro con Kestrel arranca y
- *  movement no debe tirar encuentros/eventos normales este movimiento. */
+ *  movement no debe tirar encuentros/eventos normales este movimiento.
+ *  SPEC-1236: 1 y 2 disparan en la PRÓXIMA llegada a CUALQUIER lugar tras
+ *  cumplirse la condición (ya no exigen town/garden_1 exactos -- ver
+ *  comentario de cabecera). El 3 sigue atado a inferno_1 a propósito. */
 export function maybeStartRivalEncounter(locationId) {
-  if (locationId === "town" && getQuestStatus("mq_01_la_cancion") === "completed" && !hasFlag("rival_encounter_1_seen")) {
+  if (getQuestStatus("mq_01_la_cancion") === "completed" && !hasFlag("rival_encounter_1_seen")) {
     setFlag("rival_encounter_1_seen");
     setTimeout(() => showTravelEvent(RIVAL_ENCOUNTER_1), 700);
     return true;
   }
-  if (locationId === "garden_1" && getQuestStatus("mq_03_ecos") === "completed" && !hasFlag("rival_encounter_2_seen")) {
+  if (getQuestStatus("mq_03_ecos") === "completed" && !hasFlag("rival_encounter_2_seen")) {
     setFlag("rival_encounter_2_seen");
     setTimeout(() => showTravelEvent(RIVAL_ENCOUNTER_2), 700);
     return true;
@@ -241,4 +260,25 @@ export function maybeStartRivalEncounter(locationId) {
     return true;
   }
   return false;
+}
+
+// SPEC-1236 — bug real: el encuentro final de Kestrel (arriba) y la
+// confrontación de Valdris (valdrisArc.js) disparan en el MISMO umbral
+// (inferno_1), pero movement.js corta con un early-return apenas
+// maybeStartRivalEncounter() devuelve true -- Valdris nunca llegaba a
+// chequearse en esa misma llegada. El jugador tenía que salir y volver a
+// entrar para que se disparara. Los caminos "aliado"/"traidor" (sin
+// combate) encadenan acá, al cerrarse su modal; el camino "competidor" (el
+// duelo real) encadena en cambio desde combatRewards.js, al terminar ESE
+// combate -- si lo hiciéramos acá, Valdris aparecería ENCIMA del duelo que
+// todavía no empezó.
+export function maybeChainValdrisAfterRival() {
+  if (!hasFlag("rival_chain_valdris_pending")) return false;
+  flags().rival_chain_valdris_pending = false;
+  setTimeout(() => maybeStartValdrisEncounter("inferno_1"), 700);
+  return true;
+}
+
+export function setupRivalArc() {
+  window.addEventListener("pixel:travelEventClosed", () => maybeChainValdrisAfterRival());
 }
