@@ -1,7 +1,8 @@
 // SPEC-1001 — finales según decisiones: el epílogo refleja cómo jugaste, no solo que ganaste.
 import { gameState } from "./state.js";
-import { t } from "./i18n.js";
+import { t, formatText } from "./i18n.js";
 import { getLastRunFragments } from "./metaProgress.js";
+import { zoneBossesDefeatedCount, ZONE_BOSS_IDS } from "./eryndelArc.js";
 
 // Decisiones morales que el mundo recuerda (worldFlags → línea de recap + peso moral)
 export const MORAL_DECISIONS = [
@@ -38,6 +39,19 @@ const RIVAL_RECAP = {
 function getRivalRecap(flags = {}) {
   const [, entry] = Object.entries(RIVAL_RECAP).find(([flag]) => flags[flag]) ?? [];
   return entry ?? null;
+}
+
+// SPEC-1238 — Fragmentos de Eco: cada jefe de zona vencido ya reveló su
+// epilogueLines propio al caer (ver enemies.js) -- eso ES el fragmento, así
+// que se reusa zoneBossesDefeatedCount() como el conteo de recolectados en
+// vez de inventar un contador nuevo que guardar/cargar (mismo criterio que
+// eryndelArc.js). Decisión confirmada con el usuario: suma al recap del
+// final (no cambia el tono ni el final estructural elegido) -- ver
+// [[project_spec1237_kestrel_rework_2026-09]] para el resto del diseño.
+function getEchoFragmentsRecap(gameState) {
+  const n = zoneBossesDefeatedCount(gameState);
+  if (n <= 0) return null;
+  return { icon: "📜", key: n >= ZONE_BOSS_IDS.length ? "recapEchoFragmentsAll" : "recapEchoFragmentsPartial", count: n };
 }
 
 // SPEC-1202 — coda de 1 frase por clase×tono (9 combinaciones), anexada al
@@ -79,7 +93,12 @@ export function getEndingContent(flags = {}) {
     textKey: structural?.textKey ?? `endingText${cap}`,
     classBeatKey: CLASS_BEAT_KEYS[gameState.player?.class]?.[tone] ?? null,
     recapKeys: MORAL_DECISIONS.filter(d => flags[d.flag]).map(d => d.recapKey),
-    rivalRecap: getRivalRecap(flags)
+    rivalRecap: getRivalRecap(flags),
+    echoFragmentsRecap: getEchoFragmentsRecap(gameState),
+    // SPEC-1238: recompensa de "sensación extrema" por el 100% -- solo se
+    // usa en showEnding() (victoria); showGameOver() nunca toca textKey.
+    echoFragmentsBeatKey: zoneBossesDefeatedCount(gameState) >= ZONE_BOSS_IDS.length
+      ? "endingBeatEchoFragmentsComplete" : null
   };
 }
 
@@ -88,6 +107,11 @@ export function getEndingContent(flags = {}) {
 function decisionRecapHtml(content) {
   const items = content.recapKeys.map(k => `<li>${t(k)}</li>`);
   if (content.rivalRecap) items.push(`<li>${content.rivalRecap.icon} ${t(content.rivalRecap.key)}</li>`);
+  if (content.echoFragmentsRecap) {
+    const r = content.echoFragmentsRecap;
+    const text = r.count !== undefined ? formatText(t(r.key), { count: r.count, total: ZONE_BOSS_IDS.length }) : t(r.key);
+    items.push(`<li>${r.icon} ${text}</li>`);
+  }
   return items.length ? items.join("") : `<li>${t("recapNone")}</li>`;
 }
 
@@ -101,9 +125,12 @@ export function showEnding() {
   const title = document.getElementById("ending-title");
   const msg   = document.getElementById("endingMessage");
   if (title) title.textContent = t(content.titleKey);
-  if (msg)   msg.textContent   = content.classBeatKey
-    ? `${t(content.textKey)} ${t(content.classBeatKey)}`
-    : t(content.textKey);
+  if (msg) {
+    const parts = [t(content.textKey)];
+    if (content.classBeatKey) parts.push(t(content.classBeatKey));
+    if (content.echoFragmentsBeatKey) parts.push(t(content.echoFragmentsBeatKey)); // SPEC-1238: solo con el 100%
+    msg.textContent = parts.join(" ");
+  }
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set("ending-level",     p.level ?? 1);

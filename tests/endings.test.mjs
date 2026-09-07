@@ -5,6 +5,8 @@ import assert from "node:assert/strict";
 
 const { MORAL_DECISIONS, computeEndingTone, getEndingContent } = await import("../js/endings.js");
 const { dictionaries } = await import("../js/i18n.js");
+// namespace, no destructuring: resetState() reasigna gameState y el snapshot quedaría obsoleto
+const state = await import("../js/state.js");
 
 test("tono: luz con ≥2 buenas, oscuro con ≤−2, gris en medio", () => {
   assert.equal(computeEndingTone({ echo_freed: true, traveler_helped: true }).tone, "light");
@@ -84,6 +86,50 @@ test("finalChoiceId no afecta el tono ni el recap — ambos sistemas conviven", 
 
 test("las 3 claves de los finales estructurales existen en EN y ES", () => {
   for (const k of ["endingTitleConstellation", "endingTextConstellation", "endingTitleGuardian", "endingTextGuardian", "endingTitleMortalAge", "endingTextMortalAge"]) {
+    assert.ok(dictionaries.en[k], `${k} en EN`);
+    assert.ok(dictionaries.es[k], `${k} en ES`);
+  }
+});
+
+// SPEC-1238 — Fragmentos de Eco: reusa gameState.stats.enemiesDefeated (ya
+// llevado por bestiary.js) como el conteo de recolectados, sin contador
+// nuevo. Suma al recap del final; el 100% además desbloquea una línea extra
+// de epílogo (echoFragmentsBeatKey), solo usada en la victoria.
+test("getEchoFragmentsRecap: sin ningún jefe de zona vencido, no hay recap", () => {
+  state.resetState();
+  const c = getEndingContent({});
+  assert.equal(c.echoFragmentsRecap, null);
+  assert.equal(c.echoFragmentsBeatKey, null);
+});
+
+test("getEchoFragmentsRecap: parcial (1-6 de 7) usa la clave 'partial' con el conteo real", () => {
+  state.resetState();
+  state.gameState.stats.enemiesDefeated = { forest_titan: 1, cave_devourer: 1 };
+  const c = getEndingContent({});
+  assert.deepEqual(c.echoFragmentsRecap, { icon: "📜", key: "recapEchoFragmentsPartial", count: 2 });
+  assert.equal(c.echoFragmentsBeatKey, null, "sin el 100%, no hay línea extra de epílogo");
+});
+
+test("getEchoFragmentsRecap: los 7 jefes de zona vencidos → clave 'all' + línea extra de epílogo", () => {
+  state.resetState();
+  state.gameState.stats.enemiesDefeated = {
+    forest_titan: 1, cave_devourer: 1, mountain_colossus: 1, ancient_construct: 1,
+    swamp_abomination: 1, frost_wyrm: 1, inferno_dragon: 1
+  };
+  const c = getEndingContent({});
+  assert.deepEqual(c.echoFragmentsRecap, { icon: "📜", key: "recapEchoFragmentsAll", count: 7 });
+  assert.equal(c.echoFragmentsBeatKey, "endingBeatEchoFragmentsComplete");
+});
+
+test("getEchoFragmentsRecap: dragon_king u otros bosses no cuentan (solo los 7 jefes de ZONA)", () => {
+  state.resetState();
+  state.gameState.stats.enemiesDefeated = { dragon_king: 1, valdris_corrupted: 1, kestrel_rival: 1 };
+  const c = getEndingContent({});
+  assert.equal(c.echoFragmentsRecap, null);
+});
+
+test("las claves de Fragmentos de Eco existen en EN y ES", () => {
+  for (const k of ["recapEchoFragmentsPartial", "recapEchoFragmentsAll", "endingBeatEchoFragmentsComplete"]) {
     assert.ok(dictionaries.en[k], `${k} en EN`);
     assert.ok(dictionaries.es[k], `${k} en ES`);
   }

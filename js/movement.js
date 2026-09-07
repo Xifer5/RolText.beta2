@@ -9,7 +9,7 @@ import { checkAchievements } from "./achievements.js";
 import { getTravelEvent, showTravelEvent } from "./travelEvents.js";
 import { trySpawnBoss, AMBUSH_CHANCE_MULT, biomeBosses } from "./biomeBosses.js";
 import { biomes } from "./biomes.js";
-import { hasActiveKillQuestFor } from "./quests.js";
+import { hasActiveKillQuestFor, getQuestStatus } from "./quests.js";
 import { showMiniBossReunion } from "./miniBossReunion.js";
 import { t, formatText, localizeText, pickVariant } from "./i18n.js";
 import { maybeShowHint } from "./onboarding.js";
@@ -216,6 +216,18 @@ export function handleMove(direction) {
     let bossBiasMult = 1;
     const zoneBoss = biomeBosses[biome]?.boss;
     if (zoneBoss && hasActiveKillQuestFor(zoneBoss)) {
+      ambushMult *= QUEST_BOSS_AMBUSH_MULT;
+      bossBiasMult = QUEST_BOSS_BIAS_MULT;
+    } else if (
+      // SPEC-1238 — "cacería de Ecos": tras entregar mq_02_los_sellos,
+      // Valdris revela dónde están los demás jefes de zona (ver su diálogo
+      // "completed" en quests.js) -- misma mecánica que SPEC-1224, pero
+      // gateada por la QUEST COMPLETA (no una activa "kill" puntual) y solo
+      // mientras ESE jefe en particular siga sin caer.
+      zoneBoss &&
+      getQuestStatus("mq_02_los_sellos") === "completed" &&
+      !(gameState.stats?.enemiesDefeated?.[zoneBoss] > 0)
+    ) {
       ambushMult *= QUEST_BOSS_AMBUSH_MULT;
       bossBiasMult = QUEST_BOSS_BIAS_MULT;
     }

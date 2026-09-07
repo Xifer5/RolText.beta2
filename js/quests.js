@@ -201,10 +201,17 @@ export const QUEST_DATA = {
         { en: "The Forest Titan roams the deep heart of the Valdris Forest.", es: "El Titán del Bosque vaga por el corazón profundo del Bosque de Valdris." },
         { en: "It will not be easy. But it is necessary.", es: "No será fácil. Pero es necesario." }
       ],
+      // SPEC-1238 — "cacería de Ecos": la 4ta línea revela dónde están los
+      // 6 jefes de zona restantes (Fragmentos de Eco, ver eryndelArc.js's
+      // ZONE_BOSS_IDS) y funciona como el gancho narrativo del bias de
+      // encuentro que se activa en movement.js apenas esta quest está
+      // "completed" -- misión secundaria opcional, pero que ahora tiene
+      // peso real en el recap del final (ver endings.js).
       completed: [
         { en: "Extraordinary. The Titan fell... but did you hear what it said? 'The dragon is crying.'", es: "Extraordinario. El titán cayó… ¿pero escuchaste lo que dijo? 'El dragón está llorando.'" },
         { en: "This confirms everything I suspected. The guardians are not corrupted — they are grieving.", es: "Esto confirma todo lo que sospechaba. Los guardianes no están corrompidos — están de luto." },
-        { en: "Listen — as you find the other seals, bring them to me. Someone must keep them together, away from careless hands. I only want to understand them. I swear it.", es: "Escucha — a medida que encuentres los demás sellos, tráemelos a mí. Alguien debe mantenerlos juntos, lejos de manos descuidadas. Solo quiero comprenderlos. Lo juro." }
+        { en: "Listen — as you find the other seals, bring them to me. Someone must keep them together, away from careless hands. I only want to understand them. I swear it.", es: "Escucha — a medida que encuentres los demás sellos, tráemelos a mí. Alguien debe mantenerlos juntos, lejos de manos descuidadas. Solo quiero comprenderlos. Lo juro." },
+        { en: "Six more wounds remain, scattered where their pain runs deepest — a devourer in the deep caves, a colossus atop the mountains, a construct among the eastern ruins, an abomination in the poison swamp, a dragon in the volcanic depths, and a wyrm in the frozen tundra. Listen for them. They should be easier to find now that you're truly looking.", es: "Quedan seis heridas más, dispersas donde su dolor es más profundo — un devorador en las cuevas profundas, un coloso en la cima de las montañas, un constructo entre las ruinas del este, una abominación en el pantano venenoso, un dragón en las profundidades volcánicas, y un wyrm en la tundra helada. Escuchalos. Deberían ser más fáciles de encontrar ahora que de verdad los estás buscando." }
       ]
     }
   },

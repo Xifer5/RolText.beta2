@@ -319,6 +319,10 @@ export const dictionaries = {
     recapRivalAlly: "Kestrel stuck around long enough to call it a partnership, then vanished the way rivals do — already chasing the next seal.",
     recapRivalTraitor: "Kestrel took what they came for and never looked back. Some rivalries end that way — one winner, no goodbye.",
     recapRivalCompetitor: "Kestrel went down fighting and got back up laughing. \"Rematch,\" they said, and meant it.",
+    // SPEC-1238 — Fragmentos de Eco: recap del recorrido de jefes de zona.
+    recapEchoFragmentsPartial: "Recovered {{count}}/{{total}} Echoes of the fallen guardians.",
+    recapEchoFragmentsAll: "Recovered all {{total}} Echoes of the fallen guardians — a complete memory of Aetheria's guardians.",
+    endingBeatEchoFragmentsComplete: "And because you gathered every last Echo, Aetheria remembers all of them — not as monsters, but as the guardians they always were.",
     endingBeatWarriorLight: "They say the warrior's sword never bit deeper than mercy demanded — a rare restraint sung about longer than the killing blows.",
     endingBeatWarriorGray: "The warrior kept walking after the battle, same as before it — a soldier's peace, not a saint's.",
     endingBeatWarriorDark: "Every blade the warrior swung remembered a reason. Aetheria remembers the blades.",
@@ -1006,6 +1010,10 @@ export const dictionaries = {
     recapRivalAlly: "Kestrel se quedó lo suficiente como para llamarlo sociedad, y después desapareció como hacen los rivales — ya persiguiendo el próximo sello.",
     recapRivalTraitor: "Kestrel se llevó lo que buscaba y no miró atrás. Algunas rivalidades terminan así — un solo ganador, sin despedida.",
     recapRivalCompetitor: "Kestrel cayó peleando y se levantó riendo. \"Revancha\", dijo, y lo decía en serio.",
+    // SPEC-1238 — Fragmentos de Eco: recap del recorrido de jefes de zona.
+    recapEchoFragmentsPartial: "Recuperaste {{count}}/{{total}} Ecos de los guardianes caídos.",
+    recapEchoFragmentsAll: "Recuperaste los {{total}} Ecos de los guardianes caídos — una memoria completa de los guardianes de Aetheria.",
+    endingBeatEchoFragmentsComplete: "Y porque juntaste hasta el último Eco, Aetheria los recuerda a todos — no como monstruos, sino como los guardianes que siempre fueron.",
     endingBeatWarriorLight: "Dicen que la espada del guerrero nunca cortó más de lo que la piedad exigía — una moderación rara, cantada más tiempo que sus golpes de gracia.",
     endingBeatWarriorGray: "El guerrero siguió caminando después de la batalla, igual que antes de ella — la paz de un soldado, no la de un santo.",
     endingBeatWarriorDark: "Cada golpe que dio el guerrero tuvo un motivo. Aetheria recuerda los motivos.",
