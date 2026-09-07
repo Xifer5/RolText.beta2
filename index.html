@@ -421,7 +421,7 @@
   <div class="modal-content inventory-modal-content">
     <div class="modal-header">
       <div class="inventory-heading">
-        <span class="inventory-heading-kicker">Equipo del aventurero</span>
+        <span class="inventory-heading-kicker" data-i18n="inventoryKicker">Equipo del aventurero</span>
         <h2 id="inventory-title" data-i18n="inventoryTitle">🎒 Inventario</h2>
       </div>
       <button class="modal-close" id="closeInventoryBtn" aria-label="Cerrar" data-i18n-attr="aria-label" data-i18n="closeLabel">✕</button>
@@ -447,8 +447,8 @@
     <div class="inventory-grid">
       <div class="inventory-list-col">
         <div class="inventory-section-heading">
-          <div><span class="section-eyebrow">Mochila</span><h3 data-i18n="itemsSectionTitle">Objetos</h3></div>
-          <span class="inventory-section-hint">Selecciona para comparar</span>
+          <div><span class="section-eyebrow" data-i18n="inventoryBagLabel">Mochila</span><h3 data-i18n="itemsSectionTitle">Objetos</h3></div>
+          <span class="inventory-section-hint" data-i18n="inventoryCompareHint">Selecciona para comparar</span>
         </div>
         <div id="inventoryFilters" class="inv-filter-bar" role="group" aria-label="Filtrar inventario" data-i18n-attr="aria-label" data-i18n="invFilterBarLabel">
           <button class="inv-filter-chip active" data-filter="all" aria-pressed="true" data-i18n="invFilterAll">Todos</button>
@@ -468,7 +468,7 @@
                 <img id="equipmentCharacterAvatar" class="equipment-character-avatar" alt="" hidden>
                 <span id="equipmentCharacterFallback" class="equipment-character-fallback" aria-hidden="true">⚔️</span>
               </div>
-              <span class="equipment-character-kicker">Build actual</span>
+              <span class="equipment-character-kicker" data-i18n="equipmentBuildCurrent">Build actual</span>
               <strong id="equipment-character-name">Aventurero</strong>
               <span id="equipmentCharacterRole">Nivel 1 · Aventurero</span>
             </div>
@@ -482,7 +482,7 @@
               <li data-slot="ring"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotRing">Anillo</span><span id="equip-ring" class="equip-val">Vacío</span></span></li>
               <li data-slot="accessory"><span class="equip-slot-art" aria-hidden="true"></span><span class="equip-slot-copy"><span class="equip-slot-label" data-i18n="slotAccessory">Accesorio</span><span id="equip-accessory" class="equip-val">Vacío</span></span></li>
             </ul>
-            <div class="equipment-vitals" aria-label="Recursos y estadísticas del personaje">
+            <div class="equipment-vitals" aria-label="Recursos y estadísticas del personaje" data-i18n-aria="equipmentVitalsLabel">
               <div class="equipment-vital hp"><span>HP</span><div class="equipment-vital-track"><i id="equipmentHpBar"></i></div><strong id="equipmentHpText">0 / 0</strong></div>
               <div class="equipment-vital mp"><span>MP</span><div class="equipment-vital-track"><i id="equipmentMpBar"></i></div><strong id="equipmentMpText">0 / 0</strong></div>
               <dl class="equipment-stat-strip">
@@ -509,6 +509,7 @@
           <div class="item-detail-actions">
             <button id="detailUseBtn" class="btn-action hidden">Usar</button>
             <button id="detailEquipBtn" class="btn-action secondary hidden">Equipar</button>
+            <button id="detailUnequipBtn" class="btn-action outlined hidden" data-i18n="equipmentUnequipButton">Desequipar</button>
           </div>
         </div>
       </div>

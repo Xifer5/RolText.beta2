@@ -63,3 +63,29 @@ test("equipmentStageHTML: interactive=true agrega role=button/tabindex a cada sl
   assert.ok(active.includes('tabindex="0"'));
 });
 
+test("equipmentStageHTML escapa nombres de jugador y objetos", () => {
+  const view = buildEquipmentView({
+    name: '<img src=x onerror="alert(1)">', class: "warrior"
+  }, {
+    rightHand: { id: "sword", name: '<script>alert(1)</script>', icon: "⚔️" }
+  });
+  const html = equipmentStageHTML(view, { interactive: true });
+  assert.ok(!html.includes("<script>"));
+  assert.ok(!html.includes("<img src=x"));
+  assert.ok(html.includes("&lt;script&gt;"));
+});
+
+// El fallback de imagen rota se sacó del onerror inline (era su propio
+// vector de inyección) y ahora vive en data-fallback + un listener delegado
+// (ver equipmentView.js) -- acá solo se verifica que el string sigue
+// llevando el dato que ese listener necesita, sin volver a meter un
+// onerror="..." embebido en el HTML.
+test("equipmentStageHTML: el ícono de un ítem lleva data-fallback en vez de onerror inline", () => {
+  const view = buildEquipmentView({ class: "warrior" }, {
+    rightHand: { id: "sword", name: { es: "Espada" }, icon: "sword.webp" }
+  });
+  const html = equipmentStageHTML(view);
+  assert.ok(!html.includes("onerror="), "no debe reaparecer un onerror embebido en el HTML");
+  assert.ok(html.includes('data-fallback="⚔️"'), "debe llevar el emoji de respaldo del slot rightHand");
+});
+

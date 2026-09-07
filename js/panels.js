@@ -17,6 +17,7 @@ const CLASS_AVATARS = {
 };
 import { resolveIconSrc } from "./utils.js";
 import { buildEquipmentView, equipmentStageHTML } from "./equipmentView.js";
+import { unequipSlot } from "./equipmentActions.js";
 import { addMessage } from "./story.js";
 import { updateUI } from "./ui.js";
 import { renderMinimap } from "./minimap.js";
@@ -188,13 +189,10 @@ function renderEquipDetail() {
     </div>
   `;
   box.querySelector("[data-unequip]")?.addEventListener("click", () => {
-    const curItem = gameState.equipment[selectedEquipSlot];
-    if (!curItem) return;
-    if (!gameState.inventory[curItem.id]) gameState.inventory[curItem.id] = 0;
-    gameState.inventory[curItem.id]++;
-    gameState.equipment[selectedEquipSlot] = null;
+    const result = unequipSlot(gameState, selectedEquipSlot);
+    if (!result.ok) return;
     applyDerivedMaxes();
-    addMessage(formatText('equipmentUnequipMessage', { item: localizeText(curItem.name) }), "system");
+    addMessage(formatText(t('equipmentUnequipMessage'), { item: localizeText(result.item.name) }), "system");
     updateUI();
     renderEquipment(); // re-render completo (stage + detalle)
   });

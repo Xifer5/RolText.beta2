@@ -49,6 +49,10 @@ JavaScript y reutilizando los assets existentes.
 - [x] La ventana funciona a 1440x900 y se apila por debajo de 760px.
 - [x] Los controles tienen foco visible y objetivos táctiles de al menos 44px.
 - [x] La presentación de clase, recursos y slots tiene pruebas automatizadas.
+- [x] Una ranura ocupada se puede abrir con clic, Enter o Espacio y desequipar.
+- [x] Equipar un objeto incompatible no lo elimina del inventario.
+- [x] Todos los textos propios de la ventana responden al cambio ES/EN.
+- [x] El HTML compartido escapa nombres personalizados antes de renderizarlos.
 
 ## Gherkin
 
@@ -65,4 +69,3 @@ Feature: Comprender y modificar el equipo
     Then ve el cambio estimado de sus estadísticas
     And el equipo no cambia hasta que pulsa Equipar
 ```
-

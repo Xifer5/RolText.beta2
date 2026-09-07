@@ -1,6 +1,6 @@
 import { calculateTotalStats } from "./stats.js";
 import { resolveIconSrc } from "./utils.js";
-import { t, localizeText } from "./i18n.js";
+import { t, formatText, localizeText } from "./i18n.js";
 
 export const CLASS_EQUIPMENT_AVATARS = Object.freeze({
   warrior: "img/avatar_warrior.webp",
@@ -9,14 +9,14 @@ export const CLASS_EQUIPMENT_AVATARS = Object.freeze({
 });
 
 export const EQUIPMENT_SLOT_VIEW = Object.freeze([
-  { slot: "head", id: "equip-head", label: "Cabeza", emptyIcon: "🪖" },
-  { slot: "rightHand", id: "equip-rightHand", label: "Mano derecha", emptyIcon: "⚔️" },
-  { slot: "leftHand", id: "equip-leftHand", label: "Mano izquierda", emptyIcon: "🛡️" },
-  { slot: "armor", id: "equip-armor", label: "Armadura", emptyIcon: "🥋" },
-  { slot: "arms", id: "equip-arms", label: "Brazos", emptyIcon: "🦾" },
-  { slot: "boots", id: "equip-boots", label: "Botas", emptyIcon: "👢" },
-  { slot: "ring", id: "equip-ring", label: "Anillo", emptyIcon: "💍" },
-  { slot: "accessory", id: "equip-accessory", label: "Accesorio", emptyIcon: "✨" }
+  { slot: "head", id: "equip-head", labelKey: "slotHead", emptyIcon: "🪖" },
+  { slot: "rightHand", id: "equip-rightHand", labelKey: "slotRightHand", emptyIcon: "⚔️" },
+  { slot: "leftHand", id: "equip-leftHand", labelKey: "slotLeftHand", emptyIcon: "🛡️" },
+  { slot: "armor", id: "equip-armor", labelKey: "slotArmor", emptyIcon: "🥋" },
+  { slot: "arms", id: "equip-arms", labelKey: "slotArms", emptyIcon: "🦾" },
+  { slot: "boots", id: "equip-boots", labelKey: "slotBoots", emptyIcon: "👢" },
+  { slot: "ring", id: "equip-ring", labelKey: "slotRing", emptyIcon: "💍" },
+  { slot: "accessory", id: "equip-accessory", labelKey: "slotAccessory", emptyIcon: "✨" }
 ]);
 
 export function buildEquipmentView(player = {}, equipment = {}) {
@@ -24,8 +24,8 @@ export function buildEquipmentView(player = {}, equipment = {}) {
   const maxHp = Math.max(1, stats.maxHp || player.maxHp || 1);
   const maxMp = Math.max(1, stats.maxMp || player.maxMp || 1);
   return {
-    name: player.name || "Aventurero",
-    role: `Nivel ${player.level || 1} · ${player.className || "Aventurero"}`,
+    name: player.name || t("defaultPlayerName"),
+    role: formatText(t("equipmentRole"), { level: player.level || 1, className: player.className || t("defaultPlayerName") }),
     avatar: CLASS_EQUIPMENT_AVATARS[player.class] || null,
     fallback: player.classEmoji || "⚔️",
     hp: Math.max(0, Math.min(player.hp ?? maxHp, maxHp)),
@@ -35,14 +35,43 @@ export function buildEquipmentView(player = {}, equipment = {}) {
     maxMp,
     mpPercent: Math.max(0, Math.min(100, ((player.mp ?? maxMp) / maxMp) * 100)),
     stats: { attack: stats.attack || 0, defense: stats.defense || 0, magic: stats.magic || 0 },
-    slots: EQUIPMENT_SLOT_VIEW.map(slot => ({ ...slot, item: equipment[slot.slot] || null }))
+    slots: EQUIPMENT_SLOT_VIEW.map(slot => ({ ...slot, label: t(slot.labelKey), item: equipment[slot.slot] || null }))
   };
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 function equipIconInner(item, emptyIcon) {
   const src = item?.icon ? resolveIconSrc(item.icon) : null;
-  if (src) return `<img src="${src}" width="44" height="44" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${emptyIcon}'}))">`;
-  return `<span style="font-size:31px">${item?.icon || emptyIcon}</span>`;
+  // data-fallback usa emptyIcon (el icono genérico de la ranura), no
+  // item?.icon -- si la imagen falló, mostrar el mismo string que acaba de
+  // fallar no sirve de fallback.
+  if (src) return `<img src="${escapeHTML(src)}" width="44" height="44" alt="" data-fallback="${escapeHTML(emptyIcon)}">`;
+  return `<span class="equip-slot-fallback">${escapeHTML(item?.icon || emptyIcon)}</span>`;
+}
+
+// El `onerror="..."` inline que había antes se sacó al escapar el HTML (una
+// cadena de JS embebida en un atributo es su propio vector de inyección,
+// aunque acá `emptyIcon` siempre sea un literal interno seguro). Se
+// reemplaza por un listener delegado en captura ("error" no burbujea) que
+// swap-ea la imagen rota por el mismo span de respaldo que ya usa el resto
+// del componente -- mismo resultado visual, sin script embebido en el HTML.
+if (typeof document !== "undefined") {
+  document.addEventListener("error", (event) => {
+    const img = event.target;
+    if (img?.tagName !== "IMG" || !("fallback" in (img.dataset || {}))) return;
+    const span = document.createElement("span");
+    span.className = "equip-slot-fallback";
+    span.textContent = img.dataset.fallback;
+    img.replaceWith(span);
+  }, true);
 }
 
 // SPEC-1220 — componente de equipamiento compartido entre el Inventario
@@ -59,30 +88,30 @@ export function equipmentStageHTML(view, { interactive = false } = {}) {
     const valText = item ? localizeText(item.name) : t('emptySlot');
     const a11y = interactive ? ` role="button" tabindex="0"` : "";
     return `
-      <li data-slot="${slot}" class="${item ? 'is-equipped' : ''}" title="${label}: ${valText}"${a11y}>
+      <li data-slot="${escapeHTML(slot)}" class="${item ? 'is-equipped' : ''}" title="${escapeHTML(label)}: ${escapeHTML(valText)}"${a11y}>
         <span class="equip-slot-art" aria-hidden="true">${equipIconInner(item, emptyIcon)}</span>
         <span class="equip-slot-copy">
-          <span class="equip-slot-label">${label}</span>
-          <span class="equip-val">${valText}</span>
+          <span class="equip-slot-label">${escapeHTML(label)}</span>
+          <span class="equip-val">${escapeHTML(valText)}</span>
         </span>
       </li>`;
   }).join("");
 
   return `
     <h3 class="equipment-banner-title">${t('invDetailEquipment')}</h3>
-    <section class="equipment-stage" aria-label="${view.name}">
+    <section class="equipment-stage" aria-label="${escapeHTML(view.name)}">
       <div class="equipment-character">
         <div class="equipment-avatar-frame">
           ${view.avatar
-            ? `<img class="equipment-character-avatar" src="${view.avatar}" alt="${view.name}, ${view.role}">`
-            : `<span class="equipment-character-fallback" aria-hidden="true">${view.fallback}</span>`}
+            ? `<img class="equipment-character-avatar" src="${escapeHTML(view.avatar)}" alt="${escapeHTML(view.name)}, ${escapeHTML(view.role)}">`
+            : `<span class="equipment-character-fallback" aria-hidden="true">${escapeHTML(view.fallback)}</span>`}
         </div>
-        <span class="equipment-character-kicker">Build actual</span>
-        <strong>${view.name}</strong>
-        <span class="equipment-character-role">${view.role}</span>
+        <span class="equipment-character-kicker">${escapeHTML(t('equipmentBuildCurrent'))}</span>
+        <strong>${escapeHTML(view.name)}</strong>
+        <span class="equipment-character-role">${escapeHTML(view.role)}</span>
       </div>
       <ul class="equipment-slots-list" role="list">${slotsHTML}</ul>
-      <div class="equipment-vitals" aria-label="Recursos y estadísticas del personaje">
+      <div class="equipment-vitals" aria-label="${escapeHTML(t('equipmentVitalsLabel'))}">
         <div class="equipment-vital hp"><span>HP</span><div class="equipment-vital-track"><i style="width:${view.hpPercent}%"></i></div><strong>${view.hp} / ${view.maxHp}</strong></div>
         <div class="equipment-vital mp"><span>MP</span><div class="equipment-vital-track"><i style="width:${view.mpPercent}%"></i></div><strong>${view.mp} / ${view.maxMp}</strong></div>
         <dl class="equipment-stat-strip">
@@ -93,4 +122,3 @@ export function equipmentStageHTML(view, { interactive = false } = {}) {
       </div>
     </section>`;
 }
-

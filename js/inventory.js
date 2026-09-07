@@ -1,5 +1,5 @@
 import { gameState } from "./state.js";
-import { allItems, addItemToInventory, removeItemFromInventory } from "./items.js";
+import { allItems, removeItemFromInventory } from "./items.js";
 import { calculateTotalStats, applyDerivedMaxes } from "./stats.js";
 import { LEARNABLE_SKILLS, hasLearnedSkill, learnUniversalSkill } from "./classes.js";
 import { createIconElement } from "./utils.js";
@@ -7,6 +7,7 @@ import { addMessage } from "./story.js";
 import { updateUI, renderStatsModal } from "./ui.js";
 import { t, formatText, localizeText } from "./i18n.js";
 import { buildEquipmentView } from "./equipmentView.js";
+import { equipInventoryItem, unequipSlot } from "./equipmentActions.js";
 
 let selectedInventoryItemId = null;
 let inventoryFilterText = "";
@@ -158,7 +159,7 @@ export function renderInventory() {
     const empty = document.createElement("li");
     empty.className = "empty-list-row";
     empty.setAttribute("aria-disabled", "true");
-    empty.textContent = "Inventario vacio. Explora, compra o derrota enemigos para encontrar objetos.";
+    empty.textContent = t('inventoryEmpty');
     list.appendChild(empty);
   }
 
@@ -171,6 +172,25 @@ export function renderInventory() {
     if (row) {
       row.classList.toggle('is-equipped', !!item);
       row.title = item ? localizeText(item.name) : `${row.querySelector('.equip-slot-label')?.textContent || slot}: ${t('emptySlot')}`;
+      row.classList.toggle('is-interactive', !!item);
+      if (item) {
+        row.tabIndex = 0;
+        row.setAttribute('role', 'button');
+        row.setAttribute('aria-label', `${localizeText(item.name)}. ${t('equipmentUnequipButton')}`);
+        row.onclick = () => showItemDetails(item.id, item, { equippedSlot: slot });
+        row.onkeydown = (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            row.click();
+          }
+        };
+      } else {
+        row.tabIndex = -1;
+        row.removeAttribute('role');
+        row.removeAttribute('aria-label');
+        row.onclick = null;
+        row.onkeydown = null;
+      }
       const art = row.querySelector('.equip-slot-art');
       if (art) {
         art.innerHTML = '';
@@ -187,7 +207,7 @@ export function renderInventory() {
   if (foundItems === 0) {
     const empty = document.createElement('li');
     empty.className = 'inventory-empty';
-    empty.textContent = inventoryFilterText || inventoryTypeFilter !== 'all' ? 'No se encontraron objetos.' : 'No tienes objetos en el inventario.';
+    empty.textContent = inventoryFilterText || inventoryTypeFilter !== 'all' ? t('inventoryNoResults') : t('inventoryNoItems');
     list.appendChild(empty);
   }
   const grid = document.querySelector('.inventory-grid');
@@ -250,7 +270,7 @@ function renderEquipmentComparison(item) {
   wrap.className = "equipment-compare";
   const title = document.createElement("div");
   title.className = "equipment-compare-title";
-  title.textContent = "Comparacion al equipar";
+  title.textContent = t('equipmentCompareTitle');
   wrap.appendChild(title);
   const grid = document.createElement("div");
   grid.className = "equipment-compare-grid";
@@ -265,7 +285,7 @@ function renderEquipmentComparison(item) {
   return wrap;
 }
 
-function showItemDetails(itemId, item) {
+function showItemDetails(itemId, item, { equippedSlot = null } = {}) {
   selectedInventoryItemId = itemId;
   const detailCard = document.getElementById('itemDetailCard');
   const detailEmpty = document.querySelector('#inventoryDetail .item-detail-empty');
@@ -276,6 +296,7 @@ function showItemDetails(itemId, item) {
   const detailIcon = document.getElementById('detailIcon');
   const useBtn = document.getElementById('detailUseBtn');
   const equipBtn = document.getElementById('detailEquipBtn');
+  const unequipBtn = document.getElementById('detailUnequipBtn');
 
   const equipOverview = document.getElementById('invEquipOverview');
   if (equipOverview) equipOverview.style.display = 'none';
@@ -355,8 +376,9 @@ function showItemDetails(itemId, item) {
   }
 
   if (equipBtn) {
-    equipBtn.classList.toggle('hidden', !item.slot);
-    if (item.slot) {
+    const canEquipFromBag = !!item.slot && !equippedSlot && !!gameState.inventory[itemId];
+    equipBtn.classList.toggle('hidden', !canEquipFromBag);
+    if (canEquipFromBag) {
       equipBtn.disabled = false;
       equipBtn.className = 'btn-action secondary';
       equipBtn.textContent = t('btnEquip');
@@ -364,6 +386,29 @@ function showItemDetails(itemId, item) {
         const ok = equipItem(itemId, item);
         if (ok) showItemDetails(itemId, item);
       };
+    } else {
+      equipBtn.onclick = null;
+    }
+  }
+
+  if (unequipBtn) {
+    unequipBtn.classList.toggle('hidden', !equippedSlot);
+    if (equippedSlot) {
+      unequipBtn.disabled = false;
+      unequipBtn.textContent = t('equipmentUnequipButton');
+      unequipBtn.setAttribute('aria-label', formatText(t('equipmentUnequipLabel'), { item: localizeText(item.name) }));
+      unequipBtn.onclick = () => {
+        const result = unequipSlot(gameState, equippedSlot);
+        if (!result.ok) return;
+        applyDerivedMaxes();
+        addMessage(formatText(t('equipmentUnequipMessage'), { item: localizeText(result.item.name) }), 'system');
+        updateUI();
+        closeItemDetail();
+        renderInventory();
+      };
+    } else {
+      unequipBtn.removeAttribute('aria-label');
+      unequipBtn.onclick = null;
     }
   }
 
@@ -460,32 +505,15 @@ function useItem(itemId, item) {
 }
 
 function equipItem(itemId, item) {
-  // ensure item exists in inventory
-  if (!removeItemFromInventory(gameState.inventory, itemId, 1)) {
+  const result = equipInventoryItem(gameState, itemId, item);
+  if (!result.ok && result.reason === 'notOwned') {
     addMessage(t('itemNotOwnedEquip'), 'system');
     return false;
   }
-
-  // Validar slot y tipo
-  const slot = item.slot;
-  const slotTypeMap = {
-    rightHand: ['weapon'],
-    leftHand: ['shield'],
-    armor: ['armor'],
-    boots: ['boots'],
-    arms: ['arms'],
-    ring: ['ring'],
-    head: ['helmet', 'hat'],
-    accessory: ['emblem', 'collar', 'talisman', 'accessory']
-  };
-  if (!slot || !slotTypeMap[slot] || !slotTypeMap[slot].includes(item.type)) {
+  if (!result.ok) {
     addMessage(t('cannotEquipItem'), 'system');
     return false;
   }
-  const oldItem = gameState.equipment[slot];
-  // Equipar nuevo item
-  gameState.equipment[slot] = item;
-  if (oldItem && oldItem.id) addItemToInventory(gameState.inventory, oldItem.id, 1);
   addMessage(formatText(t('equippedItem'), { item: localizeText(item.name) }), 'stat');
 
   // Recalculate derived stats after equipping so STR/INT/HP bonuses take effect
@@ -493,4 +521,11 @@ function equipItem(itemId, item) {
   updateUI();
   renderInventory();
   return true;
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pixel:localeChanged', () => {
+    const modal = document.getElementById('inventoryModal');
+    if (modal && !modal.classList.contains('hidden')) renderInventory();
+  });
 }
