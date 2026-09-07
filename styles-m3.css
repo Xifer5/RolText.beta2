@@ -1703,7 +1703,7 @@ button:focus-visible,
     width: min(100%, 540px);
     max-height: 82vh;
     background: var(--md-surface-c);
-    border-radius: 24px;
+    border-radius: var(--r-xl); /* SPEC-1239: normalizado, era 24px ad-hoc */
     overflow: hidden;
     box-shadow: 0 24px 48px rgba(0,0,0,.25);
     position: relative;
@@ -2294,7 +2294,7 @@ button:focus-visible,
   width: 70px;
   height: 70px;
   min-width: 70px;
-  border-radius: 18px;
+  border-radius: var(--r-lg); /* SPEC-1239: normalizado, era 18px ad-hoc */
   background: var(--md-surface-c);
   display: grid;
   place-items: center;
@@ -2366,7 +2366,7 @@ button:focus-visible,
   gap: 2px 6px;
   align-items: center;
   padding: 7px 8px;
-  border-radius: 10px;
+  border-radius: var(--r-md); /* SPEC-1239: normalizado, era 10px ad-hoc -- mismo patrón que .stat-cell */
   background: var(--md-surface-c);
   border: 1px solid var(--md-outline-variant);
   font-family: var(--font-ui);
@@ -4414,7 +4414,7 @@ button:focus-visible,
   align-items: center;
   gap: 7px;
   padding: 8px 20px;
-  border-radius: 99px;
+  border-radius: 999px; /* SPEC-1239: 99px -> 999px, mismo idioma "pill" que el resto del archivo */
   border: 1.5px solid var(--gold-dim);
   background: linear-gradient(135deg, rgba(212,175,85,.14), rgba(212,175,85,.06));
   color: var(--gold);
@@ -5361,7 +5361,7 @@ kbd {
 .diff-chip, .origin-chip, .mod-chip {
   display: inline-flex; align-items: center; gap: 6px;
   min-height: 44px; padding: 8px 16px;
-  border: 1.5px solid var(--md-outline, #49454f); border-radius: 20px;
+  border: 1.5px solid var(--md-outline, #49454f); border-radius: var(--r-lg); /* SPEC-1239: normalizado, era 20px ad-hoc */
   background: transparent; color: var(--md-on-surface, #e6e1e5);
   font-family: inherit; font-size: 14px; cursor: pointer;
   transition: background var(--md-dur-short3) var(--ease), border-color var(--md-dur-short3) var(--ease), transform var(--md-dur-short2) var(--ease);
@@ -5467,7 +5467,7 @@ kbd {
 .mastery-empty { font-size: 13px; font-style: italic; }
 .mastery-row {
   display: flex; align-items: center; gap: var(--sp-3);
-  padding: 8px 10px; border-radius: 10px;
+  padding: 8px 10px; border-radius: var(--r-md); /* SPEC-1239: normalizado, era 10px ad-hoc */
   background: var(--md-surface-c);
 }
 .mastery-emoji { font-size: 18px; }
@@ -5491,7 +5491,7 @@ kbd {
 .spec-choice-grid { display: flex; flex-direction: column; gap: var(--sp-3); }
 .spec-card {
   display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
-  padding: var(--sp-4); border-radius: 14px; text-align: left;
+  padding: var(--sp-4); border-radius: var(--r-lg); text-align: left; /* SPEC-1239: normalizado, era 14px ad-hoc -- mismo patrón que .class-card */
   border: 1.5px solid var(--md-outline, #49454f);
   background: var(--md-surface-c);
   color: var(--md-on-surface, #e6e1e5);
@@ -5556,7 +5556,7 @@ kbd {
   min-width: 44px;
   padding: 8px 16px;
   border: none;
-  border-radius: 20px;
+  border-radius: var(--r-lg); /* SPEC-1239: normalizado, era 20px ad-hoc */
   background: var(--md-primary);
   color: var(--md-on-primary);
   font-family: var(--font-ui);
@@ -5570,7 +5570,7 @@ kbd {
 .onb-highlight {
   outline: 3px solid var(--md-primary);
   outline-offset: 3px;
-  border-radius: 8px;
+  border-radius: var(--r-sm); /* SPEC-1239: era 8px literal, mismo valor que --r-sm */
   animation: onbPulse 1.4s ease-in-out infinite;
 }
 @keyframes onbPulse {
@@ -5601,7 +5601,7 @@ kbd {
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  border-radius: 8px;
+  border-radius: var(--r-sm); /* SPEC-1239: era 8px literal, mismo valor que --r-sm */
   border: 1px solid var(--md-primary);
   background: var(--md-surface-c-highest);
   color: var(--md-on-surface);
