@@ -203,7 +203,9 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
     // patrón que nextAction/enraged/isDefending)
     // SPEC-1219 (Fase 4): dragon_king empieza su fase 1 con la misma
     // guardia que forest_titan — updateBossPhase() la apaga al escalar.
-    hasGuard: enemyType === "forest_titan" || enemyType === "dragon_king",
+    // SPEC-1237: kestrel_rival_2 (segundo duelo de Kestrel) reusa la misma
+    // guardia -- decisión de diseño para no inventar IA de boss nueva.
+    hasGuard: enemyType === "forest_titan" || enemyType === "dragon_king" || enemyType === "kestrel_rival_2",
     guardBroken: 0,
     turnsSinceDevour: 0,
     turnsSinceOverload: 0,

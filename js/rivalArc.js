@@ -1,20 +1,40 @@
 // SPEC-1108 — Kestrel, el rival recurrente (roadmap "siguiente nivel" ítem
-// #8). Aparece en 3 puntos de la cadena principal (tras mq_01, tras mq_03,
-// y antes de mq_05/Rey Dragón). Las primeras 2 apariciones suman/restan
-// `worldFlags.rival_score` (mini-tono propio, independiente de
-// MORAL_DECISIONS); la 3ra resuelve la relación: aliado (score≥1, ayuda
-// antes del jefe final), competidor (score===0, duelo directo) o traidor
-// (score≤-1, te roba y desaparece).
+// #8).
 //
 // SPEC-1236 — el usuario reportó que en su partida solo vio a Kestrel al
-// final: los encuentros 1/2 originalmente exigían estar parado EXACTO en
+// final: los encuentros originalmente exigían estar parado EXACTO en
 // "town"/"garden_1" cuando se cumplía la condición, algo que no siempre
 // pasa naturalmente (quests "visit" se completan hablando con el NPC, no
-// necesariamente de vuelta en esa sala). Se sacó el requisito de sala para
-// 1/2 -- disparan en la PRÓXIMA llegada a cualquier lado una vez cumplida
-// la condición, garantizando que se vean pronto. El encuentro 3 SÍ sigue
-// atado a inferno_1 a propósito (es el cuello de botella obligatorio del
-// final, no depende de que el jugador "pase por ahí de nuevo" por azar).
+// necesariamente de vuelta en esa sala). Se sacó el requisito de sala salvo
+// donde sigue teniendo sentido (inferno_1, cuello de botella obligatorio).
+//
+// SPEC-1237 — rediseño completo del arco (diseñado vía /office-hours, ver
+// memoria de sesión) en 4 etapas:
+//   0. Duelo amistoso (obligatorio, tras mq_01) — combate real contra
+//      kestrel_early, una versión débil separada. Ganar la deja picada
+//      (rival_score -1); perder es la introducción normal a una rival de
+//      verdad (rival_score +1) -- invierte a propósito la intuición de que
+//      "ganar siempre es lo bueno" para el vínculo.
+//   1. Discursos por bioma (una vez por cada uno de los 7 biomas con jefe de
+//      zona, solo tras el duelo 0) -- enriquecen su arquetipo y dan pistas
+//      de cómo ganarse su confianza, sin elección ni impacto en el score.
+//   2. Segundo duelo (mitad de juego, tras vencer 3 jefes de zona) -- combate
+//      real contra kestrel_rival_2, que reusa la guardia de forest_titan
+//      (ver combat.js) en vez de mecánica nueva. Ganar sube el score en
+//      serio (+2, un respeto genuino, no una picardía de rivalidad menor).
+//   3. Prueba de confianza (en inferno_1, reemplaza la resolución
+//      automática por score puro) -- una acción real y explícita del
+//      jugador (aliarse / desafiarla / dejarla robar) decide la relación
+//      final. El score acumulado en las etapas 0-2 queda como flavor
+//      (influye qué tone beat aparece), no como el árbitro.
+//
+// Restricción real de arquitectura (verificada antes de diseñar): un combate
+// perdido es Game Over normal (gameState.isGameOver = true en combat.js,
+// nunca pasa por endCombat) -- no existe en todo el juego un sistema de
+// "muerte segura" (ver auditoría de jugabilidad, decisión explícita de no
+// inventar uno). Por eso "si Kestrel gana, se burla" solo puede foreshadow-
+// earse en el texto del desafío ANTES del combate -- la reacción concreta y
+// scriptada solo es entregable en el camino que SÍ tiene callback (ganar).
 import { gameState } from "./state.js";
 import { addMessage } from "./story.js";
 import { showTravelEvent } from "./travelEvents.js";
@@ -22,6 +42,7 @@ import { getQuestStatus } from "./quests.js";
 import { computeEndingTone } from "./endings.js";
 import { getVictories } from "./metaProgress.js";
 import { maybeStartValdrisEncounter } from "./valdrisArc.js";
+import { zoneBossesDefeatedCount } from "./eryndelArc.js";
 
 const flags = () => (gameState.worldFlags ??= {});
 const setFlag = k => { flags()[k] = true; };
@@ -81,18 +102,19 @@ const TONE_BEATS = {
   }
 };
 
-// SPEC-1236: texto sin referencia a "en el pueblo" -- ya no está atado a esa
-// sala específica, así que la frase debe funcionar en cualquier lugar donde
-// el jugador esté parado al completar mq_01.
-const ENCOUNTER_1_BASE_TEXT = {
-  en: "A stranger steps into your path, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Trade notes, or keep your secrets?\"",
-  es: "Un desconocido te corta el paso, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. ¿Compartimos lo que sabemos, o guardás tus secretos?\""
+// SPEC-1237: el primer encuentro ahora es un desafío a duelo -- el texto
+// foreshadowea ambas reacciones posibles ("me río" / "me enojo") porque solo
+// una de las dos es entregable como callback real tras el combate (ver
+// comentario de cabecera sobre la restricción de "muerte segura").
+const RIVAL_DUEL_1_BASE_TEXT = {
+  en: "A stranger steps into your path, already drawing a blade, grinning. \"Kestrel. I hunt the same seals you do — for the fee, not the fate of the world. Let's see what you're made of before I decide if you're worth my time. Friendly duel, first blood. Win and I'll be insufferable about it. Lose and you'll never hear the end of it either.\"",
+  es: "Un desconocido te corta el paso, ya desenvainando un arma, sonriendo. \"Kestrel. Cazo los mismos sellos que vos — por la paga, no por el destino del mundo. Veamos de qué estás hecho antes de decidir si valés mi tiempo. Duelo amistoso, primera sangre. Si ganás, voy a ser insoportable al respecto. Si perdés, tampoco te vas a librar de escucharlo.\""
 };
 
 // SPEC-1211 — voz narrativa ampliada (revisión 2026-08-28, ítem #6): Kestrel
 // reacciona a que esta NO es tu primera vuelta (New Game+, ver
 // metaProgress.js). Solo en el primer encuentro — es un guiño de
-// reconocimiento al arrancar la relación, no algo que repetir en las 3
+// reconocimiento al arrancar la relación, no algo que repetir en las demás
 // apariciones. Sin beat en la primera partida (getVictories()===0), mismo
 // patrón null-safe que CLASS_BEATS/ORIGIN_BEATS/TONE_BEATS.
 const NG_BEATS = {
@@ -102,35 +124,29 @@ const NG_BEATS = {
   }
 };
 
-export const RIVAL_ENCOUNTER_1 = {
-  id: "rival_encounter_1",
+// SPEC-1237 — Etapa 0: duelo amistoso, obligatorio y temprano (tras mq_01).
+// Único choice a propósito: no es una elección de tono, es aceptar el
+// desafío. El resultado real (rival_score, mensaje reactivo) se resuelve en
+// combatRewards.js al terminar el combate contra kestrel_early.
+export const RIVAL_DUEL_1_INTRO = {
+  id: "rival_duel_1_intro",
   icon: "🗡️",
-  title: { en: "An Unexpected Rival", es: "Un rival inesperado" },
+  title: { en: "A Friendly Challenge", es: "Un desafío amistoso" },
   get text() {
-    const withClass = withBeat(ENCOUNTER_1_BASE_TEXT, CLASS_BEATS[gameState.player?.class]);
+    const withClass = withBeat(RIVAL_DUEL_1_BASE_TEXT, CLASS_BEATS[gameState.player?.class]);
     return withBeat(withClass, getVictories() > 0 ? NG_BEATS.returning : null);
   },
   biomes: null,
-  choices: [
-    {
-      label: { en: "Share what you know", es: "Compartir lo que sabes" },
-      icon: "🤝",
-      apply() {
-        addRivalScore(1);
-        gameState.player.experience = (gameState.player.experience ?? 0) + 10;
-        return { en: "Kestrel nods, almost surprised. \"Careless of you. I'll remember it.\" +10 XP", es: "Kestrel asiente, casi sorprendido. \"Descuidado de tu parte. Lo voy a recordar.\" +10 XP" };
-      }
-    },
-    {
-      label: { en: "Keep your information", es: "Guardarte la información" },
-      icon: "🤐",
-      apply() {
-        addRivalScore(-1);
-        gameState.player.gold = (gameState.player.gold ?? 0) + 15;
-        return { en: "Kestrel shrugs and pawns a lead of their own for quick coin. +15 gold", es: "Kestrel se encoge de hombros y vende una pista propia por monedas rápidas. +15 de oro" };
-      }
+  choices: [{
+    label: { en: "Accept the duel", es: "Aceptar el duelo" },
+    icon: "⚔️",
+    apply() {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: "kestrel_early", isBoss: false } }));
+      }, 900);
+      return { en: "Blades out. No hard feelings — yet.", es: "Armas afuera. Sin resentimientos — todavía." };
     }
-  ]
+  }]
 };
 
 const ENCOUNTER_2_BASE_TEXT = {
@@ -169,18 +185,99 @@ export const RIVAL_ENCOUNTER_2 = {
   ]
 };
 
-export function rivalResolutionEvent() {
+// SPEC-1237 — Etapa 1: un discurso por bioma, una sola vez cada uno, solo en
+// los 7 biomas con jefe de zona (mismo criterio que el narrador oculto,
+// SPEC-1223) y solo tras el duelo 0 (Kestrel ya establecida en la historia).
+// Puro flavor -- sin choice de tono ni impacto en rival_score: son pistas de
+// arquetipo, no puntos de decisión.
+function biomeSpeech(id, icon, title, text) {
+  return {
+    id: `rival_biome_${id}`,
+    icon,
+    title,
+    text,
+    biomes: null,
+    choices: [{
+      label: { en: "Keep moving", es: "Seguir camino" },
+      icon: "🚶",
+      apply() { return { en: "She's already gone.", es: "Ya se fue." }; }
+    }]
+  };
+}
+export const BIOME_SPEECHES = {
+  forest: biomeSpeech("forest", "🌲", { en: "Old Wounds", es: "Heridas viejas" }, {
+    en: "Kestrel falls into step beside you without asking, scanning the tree line out of habit. \"I used to work jobs like this with a partner. Ended badly — they wanted glory, I wanted paid. Different currencies. People who confuse the two get others killed.\" She peels off before you can answer.",
+    es: "Kestrel camina a tu lado sin pedir permiso, escaneando la línea de árboles por costumbre. \"Antes hacía trabajos como este con un compañero. Terminó mal — él quería gloria, yo quería cobrar. Monedas distintas. La gente que confunde las dos termina matando a otros.\" Se aparta antes de que puedas responder."
+  }),
+  cave: biomeSpeech("cave", "🕳️", { en: "Honest Dark", es: "Oscuridad honesta" }, {
+    en: "You find her crouched at a cave mouth, listening. \"Caves are honest,\" she says without turning. \"They don't pretend to be safer than they are. Wish I could say the same about most people I've worked with. You, I still haven't decided.\"",
+    es: "La encontrás agachada en la entrada de una cueva, escuchando. \"Las cuevas son honestas\", dice sin darse vuelta. \"No fingen ser más seguras de lo que son. Ojalá pudiera decir lo mismo de la mayoría de la gente con la que trabajé. Vos, todavía no te tengo decidida.\""
+  }),
+  mountain: biomeSpeech("mountain", "⛰️", { en: "No Titles Up Here", es: "Sin títulos allá arriba" }, {
+    en: "Kestrel is already at the summit trail when you arrive, unimpressed by the view. \"Height doesn't make you important. I've robbed kings and beggars from the same ledge. Gravity doesn't care about your title, and neither do I — only about whether you're worth the climb.\"",
+    es: "Kestrel ya está en el sendero de la cumbre cuando llegás, sin impresionarse por la vista. \"La altura no te hace importante. Robé a reyes y a mendigos desde el mismo saliente. A la gravedad no le importa tu título, y a mí tampoco — solo si valés la subida.\""
+  }),
+  ruin: biomeSpeech("ruin", "🏛️", { en: "What Ruins Keep", es: "Lo que guardan las ruinas" }, {
+    en: "She's picking through rubble when you find her, careful not to disturb something. \"Ruins keep better secrets than people do. People lie to your face. Ruins just... wait. I respect that. If you ever want my trust, try waiting instead of asking.\"",
+    es: "Está revisando escombros cuando la encontrás, con cuidado de no perturbar algo. \"Las ruinas guardan mejor los secretos que la gente. La gente te miente en la cara. Las ruinas solo... esperan. Respeto eso. Si alguna vez querés mi confianza, probá esperar en vez de pedir.\""
+  }),
+  swamp: biomeSpeech("swamp", "🐍", { en: "No Questions Asked", es: "Sin hacer preguntas" }, {
+    en: "Kestrel wades out of the mud with a scowl, boots ruined. \"I take jobs like this because the pay's good and nobody asks questions. Lately you're the one making me ask questions. I don't love it. Don't get used to it either.\"",
+    es: "Kestrel sale del barro con el ceño fruncido, botas arruinadas. \"Acepto trabajos así porque la paga es buena y nadie hace preguntas. Últimamente sos vos la que me hace hacer preguntas. No me encanta. Tampoco te acostumbres.\""
+  }),
+  volcano: biomeSpeech("volcano", "🌋", { en: "What's Left After", es: "Lo que queda después" }, {
+    en: "She watches the lava fields with an expression you can't read. \"Heat like this burns away anything fake fast. Loyalty, love, all of it — cheap talk melts first. What's left after is the only thing worth trusting. We'll see what's left of you.\"",
+    es: "Observa los campos de lava con una expresión que no podés leer. \"Un calor así quema rápido todo lo falso. Lealtad, amor, todo eso — la palabrería barata se derrite primero. Lo que queda después es lo único que vale la pena confiar. Vamos a ver qué queda de vos.\""
+  }),
+  tundra: biomeSpeech("tundra", "❄️", { en: "Slow to Warm", es: "Lenta para entrar en confianza" }, {
+    en: "Kestrel's breath fogs as she catches up, uncharacteristically quiet. \"Cold like this kills the ones who trust the wrong person to keep watch. I've buried people who trusted wrong. Don't take it personally if I'm slow to warm up to you — it's kept me alive this long.\"",
+    es: "El aliento de Kestrel se hace vapor mientras te alcanza, inusualmente callada. \"Un frío así mata a los que confían en la persona equivocada para hacer guardia. Enterré gente que confió mal. No te lo tomes personal si tardo en entrar en confianza — eso me mantuvo viva hasta ahora.\""
+  }),
+};
+
+// SPEC-1237 — Etapa 2: segundo duelo, mitad de juego (tras 3 jefes de zona
+// vencidos). Esta vez es real -- kestrel_rival_2 reusa la guardia de
+// forest_titan (ver combat.js). Igual que el duelo 0, el texto foreshadowea
+// ambas reacciones porque solo ganar tiene callback real (ver cabecera).
+const RIVAL_DUEL_2_BASE_TEXT = {
+  en: "Kestrel drops from a rooftop, weapon already drawn, no pleasantries this time. \"You're still standing. Good — makes this worth doing right.\" Her eyes are sharper now, calculating. \"Half-measures got us this far. Let's see if there's anything real behind them. Win and I'll actually respect you. Lose and I'll make sure you remember exactly how.\"",
+  es: "Kestrel cae desde un techo, arma ya desenvainada, sin cortesías esta vez. \"Seguís de pie. Bien — eso hace que valga la pena hacer esto en serio.\" Sus ojos están más afilados ahora, calculando. \"Las medias tintas nos trajeron hasta acá. Veamos si hay algo real detrás. Si ganás, te voy a respetar de verdad. Si perdés, me voy a asegurar de que te acuerdes exactamente cómo.\""
+};
+export const RIVAL_DUEL_2_INTRO = {
+  id: "rival_duel_2_intro",
+  icon: "⚔️",
+  title: { en: "No More Half-Measures", es: "Se acabaron las medias tintas" },
+  text: RIVAL_DUEL_2_BASE_TEXT,
+  biomes: null,
+  choices: [{
+    label: { en: "Fight for real", es: "Pelear en serio" },
+    icon: "⚔️",
+    apply() {
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("pixel:startCombat", { detail: { enemyId: "kestrel_rival_2", isBoss: true } }));
+      }, 900);
+      return { en: "This time, neither of you is holding back.", es: "Esta vez, ninguna de las dos se guarda nada." };
+    }
+  }]
+};
+
+// SPEC-1237: forcedOutcome ("ally"|"traitor"|"competitor") permite que
+// RIVAL_TRUST_TEST decida la relación por una acción explícita del jugador
+// en vez de por el score acumulado. Sin argumento, cae al umbral de score de
+// siempre (compatibilidad con los tests existentes, que solo fijan score).
+export function rivalResolutionEvent(forcedOutcome = null) {
   const score = rivalScore();
+  const outcome = forcedOutcome ?? (score >= 1 ? "ally" : score <= -1 ? "traitor" : "competitor");
   // SPEC-1108b: Kestrel decide cuánto confiar en vos también según cómo
   // jugaste hasta ahora, no solo según el propio historial que tiene con
   // ella — mismo tono (light/dark/gray) que ya usa el epílogo de la run.
   const toneBeat = TONE_BEATS[computeEndingTone(gameState.worldFlags).tone];
-  if (score >= 1) {
+  if (outcome === "ally") {
     return {
       id: "rival_resolution_ally",
       icon: "🤝",
       title: { en: "An Unlikely Ally", es: "Un aliado inesperado" },
-      text: withBeat({ en: "Kestrel steps out of the shadows at the threshold. \"Figures I'd end up owing you. Don't die in there — I'm not done being annoyed at you.\"", es: "Kestrel sale de las sombras en el umbral. \"Tenía que terminar debiéndote una. No te mueras ahí adentro — todavía no termino de estar molesto con vos.\"" }, toneBeat),
+      text: withBeat({ en: "Kestrel's grin turns real for half a second. \"Together, then. Try to keep up.\"", es: "La sonrisa de Kestrel se vuelve real por medio segundo. \"Juntas, entonces. Tratá de seguirme el ritmo.\"" }, toneBeat),
       biomes: null,
       choices: [{
         label: { en: "Accept the help", es: "Aceptar la ayuda" },
@@ -197,12 +294,12 @@ export function rivalResolutionEvent() {
       }]
     };
   }
-  if (score <= -1) {
+  if (outcome === "traitor") {
     return {
       id: "rival_resolution_traitor",
       icon: "🔪",
       title: { en: "A Familiar Betrayal", es: "Una traición conocida" },
-      text: withBeat({ en: "Kestrel corners you at the threshold, all pretense gone. \"Nothing personal. I just don't share.\"", es: "Kestrel te acorrala en el umbral, sin fingir ya. \"Nada personal. Solo que no comparto.\"" }, toneBeat),
+      text: withBeat({ en: "Kestrel doesn't hesitate. \"Your loss. Try not to think about it while I'm gone.\"", es: "Kestrel no duda. \"Perdiste vos. Tratá de no pensar en eso mientras no esté.\"" }, toneBeat),
       biomes: null,
       choices: [{
         label: { en: "...", es: "..." },
@@ -213,7 +310,7 @@ export function rivalResolutionEvent() {
           const p = gameState.player;
           const stolen = Math.max(1, Math.floor((p.gold || 0) * 0.20));
           p.gold = Math.max(0, (p.gold || 0) - stolen);
-          return { en: `Kestrel lifts ${stolen} gold from your pack and vanishes before you can react.`, es: `Kestrel te saca ${stolen} de oro de la mochila y desaparece antes de que reacciones.` };
+          return { en: `She takes you at your word, and then some — Kestrel lifts ${stolen} gold from your own pack on her way out, just to make a point.`, es: `Te toma la palabra, y un poco más — Kestrel te saca ${stolen} de oro de tu propia mochila al irse, solo para dejar un mensaje.` };
         }
       }]
     };
@@ -222,7 +319,7 @@ export function rivalResolutionEvent() {
     id: "rival_resolution_competitor",
     icon: "⚔️",
     title: { en: "One Last Contest", es: "Un último desafío" },
-    text: withBeat({ en: "Kestrel blocks the threshold, drawing steel. \"Neither of us trusted the other enough. Let's settle it the simple way — whoever's still standing goes in first.\"", es: "Kestrel bloquea el umbral, desenvainando. \"Ninguno de los dos confió lo suficiente en el otro. Resolvámoslo simple — el que quede en pie entra primero.\"" }, toneBeat),
+    text: withBeat({ en: "Kestrel's jaw sets. \"Fine. Prove it, then.\" She draws steel.", es: "Kestrel aprieta la mandíbula. \"Bien. Entonces demostralo.\" Desenvaina." }, toneBeat),
     biomes: null,
     choices: [{
       label: { en: "Accept the duel", es: "Aceptar el duelo" },
@@ -238,25 +335,80 @@ export function rivalResolutionEvent() {
   };
 }
 
+// SPEC-1237 — Etapa 3: prueba de confianza. Reemplaza la resolución
+// automática por score puro con una acción explícita y concreta: el jugador
+// decide directamente si Kestrel termina siendo aliada, enemiga o traidora,
+// delegando a las 3 ramas ya existentes de rivalResolutionEvent() (mismo
+// mecanismo de recompensa/combate, solo elegido a mano en vez de por
+// umbral). El score acumulado en las etapas 0-2 solo elige el toneBeat de
+// cada rama (ver rivalResolutionEvent) -- ya no decide el resultado.
+export const RIVAL_TRUST_TEST = {
+  id: "rival_trust_test",
+  icon: "🗝️",
+  title: { en: "One Real Question", es: "Una pregunta de verdad" },
+  text: {
+    en: "Kestrel blocks the threshold one last time, no games left in her voice. \"There's a vault two turns back — Valdris's old stash, probably. Enough gold to retire on. I found it an hour ago and haven't touched it. I'm asking, not telling: do we do this together, or do I disappear the second that door opens?\"",
+    es: "Kestrel bloquea el umbral una última vez, sin juegos en la voz. \"Hay una bóveda dos vueltas atrás — el escondite viejo de Valdris, probablemente. Oro suficiente para retirarme. La encontré hace una hora y no la toqué. Te lo pregunto, no te lo digo: ¿hacemos esto juntas, o desaparezco apenas se abra esa puerta?\""
+  },
+  biomes: null,
+  choices: [
+    {
+      label: { en: "Fight beside me — we split it after", es: "Pelear a mi lado — lo repartimos después" },
+      icon: "🤝",
+      apply() { return rivalResolutionEvent("ally").choices[0].apply(); }
+    },
+    {
+      label: { en: "Not until you prove you mean it", es: "No hasta que demuestres que hablás en serio" },
+      icon: "⚔️",
+      apply() { return rivalResolutionEvent("competitor").choices[0].apply(); }
+    },
+    {
+      label: { en: "Take it. Just go.", es: "Tomala. Andate." },
+      icon: "🔪",
+      apply() { return rivalResolutionEvent("traitor").choices[0].apply(); }
+    }
+  ]
+};
+
 /** Llamar al llegar a una zona. true = un encuentro con Kestrel arranca y
  *  movement no debe tirar encuentros/eventos normales este movimiento.
- *  SPEC-1236: 1 y 2 disparan en la PRÓXIMA llegada a CUALQUIER lugar tras
- *  cumplirse la condición (ya no exigen town/garden_1 exactos -- ver
- *  comentario de cabecera). El 3 sigue atado a inferno_1 a propósito. */
+ *  SPEC-1236/1237: las etapas 0-2 disparan en la PRÓXIMA llegada a
+ *  CUALQUIER lugar tras cumplirse su condición (ya no exigen town/garden_1
+ *  exactos -- ver comentario de cabecera). La etapa 3 sigue atada a
+ *  inferno_1 a propósito (cuello de botella obligatorio del final). */
 export function maybeStartRivalEncounter(locationId) {
-  if (getQuestStatus("mq_01_la_cancion") === "completed" && !hasFlag("rival_encounter_1_seen")) {
-    setFlag("rival_encounter_1_seen");
-    setTimeout(() => showTravelEvent(RIVAL_ENCOUNTER_1), 700);
+  // Etapa 0: duelo amistoso, obligatorio y temprano.
+  if (getQuestStatus("mq_01_la_cancion") === "completed" && !hasFlag("rival_duel1_seen")) {
+    setFlag("rival_duel1_seen");
+    setTimeout(() => showTravelEvent(RIVAL_DUEL_1_INTRO), 700);
     return true;
   }
+  // "Kestrel en apuros" (jardín) -- sin cambios de disparador ni contenido.
   if (getQuestStatus("mq_03_ecos") === "completed" && !hasFlag("rival_encounter_2_seen")) {
     setFlag("rival_encounter_2_seen");
     setTimeout(() => showTravelEvent(RIVAL_ENCOUNTER_2), 700);
     return true;
   }
-  if (locationId === "inferno_1" && getQuestStatus("mq_04_la_verdad") === "completed" && !hasFlag("rival_encounter_3_seen")) {
-    setFlag("rival_encounter_3_seen");
-    setTimeout(() => showTravelEvent(rivalResolutionEvent()), 700);
+  // Etapa 1: discurso por bioma (solo tras el duelo 0, una vez por bioma).
+  if (hasFlag("rival_duel1_seen")) {
+    const biomeId = window.worldMap?.[locationId]?.biome;
+    const speech = biomeId ? BIOME_SPEECHES[biomeId] : null;
+    if (speech && !hasFlag("rival_biome_seen_" + biomeId)) {
+      setFlag("rival_biome_seen_" + biomeId);
+      setTimeout(() => showTravelEvent(speech), 700);
+      return true;
+    }
+  }
+  // Etapa 2: segundo duelo, mitad de juego (tras 3 jefes de zona vencidos).
+  if (hasFlag("rival_duel1_seen") && zoneBossesDefeatedCount(gameState) >= 3 && !hasFlag("rival_duel2_seen")) {
+    setFlag("rival_duel2_seen");
+    setTimeout(() => showTravelEvent(RIVAL_DUEL_2_INTRO), 700);
+    return true;
+  }
+  // Etapa 3: prueba de confianza -- reemplaza la resolución automática.
+  if (locationId === "inferno_1" && getQuestStatus("mq_04_la_verdad") === "completed" && !hasFlag("rival_trust_test_seen")) {
+    setFlag("rival_trust_test_seen");
+    setTimeout(() => showTravelEvent(RIVAL_TRUST_TEST), 700);
     return true;
   }
   return false;

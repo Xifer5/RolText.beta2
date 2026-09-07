@@ -541,8 +541,42 @@ export const enemyData = {
     img: "img/enemies/dragon.webp",
   },
 
-  // SPEC-1108: Kestrel, el rival recurrente — duelo único si el jugador no
-  // lo ayudó ni lo traicionó lo suficiente en sus 2 apariciones previas.
+  // SPEC-1237 — Kestrel, primer duelo (obligatorio, temprano): dispara junto
+  // a mq_01, cuando el jugador todavía está en nivel muy bajo. Versión débil
+  // separada de kestrel_rival/kestrel_rival_2 a propósito -- reusar
+  // cualquiera de esos rompería el balance temprano.
+  kestrel_early: {
+    type: "Kestrel",
+    levelRequirement: 2,
+    hp: 45,
+    maxHp: 45,
+    attack: 7,
+    defense: 2,
+    experience: 25,
+    gold: 20,
+    drops: ["health_potion"],
+    img: "img/enemies/thief.webp",
+  },
+
+  // SPEC-1237 — Kestrel, segundo duelo (mitad de juego, tras 3 jefes de zona
+  // vencidos). Reusa la guardia de raíces de forest_titan (hasGuard, ver
+  // combat.js) en vez de inventar una mecánica nueva -- para cuando esto
+  // dispara, forest_titan casi seguro ya cayó.
+  kestrel_rival_2: {
+    type: "Kestrel",
+    levelRequirement: 6,
+    hp: 220,
+    maxHp: 220,
+    attack: 24,
+    defense: 10,
+    experience: 180,
+    gold: 90,
+    drops: ["health_potion"],
+    img: "img/enemies/thief.webp",
+  },
+
+  // SPEC-1108: Kestrel, el rival recurrente — duelo final si la prueba de
+  // confianza (rivalArc.js) resuelve "competidor".
   kestrel_rival: {
     type: "Kestrel",
     levelRequirement: 10,

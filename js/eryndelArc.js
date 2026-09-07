@@ -5,7 +5,7 @@
 // Cuenta solo los 7 jefes de ZONA (no mini-bosses/Kestrel/Valdris/dragon_king,
 // que bestiary.js también marca como "boss" pero no son a lo que se refiere
 // "con cada boss que despierta" del documento).
-const ZONE_BOSS_IDS = [
+export const ZONE_BOSS_IDS = [
   "forest_titan", "cave_devourer", "mountain_colossus",
   "ancient_construct", "swamp_abomination", "frost_wyrm", "inferno_dragon"
 ];

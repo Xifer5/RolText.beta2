@@ -91,6 +91,28 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       });
     }
 
+    // SPEC-1237 — Kestrel, etapa 0 (duelo amistoso): ganar la deja picada.
+    // Solo el camino "ganar" es entregable acá -- perder es Game Over normal,
+    // sin callback posible (ver comentario de cabecera en rivalArc.js).
+    if (enemy.id === "kestrel_early") {
+      gameState.worldFlags.rival_score = (gameState.worldFlags.rival_score || 0) - 1;
+      setTimeout(() => addMessage(localizeText({
+        en: "Kestrel lowers her blade, annoyed. \"...Beginner's luck. Don't let it go to your head.\"",
+        es: "Kestrel baja el arma, molesta. \"...Suerte de principiante. No te lo creas tanto.\""
+      }), "system"), 800);
+    }
+
+    // SPEC-1237 — Kestrel, etapa 2 (segundo duelo): ganar de verdad sube el
+    // score en serio (+2, no ±1 como los encuentros de dialogo) -- es la
+    // primera vez que la relación se gana con hechos, no con charla.
+    if (enemy.id === "kestrel_rival_2") {
+      gameState.worldFlags.rival_score = (gameState.worldFlags.rival_score || 0) + 2;
+      setTimeout(() => addMessage(localizeText({
+        en: "Kestrel lowers her weapon, breathing hard, something unreadable on her face. \"...Huh. Didn't see that coming.\"",
+        es: "Kestrel baja el arma, respirando fuerte, algo indescifrable en la cara. \"...Eh. No lo vi venir.\""
+      }), "system"), 800);
+    }
+
     // SPEC-1236 — el duelo "competidor" de Kestrel (rivalArc.js) pasa en el
     // mismo umbral que Valdris (inferno_1). Los caminos "aliado"/"traidor"
     // (sin combate) encadenan a Valdris desde rivalArc.js al cerrarse su
