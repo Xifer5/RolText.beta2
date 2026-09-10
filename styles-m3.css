@@ -1266,7 +1266,7 @@ button:focus-visible,
   background: var(--md-surface-c-low);
   border-left: 1px solid var(--md-outline-variant);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   grid-auto-rows: min-content;
   padding: 12px;
   gap: 10px;
@@ -1274,16 +1274,26 @@ button:focus-visible,
   height: 100%;
   min-height: 0;
 }
-/* El panel de la derecha incluye acciones, navegación/combate y minimapa (3
-   bloques visibles — el quest tracker vive oculto por defecto, ver
-   #questTracker.hidden más abajo). El bloque de navegación/combate ocupa el
-   espacio flexible; si algún día se reactiva un 4° bloque permanente, hay
-   que sumarle su propia fila `auto` aquí o vuelve a romperse (ver
-   feedback_sidebar_grid.md). */
+/* El panel de la derecha incluye acciones, objetivo actual, navegación/
+   combate y minimapa (4 bloques visibles fuera de combate — SPEC-1240
+   revivió el bloque de objetivo, antes permanentemente oculto). El bloque
+   de navegación/combate ocupa el espacio flexible; si se agrega otro
+   bloque permanente en el futuro, hay que sumarle su propia fila `auto`
+   aquí o vuelve a colapsar a 0px (ver [[feedback_sidebar_grid]]). */
 #right-panel:has(.combat-block:not(.hidden)),
 #right-panel:has(.nav-block:not(.hidden)):has(.combat-block.hidden) {
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
 }
+/* SPEC-1240: filas fijas por bloque, no por orden de aparición. El bloque de
+   objetivo actual se oculta (display:none) durante combate — sin esto, la
+   fila auto-placement de CSS Grid recorre solo los bloques VISIBLES en
+   orden y corre a combate/nav y minimapa una fila hacia arriba, rompiendo
+   el tamaño flexible de combate y estirando el minimapa a 1fr. */
+#right-panel .action-panel        { grid-row: 1; }
+#right-panel .quest-tracker-block { grid-row: 2; }
+#right-panel .combat-block,
+#right-panel .nav-block           { grid-row: 3; }
+#right-panel .minimap-block       { grid-row: 4; }
 #right-panel .sidebar-block {
   background: var(--md-surface-c);
   border-radius: var(--r-md);
@@ -1648,6 +1658,17 @@ button:focus-visible,
   .mobile-hud-fill.hp { background: var(--c-hp); }
   .mobile-hud-fill.mp { background: var(--c-mp); }
   .mobile-hud-fill.xp { background: var(--c-xp); }
+  /* SPEC-1240: mismo texto que #questTrackerContent (desktop/tablet), pero
+     el sidebar entero está display:none en este breakpoint -- una línea
+     chica basta, no necesita el tratamiento de bloque/tarjeta del sidebar. */
+  .mobile-hud-objective {
+    margin-top: 8px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--md-on-surface-variant);
+  }
+  .mobile-hud-objective:empty { display: none; }
   .location-actions {
     top: 12px;
     left: 12px;

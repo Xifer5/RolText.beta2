@@ -86,6 +86,12 @@
       <b id="mobile-xp-text">0/0</b>
     </div>
   </div>
+  <!-- SPEC-1240: la línea de "Objetivo actual" del sidebar de escritorio
+       (#questTrackerContent) también aparece acá -- en ≤960px #right-panel
+       está oculto (display:none), así que sin esto la línea no existía en
+       ningún breakpoint de teléfono. Mismo texto, misma función de
+       prioridad (updateObjectiveHint(), js/ui.js), oculta en combate. -->
+  <div id="mobile-objective-hint" class="mobile-hud-objective"></div>
 </section>
 
 <!-- ══ LAYOUT ══════════════════════════════════════════════════ -->
@@ -240,15 +246,14 @@
       </div>
     </div>
 
-    <!-- Quest tracker: solo se ve al abrir el diario con el botón "Misiones"
-         (no permanente en el sidebar — le robaba espacio al panel de
-         Navegación/Combate, ver feedback_sidebar_grid.md) -->
-    <div id="questTracker" class="sidebar-block quest-tracker-block hidden">
-      <div class="block-label" data-i18n="questTrackerTitle">Seguimiento de misiones</div>
-      <div class="quest-tracker-body">
-        <div id="questTrackerContent" class="quest-tracker-content"></div>
-        <button id="questTrackerOpenBtn" class="btn-action small" data-i18n="questTrackerOpenLog">Abrir diario</button>
-      </div>
+    <!-- Objetivo actual (SPEC-1240): una sola línea de prioridad sobre
+         estado ya existente (HP crítico > misión activa > mejor equipo en
+         tienda > Fragmentos listos > idle). Oculto solo durante combate
+         (updateObjectiveHint(), js/ui.js). El detalle completo de misiones
+         sigue viviendo en el diario, vía el botón "Misiones" de arriba. -->
+    <div id="questTracker" class="sidebar-block quest-tracker-block">
+      <div class="block-label" data-i18n="questTrackerTitle">Objetivo actual</div>
+      <div id="questTrackerContent" class="quest-tracker-content"></div>
     </div>
 
     <!-- COMBAT panel (shown in combat) -->

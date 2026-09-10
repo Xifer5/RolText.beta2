@@ -10,9 +10,8 @@ import { renderQuestLog, setupQuestLogTabs } from "./questlog.js";
 import { playSound, getVolume, setVolume, isMuted, toggleMute,
          getMusicVolume, setMusicVolume, isMusicMuted, toggleMusicMute } from "./sounds.js";
 import { QUEST_DATA, getQuestStatus, getQuestDialogue, getQuestActionLabel, activateQuest, checkQuestCondition, completeQuest, isQuestLocked, pickNpcQuestId } from "./quests.js";
-import { allItems } from "./items.js";
-import { enemyData } from "./enemies.js";
 import { t, formatText, localizeText } from "./i18n.js";
+import { getCurrentObjective } from "./objectiveHint.js";
 import { getMasteryDisplay } from "./mastery.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
 import { ACTION_META } from "./enemyAI.js";
@@ -123,7 +122,7 @@ export function initUICache() {
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
     "screen","buff-bar","skill-panel","stat-points-row","char-portrait-emoji",
-    "questTracker","questTrackerContent","questTrackerOpenBtn",
+    "questTracker","questTrackerContent","mobile-objective-hint",
     "mobile-location-name","mobile-state-chip","mobile-time-chip","mobile-level","mobile-gold",
     "mobile-hp-bar","mobile-hp-text","mobile-mp-bar","mobile-mp-text",
     "mobile-xp-bar","mobile-xp-text",
@@ -578,7 +577,7 @@ export function updateUI() {
   updateCombatDecisionHints(derived);
   updateDirectionControls(loc, inCombat);
 
-  updateQuestTracker();
+  updateObjectiveHint();
 
   // NPC talk button — visible only when an NPC is present and not in combat
   const npcTalkBtn = ui["npc-talk-btn"] || document.getElementById("npc-talk-btn");
@@ -711,52 +710,26 @@ function updateBuffBar() {
   bar.style.display = chips.length ? "flex" : "none";
 }
 
-function updateQuestTracker() {
-  const container = document.getElementById("questTrackerContent");
-  if (!container) return;
-  const activeQuests = Object.values(QUEST_DATA).filter(q => getQuestStatus(q.id) === "active");
-  if (!activeQuests.length) {
-    container.innerHTML = `<div class="quest-tracker-empty">${t('questTrackerNoActive')}</div>`;
-    return;
+// SPEC-1240: reemplaza la vieja lista completa de misiones (movida al
+// diario vía el botón "Misiones" de actionsPanel) por una sola línea de
+// prioridad sobre estado ya existente. Oculto en combate para no competir
+// con el HUD de combate (ver design doc 2026-09-09).
+function updateObjectiveHint() {
+  const block = ui.questTracker;
+  const container = ui.questTrackerContent;
+  // SPEC-1240: mismo texto en el bloque de sidebar (desktop/tablet) y en el
+  // HUD sticky de teléfono (ui["mobile-objective-hint"]) -- #right-panel
+  // entero es display:none en ese breakpoint, así que sin el segundo
+  // elemento la línea no existía en ningún tamaño de pantalla móvil.
+  const mobileLine = ui["mobile-objective-hint"];
+  const inCombat = gameState.isInCombat;
+  const line = inCombat ? "" : getCurrentObjective();
+
+  if (block && container) {
+    block.classList.toggle("hidden", inCombat);
+    if (!inCombat) container.textContent = line;
   }
-
-  // SPEC-1109: sube de 2 a 4 para que quepan la misión principal activa +
-  // hasta 3 rumores auto-activados al empezar la partida.
-  const lines = activeQuests.slice(0, 4).map((q) => {
-    const progress = (() => {
-      switch (q.type) {
-        case "visit": {
-          const target = localizeText(window.worldMap?.[q.target]?.name) || q.target;
-          const done = !!(gameState.visitedLocations?.[q.target]);
-          return `${t('qlProgressVisit').replace('{{target}}', target)} ${done ? '✅' : '⬜'}`;
-        }
-        case "collect": {
-          const have = gameState.inventory?.[q.item] ?? 0;
-          const need = q.qty;
-          const itemName = localizeText(allItems[q.item]?.name) || q.item;
-          return `${formatText('qlProgressCollect', { item: itemName, have, need })}`;
-        }
-        case "kill": {
-          const killed = gameState.stats?.enemiesDefeated?.[q.enemy] ?? 0;
-          const need = q.count;
-          // q.enemy es un id interno (ej. "pirate") — localizeText(q.enemy)
-          // lo devolvía tal cual, mostrando el id crudo. El nombre real
-          // vive en enemyData[id].type (ej. "Pirate").
-          const enemyName = localizeText(enemyData[q.enemy]?.type) || q.enemy;
-          return `${formatText('qlProgressKill', { enemy: enemyName, killed, need })}`;
-        }
-        default:
-          return t('qlProgressActive') || "In progress";
-      }
-    })();
-
-    return `<div class="quest-tracker-item">
-      <div class="quest-tracker-name">${localizeText(q.title)}</div>
-      <div class="quest-tracker-progress">${progress}</div>
-    </div>`;
-  }).join("");
-
-  container.innerHTML = lines;
+  if (mobileLine) mobileLine.textContent = line;
 }
 
 function updateSkillPanel() {
@@ -1276,11 +1249,6 @@ export function setupUIListeners() {
     document.getElementById("questLogModal")?.classList.remove("hidden");
   });
 
-  document.getElementById("questTrackerOpenBtn")?.addEventListener("click", () => {
-    renderQuestLog("active");
-    document.querySelectorAll(".ql-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "active"));
-    document.getElementById("questLogModal")?.classList.remove("hidden");
-  });
   document.getElementById("closeQuestLogBtn")?.addEventListener("click", () =>
     document.getElementById("questLogModal")?.classList.add("hidden")
   );
