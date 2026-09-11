@@ -40,7 +40,7 @@ function _recipesHTML(tab) {
       <div class="craft-recipe-card ${craftable ? "craftable" : ""}" data-recipe="${key}">
         <span class="craft-recipe-icon">${r.icon ?? "⚙️"}</span>
         <div class="craft-recipe-info">
-          <div class="craft-recipe-name">${r.name}</div>
+          <div class="craft-recipe-name">${localizeText(r.name)}</div>
           <div class="craft-rarity-tag rarity-${r.rarity}">${rarityLabel(r.rarity)}</div>
         </div>
         ${craftable ? `<span class="craft-can-dot" title="${t('youCanCraft')}">✓</span>` : ""}
@@ -81,7 +81,7 @@ function _detailHTML(tab, recipeKey) {
       <div class="craft-detail-header">
         <span class="craft-detail-icon">${recipe.icon ?? "⚙️"}</span>
         <div>
-          <div class="craft-detail-name">${localizeText(recipe.name) || recipe.name}</div>
+          <div class="craft-detail-name">${localizeText(recipe.name)}</div>
           <span class="craft-rarity-tag rarity-${recipe.rarity}">${localizeText(RARITY_LABEL[recipe.rarity] ?? { en: recipe.rarity, es: recipe.rarity })}</span>
         </div>
       </div>
@@ -90,7 +90,7 @@ function _detailHTML(tab, recipeKey) {
       <ul class="craft-mats-list">${mats}</ul>
       ${!levelOk ? `<p class="craft-level-warn">🔒 ${formatText('craftingRequiresLevel', { level: recipe.levelReq })}</p>` : ""}
       <button id="craftBtn" class="btn ${craftable ? "" : "outlined"}" ${craftable ? "" : "disabled"}>
-        ${craftable ? `${recipe.icon ?? "⚒️"} ${formatText('craftButton', {})} ${recipe.name}` : t('craftingInsufficientMaterials')}
+        ${craftable ? `${recipe.icon ?? "⚒️"} ${formatText('craftButton', {})} ${localizeText(recipe.name)}` : t('craftingInsufficientMaterials')}
       </button>
     </div>`;
 }
@@ -146,7 +146,7 @@ export function wireCraftingPanel(container) {
       const result = craftItem(recipe, gameState.inventory, gameState.player.level);
       if (result) {
         playSound("loot");
-        addMessage(formatText(t('craftedItem'), { item: recipe.name }), "loot");
+        addMessage(formatText(t('craftedItem'), { item: localizeText(recipe.name) }), "loot");
         checkAchievements();
         updateUI();
         refreshDetail();

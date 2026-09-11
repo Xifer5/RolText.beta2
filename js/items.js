@@ -1657,6 +1657,41 @@ export const allItems = {
     icon: "./img/runeGreen2.webp"
   },
 
+  // SPEC-1241: mountain_emblem_upgraded/arcane_emblem_upgraded/
+  // tundra_emblem_upgraded no existían como ítems -- sus recetas de forja
+  // arcana (craftingRecipes.js) devolvían por error el mismo emblema base
+  // que pedían como ingrediente (result.id copiado mal, ver esas 3
+  // recetas), así que forjarlas gastaba materiales raros para no dar nada.
+  // Estos 3 ítems nuevos cierran ese bug, mismo patrón que forest_emblem_
+  // upgraded/inferno_emblem_upgraded de arriba/abajo.
+  mountain_emblem_upgraded: {
+    id: "mountain_emblem_upgraded",
+    name: { en: "Mountain Emblem+", es: "Emblema de la Montaña+" },
+    type: "accessory",
+    slot: "accessory",
+    rarity: "epic",
+    defense: 10,
+    strength: 6,
+    hpBonus: 40,
+    price: 220,
+    description: { en: "The Mountain Emblem+. +10 DEF, +6 STR, +40 Max HP", es: "El Emblema de la Montaña+. +10 DEF, +6 FUE, +40 HP máx." },
+    icon: "./img/runePower.webp"
+  },
+
+  arcane_emblem_upgraded: {
+    id: "arcane_emblem_upgraded",
+    name: { en: "Arcane Emblem+", es: "Emblema Arcano+" },
+    type: "accessory",
+    slot: "accessory",
+    rarity: "epic",
+    magic: 16,
+    defense: 6,
+    intelligence: 6,
+    price: 260,
+    description: { en: "The Arcane Emblem+. +6 DEF, +16 Magic, +6 Intelligence", es: "El Emblema Arcano+. +6 DEF, +16 Magia, +6 Inteligencia" },
+    icon: "./img/runeSpirit2.webp"
+  },
+
   inferno_emblem_upgraded: {
     id: "inferno_emblem_upgraded",
     name: { en: "Inferno Emblem+", es: "Emblema del Infierno+" },
@@ -1671,6 +1706,20 @@ export const allItems = {
     price: 300,
     description: { en: "The Inferno Emblem+. +10 STR, +10 AGI, +10 INT, +10 ATK, +10 Magic", es: "El Emblema del Infierno+. +10 FUE, +10 AGI, +10 INT, +10 ATK, +10 Magia" },
     icon: "./img/runeFire.webp"
+  },
+
+  tundra_emblem_upgraded: {
+    id: "tundra_emblem_upgraded",
+    name: { en: "Tundra Emblem+", es: "Emblema de la Tundra+" },
+    type: "accessory",
+    slot: "accessory",
+    rarity: "legendary",
+    defense: 10,
+    magic: 8,
+    intelligence: 5,
+    price: 320,
+    description: { en: "The Tundra Emblem+. +10 DEF, +8 Magic, +5 Intelligence", es: "El Emblema de la Tundra+. +10 DEF, +8 Magia, +5 Inteligencia" },
+    icon: "./img/runePurple2.webp"
   },
 
   rusty_coin: {
