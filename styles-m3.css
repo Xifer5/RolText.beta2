@@ -1937,10 +1937,6 @@ button:focus-visible,
 .modal-text-center { text-align: center; }
 .modal-body-text   { margin: 14px 0; color: var(--c-muted); }
 .modal-actions-row { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
-.shop-columns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 480px) {
-  .shop-columns-grid { grid-template-columns: 1fr; }
-}
 .stat-pts-display  { font-size: 1.3em; }
 .hint-text-mt      { margin-top: 16px; }
 
@@ -2061,7 +2057,6 @@ button:focus-visible,
   max-height: 60vh;
 }
 .item-detail-header { margin-top: 12px; }
-.inv-equipment-section { margin-top: 20px; }
 /* M3 — filas de la tienda (#shopBuyList/#shopSellList, ver shop.js) necesitan
    display/gap propios: .shop-compare-chip son 3 <span> inline sin separador
    en el DOM, así que sin esto el navegador los pegaba uno contra otro
@@ -2359,7 +2354,6 @@ button:focus-visible,
 .equip-val { color: var(--md-on-surface); font-weight: 500; }
 
 .item-detail-empty,
-.placeholder-text,
 .hint-text {
   color: var(--md-on-surface-variant);
   font-size: 13px;
@@ -2519,67 +2513,13 @@ button:focus-visible,
   color: var(--md-on-surface-variant);
 }
 
-/* Crafting */
-.crafting-content { max-width: 800px; }
-.crafting-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 16px;
-}
-.crafting-tabs {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-.crafting-tab {
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: var(--md-on-surface-variant);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  font-weight: 600;
-  text-align: left;
-  border-radius: var(--r-sm);
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.crafting-tab.active {
-  background: var(--md-primary-container);
-  color: var(--md-on-primary-container);
-}
-.recipes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.crafting-details {
-  background: var(--md-surface-c-low);
-  border-radius: var(--r-md);
-  padding: 16px;
-}
-.recipe-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.rarity-badge {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  padding: 3px 10px;
-  border-radius: 999px;
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
-  display: inline-block;
-  border: 1px solid transparent;
-}
-.materials-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 8px 0 16px;
-}
+/* SPEC-1242: bloque "Crafting" viejo eliminado -- .crafting-content/
+   -layout/-tabs/-tab/-details/.recipes-list/.recipe-header/.rarity-badge
+   (esta 1ra definición)/.materials-list quedaron huérfanos desde que
+   crafting.js pasó al prefijo .craft-* (ver .craft-panel/.craft-tabs/
+   .craft-recipe-card más abajo en el archivo) -- confirmado contra
+   legacy/prompt_para_ia.txt, que sí las tiene, y el crafting.js actual,
+   que no las usa en ningún lado. */
 
 /* NPC modal */
 /* Main Menu */
@@ -3504,39 +3444,13 @@ button:focus-visible,
   text-align: right;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   MINIMAP / BESTIARY / JOURNAL — Containers genéricos
-   ═══════════════════════════════════════════════════════════ */
-.minimap-grid,
-.bestiary-grid,
-.achievements-grid {
-  display: grid;
-  gap: 8px;
-}
-.bestiary-grid,
-.achievements-grid {
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-}
-.bestiary-card,
-.achievement-card {
-  padding: 12px;
-  background: var(--md-surface-c-low);
-  border: 1px solid var(--md-outline-variant);
-  border-radius: var(--r-md);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.bestiary-card.locked,
-.achievement-card.locked {
-  opacity: .5;
-  filter: grayscale(.6);
-}
-.bestiary-card .be-emoji,
-.achievement-card .ach-emoji {
-  font-size: 32px;
-  text-align: center;
-}
+/* SPEC-1242: bloque "MINIMAP / BESTIARY / JOURNAL — Containers genéricos"
+   eliminado -- .minimap-grid/.bestiary-grid/.achievements-grid/
+   .bestiary-card/.achievement-card/.be-emoji/.ach-emoji quedaron
+   huérfanos desde que minimap.js pasó al prefijo .mm-* y bestiary.js a
+   .bestiary-entry/.bestiary-portrait-wrap (achievements.js usa .ach-card,
+   no .achievement-card). Confirmado: cero referencias en ningún .js/.html
+   actual, solo en legacy/prompt_para_ia.txt. */
 
 /* ═══════════════════════════════════════════════════════════
    CRAFTING — Sistema de fabricación
@@ -3752,9 +3666,10 @@ button:focus-visible,
   margin-bottom: 12px;
 }
 
-/* Rarity tags shared (crafting + achievements) */
-.craft-rarity-tag,
-.rarity-badge {
+/* Rarity tags shared (crafting + achievements) -- SPEC-1242: .rarity-badge
+   (bare, sin .craft-rarity-tag) quitado del selector, huérfano igual que
+   su 1ra definición ya eliminada más arriba. */
+.craft-rarity-tag {
   display: inline-block;
   font-family: var(--font-ui);
   font-size: 10px;
