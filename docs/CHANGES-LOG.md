@@ -213,4 +213,23 @@
 - [ ] Create accessibility checklist
 - [ ] Review mobile responsiveness at various breakpoints
 - [ ] Consider performance optimizations for gradient rendering
+
+---
+
+## Nota (2026-09-11): este log dejó de mantenerse acá
+
+Este archivo registró en detalle la auditoría M3 de junio de 2026 (Prioridad
+1 y 2 de arriba) y nunca se volvió a tocar desde entonces — 102 commits y
+decenas de SPECs (M3-AUDIT.md, la auditoría de código muerto, la de
+jugabilidad, la de UI/UX, la de ítems, "historia mejorada" fases 1-5, y
+todo lo de SPEC-1200 en adelante) pasaron sin dejar rastro acá.
+
+No tiene sentido reconstruir retroactivamente ese detalle por commit — el
+historial real ya vive en `git log` (mensajes de commit descriptivos por
+SPEC) y en la memoria de sesión del agente (`MEMORY.md` del proyecto), que
+es más granular y se mantiene al día en cada sesión. Este archivo queda
+como registro histórico de la auditoría M3 original; los "Próximos pasos
+(Prioridad 3)" de arriba, en la práctica, se resolvieron así — no
+actualizando `DESIGN-GUIDELINES.md`/`PROJECT-OVERVIEW.md` a mano, sino con
+ese historial de commits + memoria como fuente de verdad continua.
 - [ ] Plan any remaining refinements based on user feedback

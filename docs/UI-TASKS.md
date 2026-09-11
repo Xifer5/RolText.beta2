@@ -29,10 +29,19 @@
 - **Location hero button**: Smooth elevation transitions with hover/active feedback
 
 ## Priority 3 — Documentation and workflow
-- [ ] Document component patterns in `DESIGN-GUIDELINES.md`.
-- [ ] Update `PROJECT-OVERVIEW.md` when new UI modules or patterns are introduced.
-- [ ] Review JS panel toggles and identify opportunities for smaller UI improvements.
-- [ ] Capture design decisions in markdown before making larger style changes.
+- [x] Document component patterns in `DESIGN-GUIDELINES.md`. — *resuelto de otra forma, ver nota 2026-09-11 abajo.*
+- [x] Update `PROJECT-OVERVIEW.md` when new UI modules or patterns are introduced. — *ídem.*
+- [x] Review JS panel toggles and identify opportunities for smaller UI improvements. — cubierto por los pases de UI/UX y responsive posteriores (ver `MEMORY.md`: `project_ui_polish_2026-08`, `project_m3_responsive_2026-08`).
+- [x] Capture design decisions in markdown before making larger style changes. — cada SPEC de diseño real desde entonces pasó por `/office-hours` con su propio design doc antes de codear.
+
+### Nota (2026-09-11)
+Estos 4 ítems quedaron abiertos desde la auditoría M3 de junio de 2026.
+En la práctica, el proyecto los resolvió con otro mecanismo: no
+actualizando `DESIGN-GUIDELINES.md`/`PROJECT-OVERVIEW.md` a mano por cada
+cambio, sino con mensajes de commit descriptivos por SPEC + la memoria de
+sesión del agente (`MEMORY.md`), que terminó siendo más granular y más al
+día que mantener esos dos documentos manualmente. Ver también la nota
+equivalente en `docs/CHANGES-LOG.md`.
 
 ## Notes
 - Prefer small, modular CSS updates that don’t require structural HTML changes.
