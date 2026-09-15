@@ -155,7 +155,8 @@ export const allItems = {
     rarity: "rare",
     slot: "rightHand",
     attack: 9,
-    price: 95
+    price: 95,
+    icon: "./img/simitarra2.webp"
   },
   trident: {
     id: "trident",
