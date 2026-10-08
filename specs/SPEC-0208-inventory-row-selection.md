@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "02"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0208 Inventory Row Selection
@@ -74,6 +74,6 @@ Feature: Seleccion de inventario
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check

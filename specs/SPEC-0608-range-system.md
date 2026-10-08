@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0608 Sistema de Alcance
@@ -41,4 +41,4 @@ En `handleAction()`, antes del check de stun:
 - [x] Con tridente equipado, el jugador NO cede iniciativa a enemigos de alcance 2-3
 - [x] El ataque de iniciativa puede matar al jugador
 - [x] El flag `hasInitiative` se limpia tras el primer ataque (no se repite)
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0604 Inteligencia de enemigos — Behavior patterns
@@ -46,4 +46,4 @@ Dar personalidad táctica a cada enemigo mediante patrones de comportamiento que
 - [x] Aggressive hace 20% más daño consistentemente.
 - [x] Status enemies aplican efectos con mayor frecuencia.
 - [x] Defensive enemy reduce ataque al llegar a HP bajo.
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

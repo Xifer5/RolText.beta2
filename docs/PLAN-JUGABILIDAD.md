@@ -1,5 +1,7 @@
 # Plan de Trabajo: Mejorar Jugabilidad y Saldar Deudas
 
+> **Archivado 2026-10-08:** plan de jun/jul 2026, superado por las auditorías cerradas de agosto (UX/UI, jugabilidad, segunda revisión) y las specs 10xx–12xx. Se conserva como historial; no es una lista de trabajo vigente.
+
 ## Objetivo
 Crear una ruta clara para mejorar la experiencia de juego de RolText, abordando tanto mejoras de gameplay como las deudas técnicas y de UX/UI identificadas en el proyecto.
 

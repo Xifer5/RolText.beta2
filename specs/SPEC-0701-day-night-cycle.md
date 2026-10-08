@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "07"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0701 Ciclo día/noche
@@ -70,7 +70,7 @@ getTimeTransitionMessage(time)     → string narrativo
 - [x] Stats de enemigos se modifican según hora.
 - [x] Multiplicadores de daño por tipo respetan la tabla TIME_DAMAGE_MULTS.
 - [x] Chip de tiempo visible en HUD móvil con colores diferenciados.
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Plan De Implementacion
 
@@ -79,4 +79,4 @@ getTimeTransitionMessage(time)     → string narrativo
 - [x] `js/ui.js`: import, cache de chip, updateUI, restAtCurrentLocation, setupUIListeners
 - [x] `index.html`: `#mobile-time-chip` en `.mobile-hud-chips`
 - [x] `styles-m3.css`: `.time-chip`, `.time-chip.time-day`, `.time-chip.time-night`
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

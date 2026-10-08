@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "01"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0104 Shop Affordance And Comparison
@@ -59,7 +59,7 @@ Mejorar decisiones de compra mostrando si el jugador puede pagar y que impacto t
 - [x] Items equipables muestran delta ATK/DEF/MAG.
 - [x] Venta mantiene comportamiento.
 - [x] JS syntax check pasa.
-- [ ] QA visual en navegador.
+- [x] QA visual en navegador. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -80,7 +80,7 @@ Feature: Compra informada
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_

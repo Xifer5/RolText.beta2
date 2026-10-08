@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "01"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0103 Inventory Equipment Comparison
@@ -59,7 +59,7 @@ Ayudar al jugador a decidir si equipar un objeto mostrando comparacion directa c
 - [x] Item consumible/material no muestra comparacion.
 - [x] Deltas positivos/negativos/neutros son visibles.
 - [x] No cambia equipamiento hasta tocar `Equipar`.
-- [ ] QA visual en navegador.
+- [x] QA visual en navegador. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -77,11 +77,11 @@ Feature: Comparacion de equipo
 - [x] Agregar helper de comparacion.
 - [x] Renderizar chips en detalle de item.
 - [x] Estilizar chips.
-- [ ] QA visual.
+- [x] QA visual. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_

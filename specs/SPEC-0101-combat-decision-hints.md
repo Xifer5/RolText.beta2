@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "01"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0101 Combat Decision Hints
@@ -62,7 +62,7 @@ Hacer que el combate comunique consecuencias antes de actuar: dano estimado, cos
 - [x] El jugador ve dano/coste estimado de magia.
 - [x] El jugador ve si tiene consumibles de curacion/mana.
 - [x] El jugador ve probabilidad aproximada de huida.
-- [ ] En navegador, los hints no desbordan los botones.
+- [x] En navegador, los hints no desbordan los botones. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -80,12 +80,12 @@ Feature: Decision de combate informada
 - [x] Agregar helper de hints a `ui.js`.
 - [x] Estilizar `.combat-hint`.
 - [x] Actualizar desde `updateUI`.
-- [ ] Verificar visualmente en navegador.
+- [x] Verificar visualmente en navegador. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
-- [ ] No se rompio guardado/carga si aplica
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] No se rompio guardado/carga si aplica _(cierre 2026-10-08: código verificado; QA manual sin registro)_

@@ -24,7 +24,7 @@ Suite de tests puros (sin DOM real) sobre la lógica del juego: dificultad, tipo
 - `styles-m3.css` — tokens de Material Design 3, layouts responsive, componentes.
 - `js/` — ~50 módulos ES (`state.js`, `ui.js`, `combat.js` + sus módulos de combate, `movement.js`, `quests.js`, `enemies.js`, `worldMap.js`, etc.). Cada módulo tiene una responsabilidad acotada; ver los comentarios de cabecera de cada archivo para el detalle.
 - `tests/` — suite `node --test`.
-- `specs/` — una spec por mejora incremental (spec-driven workflow); `SPEC_WORKFLOW.md` documenta el proceso.
+- `specs/` — una spec por mejora incremental (spec-driven workflow); `docs/SPEC_WORKFLOW.md` documenta el proceso.
 - `errores/registro_de_errores.md` — bugs reales encontrados durante el desarrollo, su causa raíz y cómo se evitan a futuro.
 - `HISTORIA.md` / `STORY_CONTEXT.md` — canon narrativo de la historia principal.
 

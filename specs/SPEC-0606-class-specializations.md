@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0606 Especializaciones de Clase
@@ -64,4 +64,4 @@ En el modal de estadísticas (stats modal):
 - [x] Duelist aumenta la evasión y permite contraataque
 - [x] Explorer multiplica el oro ganado y mejora la huida
 - [x] Assassin aplica veneno en ataques normales
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

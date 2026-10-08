@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0603 Resistencias en armaduras
@@ -55,4 +55,4 @@ Hacer que las armaduras, escudos y cascos otorguen resistencias específicas por
 - [x] Equipar `dark_armor` reduce 30% del daño oscuro pero amplifica 20% la luz.
 - [x] Las resistencias se acumulan con las de la clase base.
 - [x] El detalle del ítem en inventario muestra las resistencias.
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

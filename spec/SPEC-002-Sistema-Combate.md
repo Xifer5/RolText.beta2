@@ -232,17 +232,19 @@ Ver `ENEMY_STATUS_EFFECTS` en `combat.js`:
 
 ### 10.1 Mecánicas
 - [ ] **Sistema de combos**: Bonus por alternar tipos de ataque
-- [ ] **Contrataques**: Chance de contraatacar al bloquear
-- [ ] **Morale**: El enemigo puede huir si HP < 20%
+- [x] **Contrataques**: Chance de contraatacar al bloquear _(hecho; verificado 2026-10-08)_
+- [x] **Morale**: El enemigo puede huir si HP < 20% _(hecho; verificado 2026-10-08)_
 - [ ] **Cover system**: Posicionamiento táctico (front/back row)
 
 ### 10.2 UX
 - [ ] **Timeline visual**: Mostrar orden de turnos
-- [ ] **Damage numbers**: Animación de daño flotante (descomentar)
-- [ ] **Screen shake**: Feedback de impacto (descomentar)
+- [x] **Damage numbers**: Animación de daño flotante (descomentar) _(hecho; verificado 2026-10-08)_
+- [x] **Screen shake**: Feedback de impacto (descomentar) _(hecho; verificado 2026-10-08)_
 - [ ] **Battle log**: Historial de acciones del combate actual
 
 ### 10.3 Técnicas
 - [ ] **State machine formal**: Reemplar flags booleanos con máquina de estados
 - [ ] **Action queue**: Cola de acciones para evitar race conditions
 - [ ] **Combat snapshot**: Guardar estado del combate para reconexión
+
+> Auditoría 2026-10-08: backlog reconciliado con el código. [x]=hecho, [~]=parcial, [ ]=pendiente real.

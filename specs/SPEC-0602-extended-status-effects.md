@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, parcial]
 serie: "06"
-estado: pendiente
+estado: parcial
 ---
 
 # SPEC-0602 Estados alterados expandidos
@@ -46,3 +46,10 @@ Ampliar el sistema de debuffs del jugador con: sangrado (bleed), debilidad (weak
 - [x] `playerAttack()`: check blind con 30% de fallo antes de calcular daño
 - [x] `enemyTurn()` switch: cases para bleed, weakness, blind con mensajes
 - [ ] QA visual en navegador
+
+## Auditoría 2026-10-08 — estado real: PARCIAL
+
+Verificado contra el código; el plan de arriba NO coincide con lo que existe:
+- `bleed` existe, pero lo aplican `jungle_tiger` y `pirate_captain` (SPEC-1102), no cave_bat/goblin/wolf. `cave_bat` aplica `poison`.
+- `weakness` (+25% daño recibido) y `blind` (30% de fallo) **no existen** en `combat.js` ni en ningún otro archivo; `beholder`, `cultist`, `dark_knight` y `diablo` no tienen entrada en `ENEMY_STATUS_EFFECTS`.
+- Pendiente real: decidir si se implementan weakness/blind o se descarta esta parte de la spec.

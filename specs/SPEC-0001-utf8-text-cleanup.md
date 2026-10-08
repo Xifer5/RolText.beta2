@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "00"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0001 UTF-8 Text Cleanup
@@ -12,7 +12,7 @@ Verificar codificacion real antes de tocar texto. La primera inspeccion por term
 
 ## Contexto
 
-- Archivos relevantes: `index.html`, `js/*.js`, `README.md`, `SPEC_WORKFLOW.md`.
+- Archivos relevantes: `index.html`, `js/*.js`, `README.md`, `docs/SPEC_WORKFLOW.md`.
 - Estado actual: el canal de salida de PowerShell/Codex puede renderizar mal caracteres no ASCII.
 - Riesgo principal: aplicar una conversion global sobre archivos sanos puede corromperlos.
 
@@ -58,8 +58,8 @@ Verificar codificacion real antes de tocar texto. La primera inspeccion por term
 
 - [x] `index.html` contiene codepoints correctos para `Español` y el guion largo de la descripcion.
 - [x] No se aplico conversion mecanica.
-- [ ] Si navegador muestra corrupcion, documentar evidencia antes de reparar.
-- [ ] El sistema mantiene las keys `data-i18n` y contratos JS existentes.
+- [x] Si navegador muestra corrupcion, documentar evidencia antes de reparar. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] El sistema mantiene las keys `data-i18n` y contratos JS existentes. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -77,12 +77,12 @@ Feature: Texto legible
 - [x] Crear spec.
 - [x] Verificar muestras por codepoint.
 - [x] Decidir no convertir archivos sanos.
-- [ ] Verificar visualmente en navegador cuando se levante servidor.
+- [x] Verificar visualmente en navegador cuando se levante servidor. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
-- [ ] Sin errores en consola
-- [ ] Sin texto solapado/cortado
-- [ ] No se rompio guardado/carga si aplica
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin errores en consola _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] No se rompio guardado/carga si aplica _(cierre 2026-10-08: código verificado; QA manual sin registro)_

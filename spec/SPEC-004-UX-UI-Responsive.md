@@ -242,15 +242,15 @@ document.documentElement.dataset.theme = stored;
 ## 9. Mejoras Propuestas
 
 ### 9.1 UX Inmediatas
-- [ ] **Tutorial interactivo**: Primeros 5 minutos guiados
-- [ ] **Tooltips everywhere**: Hover/long-press en todos los elementos interactivos
-- [ ] **Quick actions**: Atajos de teclado visibles (badges en botones)
+- [x] **Tutorial interactivo**: Primeros 5 minutos guiados _(hecho; verificado 2026-10-08)_
+- [x] **Tooltips everywhere**: Hover/long-press en todos los elementos interactivos _(hecho; verificado 2026-10-08)_
+- [x] **Quick actions**: Atajos de teclado visibles (badges en botones) _(hecho; verificado 2026-10-08)_
 - [ ] **Undo**: Deshacer última acción de combate (1 vez/encuentro)
 
 ### 9.2 UI de Alto Impacto
-- [ ] **Character sheet redesign**: Vista unificada de stats + equipo + skills
+- [x] **Character sheet redesign**: Vista unificada de stats + equipo + skills _(hecho; verificado 2026-10-08)_
 - [ ] **Combat log**: Panel dedicado con timeline de turnos
-- [ ] **Inventory grid**: Vista de iconos + filtros por tipo/rareza
+- [x] **Inventory grid**: Vista de iconos + filtros por tipo/rareza _(hecho; verificado 2026-10-08)_
 - [ ] **World map interactivo**: Zoom, pan, marcadores de objetivo
 
 ### 9.3 Responsive Avanzado
@@ -258,3 +258,5 @@ document.documentElement.dataset.theme = stored;
 - [ ] **Touch gestures**: Pinch para zoom en mapa, swipe para navegación
 - [ ] **Vibration API**: Haptic feedback en combate (móvil)
 - [ ] **Orientation**: Layout alternativo en landscape móvil
+
+> Auditoría 2026-10-08: backlog reconciliado con el código. [x]=hecho, [~]=parcial, [ ]=pendiente real.

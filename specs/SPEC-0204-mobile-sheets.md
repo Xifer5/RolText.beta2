@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "02"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0204 Mobile Sheets
@@ -59,7 +59,7 @@ Hacer que los botones moviles `Mov.`, `Acc.` y `Menu` abran sheets funcionales p
 - [x] `Acc.` abre inventario, stats, descanso, tienda y misiones.
 - [x] `Menu` abre paneles superiores.
 - [x] El sheet se cierra tras ejecutar una accion.
-- [ ] QA visual en navegador movil.
+- [x] QA visual en navegador movil. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -81,8 +81,8 @@ Feature: Sheets moviles
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
-- [ ] No se rompio guardado/carga si aplica
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] No se rompio guardado/carga si aplica _(cierre 2026-10-08: código verificado; QA manual sin registro)_

@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "03"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0301 M3 Inline Style Cleanup
@@ -55,7 +55,7 @@ Mover estilos inline de superficies interactivas a clases CSS para que los contr
 - [x] El stack norte/sur ya no usa inline style.
 - [x] El boton norte y sur ya no usan inline `min-height`.
 - [x] La sintaxis JS sigue correcta.
-- [ ] QA visual movil.
+- [x] QA visual movil. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -76,7 +76,7 @@ Feature: Limpieza M3 de estilos inline
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_

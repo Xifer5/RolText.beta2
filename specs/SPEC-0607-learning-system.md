@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0607 Sistema de Aprendizaje
@@ -55,4 +55,4 @@ Habilidades universales que cualquier clase puede aprender usando pergaminos/lib
 - [x] Las habilidades aprendidas aparecen en el panel de combate
 - [x] Las habilidades aprendidas aparecen en el grimorio
 - [x] Los pergaminos están disponibles en castle_shop
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

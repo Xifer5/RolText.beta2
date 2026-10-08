@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "01"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0102 Navigation Affordance
@@ -59,7 +59,7 @@ Hacer visibles las salidas disponibles y deshabilitar controles de direccion que
 - [x] Direcciones existentes siguen activas fuera de combate.
 - [x] Durante combate/proceso, movimiento queda deshabilitado.
 - [x] JS syntax check pasa.
-- [ ] QA visual en navegador.
+- [x] QA visual en navegador. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -81,7 +81,7 @@ Feature: Direcciones disponibles
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 - [x] JS syntax check
-- [ ] Sin texto solapado/cortado
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_

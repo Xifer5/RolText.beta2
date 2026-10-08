@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "07"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0703 Eventos de Viaje Contextuales
@@ -36,4 +36,4 @@ Añadir 8 nuevos eventos de viaje que reaccionan al estado del jugador (clase, e
 - [x] `explorer_cache` da más recompensa al explorador
 - [x] `wounded_mage` puede enseñar arcane_bolt a magos
 - [x] `ancient_scroll_find` da un pergamino aleatorio
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

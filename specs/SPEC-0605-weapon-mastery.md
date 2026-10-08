@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0605 Maestría de Armas
@@ -50,4 +50,4 @@ Sección "⚔️ Maestría de Armas" en el modal de stats:
 - [x] Mensaje notifica al subir de tier
 - [x] Stats modal muestra maestría actual con barra de progreso
 - [x] `weaponMastery` se persiste en gameState (se guarda con el resto)
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

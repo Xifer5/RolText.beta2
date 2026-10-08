@@ -175,7 +175,7 @@ Elara (Town) → Valdris (Tower) → Brennan (Port) → Eryndel (Garden) → The
 - [ ] **Enchanting**: Mejorar equipo existente con materiales
 - [ ] **Durabilidad**: Equipo se desgasta, requiere reparación
 - [ ] **Respec**: Poción de olvido (costosa) para redistribuir stats
-- [ ] **Prestige**: Reset a nivel 1 con bonus permanente al completar juego
+- [x] **Prestige**: Reset a nivel 1 con bonus permanente al completar juego _(hecho; verificado 2026-10-08)_
 
 ## 9. Persistencia
 
@@ -201,3 +201,5 @@ merged = { ...deepClone(initialGameState), ...deepClone(loaded.gameState) };
 - Derrotar jefe
 - Completar misión
 - Manual (botón Save)
+
+> Auditoría 2026-10-08: backlog reconciliado con el código. [x]=hecho, [~]=parcial, [ ]=pendiente real.

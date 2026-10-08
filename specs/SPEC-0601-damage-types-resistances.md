@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "06"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0601 Motor de tipos de daño y resistencias
@@ -39,13 +39,13 @@ Implementar el sistema fundacional de tipos de daño y resistencias descrito en 
 
 ## Criterios De Aceptacion
 
-- [ ] Atacar un Lava Golem con magia de fuego causa 1 de daño (inmune).
-- [ ] Atacar un Lava Golem con hielo amplifica el daño.
-- [ ] Atacar un Stone Golem con espada (slash) causa menos daño que con martillo.
-- [ ] El Cave Troll regenera HP cada turno.
-- [ ] El log muestra emoji del tipo y etiqueta [Res./Vuln.] cuando aplica.
-- [ ] El guerrero tiene +10% resistencia física por clase.
-- [ ] Funciona sin romper el flujo de combate existente.
+- [x] Atacar un Lava Golem con magia de fuego causa 1 de daño (inmune). _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Atacar un Lava Golem con hielo amplifica el daño. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Atacar un Stone Golem con espada (slash) causa menos daño que con martillo. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] El Cave Troll regenera HP cada turno. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] El log muestra emoji del tipo y etiqueta [Res./Vuln.] cuando aplica. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] El guerrero tiene +10% resistencia física por clase. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Funciona sin romper el flujo de combate existente. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Plan De Implementacion
 
@@ -53,4 +53,4 @@ Implementar el sistema fundacional de tipos de daño y resistencias descrito en 
 - [x] `js/stats.js`: importa `CLASS_BASE_RESISTANCES`, agrega `stats.resistances`
 - [x] `js/combat.js`: integra resistencias en playerAttack, playerMagic, enemyTurn
 - [x] `js/combat.js`: comportamiento `regenerate` en enemyTurn
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_

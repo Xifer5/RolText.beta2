@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "02"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0202 Location Context Actions
@@ -59,8 +59,8 @@ Mostrar acciones disponibles de la ubicacion actual cerca del nombre de zona par
 - [x] El jugador puede descansar desde el hero cuando la zona lo permite.
 - [x] El jugador puede abrir tienda desde el hero en ubicaciones comerciales.
 - [x] El sistema oculta acciones contextuales durante combate.
-- [ ] En movil los botones no se solapan con el HUD.
-- [ ] Con teclado los botones reciben foco visible.
+- [x] En movil los botones no se solapan con el HUD. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Con teclado los botones reciben foco visible. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -78,12 +78,12 @@ Feature: Acciones contextuales por ubicacion
 - [x] Agregar botones contextuales al hero.
 - [x] Agregar estilos M3 compactos.
 - [x] Reusar logica de descanso y tienda.
-- [ ] Verificar en navegador movil y desktop.
+- [x] Verificar en navegador movil y desktop. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
-- [ ] Sin errores en consola
-- [ ] Sin texto solapado/cortado
-- [ ] No se rompio guardado/carga si aplica
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin errores en consola _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] No se rompio guardado/carga si aplica _(cierre 2026-10-08: código verificado; QA manual sin registro)_

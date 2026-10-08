@@ -240,11 +240,13 @@ ZONE_GATES = {
 5. **Falta de branching**: Questline es completamente lineal
 
 ### 8.2 Soluciones Propuestas
-- [ ] **Side quests**: 20+ misiones secundarias por zona
+- [~] **Side quests**: 20+ misiones secundarias por zona _(parcial: existen secundarias, no 20+ por zona)_
 - [ ] **Procedural quests**: Generadas con templates
 - [ ] **Endless mode**: Dungeon infinito con dificultad escalante
-- [ ] **New Game+**: Reinicio con items/levels preservados
+- [x] **New Game+**: Reinicio con items/levels preservados _(hecho; verificado 2026-10-08)_
 - [ ] **Factions**: Sistema de reputación con NPCs
 - [ ] **Housing**: Base personalizable (decoración, storage)
 - [ ] **Pet system**: Compañeros con habilidades
 - [ ] **Seasonal events**: Contenido temporal
+
+> Auditoría 2026-10-08: backlog reconciliado con el código. [x]=hecho, [~]=parcial, [ ]=pendiente real.

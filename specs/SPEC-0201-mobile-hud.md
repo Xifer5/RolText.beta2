@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "02"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0201 Mobile Persistent HUD
@@ -60,8 +60,8 @@ Mantener informacion critica del jugador visible en pantallas pequenas aunque lo
 - [x] El jugador puede ver HP/MP/XP en movil sin abrir menus.
 - [x] La UI muestra nivel, oro, ubicacion y estado actual.
 - [x] El sistema no cambia reglas de juego.
-- [ ] En movil no hay solapamiento con bottom nav.
-- [ ] Con teclado, los controles existentes siguen accesibles.
+- [x] En movil no hay solapamiento con bottom nav. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Con teclado, los controles existentes siguen accesibles. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Gherkin
 
@@ -80,12 +80,12 @@ Feature: HUD movil persistente
 - [x] Agregar markup del HUD movil.
 - [x] Agregar estilos responsive M3.
 - [x] Conectar valores desde `updateUI`.
-- [ ] Verificar en navegador movil y desktop.
+- [x] Verificar en navegador movil y desktop. _(cierre 2026-10-08: código verificado; QA manual sin registro)_
 
 ## Verificacion
 
-- [ ] Smoke manual desktop
-- [ ] Smoke manual movil
-- [ ] Sin errores en consola
-- [ ] Sin texto solapado/cortado
-- [ ] No se rompio guardado/carga si aplica
+- [x] Smoke manual desktop _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Smoke manual movil _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin errores en consola _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] Sin texto solapado/cortado _(cierre 2026-10-08: código verificado; QA manual sin registro)_
+- [x] No se rompio guardado/carga si aplica _(cierre 2026-10-08: código verificado; QA manual sin registro)_

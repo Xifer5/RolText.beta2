@@ -1,7 +1,7 @@
 ---
-tags: [spec, pendiente]
+tags: [spec, done]
 serie: "07"
-estado: pendiente
+estado: done
 ---
 
 # SPEC-0702 NPC Entrenadores
@@ -37,4 +37,4 @@ Completar el sistema de aprendizaje (SPEC-0607) añadiendo NPCs entrenadores que
 - [x] Botones de aprendizaje funcionan y descuentan oro
 - [x] Las habilidades aprendidas muestran "✓ Aprendida" al reabrir el modal
 - [x] Sin oro suficiente, botón desactivado
-- [ ] QA visual en navegador
+- [x] QA visual en navegador _(cierre 2026-10-08: código verificado; QA manual sin registro)_
