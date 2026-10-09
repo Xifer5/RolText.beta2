@@ -8,9 +8,9 @@ const { enemyData } = await import("../js/enemies.js");
 const { t } = await import("../js/i18n.js");
 
 test("SPEC-0602: enemigos de la spec aplican el estado correcto", () => {
-  for (const id of ["cave_bat", "goblin", "wolf"]) assert.equal(ENEMY_STATUS_EFFECTS[id]?.type, "bleed", id);
-  for (const id of ["cultist", "dark_knight", "diablo"]) assert.equal(ENEMY_STATUS_EFFECTS[id]?.type, "weakness", id);
-  assert.equal(ENEMY_STATUS_EFFECTS.beholder?.type, "blind");
+  for (const id of ["cave_bat", "goblin", "wolf", "cave_bear", "chimera"]) assert.equal(ENEMY_STATUS_EFFECTS[id]?.type, "bleed", id);
+  for (const id of ["cultist", "dark_knight", "diablo", "imp"]) assert.equal(ENEMY_STATUS_EFFECTS[id]?.type, "weakness", id);
+  for (const id of ["beholder", "medusa", "sand_worm"]) assert.equal(ENEMY_STATUS_EFFECTS[id]?.type, "blind", id);
 });
 
 test("SPEC-0602: todo enemigo con status existe en enemyData y los no-DoT no llevan damage", () => {

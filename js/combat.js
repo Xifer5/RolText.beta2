@@ -80,10 +80,15 @@ export const ENEMY_STATUS_EFFECTS = {
   diablo:            { type: "weakness", chance: 0.35, turns: 3 },
   // SPEC-0602: ataques oculares psíquicos → ceguera (30% de fallo)
   beholder:          { type: "blind",  chance: 0.35, turns: 2 },
+  // SPEC-0602 (ronda 2): más cobertura temática por estado
+  cave_bear:         { type: "bleed",  chance: 0.30, damage: 5, turns: 2 },
+  chimera:           { type: "bleed",  chance: 0.30, damage: 6, turns: 3 },
+  imp:               { type: "weakness", chance: 0.30, turns: 2 },
+  sand_worm:         { type: "blind",  chance: 0.30, turns: 2 },
   goblin_shaman:     { type: "burn",   chance: 0.35, damage: 5,  turns: 2 },
   warlock:           { type: "burn",   chance: 0.40, damage: 8,  turns: 3 },
   vampire:           { type: "stun",   chance: 0.25, turns: 1 },
-  medusa:            { type: "stun",   chance: 0.30, turns: 1 },
+  medusa:            { type: "blind",  chance: 0.35, turns: 2 }, // SPEC-0602: su mirada ciega (antes aturdía)
   lava_golem:        { type: "burn",   chance: 0.35, damage: 8,  turns: 2 },
   Inferno_elemental: { type: "burn",   chance: 0.40, damage: 10, turns: 2 },
   pyro_elemental:    { type: "burn",   chance: 0.45, damage: 10, turns: 2 },
@@ -98,7 +103,7 @@ export const ENEMY_STATUS_EFFECTS = {
   jungle_tiger:      { type: "bleed",  chance: 0.35, damage: 5,  turns: 3 },
   pirate_captain:    { type: "bleed",  chance: 0.30, damage: 6,  turns: 3 },
   // SPEC-1219 — Valdris: arcano puro, mismo status que otros hechiceros
-  // (vampire/medusa) en vez de inventar un efecto nuevo para esta pelea.
+  // (vampire) en vez de inventar un efecto nuevo para esta pelea.
   valdris_corrupted: { type: "stun",   chance: 0.25, turns: 1 },
 };
 
