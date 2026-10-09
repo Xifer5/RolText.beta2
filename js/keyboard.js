@@ -21,6 +21,7 @@ const COMBAT_KEYS = {
   "2": "pixel:magic",
   "4": "pixel:flee",
   "5": "pixel:defend",
+  "9": "pixel:dodge",
   "6": "pixel:breakGuard",
   "7": "pixel:interrupt",
   "8": "pixel:spare",

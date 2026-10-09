@@ -1,7 +1,7 @@
 ---
-tags: [spec, aprobada]
+tags: [spec, implementada]
 serie: "13"
-estado: aprobada
+estado: implementada (pendiente QA manual)
 padre: SPEC-1301
 ---
 
@@ -141,3 +141,10 @@ Si `enemy.exposed`: multiplicar el daño por `EXPOSED_DAMAGE_MULT`, añadir marc
 ## Relacionado
 
 - SPEC-1301 (padre), SPEC-1102 (Concentrarse/contraataque de Defender), SPEC-0802 (intención enemiga), SPEC-1105 (especialización Duelista).
+
+## Cierre 2026-10-09
+
+Implementada: `js/dodge.js` (puro), `playerDodge`, tirada unica en `enemyTurn`, estado `exposed`, boton/tecla 9/movil, chip esquivable, i18n en/es. Tests: `tests/dodge.test.mjs` (10). Suite 360/360. Pendiente: QA manual en navegador (desktop, teclado, movil) y calibracion en playtest (+35 puntos, +25
+## Cierre 2026-10-09
+
+Implementada: `js/dodge.js` (puro), `playerDodge`, tirada única en `enemyTurn`, estado `exposed`, botón/tecla 9/móvil, chip esquivable, i18n en/es. Tests: `tests/dodge.test.mjs` (10). Suite 360/360. Pendiente: QA manual en navegador (desktop, teclado, móvil) y calibración en playtest (+35 puntos, +25%).

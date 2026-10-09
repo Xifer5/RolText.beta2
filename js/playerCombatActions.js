@@ -20,6 +20,7 @@ import { getActiveSpec } from "./specializations.js";
 import { applyResistance, getWeaponDamageType, getEffectiveResistances } from "./damageTypes.js";
 import { delay, damageFloatType, resistanceNote, maybeResistanceAdvice, grantMasteryXP } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
+import { isTacticalDifficulty, EXPOSED_DAMAGE_MULT } from "./dodge.js";
 import { applyThiefGoldSteal } from "./enemyTraits.js";
 import { applyDamageToEnemy, tickBuffs, enemyTurn } from "./combat.js";
 
@@ -70,6 +71,31 @@ export async function playerDefend() {
   tickBuffs();
   updateUI();
   await delay(500); await enemyTurn();
+}
+
+// SPEC-1302: Esquivar — apuesta a evitar el proximo golpe (la tirada se resuelve
+// en enemyTurn() con dodge.js). Solo existe en Aventura/Dificil/Imposible.
+// Mismo patron que defend_stance: tickBuffs() resta 1 antes de enemyTurn().
+export async function playerDodge() {
+  if (!gameState.isInCombat || !isTacticalDifficulty(gameState.difficulty)) return;
+  if (!gameState.activeBuffs) gameState.activeBuffs = {};
+  delete gameState.activeBuffs.defend_stance; // Defender y Esquivar son excluyentes
+  gameState.activeBuffs.dodge_stance = 2;
+  addMessage(t('dodgeStanceMsg'), "combat");
+  playSound("defend");
+
+  tickBuffs();
+  updateUI();
+  await delay(500); await enemyTurn();
+}
+
+// SPEC-1302: el enemigo queda "expuesto" tras una esquiva con boton: el
+// siguiente Atacar/Magia hace +25% y lo consume.
+function consumeExposed(dmg) {
+  const enemy = gameState.currentEnemy;
+  if (!enemy?.exposed) return { dmg, tag: "" };
+  enemy.exposed = false;
+  return { dmg: Math.max(1, Math.floor(dmg * EXPOSED_DAMAGE_MULT)), tag: ` ${t('exposedBonusTag')}` };
 }
 
 // SPEC-1102: Interrumpir — cancela la acción cargada del enemigo. Solo
@@ -169,7 +195,8 @@ export async function playerAttack() {
   // SPEC-1105: Asesino — daño adicional al ejecutar enemigos debilitados
   const executeMult = (spec?.bonuses?.executeBonus && enemy.maxHp > 0 && (enemy.hp / enemy.maxHp) < 0.3)
     ? (1 + spec.bonuses.executeBonus) : 1;
-  const dmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul * executeMult)), weaponType, enemyRes);
+  const baseDmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul * executeMult)), weaponType, enemyRes);
+  const { dmg, tag: exposedTag } = consumeExposed(baseDmg);
   const total = dmg + extraHit;
 
   playSound("attack");
@@ -183,7 +210,7 @@ export async function playerAttack() {
     damage: dmg,
     extra: extraHit ? ` + ${extraHit} (${t('doubleStrike')})` : "",
     crit: critLabel
-  }) + resistanceNote(enemy.id, weaponType), isCrit ? "combat-crit" : "combat");
+  }) + exposedTag + resistanceNote(enemy.id, weaponType), isCrit ? "combat-crit" : "combat");
   maybeResistanceAdvice(enemy, weaponType);
   if (isCrit) maybeStunEnemy(enemy);
 
@@ -266,11 +293,13 @@ export async function playerMagic() {
   const magicCritMul = isMagicCrit ? 1.75 : 1.0;
   let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * magicCritMul * (0.9 + Math.random()*0.2)));
   dmg = applyResistance(dmg, magicType, getEffectiveResistances(enemy));
+  const magicExposed = consumeExposed(dmg);
+  dmg = magicExposed.dmg;
 
   playSound("magic");
   applyDamageToEnemy(dmg, magicType);
   playSound("hit");
-  addMessage(formatText(pickVariant('castMagic'), { damage: dmg, crit: isMagicCrit ? " 💥 ¡CRÍTICO!" : "" }) + resistanceNote(enemy.id, magicType) + (wasFocused ? ` ${t('focusedBonusTag')}` : ""), isMagicCrit ? "combat-crit" : "combat");
+  addMessage(formatText(pickVariant('castMagic'), { damage: dmg, crit: isMagicCrit ? " 💥 ¡CRÍTICO!" : "" }) + resistanceNote(enemy.id, magicType) + magicExposed.tag + (wasFocused ? ` ${t('focusedBonusTag')}` : ""), isMagicCrit ? "combat-crit" : "combat");
   maybeResistanceAdvice(enemy, magicType);
   grantMasteryXP(magicType);
   showFloatingText(`-${dmg}${isMagicCrit ? "!" : ""}`, window.innerWidth/2+50, window.innerHeight/2-50, "#818cf8", "2.4em", damageFloatType(isMagicCrit, magicType, getEffectiveResistances(enemy)));

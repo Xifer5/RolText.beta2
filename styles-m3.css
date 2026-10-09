@@ -1808,6 +1808,7 @@ button:focus-visible,
   .mob-bar-combat { flex-wrap: wrap; }
   .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
   .mob-defend { color: var(--c-freeze); }
+  .mob-dodge { color: var(--c-muted); }
   .mob-break-guard { color: var(--c-burn); }
   .mob-interrupt   { color: var(--c-skill); }
   .mob-mercy       { color: var(--c-mercy); }
@@ -5969,3 +5970,7 @@ kbd {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* SPEC-1302: Esquivar */
+.combat-btn.dodge { color: var(--c-muted); }
+.enemy-intent-dodgeable { margin-left: 6px; font-size: .85em; opacity: .85; }

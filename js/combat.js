@@ -41,7 +41,8 @@ import { endCombat } from "./combatRewards.js";
 import { showGameOver } from "./endings.js";
 import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
 import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
-import { playerAttack, playerMagic, playerDefend, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
+import { playerAttack, playerMagic, playerDefend, playerDodge, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
+import { computeDodgeChance, isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 
 // Re-exportado: tests/combatAdvice.test.mjs y cualquier otro consumidor
 // externo lo importan desde "./combat.js" (API pública histórica).
@@ -111,6 +112,7 @@ export function setupCombat() {
   window.addEventListener("pixel:attack", () => handleAction(playerAttack));
   window.addEventListener("pixel:magic",  () => handleAction(playerMagic));
   window.addEventListener("pixel:defend", () => handleAction(playerDefend));
+  window.addEventListener("pixel:dodge",  () => handleAction(playerDodge));
   window.addEventListener("pixel:breakGuard", () => handleAction(playerBreakGuard));
   window.addEventListener("pixel:interrupt", () => handleAction(playerInterrupt));
   window.addEventListener("pixel:spare", () => handleAction(playerSpare));
@@ -134,6 +136,8 @@ async function handleAction(fn) {
     busy = false;
     return;
   }
+  // SPEC-1302: "expuesto" solo dura hasta el siguiente Atacar/Magia
+  if (fn !== playerAttack && fn !== playerMagic && gameState.currentEnemy) gameState.currentEnemy.exposed = false;
   await fn();
   busy = false;
 }
@@ -313,6 +317,12 @@ export async function enemyTurn() {
   // veneno/quemadura de abajo hacen daño completo
   enemy.isDefending = false;
 
+  // SPEC-1302: la postura de esquiva vale para ESTE turno enemigo aunque la
+  // acción no sea esquivable (devorar, regenerar, aturdido...) — se lee y se
+  // limpia antes de cualquier return temprano.
+  const wasDodging = gameState.activeBuffs?.dodge_stance > 0;
+  if (wasDodging) delete gameState.activeBuffs.dodge_stance;
+
   // SPEC-1101: la guardia de raíces (Forest Titan) se restaura sola pasados
   // los turnos de "Romper Guardia"
   if (enemy.guardBroken > 0) {
@@ -484,8 +494,19 @@ export async function enemyTurn() {
     + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
     + (spec?.bonuses?.evasionBonus || 0)
     + mistBonus;
-  if (Math.random() < evasionChance) {
+  // SPEC-1302: pasiva + botón en una sola tirada (Fácil: fórmula original)
+  const finalDodgeChance = computeDodgeChance({
+    passive: evasionChance,
+    buttonActive: wasDodging,
+    isMagic: useMagic,
+    tactical: isTacticalDifficulty(gameState.difficulty)
+  });
+  if (Math.random() < finalDodgeChance) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
+    if (wasDodging) {
+      enemy.exposed = true;
+      addMessage(formatText(t('dodgeSuccess'), { enemy: enemy.type }), "combat");
+    }
     // Duelista: 25% de contraatacar al esquivar (+ bono de daño propio)
     if (spec?.bonuses?.counterattack && Math.random() < 0.25) {
       const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5 * (1 + (spec.bonuses.counterDmgBonus || 0))));
@@ -498,6 +519,8 @@ export async function enemyTurn() {
     rollEnemyIntent(); // SPEC-0802: la acción esquivada se consumió
     updateUI(); return;
   }
+
+  if (wasDodging) addMessage(t('dodgeFail'), "combat");
 
   // Tipo de daño del enemigo vs resistencias del jugador (clase + equipo)
   const enemyCombat = ENEMY_COMBAT_DATA[enemy.id];

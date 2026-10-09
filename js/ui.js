@@ -21,6 +21,7 @@ import { eryndelMemoryKey } from "./eryndelArc.js";
 
 // SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
 // import circular ui.js<->combat.js solo para una constante chica.
+import { isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
@@ -117,7 +118,7 @@ export function initUICache() {
     "gold","level","strength","agility","intelligence","stat-points",
     "location-name","location-subtitle","enemy-panel","enemy-name","enemy-hp","enemy-hp-bar",
     "combat-menu","navigation-menu","combat-content","navigation-content",
-    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","breakGuardBtn","interruptBtn","mercyBtn",
+    "attackBtn","magicBtn","itemBtn","fleeBtn","defendBtn","dodgeBtn","breakGuardBtn","interruptBtn","mercyBtn",
     "derived-attack","derived-defense","derived-magic",
     "saveInfo","continueBtn","loadGameBtn","deleteSaveBtn",
     "modal-stat-points","modal-strength","modal-agility","modal-intelligence",
@@ -201,6 +202,7 @@ function _setupMobileNav() {
     ["mob-magicBtn",  () => window.dispatchEvent(new Event("pixel:magic"))],
     ["mob-itemBtn",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); }],
     ["mob-defendBtn", () => window.dispatchEvent(new Event("pixel:defend"))],
+    ["mob-dodgeBtn", () => window.dispatchEvent(new Event("pixel:dodge"))],
     ["mob-breakGuardBtn", () => window.dispatchEvent(new Event("pixel:breakGuard"))],
     ["mob-interruptBtn", () => window.dispatchEvent(new Event("pixel:interrupt"))],
     ["mob-mercyBtn", () => window.dispatchEvent(new Event("pixel:spare"))],
@@ -433,6 +435,10 @@ export function updateUI() {
         // — "sin piedad" deja de ser solo un multiplicador de daño).
         const adviceKey = (hidden || gameState.difficulty === "impossible") ? null : INTENT_ADVICE_KEYS[nextAction];
         if (adviceKey) intentAdvice = `<span class="enemy-intent-advice">💡 ${t(adviceKey)}</span>`;
+        // SPEC-1302: marca de "esquivable" (no con intencion oculta ni en Imposible)
+        if (!hidden && gameState.difficulty !== "impossible" && isTacticalDifficulty(gameState.difficulty) && DODGEABLE_ACTIONS.has(nextAction)) {
+          intentChip += `<span class="enemy-intent-dodgeable" data-tooltip="${t('dodgeTooltip')}">🌀 ${t('intentDodgeable')}</span>`;
+        }
       }
       ui["enemy-name"].innerHTML =
         badge + gameState.currentEnemy.type +
@@ -520,6 +526,13 @@ export function updateUI() {
     // SPEC-1101: Frost Wyrm congela la magia — bloquea el botón móvil aunque haya MP
     const mobMagicFrozen = document.getElementById("mob-magicBtn");
     if (mobMagicFrozen && inCombat && gameState.playerDebuffs?.arcaneFreeze) mobMagicFrozen.disabled = true;
+    // SPEC-1302: "Esquivar" solo en Aventura/Dificil/Imposible
+    const mobDodge = document.getElementById("mob-dodgeBtn");
+    if (mobDodge) {
+      const showDodge = inCombat && isTacticalDifficulty(gameState.difficulty);
+      mobDodge.classList.toggle("hidden", !showDodge);
+      mobDodge.disabled = !showDodge;
+    }
     // SPEC-1101: "Romper Guardia" solo existe contra bosses con guardia (Forest Titan)
     const mobBreakGuard = document.getElementById("mob-breakGuardBtn");
     if (mobBreakGuard) {
@@ -551,6 +564,12 @@ export function updateUI() {
   if (ui.itemBtn)   ui.itemBtn.disabled   = disabled;
   if (ui.defendBtn) ui.defendBtn.disabled = disabled;
   if (ui.fleeBtn)   ui.fleeBtn.disabled   = disabled;
+  // SPEC-1302: "Esquivar" solo en Aventura/Dificil/Imposible
+  if (ui.dodgeBtn) {
+    const showDodge = !disabled && isTacticalDifficulty(gameState.difficulty);
+    ui.dodgeBtn.classList.toggle("hidden", !showDodge);
+    ui.dodgeBtn.disabled = !showDodge;
+  }
   // SPEC-1101: "Romper Guardia" solo existe contra bosses con guardia (Forest Titan)
   if (ui.breakGuardBtn) {
     const showGuard = !disabled && !!gameState.currentEnemy?.hasGuard;
