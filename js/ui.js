@@ -22,7 +22,8 @@ import { eryndelMemoryKey } from "./eryndelArc.js";
 // SPEC-1102: duplicado intencional del mismo set en combat.js — evita un
 // import circular ui.js<->combat.js solo para una constante chica.
 import { isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
-const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic"]);
+import { ARCHETYPES, archetypeScale } from "./archetypes.js";
+const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
 // SPEC-1111: devour/overload/freeze_magic (mecánicas de boss forzadas por
@@ -36,7 +37,9 @@ export const INTENT_ADVICE_KEYS = {
   defend:       "adviceDefend",
   devour:       "adviceDevour",
   overload:     "adviceOverload",
-  freeze_magic: "adviceFreezeMagic"
+  freeze_magic: "adviceFreezeMagic",
+  channel:         "adviceChannel",
+  channeled_magic: "adviceChanneledMagic"
 };
 
 // SPEC-1210 — telegraph narrativo (revisión 2026-08-28, ítem #7): una línea
@@ -440,15 +443,22 @@ export function updateUI() {
           intentChip += `<span class="enemy-intent-dodgeable" data-tooltip="${t('dodgeTooltip')}">🌀 ${t('intentDodgeable')}</span>`;
         }
       }
+      // SPEC-1303: etiqueta de arquetipo (Aventura/Difícil/Imposible); consejo solo en Aventura
+      const arch = ARCHETYPES[gameState.currentEnemy.archetype];
+      const archBadge = arch
+        ? `<span class="enemy-archetype-badge" data-tooltip="${t(arch.tipKey)}">${arch.icon} ${t(arch.nameKey)}</span>` : "";
+      const archAdvice = (arch && archetypeScale(gameState.difficulty) === 1)
+        ? `<span class="enemy-archetype-advice">💡 ${t(arch.adviceKey)}</span>` : "";
       ui["enemy-name"].innerHTML =
-        badge + gameState.currentEnemy.type +
+        badge + gameState.currentEnemy.type + archBadge +
         `<span class="enemy-stats-row">` +
         `<span class="enemy-stat-badge">⚔ <b>${enemyAtk}</b></span>` +
         `<span class="enemy-stat-badge">🛡 <b>${enemyDef}</b></span>` +
         intentChip +
         `</span>` +
         intentTelegraph +
-        intentAdvice;
+        intentAdvice +
+        archAdvice;
     }
     const ePct = Math.max(0, Math.round((gameState.currentEnemy.hp / gameState.currentEnemy.maxHp) * 100));
     if (ui["enemy-hp"]) ui["enemy-hp"].textContent = `${gameState.currentEnemy.hp}/${gameState.currentEnemy.maxHp}`;

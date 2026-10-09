@@ -1,7 +1,7 @@
 ---
 tags: [spec, aprobada]
 serie: "13"
-estado: aprobada
+estado: entrega 1 implementada (pendiente QA manual)
 padre: SPEC-1301
 depende: SPEC-1302
 ---
@@ -139,3 +139,7 @@ Reglas transversales de estados (ya acordadas en SPEC-1301): control duro ≤ 1 
 ## Relacionado
 
 SPEC-1301 (padre), SPEC-1302 (Esquivar), SPEC-0802 (intención), SPEC-0604 (behaviors), SPEC-0602 (estados), SPEC-1103 (rasgos).
+
+## Cierre entrega 1 — 2026-10-09
+
+Implementada: `js/archetypes.js` (puro), acciones `channel`/`channeled_magic` en `enemyAI.js`, hooks en `enemyTurn`/`applyDamageToEnemy` (Rompeguardia, Asaltante, Guardián, Canalizador), etiqueta de arquetipo + consejo (solo Aventura) en el panel del enemigo, i18n en/es. Enemigos de prueba: orc, wolf, guard, goblin_shaman. Tests: `tests/archetypes.test.mjs` (9). Suite 370/370. Simulación de combate real (12 combinaciones dificultad x enemigo, alternando Atacar/Defender/Esquivar/Interrumpir) sin excepciones; en Fácil el arquetipo es `null`. Pendiente: QA manual en navegador y calibración en playtest. Siguiente: entrega 2 (mágicos).

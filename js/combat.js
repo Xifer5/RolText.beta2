@@ -43,6 +43,7 @@ import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
 import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
 import { playerAttack, playerMagic, playerDefend, playerDodge, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
 import { computeDodgeChance, isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
+import { getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult } from "./archetypes.js";
 
 // Re-exportado: tests/combatAdvice.test.mjs y cualquier otro consumidor
 // externo lo importan desde "./combat.js" (API pública histórica).
@@ -183,6 +184,7 @@ function rollEnemyIntent() {
     lastAction: enemy.lastAction,
     enraged: enemy.enraged,
     hasRegenTrait: enemy.trait === "regenerator",
+    archetype: enemy.archetype,
     recentlyBurned: (enemy.turnsSinceFireHit ?? 99) < 2
   });
   enemy.intentHidden = isIntentAlwaysHidden(gameState) || isIntentHidden(enemy);
@@ -218,6 +220,8 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
     attack:  timedAtk,
     defense: timedDef,
     isBoss,
+    // SPEC-1303: arquetipo táctico (null en Fácil, jefes y enemigos sin arquetipo)
+    archetype: getArchetype(enemyType, gameState.difficulty, isBoss),
     // SPEC-1104: distingue un mini-boss real (perdonable) del boss principal
     // de zona (nunca perdonable) — ver isMiniBossId() en biomeBosses.js
     isMiniBoss: isBoss && isMiniBossId(enemyType),
@@ -395,8 +399,14 @@ export async function enemyTurn() {
   }
 
   // SPEC-0802: ejecuta la acción telegrafiada (el chip mostró esto al jugador)
-  const action = enemy.nextAction || "attack";
-  enemy.lastAction = action;
+  // SPEC-1303: "channeled_magic" es el hechizo potenciado tras canalizar —
+  // se resuelve como "magic" normal (esquivable a mitad, interrumpible) con
+  // multiplicador propio. lastAction conserva el nombre real para la IA.
+  const rawAction = enemy.nextAction || "attack";
+  enemy.lastAction = rawAction;
+  const channeledCast = rawAction === "channeled_magic";
+  const action = channeledCast ? "magic" : rawAction;
+  const archScale = archetypeScale(gameState.difficulty);
 
   if (action === "defend") {
     enemy.isDefending = true;
@@ -442,6 +452,15 @@ export async function enemyTurn() {
     return;
   }
 
+  // SPEC-1303: Canalizador — turno de carga, sin daño; la IA devuelve
+  // "channeled_magic" en el siguiente roll (lastAction === "channel").
+  if (action === "channel") {
+    addMessage(formatText(t("archChannelMsg"), { enemy: enemy.type }), "combat");
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
   // SPEC-1101 — Cave Devourer: "devorar" cada 3er turno (contador propio, no
   // RNG), telegrafiado con antelación por rollEnemyIntent como cualquier otra
   // acción.
@@ -465,13 +484,19 @@ export async function enemyTurn() {
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
   // SPEC-1105: Nigromante — la maldición reduce el ataque del enemigo mientras dure
   const curseMult = enemy.cursedDebuff?.turns > 0 ? 0.85 : 1;
-  const atkVal = Math.floor(atkBase * powerMult * frozenMult * curseMult);
+  const atkVal = Math.floor(atkBase * powerMult * frozenMult * curseMult * (channeledCast ? channelerMult(archScale) : 1));
 
   // Player defense (warrior stance halves damage)
   // SPEC-1102: se guarda ANTES de decrementar — el contraataque universal de
   // Defender depende de que la guardia haya estado activa este turno.
   const wasDefending = gameState.activeBuffs?.defend_stance > 0;
-  const defenseMult = wasDefending ? 0.5 : 1.0;
+  let defenseMult = wasDefending ? 0.5 : 1.0;
+  // SPEC-1303: Rompeguardia — su golpe pesado atraviesa parte de Defender
+  const wreckMult = wasDefending ? wreckerDefendMult(enemy.archetype, archScale, action) : null;
+  if (wreckMult != null) {
+    defenseMult = wreckMult;
+    addMessage(formatText(t("archWreckerBreaks"), { enemy: enemy.type }), "combat");
+  }
   if (gameState.activeBuffs?.defend_stance > 0) {
     gameState.activeBuffs.defend_stance--;
     if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
@@ -493,7 +518,8 @@ export async function enemyTurn() {
     + (p.class === "rogue" ? 0.1 : 0)
     + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
     + (spec?.bonuses?.evasionBonus || 0)
-    + mistBonus;
+    + mistBonus
+    + (isTacticalDifficulty(gameState.difficulty) ? skirmisherDodgeBonus(enemy.archetype, archScale, action) : 0); // SPEC-1303
   // SPEC-1302: pasiva + botón en una sola tirada (Fácil: fórmula original)
   const finalDodgeChance = computeDodgeChance({
     passive: evasionChance,
@@ -708,6 +734,16 @@ export function applyDamageToEnemy(dmg, damageType) {
   if (!enemy) return;
   // SPEC-1103: rasgo "Regenerador" — recibir fuego bloquea su regen próxima
   if (damageType === "fire") enemy.turnsSinceFireHit = 0;
+  // SPEC-1303: Guardián — golpear con física mientras defiende devuelve parte del daño
+  const reflect = guardianReflect({
+    archetype: enemy.archetype, scale: archetypeScale(gameState.difficulty),
+    isDefending: enemy.isDefending, isPhysical: !!damageType && PHYSICAL_TYPES.has(damageType),
+    dmg, playerHp: gameState.player.hp
+  });
+  if (reflect > 0) {
+    gameState.player.hp -= reflect;
+    addMessage(formatText(t("archGuardianReflect"), { enemy: enemy.type, damage: reflect }), "combat");
+  }
   let final = dmg;
   // SPEC-0802: en guardia recibe la mitad del daño del jugador (mín. 1)
   if (enemy.isDefending && dmg > 1) {

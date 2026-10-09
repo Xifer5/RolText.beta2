@@ -44,7 +44,7 @@ test("isTacticalDifficulty por dificultad", () => {
 });
 
 test("DODGEABLE_ACTIONS solo acciones que atacan", () => {
-  assert.deepEqual([...DODGEABLE_ACTIONS].sort(), ["attack", "magic", "power_attack"]);
+  assert.deepEqual([...DODGEABLE_ACTIONS].sort(), ["attack", "channeled_magic", "magic", "power_attack"]);
   assert.equal(EXPOSED_DAMAGE_MULT, 1.25);
 });
 

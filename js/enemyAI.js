@@ -25,6 +25,9 @@ export const ACTION_META = {
   regen:        { icon: "💚", labelKey: "intentRegen" },
   status:       { icon: "☠️", labelKey: "intentStatus" },
   enrage:       { icon: "😡", labelKey: "intentEnrage" },
+  // SPEC-1303: Canalizador — un turno cargando, el siguiente lanza magia potenciada
+  channel:         { icon: "🔮", labelKey: "intentChannel" },
+  channeled_magic: { icon: "✨", labelKey: "intentChanneledMagic" },
   // SPEC-1101: acciones de boss forzadas por contador de turno (no RNG),
   // decididas en combat.js/rollForcedBossAction — no pasan por decideNextAction.
   devour:       { icon: "😱", labelKey: "intentDevour" },
@@ -45,6 +48,14 @@ export function decideNextAction(e, rng = Math.random) {
   // "no quemado hace ≤1 turno" (recentlyBurned).
   if (e.hasRegenTrait && !e.recentlyBurned && hpRatio < 0.6 && e.lastAction !== "regen" && rng() < 0.5) {
     return "regen";
+  }
+
+  // SPEC-1303: Canalizador — channel -> hechizo potenciado -> (azar) otra vez.
+  // Capa aditiva, independiente de `behavior` (como el rasgo Regenerador).
+  if (e.archetype === "channeler" && canMagic) {
+    if (e.lastAction === "channel") return "channeled_magic";
+    if (rng() < 0.5) return "channel";
+    return "attack";
   }
 
   switch (behavior) {

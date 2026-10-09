@@ -12,7 +12,7 @@ export const DODGE_MAX = 0.85;
 export const MAGIC_DODGE_MULT = 0.5;
 export const EXPOSED_DAMAGE_MULT = 1.25;
 // Acciones enemigas que pasan por la tirada de evasión en enemyTurn().
-export const DODGEABLE_ACTIONS = new Set(["attack", "power_attack", "magic"]);
+export const DODGEABLE_ACTIONS = new Set(["attack", "power_attack", "magic", "channeled_magic"]);
 
 export function isTacticalDifficulty(difficulty) {
   return difficulty !== "easy";
