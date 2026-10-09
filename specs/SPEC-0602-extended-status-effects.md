@@ -1,7 +1,7 @@
 ---
-tags: [spec, parcial]
+tags: [spec, done]
 serie: "06"
-estado: parcial
+estado: done
 ---
 
 # SPEC-0602 Estados alterados expandidos
@@ -47,9 +47,11 @@ Ampliar el sistema de debuffs del jugador con: sangrado (bleed), debilidad (weak
 - [x] `enemyTurn()` switch: cases para bleed, weakness, blind con mensajes
 - [ ] QA visual en navegador
 
-## Auditoría 2026-10-08 — estado real: PARCIAL
+## Cierre 2026-10-09
 
-Verificado contra el código; el plan de arriba NO coincide con lo que existe:
-- `bleed` existe, pero lo aplican `jungle_tiger` y `pirate_captain` (SPEC-1102), no cave_bat/goblin/wolf. `cave_bat` aplica `poison`.
-- `weakness` (+25% daño recibido) y `blind` (30% de fallo) **no existen** en `combat.js` ni en ningún otro archivo; `beholder`, `cultist`, `dark_knight` y `diablo` no tienen entrada en `ENEMY_STATUS_EFFECTS`.
-- Pendiente real: decidir si se implementan weakness/blind o se descarta esta parte de la spec.
+Auditoría del 2026-10-08 encontró que weakness/blind no existían pese al plan. Implementados:
+- `ENEMY_STATUS_EFFECTS` (ahora exportado): bleed → cave_bat (pasó de veneno), goblin, wolf; weakness → cultist, dark_knight, diablo; blind → beholder.
+- `processPlayerDebuffs()` cuenta turnos de weakness/blind (`NON_DOT_DEBUFFS`) sin tick de daño.
+- `enemyTurn()`: debilidad = +25% al daño final recibido. `playerAttack()`/`playerMagic()`: ceguera = 30% de fallo (el turno se consume; la magia gasta MP).
+- Chips en la barra de buffs, i18n en/es, y la panacea (`curesAll`) también los cura.
+- Test: `tests/statusWeaknessBlind.test.mjs`. Pendiente solo QA manual en navegador.

@@ -58,15 +58,28 @@ const DEBUFF_TICK_META = {
   burn:   { icon: "🔥", label: "Quemadura",  color: "#fb923c" },
   bleed:  { icon: "🩸", label: "Sangrado",   color: "#f87171" },
 };
+// SPEC-0602: debuffs sin tick de daño — se decrementan en processPlayerDebuffs()
+// y actúan en otro punto (debilidad: enemyTurn; ceguera: playerAttack/playerMagic).
+const WEAKNESS_DAMAGE_MULT = 1.25;
+export const NON_DOT_DEBUFFS = ["weakness", "blind"];
 // SPEC-1102: contraataque universal vía Defender (independiente del bono de Duelista)
 const DEFEND_COUNTER_CHANCE = 0.3;
 const DEFEND_COUNTER_DMG_MULT = 0.5;
 
 // ── Status effects que cada enemigo puede aplicar al jugador ────────
-const ENEMY_STATUS_EFFECTS = {
+export const ENEMY_STATUS_EFFECTS = {
   slime:             { type: "poison", chance: 0.30, damage: 3,  turns: 2 },
   fungedBeast:       { type: "poison", chance: 0.20, damage: 3,  turns: 2 },
-  cave_bat:          { type: "poison", chance: 0.25, damage: 4,  turns: 2 },
+  // SPEC-0602: cave_bat pasa de veneno a sangrado (30% × 2 turnos, perforante)
+  cave_bat:          { type: "bleed",  chance: 0.30, damage: 4,  turns: 2 },
+  goblin:            { type: "bleed",  chance: 0.25, damage: 3,  turns: 2 },
+  wolf:              { type: "bleed",  chance: 0.30, damage: 4,  turns: 2 },
+  // SPEC-0602: oscuridad y maldición → debilidad (+25% daño recibido)
+  cultist:           { type: "weakness", chance: 0.30, turns: 2 },
+  dark_knight:       { type: "weakness", chance: 0.30, turns: 2 },
+  diablo:            { type: "weakness", chance: 0.35, turns: 3 },
+  // SPEC-0602: ataques oculares psíquicos → ceguera (30% de fallo)
+  beholder:          { type: "blind",  chance: 0.35, turns: 2 },
   goblin_shaman:     { type: "burn",   chance: 0.35, damage: 5,  turns: 2 },
   warlock:           { type: "burn",   chance: 0.40, damage: 8,  turns: 3 },
   vampire:           { type: "stun",   chance: 0.25, turns: 1 },
@@ -500,6 +513,8 @@ export async function enemyTurn() {
     finalDmg = Math.max(1, Math.floor(finalDmg * (1 + spec.bonuses.physicalDefensePenalty)));
   }
   finalDmg = applyResistance(finalDmg, atkType, stats.resistances);
+  // SPEC-0602: debilidad — +25% daño recibido mientras dure
+  if (gameState.playerDebuffs?.weakness) finalDmg = Math.max(1, Math.floor(finalDmg * WEAKNESS_DAMAGE_MULT));
 
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
@@ -573,6 +588,12 @@ export async function enemyTurn() {
         // SPEC-1102: sangrado — mismo patrón que quemadura, no acumula stacks
         gameState.playerDebuffs.bleed = { turns: se.turns, damage: se.damage };
         addMessage(formatText(t('enemyBleedEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
+      } else if (se.type === "weakness") {
+        gameState.playerDebuffs.weakness = { turns: se.turns };
+        addMessage(formatText(t('enemyWeaknessEffect'), { enemy: enemy.type, turns: se.turns }), "combat");
+      } else if (se.type === "blind") {
+        gameState.playerDebuffs.blind = { turns: se.turns };
+        addMessage(formatText(t('enemyBlindEffect'), { enemy: enemy.type, turns: se.turns }), "combat");
       }
       updateUI();
     }
@@ -600,8 +621,18 @@ function processPlayerDebuffs() {
     }
   }
 
+  // SPEC-0602: debilidad/ceguera no hacen daño, solo cuentan turnos
+  for (const key of NON_DOT_DEBUFFS) {
+    if (!debuffs[key]) continue;
+    debuffs[key].turns--;
+    if (debuffs[key].turns <= 0) {
+      delete debuffs[key];
+      addMessage(t(key === "weakness" ? 'weaknessWearsOff' : 'blindWearsOff'), "system");
+    }
+  }
+
   for (const key of Object.keys({ ...debuffs })) {
-    if (key === "stun" || key === "arcaneFreeze") continue;
+    if (key === "stun" || key === "arcaneFreeze" || NON_DOT_DEBUFFS.includes(key)) continue;
     const data = debuffs[key];
     if (!data?.damage) continue;
 

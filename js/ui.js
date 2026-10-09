@@ -702,6 +702,9 @@ function updateBuffBar() {
   if (playerDebuffs.burn)   chips.push(`<span class="buff-chip debuff-burn">🔥 Quemadura ×${playerDebuffs.burn.turns}</span>`);
   // SPEC-1102: nuevo — mismo patrón que veneno/quemadura
   if (playerDebuffs.bleed) chips.push(`<span class="buff-chip debuff-bleed">🩸 Sangrado ×${playerDebuffs.bleed.turns}</span>`);
+  // SPEC-0602: debilidad y ceguera
+  if (playerDebuffs.weakness) chips.push(`<span class="buff-chip debuff-weakness">💔 Debilidad ×${playerDebuffs.weakness.turns}</span>`);
+  if (playerDebuffs.blind)    chips.push(`<span class="buff-chip debuff-blind">🙈 Ceguera ×${playerDebuffs.blind.turns}</span>`);
   if (playerDebuffs.stun)   chips.push(`<span class="buff-chip debuff-stun">💫 Aturdido ×${playerDebuffs.stun.turns}</span>`);
   // SPEC-1102 fix: arcaneFreeze (SPEC-1101, Frost Wyrm) no tenía chip — el
   // jugador no veía cuántos turnos le quedaban sin magia.

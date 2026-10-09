@@ -880,6 +880,8 @@ button:focus-visible,
 .buff-chip.debuff-poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
 .buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: var(--c-burn); }
 .buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: var(--c-freeze); }
+.buff-chip.debuff-weakness { background: rgba(168,85,247,.18); color: #C4B5FD; }
+.buff-chip.debuff-blind  { background: rgba(156,163,175,.18); color: #D1D5DB; }
 .buff-chip.debuff-bleed  { background: rgba(239,68,68,.18); color: var(--c-bleed); }
 .buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: var(--c-freeze); }
 .location-actions {

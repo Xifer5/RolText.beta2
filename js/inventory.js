@@ -475,6 +475,12 @@ function useItem(itemId, item) {
     if (item.curesAll || item.curesBurn) {
       if (gameState.playerDebuffs.burn) { delete gameState.playerDebuffs.burn; msgs.push(t('statusBurn')); }
     }
+    // SPEC-0602: la panacea también disipa debilidad y ceguera
+    if (item.curesAll) {
+      for (const k of ["weakness", "blind"]) {
+        if (gameState.playerDebuffs[k]) { delete gameState.playerDebuffs[k]; msgs.push(t(k === "weakness" ? 'statusWeakness' : 'statusBlind')); }
+      }
+    }
     if (item.curesAll && gameState.playerDebuffs.stun) {
       delete gameState.playerDebuffs.stun; msgs.push(t('statusStun')); }
     if (item.restoreHp) {

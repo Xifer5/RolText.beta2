@@ -119,7 +119,21 @@ export async function playerSpare() {
   endCombat(false, false, true);
 }
 
+// SPEC-0602: ceguera — 30% de fallar ataques físicos/mágicos. Consume el turno
+// (el enemigo responde) igual que cualquier ataque fallido.
+const BLIND_MISS_CHANCE = 0.3;
+async function blindMissed() {
+  if (!gameState.playerDebuffs?.blind || Math.random() >= BLIND_MISS_CHANCE) return false;
+  addMessage(t('blindMiss'), "combat");
+  showFloatingText(t('blindMissFloat'), window.innerWidth/2+50, window.innerHeight/2-50, "#9CA3AF");
+  tickBuffs();
+  updateUI();
+  await delay(500); await enemyTurn();
+  return true;
+}
+
 export async function playerAttack() {
+  if (await blindMissed()) return;
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
   const spec = getActiveSpec();
@@ -233,6 +247,7 @@ export async function playerMagic() {
   }
 
   gameState.player.mp -= cost;
+  if (await blindMissed()) return; // SPEC-0602: el hechizo fallado igual gasta el MP
   const mult = gameState.player.class === "mage" && gameState.player.level >= 20 ? 2.0 : 1.0;
   // Escuela de magia: el ataque mágico toma el elemento de la especialización
   const magicType = spec?.bonuses?.dmgType || "magic";
