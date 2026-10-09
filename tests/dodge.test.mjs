@@ -74,3 +74,15 @@ test("playerDodge: en Fácil no cambia el estado; en Aventura pone la postura", 
   assert.equal(g.activeBuffs.dodge_stance, 1);
   g.isInCombat = false; g.activeBuffs = {}; g.difficulty = "easy";
 });
+
+test("cada evento de COMBAT_KEYS tiene click de escritorio Y móvil cableado en ui.js", () => {
+  const kb = fs.readFileSync("js/keyboard.js", "utf8");
+  const ui = fs.readFileSync("js/ui.js", "utf8");
+  const events = [...kb.matchAll(/"(\d)":\s*"(pixel:\w+)"/g)].map(m => m[2]);
+  assert.ok(events.length >= 7);
+  for (const ev of events) {
+    const hits = ui.split(`new Event("${ev}")`).length - 1;
+    // flee/attack/magic/defend/... → botón de escritorio + botón móvil
+    assert.ok(hits >= 2, `${ev} debería despacharse desde escritorio y móvil (hits=${hits})`);
+  }
+});

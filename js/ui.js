@@ -1245,6 +1245,7 @@ export function setupUIListeners() {
   document.getElementById("magicBtn")?.addEventListener("click",  () => window.dispatchEvent(new Event("pixel:magic")));
   document.getElementById("itemBtn")?.addEventListener("click",   () => { renderInventory(); document.getElementById("inventoryModal")?.classList.remove("hidden"); });
   document.getElementById("defendBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:defend")));
+  document.getElementById("dodgeBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:dodge")));
   document.getElementById("breakGuardBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:breakGuard")));
   document.getElementById("interruptBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:interrupt")));
   document.getElementById("mercyBtn")?.addEventListener("click", () => window.dispatchEvent(new Event("pixel:spare")));
