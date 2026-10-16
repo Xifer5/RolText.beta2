@@ -43,7 +43,11 @@ import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
 import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
 import { playerAttack, playerMagic, playerDefend, playerDodge, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
 import { computeDodgeChance, isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
-import { getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult } from "./archetypes.js";
+import {
+  getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult,
+  pyromancerBurnDamage, dousesPyromancer, frostDodgePenalty, cryomancerAppliesFrost, fireDispelsFrost, FROST_TURNS,
+  drainerHeal, stormUndodgeable, stormDefendMult, archetypeStatus, statusChanceMult, statusExtraTurns, STUN_IMMUNITY_TURNS
+} from "./archetypes.js";
 
 // Re-exportado: tests/combatAdvice.test.mjs y cualquier otro consumidor
 // externo lo importan desde "./combat.js" (API pública histórica).
@@ -109,6 +113,12 @@ export const ENEMY_STATUS_EFFECTS = {
   valdris_corrupted: { type: "stun",   chance: 0.25, turns: 1 },
 };
 
+// SPEC-1303: estado propio del enemigo, o el que le aporta su arquetipo
+// (Envenenador/Aturdidor) si no tiene uno en ENEMY_STATUS_EFFECTS.
+function enemyStatus(enemy) {
+  return ENEMY_STATUS_EFFECTS[enemy.id] || archetypeStatus(enemy.archetype);
+}
+
 export function setupCombat() {
   window.addEventListener("pixel:attack", () => handleAction(playerAttack));
   window.addEventListener("pixel:magic",  () => handleAction(playerMagic));
@@ -129,7 +139,10 @@ async function handleAction(fn) {
   // Stun: player loses this turn
   if (gameState.playerDebuffs?.stun?.turns > 0) {
     gameState.playerDebuffs.stun.turns--;
-    if (gameState.playerDebuffs.stun.turns <= 0) delete gameState.playerDebuffs.stun;
+    if (gameState.playerDebuffs.stun.turns <= 0) {
+      delete gameState.playerDebuffs.stun;
+      gameState.stunImmune = STUN_IMMUNITY_TURNS + 1; // SPEC-1303: 2 turnos de enemigo sin re-stun
+    }
     addMessage(t('combatStunned'), "combat");
     updateUI();
     await delay(600);
@@ -180,7 +193,7 @@ function rollEnemyIntent() {
     hp: enemy.hp,
     maxHp: enemy.maxHp,
     magicAttack: enemy.magicAttack,
-    hasStatusEffect: !!ENEMY_STATUS_EFFECTS[enemy.id],
+    hasStatusEffect: !!enemyStatus(enemy),
     lastAction: enemy.lastAction,
     enraged: enemy.enraged,
     hasRegenTrait: enemy.trait === "regenerator",
@@ -212,6 +225,7 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
   // SPEC-0701: bonos/penalidades de día o noche sobre el ataque/defensa base
   const { attack: timedAtk, defense: timedDef } = applyTimeModifiers(enemyType, scaledAtk, scaledDef);
 
+  gameState.stunImmune = 0; // SPEC-1303: la inmunidad al stun no se arrastra entre combates
   gameState.currentEnemy = {
     id: enemyType,
     ...base,
@@ -339,6 +353,7 @@ export async function enemyTurn() {
 
   // Tick player debuffs (poison/burn damage)
   if (processPlayerDebuffs()) return;
+  if (gameState.stunImmune > 0) gameState.stunImmune--; // SPEC-1303
 
   // Apply poison damage to enemy
   if (gameState.activeDebuffs?.poison) {
@@ -405,7 +420,10 @@ export async function enemyTurn() {
   const rawAction = enemy.nextAction || "attack";
   enemy.lastAction = rawAction;
   const channeledCast = rawAction === "channeled_magic";
-  const action = channeledCast ? "magic" : rawAction;
+  // SPEC-1303: "stunning_blow" (Aturdidor) se resuelve como golpe pesado normal
+  // (esquivable, interrumpible) con aturdimiento garantizado si conecta.
+  const stunBlow = rawAction === "stunning_blow";
+  const action = channeledCast ? "magic" : stunBlow ? "power_attack" : rawAction;
   const archScale = archetypeScale(gameState.difficulty);
 
   if (action === "defend") {
@@ -497,6 +515,9 @@ export async function enemyTurn() {
     defenseMult = wreckMult;
     addMessage(formatText(t("archWreckerBreaks"), { enemy: enemy.type }), "combat");
   }
+  // SPEC-1303: Tormentoso — Defender amortigua más (-60%) su magia
+  const stormMult = wasDefending ? stormDefendMult(enemy.archetype, archScale, useMagic) : null;
+  if (stormMult != null) defenseMult = stormMult;
   if (gameState.activeBuffs?.defend_stance > 0) {
     gameState.activeBuffs.defend_stance--;
     if (gameState.activeBuffs.defend_stance <= 0) delete gameState.activeBuffs.defend_stance;
@@ -519,7 +540,8 @@ export async function enemyTurn() {
     + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
     + (spec?.bonuses?.evasionBonus || 0)
     + mistBonus
-    + (isTacticalDifficulty(gameState.difficulty) ? skirmisherDodgeBonus(enemy.archetype, archScale, action) : 0); // SPEC-1303
+    + (isTacticalDifficulty(gameState.difficulty) ? skirmisherDodgeBonus(enemy.archetype, archScale, action) : 0) // SPEC-1303
+    - frostDodgePenalty(archScale, !!gameState.playerDebuffs?.frost); // SPEC-1303: escarcha del Criomante
   // SPEC-1302: pasiva + botón en una sola tirada (Fácil: fórmula original)
   const finalDodgeChance = computeDodgeChance({
     passive: evasionChance,
@@ -527,7 +549,16 @@ export async function enemyTurn() {
     isMagic: useMagic,
     tactical: isTacticalDifficulty(gameState.difficulty)
   });
-  if (Math.random() < finalDodgeChance) {
+  // SPEC-1303: la escarcha cuenta tiradas de esquiva, no turnos
+  const frostDebuff = gameState.playerDebuffs?.frost;
+  if (frostDebuff) {
+    frostDebuff.turns--;
+    if (frostDebuff.turns <= 0) { delete gameState.playerDebuffs.frost; addMessage(t("archFrostWearsOff"), "system"); }
+  }
+  // SPEC-1303: Tormentoso — sus hechizos no se esquivan
+  const undodgeable = stormUndodgeable(enemy.archetype, archScale, useMagic);
+  if (undodgeable) addMessage(formatText(t("archStormUndodgeable"), { enemy: enemy.type }), "combat");
+  if (!undodgeable && Math.random() < Math.max(0, finalDodgeChance)) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
     if (wasDodging) {
       enemy.exposed = true;
@@ -587,6 +618,12 @@ export async function enemyTurn() {
   addMessage(formatText(pickVariant('enemyUsedAttack'), { enemy: enemy.type, attack: attackLabel, damage: finalDmg }), "combat");
   showFloatingText(`-${finalDmg}`, window.innerWidth/2-80, window.innerHeight/2, "#fca5a5", "1.8em");
   shakeScreen();
+  // SPEC-1303: Drenador — se cura con parte del daño que causó
+  const drained = drainerHeal(enemy.archetype, archScale, finalDmg);
+  if (drained > 0 && enemy.hp > 0) {
+    enemy.hp = Math.min(enemy.maxHp, enemy.hp + drained);
+    addMessage(formatText(t("archDrainerHeal"), { enemy: enemy.type, heal: drained }), "combat");
+  }
 
   updateUI();
 
@@ -617,13 +654,22 @@ export async function enemyTurn() {
   // Apply a new status effect if enemy has one and player doesn't already have it
   // SPEC-0802: la acción "status" telegrafiada garantiza el intento de efecto
   // SPEC-1105: Caballero Sagrado — reduce la probabilidad de sufrir el efecto
-  const se = ENEMY_STATUS_EFFECTS[enemy.id];
+  // SPEC-1303: el golpe aturdidor aplica stun garantizado; los arquetipos de
+  // estado multiplican la chance según la dificultad.
+  const se = stunBlow ? archetypeStatus("stunner") : enemyStatus(enemy);
   const debuffResistMult = 1 - (spec?.bonuses?.debuffResistPct || 0);
-  if (se && Math.random() < (action === "status" ? debuffResistMult : se.chance * debuffResistMult)) {
+  const statusChance = (action === "status" || stunBlow)
+    ? debuffResistMult
+    : (se?.chance || 0) * debuffResistMult * statusChanceMult(enemy.archetype, archScale);
+  if (se && Math.random() < statusChance) {
     if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
     // SPEC-1101: el veneno acumula stacks (tope 5) en vez de solo refrescar/
     // ignorarse — cada stack nueva multiplica el daño por turno.
-    if (se.type === "poison") {
+    if (se.type === "burn" && enemy.burnDoused) {
+      // SPEC-1303: el hielo/agua apagó al Pirómano — pierde esta quemadura
+      enemy.burnDoused = false;
+      addMessage(formatText(t("archPyromancerDoused"), { enemy: enemy.type }), "combat");
+    } else if (se.type === "poison") {
       const existing = gameState.playerDebuffs.poison;
       const stacks = Math.min(POISON_MAX_STACKS, (existing?.stacks || 0) + 1);
       gameState.playerDebuffs.poison = { turns: se.turns, damage: se.damage, stacks };
@@ -633,24 +679,38 @@ export async function enemyTurn() {
       updateUI();
     } else if (!gameState.playerDebuffs[se.type]) {
       if (se.type === "stun") {
-        gameState.playerDebuffs.stun = { turns: se.turns };
-        addMessage(formatText(t('enemyStunEffect'), { enemy: enemy.type }), "combat");
+        // SPEC-1303: tras un stun hay 2 turnos de inmunidad (nunca stun encadenado)
+        if (gameState.stunImmune > 0) {
+          addMessage(formatText(t("archStunResisted"), { enemy: enemy.type }), "combat");
+        } else {
+          gameState.playerDebuffs.stun = { turns: se.turns };
+          addMessage(formatText(t('enemyStunEffect'), { enemy: enemy.type }), "combat");
+        }
       } else if (se.type === "burn") {
-        gameState.playerDebuffs.burn = { turns: se.turns, damage: se.damage };
-        addMessage(formatText(t('enemyBurnEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
+        const burnDmg = pyromancerBurnDamage(enemy.archetype, archScale, se.damage);
+        gameState.playerDebuffs.burn = { turns: se.turns, damage: burnDmg };
+        addMessage(formatText(t('enemyBurnEffect'), { enemy: enemy.type, damage: burnDmg, turns: se.turns }), "combat");
       } else if (se.type === "bleed") {
         // SPEC-1102: sangrado — mismo patrón que quemadura, no acumula stacks
         gameState.playerDebuffs.bleed = { turns: se.turns, damage: se.damage };
         addMessage(formatText(t('enemyBleedEffect'), { enemy: enemy.type, damage: se.damage, turns: se.turns }), "combat");
       } else if (se.type === "weakness") {
-        gameState.playerDebuffs.weakness = { turns: se.turns };
-        addMessage(formatText(t('enemyWeaknessEffect'), { enemy: enemy.type, turns: se.turns }), "combat");
+        const weakTurns = se.turns + statusExtraTurns(enemy.archetype, archScale, "weakness");
+        gameState.playerDebuffs.weakness = { turns: weakTurns };
+        addMessage(formatText(t('enemyWeaknessEffect'), { enemy: enemy.type, turns: weakTurns }), "combat");
       } else if (se.type === "blind") {
         gameState.playerDebuffs.blind = { turns: se.turns };
         addMessage(formatText(t('enemyBlindEffect'), { enemy: enemy.type, turns: se.turns }), "combat");
       }
       updateUI();
     }
+  }
+
+  // SPEC-1303: Criomante — su magia o golpe pesado deja escarcha (menos esquiva)
+  if (cryomancerAppliesFrost(enemy.archetype, archScale, action) && enemy.hp > 0) {
+    if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
+    gameState.playerDebuffs.frost = { turns: FROST_TURNS };
+    addMessage(formatText(t("archFrostApplied"), { enemy: enemy.type }), "combat");
   }
 
   // SPEC-0802: telegraph de la próxima acción
@@ -734,6 +794,12 @@ export function applyDamageToEnemy(dmg, damageType) {
   if (!enemy) return;
   // SPEC-1103: rasgo "Regenerador" — recibir fuego bloquea su regen próxima
   if (damageType === "fire") enemy.turnsSinceFireHit = 0;
+  // SPEC-1303: hielo/agua apagan al Pirómano; el fuego disipa la escarcha del Criomante
+  if (dousesPyromancer(enemy.archetype, damageType)) enemy.burnDoused = true;
+  if (fireDispelsFrost(enemy.archetype, damageType) && gameState.playerDebuffs?.frost) {
+    delete gameState.playerDebuffs.frost;
+    addMessage(t("archFrostDispelled"), "combat");
+  }
   // SPEC-1303: Guardián — golpear con física mientras defiende devuelve parte del daño
   const reflect = guardianReflect({
     archetype: enemy.archetype, scale: archetypeScale(gameState.difficulty),

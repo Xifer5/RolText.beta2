@@ -1,7 +1,7 @@
 /**
  * enemyAI.js — SPEC-0802 Enemy intent: behaviors activos + telegraph
  *
- * Módulo puro (sin DOM, sin imports): decide la próxima acción del enemigo
+ * Módulo puro (sin DOM; solo importa el módulo puro archetypes.js): decide la próxima acción del enemigo
  * según su behavior (asignado en ENEMY_COMBAT_DATA desde SPEC-0604) y si un
  * jefe oculta su intención. El RNG es inyectable para tests deterministas.
  *
@@ -10,6 +10,8 @@
  * y devuelve una de las acciones de ACTION_META (menos "unknown", que es
  * solo presentación).
  */
+
+import { usesStatusLayer } from "./archetypes.js";
 
 export const BOSS_HIDE_CHANCE = 0.35;
 export const POWER_ATTACK_MULT = 1.5;
@@ -28,6 +30,8 @@ export const ACTION_META = {
   // SPEC-1303: Canalizador — un turno cargando, el siguiente lanza magia potenciada
   channel:         { icon: "🔮", labelKey: "intentChannel" },
   channeled_magic: { icon: "✨", labelKey: "intentChanneledMagic" },
+  // SPEC-1303: Aturdidor — golpe pesado telegrafiado que aturde 1 turno
+  stunning_blow:   { icon: "💫", labelKey: "intentStunningBlow" },
   // SPEC-1101: acciones de boss forzadas por contador de turno (no RNG),
   // decididas en combat.js/rollForcedBossAction — no pasan por decideNextAction.
   devour:       { icon: "😱", labelKey: "intentDevour" },
@@ -57,6 +61,12 @@ export function decideNextAction(e, rng = Math.random) {
     if (rng() < 0.5) return "channel";
     return "attack";
   }
+
+  // SPEC-1303: Aturdidor — golpe aturdidor telegrafiado (nunca dos seguidos)
+  if (e.archetype === "stunner" && e.lastAction !== "stunning_blow" && rng() < 0.3) return "stunning_blow";
+  // SPEC-1303: Envenenador/Cegador/Maldito preparan su estado aunque su behavior no sea "status"
+  if (usesStatusLayer(e.archetype) && behavior !== "status" && e.hasStatusEffect
+      && e.lastAction !== "status" && rng() < 0.35) return "status";
 
   switch (behavior) {
     case "aggressive":

@@ -23,7 +23,7 @@ import { eryndelMemoryKey } from "./eryndelArc.js";
 // import circular ui.js<->combat.js solo para una constante chica.
 import { isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 import { ARCHETYPES, archetypeScale } from "./archetypes.js";
-const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic"]);
+const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic", "stunning_blow"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
 // SPEC-1111: devour/overload/freeze_magic (mecánicas de boss forzadas por
@@ -39,7 +39,8 @@ export const INTENT_ADVICE_KEYS = {
   overload:     "adviceOverload",
   freeze_magic: "adviceFreezeMagic",
   channel:         "adviceChannel",
-  channeled_magic: "adviceChanneledMagic"
+  channeled_magic: "adviceChanneledMagic",
+  stunning_blow:   "adviceStunningBlow"
 };
 
 // SPEC-1210 — telegraph narrativo (revisión 2026-08-28, ítem #7): una línea
@@ -735,6 +736,8 @@ function updateBuffBar() {
   if (playerDebuffs.weakness) chips.push(`<span class="buff-chip debuff-weakness">💔 Debilidad ×${playerDebuffs.weakness.turns}</span>`);
   if (playerDebuffs.blind)    chips.push(`<span class="buff-chip debuff-blind">🙈 Ceguera ×${playerDebuffs.blind.turns}</span>`);
   if (playerDebuffs.stun)   chips.push(`<span class="buff-chip debuff-stun">💫 Aturdido ×${playerDebuffs.stun.turns}</span>`);
+  // SPEC-1303: escarcha del Criomante (cuenta tiradas de esquiva)
+  if (playerDebuffs.frost)  chips.push(`<span class="buff-chip debuff-freeze">${t('archFrostChip')} ×${playerDebuffs.frost.turns}</span>`);
   // SPEC-1102 fix: arcaneFreeze (SPEC-1101, Frost Wyrm) no tenía chip — el
   // jugador no veía cuántos turnos le quedaban sin magia.
   if (playerDebuffs.arcaneFreeze) chips.push(`<span class="buff-chip debuff-freeze">❄️ Congelado ×${playerDebuffs.arcaneFreeze.turns}</span>`);

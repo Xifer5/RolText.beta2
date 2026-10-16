@@ -40,7 +40,7 @@ const SKILL_DAMAGE_TYPES = {
 const STUN_ON_CRIT_CHANCE = 0.15;
 // SPEC-1102: Interrumpir — solo tiene sentido contra una acción "grande"
 // telegrafiada, nunca contra attack/defend/regen/enrage/status.
-const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic"]);
+const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic", "stunning_blow"]);
 const INTERRUPT_MP_COST = 8;
 const INTERRUPT_CHANCE = 0.6;
 // SPEC-1104: perdonar mini-boss — botón condicional bajo este umbral de HP

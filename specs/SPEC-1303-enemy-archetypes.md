@@ -1,7 +1,7 @@
 ---
 tags: [spec, aprobada]
 serie: "13"
-estado: entrega 1 implementada (pendiente QA manual)
+estado: entregas 1, 2, 3 y expansión implementadas (pendiente QA manual y calibración en playtest)
 padre: SPEC-1301
 depende: SPEC-1302
 ---
@@ -143,3 +143,14 @@ SPEC-1301 (padre), SPEC-1302 (Esquivar), SPEC-0802 (intención), SPEC-0604 (beha
 ## Cierre entrega 1 — 2026-10-09
 
 Implementada: `js/archetypes.js` (puro), acciones `channel`/`channeled_magic` en `enemyAI.js`, hooks en `enemyTurn`/`applyDamageToEnemy` (Rompeguardia, Asaltante, Guardián, Canalizador), etiqueta de arquetipo + consejo (solo Aventura) en el panel del enemigo, i18n en/es. Enemigos de prueba: orc, wolf, guard, goblin_shaman. Tests: `tests/archetypes.test.mjs` (9). Suite 370/370. Simulación de combate real (12 combinaciones dificultad x enemigo, alternando Atacar/Defender/Esquivar/Interrumpir) sin excepciones; en Fácil el arquetipo es `null`. Pendiente: QA manual en navegador y calibración en playtest. Siguiente: entrega 2 (mágicos).
+
+## Estado de implementación (2026-10-15)
+
+- **Entregas 1-3 y expansión implementadas**: los 12 arquetipos y los 33 enemigos candidatos de las tablas están mapeados en `ENEMY_ARCHETYPE` (`js/archetypes.js`). Los jefes y mini-jefes siguen excluidos en runtime (`isBoss`).
+- Decisiones de implementación:
+  - **Criomante**: la escarcha se aplica con magia o golpe pesado (no con el ataque normal) y dura 2 *tiradas de esquiva*, no 2 turnos.
+  - **Pirómano**: apagar por hielo/agua marca `enemy.burnDoused` y cancela la siguiente quemadura que habría aplicado.
+  - **Aturdidor**: acción telegrafiada `stunning_blow` (se resuelve como golpe pesado, esquivable e interrumpible); inmunidad al stun vía `gameState.stunImmune` (2 turnos de enemigo), válida para cualquier fuente de stun.
+  - **Envenenador/Aturdidor** aportan un estado de respaldo (`archetypeStatus`) porque giant_spider, vine_serpent, mountain_giant y gorilla_warrior no tenían entrada en `ENEMY_STATUS_EFFECTS`.
+  - **Cegador**: Defender ya nunca falla con ceguera en el código existente; la mecánica nueva es solo la mayor chance de cegar.
+- Pendiente: QA manual (escritorio/teclado/móvil ≤960px y ≤400px) y calibración de números en playtest.
