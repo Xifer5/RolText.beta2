@@ -16,6 +16,7 @@ import { playSound } from "./sounds.js";
 import { showToast } from "./toast.js";
 import { t, formatText } from "./i18n.js";
 import { addMasteryXP } from "./mastery.js";
+import { getWeaponFamily, familyXp, newlyUnlocked, FAMILY_XP_PREFIX, TECHNIQUES } from "./weaponTechniques.js";
 import {
   ENEMY_COMBAT_DATA, DAMAGE_TYPE_EMOJI, DAMAGE_TYPES,
   getResistanceLabel, getWeakestResistance, getEffectiveResistances
@@ -74,6 +75,7 @@ export function maybeResistanceAdvice(enemy, damageType) {
 }
 
 export function grantMasteryXP(damageType, amount = 5) {
+  grantFamilyXP(amount);
   const tierUp = addMasteryXP(damageType, amount);
   if (tierUp) {
     const label = DAMAGE_TYPES[tierUp.type] || tierUp.type;
@@ -81,6 +83,21 @@ export function grantMasteryXP(damageType, amount = 5) {
     addMessage(msg, "milestone"); // SPEC-1212: subir de tier de maestría es un hito, no un mensaje de rutina
     showToast(msg);
     playSound("level_up");
+  }
+}
+
+// SPEC-1304: la XP también cuenta para la familia del arma equipada (por forma,
+// no por elemento) — de ahí salen las técnicas. Solo fuera de Fácil.
+function grantFamilyXP(amount) {
+  if (gameState.difficulty === "easy") return;
+  const family = getWeaponFamily(gameState.equipment?.rightHand);
+  if (!family) return;
+  const before = familyXp(family, gameState.weaponMastery);
+  addMasteryXP(FAMILY_XP_PREFIX + family, amount); // sin mensaje de tier: el hito es la técnica
+  for (const id of newlyUnlocked(family, before, familyXp(family, gameState.weaponMastery))) {
+    const msg = formatText(t('techUnlocked'), { name: t(TECHNIQUES[id].nameKey) });
+    addMessage(msg, "milestone");
+    showToast(msg);
   }
 }
 

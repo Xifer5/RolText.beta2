@@ -43,6 +43,8 @@ import { checkCowardFlee, assignRandomTrait } from "./enemyTraits.js";
 import { rollForcedBossAction, updateBossPhase, resolveDevour, resolveOverload, resolveFreezeMagic, playerBreakGuard } from "./bossMechanics.js";
 import { playerAttack, playerMagic, playerDefend, playerDodge, playerInterrupt, playerSpare, useSkill, tryFlee } from "./playerCombatActions.js";
 import { computeDodgeChance, isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
+import { useTechnique } from "./techniqueActions.js";
+import { currentPassives } from "./weaponTechniques.js";
 import {
   getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult,
   pyromancerBurnDamage, dousesPyromancer, frostDodgePenalty, cryomancerAppliesFrost, fireDispelsFrost, FROST_TURNS,
@@ -130,6 +132,7 @@ export function setupCombat() {
   window.addEventListener("pixel:flee",   () => handleAction(tryFlee));
   window.addEventListener("pixel:startCombat", (e) => startCombat(e.detail?.enemyId, e.detail?.isBoss, e.detail?.extraMult));
   window.addEventListener("pixel:useSkill", (e) => handleAction(() => useSkill(e.detail?.skillId)));
+  window.addEventListener("pixel:useTechnique", (e) => handleAction(() => useTechnique(e.detail?.techId))); // SPEC-1304
 }
 
 let busy = false;
@@ -226,6 +229,7 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
   const { attack: timedAtk, defense: timedDef } = applyTimeModifiers(enemyType, scaledAtk, scaledDef);
 
   gameState.stunImmune = 0; // SPEC-1303: la inmunidad al stun no se arrastra entre combates
+  gameState.techCooldowns = {}; // SPEC-1304: los enfriamientos de técnicas no persisten entre combates
   gameState.currentEnemy = {
     id: enemyType,
     ...base,
@@ -508,6 +512,9 @@ export async function enemyTurn() {
   // SPEC-1102: se guarda ANTES de decrementar — el contraataque universal de
   // Defender depende de que la guardia haya estado activa este turno.
   const wasDefending = gameState.activeBuffs?.defend_stance > 0;
+  // SPEC-1304: Parada y Respuesta — el contraataque de Defender sale seguro este turno
+  const riposteActive = wasDefending && gameState.activeBuffs?.riposte > 0;
+  if (gameState.activeBuffs) delete gameState.activeBuffs.riposte;
   let defenseMult = wasDefending ? 0.5 : 1.0;
   // SPEC-1303: Rompeguardia — su golpe pesado atraviesa parte de Defender
   const wreckMult = wasDefending ? wreckerDefendMult(enemy.archetype, archScale, action) : null;
@@ -642,7 +649,7 @@ export async function enemyTurn() {
   // SPEC-1102: contraataque universal vía Defender — 30%, cualquier clase,
   // independiente del 25% de Duelista al esquivar (ese ya se resolvió arriba
   // en la rama de evasión y no llega hasta acá).
-  if (wasDefending && Math.random() < DEFEND_COUNTER_CHANCE) {
+  if (wasDefending && (riposteActive || Math.random() < DEFEND_COUNTER_CHANCE)) {
     const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * DEFEND_COUNTER_DMG_MULT));
     applyDamageToEnemy(counterDmg, "physical");
     playSound("attack");
@@ -835,9 +842,30 @@ export function applyDamageToEnemy(dmg, damageType) {
 }
 
 export function tickBuffs() {
+  tickTechniqueState();
   if (!gameState.activeBuffs) return;
   for (const k in gameState.activeBuffs) {
     gameState.activeBuffs[k]--;
     if (gameState.activeBuffs[k] <= 0) delete gameState.activeBuffs[k];
+  }
+}
+
+// SPEC-1304: una vez por acción del jugador — enfriamientos, desgaste temporal
+// de defensa (Golpe Aplastante / Impacto Sísmico) y Maná Fluido.
+function tickTechniqueState() {
+  const cds = gameState.techCooldowns;
+  if (cds) for (const id of Object.keys(cds)) { if (cds[id] > 0) cds[id]--; }
+  const enemy = gameState.currentEnemy;
+  if (enemy?._techShred && --enemy._techShred.turns <= 0) {
+    enemy.defense += enemy._techShred.amount;
+    enemy._techShred = null;
+  }
+  if (gameState.isInCombat) {
+    const mpGain = currentPassives().mpPerTurn;
+    if (mpGain > 0) {
+      const p = gameState.player;
+      const cap = calculateTotalStats(p, gameState.equipment).maxMp || p.maxMp;
+      p.mp = Math.min(cap, (p.mp || 0) + mpGain);
+    }
   }
 }

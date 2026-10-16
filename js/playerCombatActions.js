@@ -23,6 +23,7 @@ import { endCombat } from "./combatRewards.js";
 import { isTacticalDifficulty, EXPOSED_DAMAGE_MULT } from "./dodge.js";
 import { applyThiefGoldSteal } from "./enemyTraits.js";
 import { applyDamageToEnemy, tickBuffs, enemyTurn } from "./combat.js";
+import { currentPassives } from "./weaponTechniques.js";
 
 // Tipo de daño de cada habilidad de clase (para resistencias y bonos de especialización)
 const SKILL_DAMAGE_TYPES = {
@@ -91,11 +92,13 @@ export async function playerDodge() {
 
 // SPEC-1302: el enemigo queda "expuesto" tras una esquiva con boton: el
 // siguiente Atacar/Magia hace +25% y lo consume.
-function consumeExposed(dmg) {
+export function consumeExposed(dmg) {
   const enemy = gameState.currentEnemy;
   if (!enemy?.exposed) return { dmg, tag: "" };
   enemy.exposed = false;
-  return { dmg: Math.max(1, Math.floor(dmg * EXPOSED_DAMAGE_MULT)), tag: ` ${t('exposedBonusTag')}` };
+  // SPEC-1304: Oportunista (perforante) suma +15% sobre el bono de "expuesto"
+  const bonus = EXPOSED_DAMAGE_MULT + currentPassives().exposedBonus;
+  return { dmg: Math.max(1, Math.floor(dmg * bonus)), tag: ` ${t('exposedBonusTag')}` };
 }
 
 // SPEC-1102: Interrumpir — cancela la acción cargada del enemigo. Solo
@@ -148,7 +151,7 @@ export async function playerSpare() {
 // SPEC-0602: ceguera — 30% de fallar ataques físicos/mágicos. Consume el turno
 // (el enemigo responde) igual que cualquier ataque fallido.
 const BLIND_MISS_CHANCE = 0.3;
-async function blindMissed() {
+export async function blindMissed() {
   if (!gameState.playerDebuffs?.blind || Math.random() >= BLIND_MISS_CHANCE) return false;
   addMessage(t('blindMiss'), "combat");
   showFloatingText(t('blindMissFloat'), window.innerWidth/2+50, window.innerHeight/2-50, "#9CA3AF");
@@ -175,7 +178,8 @@ export async function playerAttack() {
   const enrageMult = isEnraged ? (spec.bonuses.enrageDmgMult || 1) : 1;
   const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus + specDmgBonusAll) * enrageMult;
   const rawDmg = Math.floor(stats.attack * atkMult);
-  const defense = enemy.defense || 0;
+  const passives = currentPassives(); // SPEC-1304
+  const defense = Math.floor((enemy.defense || 0) * (1 - passives.defPen)); // Peso Muerto
   const variance = 0.9 + Math.random() * 0.2;
 
   // Rogue: chance of double strike
@@ -188,7 +192,8 @@ export async function playerAttack() {
   const critChance = 0.10
     + (gameState.player.agility || 0) * 0.005
     + (gameState.player.class === "rogue" ? 0.10 : 0)
-    + (spec?.bonuses?.critBonus || 0);
+    + (spec?.bonuses?.critBonus || 0)
+    + passives.critBonus; // SPEC-1304: Filo Afinado
   const isCrit  = Math.random() < critChance;
   const critMul = isCrit ? 1.75 : 1.0;
 

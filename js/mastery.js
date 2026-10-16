@@ -52,7 +52,7 @@ export function addMasteryXP(weaponType, amount = 1) {
 export function getMasteryDisplay() {
   const mastery = gameState.weaponMastery || {};
   return Object.entries(mastery)
-    .filter(([, d]) => d.xp > 0)
+    .filter(([type, d]) => d.xp > 0 && !type.startsWith("fam_")) // SPEC-1304: la XP de familia no es un tipo de daño
     .map(([type, d]) => {
       const tier = getMasteryTier(d.xp);
       const next = getNextTier(d.xp);

@@ -52,6 +52,7 @@ export const initialGameState = {
   visitedLocations: {},  // { locationId: true } — rastrea zonas visitadas para quests tipo "visit"
   achievements: {},
   playerDebuffs: {},   // { poison:{turns,damage}, burn:{turns,damage}, stun:{turns} }
+  techCooldowns: {},   // SPEC-1304: { techId: turnos } -- solo dentro de un combate
   weaponMastery: {},   // { damageType: { xp: number } }
   learnedSkills: [],   // [ skillId, ... ] — from scrolls/books
   difficulty: "easy",

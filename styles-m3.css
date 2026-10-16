@@ -5978,3 +5978,6 @@ kbd {
 /* SPEC-1303: arquetipos de enemigo */
 .enemy-archetype-badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: var(--r-sm); font-size: .72em; font-weight: 600; background: rgba(147,197,253,.16); color: var(--c-freeze); vertical-align: middle; }
 .enemy-archetype-advice { display: block; margin-top: 4px; font-size: .78em; opacity: .85; }
+
+/* SPEC-1304: técnicas por arma */
+.skill-btn.tech-btn { border-style: dashed; }

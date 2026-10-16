@@ -23,6 +23,7 @@ import { eryndelMemoryKey } from "./eryndelArc.js";
 // import circular ui.js<->combat.js solo para una constante chica.
 import { isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 import { ARCHETYPES, archetypeScale } from "./archetypes.js";
+import { getTechniquePanel } from "./techniqueActions.js";
 const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic", "stunning_blow"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
@@ -776,7 +777,13 @@ function updateSkillPanel() {
   // SPEC-0607: sin el 3er argumento, las habilidades universales aprendidas
   // (pergaminos/entrenadores) nunca llegaban a mostrarse en combate.
   const skills = getAvailableSkills(p.class, p.level, gameState.learnedSkills);
-  if (!skills.length) { panel.innerHTML = ""; return; }
+  const techniques = getTechniquePanel(); // SPEC-1304
+  if (!skills.length && !techniques.length) { panel.innerHTML = ""; return; }
+
+  const techHtml = techniques.map(x => `<button class="btn skill-btn tech-btn ${x.ready ? "" : "outlined"}"
+      data-tech="${x.id}" ${x.ready ? "" : "disabled"} title="${x.family}: ${x.desc}">
+      ${x.emoji} ${x.name}${x.ready ? "" : ` <span class="skill-cost">⏳ ${x.cooldown}</span>`}
+    </button>`).join("");
 
   panel.innerHTML = skills.map(s => {
     const canUse = (p.mp||0) >= s.mpCost;
@@ -785,8 +792,13 @@ function updateSkillPanel() {
       data-skill="${s.id}" ${!canUse?"disabled":""} title="${s.description} (Nv.${s.levelReq})">
       ${s.emoji} ${s.name} <span class="skill-cost">${s.mpCost}MP</span>
     </button>`;
-  }).join("");
+  }).join("") + techHtml;
 
+  panel.querySelectorAll("[data-tech]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      window.dispatchEvent(new CustomEvent("pixel:useTechnique", { detail: { techId: btn.dataset.tech } }));
+    });
+  });
   panel.querySelectorAll("[data-skill]").forEach(btn => {
     btn.addEventListener("click", () => {
       window.dispatchEvent(new CustomEvent("pixel:useSkill", { detail: { skillId: btn.dataset.skill } }));
