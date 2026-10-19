@@ -65,6 +65,11 @@
      crudo en 3-5 lugares distintos cada uno (chips de buff/debuff,
      botones de combate, indicadores de intención del enemigo). */
   --c-freeze:   #93C5FD; /* congelado/aturdido/postura defensiva */
+  /* Variante para TEXTO: los pasteles de arriba no cambian entre temas y en tema claro dan
+     contraste 1.45 sobre el fondo crema (Defender/Interrumpir/etiqueta de arquetipo).
+     En oscuro valen lo mismo; en claro se oscurecen (ver bloques de tema más abajo). */
+  --c-freeze-text: var(--c-freeze);
+  --c-skill-text:  var(--c-skill);
   --c-burn:     #FDBA74; /* quemado/romper guardia */
   --c-bleed:    #FCA5A5;
   --c-spell:    #80DEEA; /* botón de magia en combate */
@@ -879,11 +884,11 @@ button:focus-visible,
 .buff-chip { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .buff-chip.debuff-poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
 .buff-chip.debuff-burn   { background: rgba(251,146,60,.18); color: var(--c-burn); }
-.buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: var(--c-freeze); }
+.buff-chip.debuff-stun   { background: rgba(147,197,253,.18); color: var(--c-freeze-text); }
 .buff-chip.debuff-weakness { background: rgba(168,85,247,.18); color: #C4B5FD; }
 .buff-chip.debuff-blind  { background: rgba(156,163,175,.18); color: #D1D5DB; }
 .buff-chip.debuff-bleed  { background: rgba(239,68,68,.18); color: var(--c-bleed); }
-.buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: var(--c-freeze); }
+.buff-chip.debuff-freeze { background: rgba(147,197,253,.18); color: var(--c-freeze-text); }
 .location-actions {
   position: absolute;
   top: 54px;
@@ -1008,7 +1013,7 @@ button:focus-visible,
 }
 .edebuff.poison { background: rgba(123,211,137,.15); color: var(--c-heal); }
 .edebuff.burn   { background: rgba(251,146,60,.18); color: var(--c-burn); }
-.edebuff.frozen { background: rgba(147,197,253,.18); color: var(--c-freeze); }
+.edebuff.frozen { background: rgba(147,197,253,.18); color: var(--c-freeze-text); }
 .enemy-hp-row {
   display: flex;
   align-items: center;
@@ -1451,9 +1456,9 @@ button:focus-visible,
 .combat-btn.magic   { color: var(--c-spell); }
 .combat-btn.item    { color: var(--c-heal); }
 .combat-btn.flee    { color: var(--md-on-surface-variant); }
-.combat-btn.defend  { color: var(--c-freeze); }
+.combat-btn.defend  { color: var(--c-freeze-text); }
 .combat-btn.break-guard { color: var(--c-burn); }
-.combat-btn.interrupt   { color: var(--c-skill); }
+.combat-btn.interrupt   { color: var(--c-skill-text); }
 .combat-btn.mercy       { color: var(--c-mercy); }
 .combat-btn .key-hint,
 .combat-btn kbd {
@@ -1871,10 +1876,10 @@ button:focus-visible,
      achicar los 4 botones existentes en una sola fila ya justa de espacio. */
   .mob-bar-combat { flex-wrap: wrap; }
   .mob-bar-combat .mob-btn { flex: 1 1 30%; min-width: 0; }
-  .mob-defend { color: var(--c-freeze); }
+  .mob-defend { color: var(--c-freeze-text); }
   .mob-dodge { color: var(--c-muted); }
   .mob-break-guard { color: var(--c-burn); }
-  .mob-interrupt   { color: var(--c-skill); }
+  .mob-interrupt   { color: var(--c-skill-text); }
   .mob-mercy       { color: var(--c-mercy); }
   .mob-btn[aria-expanded="true"] {
     background: var(--md-surface-c-highest);
@@ -6040,7 +6045,7 @@ kbd {
 .enemy-intent-dodgeable { margin-left: 6px; font-size: .85em; opacity: .85; }
 
 /* SPEC-1303: arquetipos de enemigo */
-.enemy-archetype-badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: var(--r-sm); font-family: var(--font-ui); font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 600; background: rgba(147,197,253,.16); color: var(--c-freeze); vertical-align: middle; }
+.enemy-archetype-badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: var(--r-sm); font-family: var(--font-ui); font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 600; background: rgba(147,197,253,.16); color: var(--c-freeze-text); vertical-align: middle; }
 .enemy-archetype-advice { display: block; margin-top: 4px; font-family: var(--font-ui); font-size: 11px; font-weight: 400; font-style: italic; letter-spacing: 0; text-transform: none; opacity: .85; }
 
 /* SPEC-1304: técnicas por arma */
@@ -6058,3 +6063,20 @@ kbd {
 .branch-choice { text-align: left; }
 .branch-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 @media (max-width: 480px) { .branch-pick-grid { grid-template-columns: 1fr; } }
+
+/* Laptops de poca altura: con Interrumpir visible el bloque de combate pide una 4ª fila.
+   Botones de Acciones en línea y filas de combate de 54px (en 1280x720 sin esto
+   Esquivar/Huir/Interrumpir quedaban bajo el scroll interno). Va al final del archivo para
+   ganarle en orden a las reglas base de .qa-btn / .combat-grid / .combat-btn. */
+@media (min-width: 961px) and (max-height: 860px) {
+  .qa-btn { flex-direction: row; padding: 6px 8px; gap: 6px; }
+  #combat-content, .combat-grid { grid-template-rows: repeat(4, minmax(54px, 1fr)); gap: 4px; }
+  .combat-btn { padding-top: 4px; padding-bottom: 4px; }
+}
+
+/* Variantes de texto de los colores semánticos en tema claro (contraste >= 4.5 sobre el crema).
+   Se declaran sobre `body` porque ahí viven los tokens base: un valor en <html> no los pisaría. */
+[data-theme="light"] body { --c-freeze-text: #1E4FA3; --c-skill-text: #5B3FB0; }
+@media (prefers-color-scheme: light) {
+  html:not([data-theme="dark"]) body { --c-freeze-text: #1E4FA3; --c-skill-text: #5B3FB0; }
+}
