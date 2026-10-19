@@ -45,6 +45,7 @@ import { playerAttack, playerMagic, playerDefend, playerDodge, playerInterrupt, 
 import { computeDodgeChance, isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 import { useTechnique } from "./techniqueActions.js";
 import { currentPassives } from "./weaponTechniques.js";
+import { currentBranchPassives, branchDamageTakenMult } from "./branchNodes.js";
 import {
   getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult,
   pyromancerBurnDamage, dousesPyromancer, frostDodgePenalty, cryomancerAppliesFrost, fireDispelsFrost, FROST_TURNS,
@@ -231,6 +232,9 @@ export function startCombat(enemyType, isBoss = false, extraMult = null) {
 
   gameState.stunImmune = 0; // SPEC-1303: la inmunidad al stun no se arrastra entre combates
   gameState.techCooldowns = {}; // SPEC-1304: los enfriamientos de técnicas no persisten entre combates
+  gameState.techUses = {};      // SPEC-1306: usos por combate (Purificación, Rebobinar)
+  gameState.statusBlockUsed = false; // SPEC-1306: Fe Inquebrantable
+  gameState.dodgedLastTurn = false;  // SPEC-1306: Réplica Veloz
   gameState.currentEnemy = {
     id: enemyType,
     ...base,
@@ -360,13 +364,14 @@ export async function enemyTurn() {
   if (processPlayerDebuffs()) return;
   if (gameState.stunImmune > 0) gameState.stunImmune--; // SPEC-1303
 
+  const branchP = currentBranchPassives(); // SPEC-1306
   // SPEC-1305: el Regenerador se frena si hoy sufre veneno/quemadura/sangrado (se mide antes del tick)
   const dotActive = !!(gameState.activeDebuffs?.poison || gameState.activeDebuffs?.burn || gameState.activeDebuffs?.bleed);
 
   // Apply poison damage to enemy
   if (gameState.activeDebuffs?.poison) {
     const poisonInfo = gameState.activeDebuffs.poison;
-    const poisonDmg = poisonInfo.damage || 3;
+    const poisonDmg = Math.floor((poisonInfo.damage || 3) * (1 + branchP.poisonDmg)); // SPEC-1306: Veneno Potente
     applyDamageToEnemy(poisonDmg);
     addMessage(formatText(t('enemyPoisonDamage'), { enemy: enemy.type, damage: poisonDmg }), "combat");
     poisonInfo.turns--;
@@ -526,6 +531,18 @@ export async function enemyTurn() {
     return;
   }
 
+  // SPEC-1306: Trampero — el ataque del enemigo activa la trampa
+  if (enemy.trap?.charges > 0) {
+    const trap = enemy.trap;
+    trap.charges--;
+    applyDamageToEnemy(trap.damage, "pierce");
+    if (!gameState.activeDebuffs) gameState.activeDebuffs = {};
+    gameState.activeDebuffs.bleed = { turns: trap.bleed.turns, damage: trap.bleed.damage };
+    addMessage(formatText(t("brTrapTriggered"), { enemy: enemy.type, damage: trap.damage }), "combat");
+    if (trap.charges <= 0) enemy.trap = null;
+    if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
+
   const useMagic = action === "magic" && enemy.magicAttack;
   const powerMult = action === "power_attack" ? POWER_ATTACK_MULT : 1.0;
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
@@ -574,6 +591,7 @@ export async function enemyTurn() {
     + (p.class === "rogue" ? 0.1 : 0)
     + (p.level >= 5 && p.class === "rogue" ? 0.25 : 0)
     + (spec?.bonuses?.evasionBonus || 0)
+    + branchP.evasionBonus // SPEC-1306
     + mistBonus
     + (isTacticalDifficulty(gameState.difficulty) ? skirmisherDodgeBonus(enemy.archetype, archScale, action) : 0) // SPEC-1303
     - frostDodgePenalty(archScale, !!gameState.playerDebuffs?.frost); // SPEC-1303: escarcha del Criomante
@@ -590,18 +608,20 @@ export async function enemyTurn() {
     frostDebuff.turns--;
     if (frostDebuff.turns <= 0) { delete gameState.playerDebuffs.frost; addMessage(t("archFrostWearsOff"), "system"); }
   }
+  gameState.dodgedLastTurn = false; // SPEC-1306: Réplica Veloz solo premia la esquiva del último ataque
   // SPEC-1303: Tormentoso — sus hechizos no se esquivan
   const undodgeable = stormUndodgeable(enemy.archetype, archScale, useMagic);
   if (undodgeable) addMessage(formatText(t("archStormUndodgeable"), { enemy: enemy.type }), "combat");
   if (!undodgeable && Math.random() < Math.max(0, finalDodgeChance)) {
     addMessage(formatText(t('enemyAttackDodged'), { enemy: enemy.type }), "combat");
+    gameState.dodgedLastTurn = true; // SPEC-1306
     if (wasDodging) {
       enemy.exposed = true;
       addMessage(formatText(t('dodgeSuccess'), { enemy: enemy.type }), "combat");
     }
     // Duelista: 25% de contraatacar al esquivar (+ bono de daño propio)
     if (spec?.bonuses?.counterattack && Math.random() < 0.25) {
-      const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5 * (1 + (spec.bonuses.counterDmgBonus || 0))));
+      const counterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5 * (1 + (spec.bonuses.counterDmgBonus || 0) + branchP.counterDmg)));
       applyDamageToEnemy(counterDmg, "physical");
       playSound("attack");
       addMessage(formatText(t('counterattackMsg'), { damage: counterDmg }), "combat");
@@ -633,13 +653,22 @@ export async function enemyTurn() {
     finalDmg = Math.max(1, Math.floor(finalDmg * (1 + spec.bonuses.physicalDefensePenalty)));
   }
   finalDmg = applyResistance(finalDmg, atkType, stats.resistances);
+  // SPEC-1306: pasivas de rama que reducen el daño recibido, y Rebobinar
+  finalDmg = Math.max(1, Math.floor(finalDmg * branchDamageTakenMult(branchP, {
+    isPhysical: PHYSICAL_TYPES.has(atkType), isDark: atkType === "dark" || atkType === "cursed", announced: !enemy.intentHidden,
+  })));
+  if (gameState.activeBuffs?.rewind > 0) {
+    delete gameState.activeBuffs.rewind;
+    finalDmg = Math.max(1, Math.floor(finalDmg * 0.25));
+    addMessage(t("brRewindMsg"), "combat");
+  }
   // SPEC-0602: debilidad — +25% daño recibido mientras dure
   if (gameState.playerDebuffs?.weakness) finalDmg = Math.max(1, Math.floor(finalDmg * WEAKNESS_DAMAGE_MULT));
 
   p.hp = Math.max(0, (p.hp || 0) - finalDmg);
   playSound("player_hurt");
   // SPEC-1105: Tanque — probabilidad de contraatacar cualquier golpe recibido
-  if (spec?.bonuses?.counterattackOnHit && enemy.hp > 0 && Math.random() < spec.bonuses.counterattackOnHit) {
+  if (spec?.bonuses?.counterattackOnHit && enemy.hp > 0 && Math.random() < (spec.bonuses.counterattackOnHit + branchP.counterOnHit)) { // SPEC-1306: Represalia
     const tankCounterDmg = Math.max(1, Math.floor((stats.attack || 1) * 0.5));
     applyDamageToEnemy(tankCounterDmg, "physical");
     addMessage(formatText(t('tankCounterMsg'), { damage: tankCounterDmg }), "combat");
@@ -696,7 +725,7 @@ export async function enemyTurn() {
   const statusChance = (action === "status" || stunBlow)
     ? debuffResistMult
     : (se?.chance || 0) * debuffResistMult * statusChanceMult(enemy.archetype, archScale);
-  if (se && Math.random() < statusChance) {
+  if (se && Math.random() < statusChance && !tryBlockStatus(branchP, enemy)) {
     if (!gameState.playerDebuffs) gameState.playerDebuffs = {};
     // SPEC-1101: el veneno acumula stacks (tope 5) en vez de solo refrescar/
     // ignorarse — cada stack nueva multiplica el daño por turno.
@@ -881,12 +910,21 @@ export function tickBuffs() {
   }
 }
 
+// SPEC-1306: Fe Inquebrantable — bloquea la primera aplicación de estado de cada combate
+function tryBlockStatus(bp, enemy) {
+  if (!bp.statusBlock || gameState.statusBlockUsed) return false;
+  gameState.statusBlockUsed = true;
+  addMessage(formatText(t("brStatusBlocked"), { enemy: enemy.type }), "combat");
+  return true;
+}
+
 // SPEC-1304: una vez por acción del jugador — enfriamientos, desgaste temporal
 // de defensa (Golpe Aplastante / Impacto Sísmico) y Maná Fluido.
 function tickTechniqueState() {
   const cds = gameState.techCooldowns;
   if (cds) for (const id of Object.keys(cds)) { if (cds[id] > 0) cds[id]--; }
   const enemy = gameState.currentEnemy;
+  if (enemy?.marked && --enemy.marked.turns <= 0) enemy.marked = null; // SPEC-1306: Marca Letal
   if (enemy?._techShred && --enemy._techShred.turns <= 0) {
     enemy.defense += enemy._techShred.amount;
     enemy._techShred = null;

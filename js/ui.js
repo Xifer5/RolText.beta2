@@ -24,6 +24,7 @@ import { eryndelMemoryKey } from "./eryndelArc.js";
 import { isTacticalDifficulty, DODGEABLE_ACTIONS } from "./dodge.js";
 import { ARCHETYPES, archetypeScale } from "./archetypes.js";
 import { getTechniquePanel } from "./techniqueActions.js";
+import { branchSectionHTML, wireBranchSection } from "./branchUI.js";
 const INTERRUPTIBLE_ACTIONS = new Set(["power_attack", "magic", "overload", "devour", "freeze_magic", "channel", "channeled_magic", "stunning_blow"]);
 
 // SPEC-0904 — consejo táctico por intent telegrafiado (acciones que merecen aviso)
@@ -1068,7 +1069,9 @@ function renderSpecSection() {
         <span class="spec-badge-emoji">${spec.emoji}</span>
         <div><strong>${spec.name}</strong><p>${spec.desc}</p></div>
       </div>
+      ${branchSectionHTML()}
     `;
+    wireBranchSection(section, () => { renderSpecSection(); updateUI(); }); // SPEC-1306
   } else if (canSpecialize(p)) {
     section.innerHTML = `
       <h3 class="mastery-section-title">${t('specSectionTitle')}</h3>

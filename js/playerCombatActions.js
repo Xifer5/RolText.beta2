@@ -25,6 +25,7 @@ import { isTacticalDifficulty, EXPOSED_DAMAGE_MULT } from "./dodge.js";
 import { applyThiefGoldSteal } from "./enemyTraits.js";
 import { applyDamageToEnemy, tickBuffs, enemyTurn } from "./combat.js";
 import { currentPassives } from "./weaponTechniques.js";
+import { currentBranchPassives, branchDamageMult, consumeMark } from "./branchNodes.js";
 
 // Tipo de daño de cada habilidad de clase (para resistencias y bonos de especialización)
 const SKILL_DAMAGE_TYPES = {
@@ -191,7 +192,9 @@ export async function playerAttack() {
   const specDmgBonusAll = spec?.bonuses?.dmgBonusAll || 0;
   const isEnraged = !!spec?.bonuses?.enrageThreshold && (gameState.player.hp / (stats.maxHp || 1)) < spec.bonuses.enrageThreshold;
   const enrageMult = isEnraged ? (spec.bonuses.enrageDmgMult || 1) : 1;
-  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus + specDmgBonusAll) * enrageMult;
+  const branchP = currentBranchPassives(); // SPEC-1306
+  const branchMult = branchDamageMult(branchP, { hpRatio: gameState.player.hp / (stats.maxHp || 1) });
+  const atkMult = (gameState.activeBuffs?.warcry > 0 ? 1.3 : 1.0) * (1 + masteryBonus + specDmgBonus + specDmgBonusAll) * enrageMult * branchMult;
   const rawDmg = Math.floor(stats.attack * atkMult);
   const passives = currentPassives(); // SPEC-1304
   const defense = Math.floor((enemy.defense || 0) * (1 - passives.defPen)); // Peso Muerto
@@ -208,7 +211,8 @@ export async function playerAttack() {
     + (gameState.player.agility || 0) * 0.005
     + (gameState.player.class === "rogue" ? 0.10 : 0)
     + (spec?.bonuses?.critBonus || 0)
-    + passives.critBonus; // SPEC-1304: Filo Afinado
+    + passives.critBonus // SPEC-1304: Filo Afinado
+    + branchP.critBonus; // SPEC-1306: Sangre Fría
   const isCrit  = Math.random() < critChance;
   const critMul = isCrit ? 1.75 : 1.0;
 
@@ -216,7 +220,8 @@ export async function playerAttack() {
   const executeMult = (spec?.bonuses?.executeBonus && enemy.maxHp > 0 && (enemy.hp / enemy.maxHp) < 0.3)
     ? (1 + spec.bonuses.executeBonus) : 1;
   const baseDmg = applyResistance(Math.max(1, Math.floor((rawDmg - defense) * variance * critMul * executeMult)), weaponType, enemyRes);
-  const { dmg, tag: exposedTag } = consumeExposed(baseDmg);
+  const { dmg: exposedDmg, tag: exposedTag } = consumeExposed(baseDmg);
+  const dmg = Math.max(1, Math.floor(exposedDmg * consumeMark(enemy, true))); // SPEC-1306: Marca Letal
   const total = dmg + extraHit;
 
   playSound("attack");
@@ -308,11 +313,15 @@ export async function playerMagic() {
   if (wasFocused) delete gameState.activeBuffs.focused;
   // SPEC-1105: crítico mágico — mismo cálculo base que playerAttack(), sin el
   // +10% de clase pícaro (ese bono es específico del físico de rogue).
-  const magicCritChance = 0.10 + (gameState.player.agility || 0) * 0.005 + (spec?.bonuses?.critBonus || 0);
+  const branchMagicP = currentBranchPassives(); // SPEC-1306
+  const magicCritChance = 0.10 + (gameState.player.agility || 0) * 0.005 + (spec?.bonuses?.critBonus || 0) + branchMagicP.critBonus;
   const isMagicCrit = Math.random() < magicCritChance;
   const magicCritMul = isMagicCrit ? 1.75 : 1.0;
   let dmg = Math.max(1, Math.floor(calculateMagicAttack(stats) * mult * magicBonus * focusMult * magicCritMul * (0.9 + Math.random()*0.2)));
   dmg = applyResistance(dmg, magicType, getEffectiveResistances(enemy));
+  dmg = Math.max(1, Math.floor(dmg * branchDamageMult(branchMagicP, { // SPEC-1306: Explotar Debilidad
+    hpRatio: gameState.player.hp / (stats.maxHp || 1), isMagic: true, weakness: ((getEffectiveResistances(enemy) || {})[magicType] ?? 0) < 0,
+  })));
   const magicExposed = consumeExposed(dmg);
   dmg = magicExposed.dmg;
 
@@ -390,6 +399,7 @@ export async function useSkill(skillId) {
       const specBonus = spec?.bonuses?.dmgType === skillType ? (spec.bonuses.dmgBonus || 0) : 0;
       dmg = Math.max(1, Math.floor(dmg * (1 + getMasteryBonus(skillType) + specBonus)));
       dmg = applyResistance(dmg, skillType, getEffectiveResistances(gameState.currentEnemy));
+      dmg = Math.max(1, Math.floor(dmg * consumeMark(gameState.currentEnemy, PHYSICAL_TYPES.has(skillType)))); // SPEC-1306
       maybeResistanceAdvice(gameState.currentEnemy, skillType);
       grantMasteryXP(skillType);
     }

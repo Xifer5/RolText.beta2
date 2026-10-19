@@ -19,6 +19,7 @@ import { showToast } from "./toast.js";
 import { t, formatText, localizeText, pickVariant } from "./i18n.js";
 import { getDifficultyConfig } from "./difficulty.js";
 import { getActiveSpec, canSpecialize } from "./specializations.js";
+import { currentBranchPassives, nodeState } from "./branchNodes.js";
 import { showSpecializationModal } from "./specModal.js";
 import { consumeEchoReward } from "./echoIntro.js";
 import { showTravelEvent } from "./travelEvents.js";
@@ -71,6 +72,18 @@ export function endCombat(victory, fled = false, enemyFled = false) {
       const healed = Math.floor(missing * healOnKill);
       if (healed > 0) {
         p.hp = Math.min(stats.maxHp, (p.hp || 0) + healed);
+        addMessage(formatText(t('healOnKillMsg'), { heal: healed }), "combat");
+      }
+    }
+
+    // SPEC-1306: Cosecha (Nigromante) — cura un % del HP máximo al matar
+    const killHeal = currentBranchPassives().killHealPct;
+    if (killHeal) {
+      const p = gameState.player;
+      const maxHp = calculateTotalStats(p, gameState.equipment).maxHp;
+      const healed = Math.min(maxHp - (p.hp || 0), Math.floor(maxHp * killHeal));
+      if (healed > 0) {
+        p.hp += healed;
         addMessage(formatText(t('healOnKillMsg'), { heal: healed }), "combat");
       }
     }
@@ -278,6 +291,11 @@ export function levelUp() {
     addMessage(t('specUnlockedMsg'), "milestone"); // SPEC-1212
     setTimeout(() => showSpecializationModal(), 1500);
   }
+
+  // SPEC-1306: nodos de rama — nivel 15 pide una elección, nivel 20 desbloquea el remate
+  const branch = nodeState(p);
+  if (branch && p.level === 15 && branch[15].pending) addMessage(t('brPickPendingMsg'), "milestone");
+  if (branch && p.level === 20) addMessage(t('brNewActiveMsg'), "milestone");
 
   checkAchievements();
   // Autoguardar en cada level up
