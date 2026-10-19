@@ -17,7 +17,8 @@ import { playSound } from "./sounds.js";
 import { t, formatText, pickVariant } from "./i18n.js";
 import { getMasteryBonus } from "./mastery.js";
 import { getActiveSpec } from "./specializations.js";
-import { applyResistance, getWeaponDamageType, getEffectiveResistances } from "./damageTypes.js";
+import { applyResistance, getWeaponDamageType, getEffectiveResistances, PHYSICAL_TYPES } from "./damageTypes.js";
+import { retreatMissChance, archetypeScale } from "./archetypes.js";
 import { delay, damageFloatType, resistanceNote, maybeResistanceAdvice, grantMasteryXP } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
 import { isTacticalDifficulty, EXPOSED_DAMAGE_MULT } from "./dodge.js";
@@ -161,8 +162,22 @@ export async function blindMissed() {
   return true;
 }
 
+// SPEC-1305: el Hostigador se está alejando — los golpes físicos pueden no alcanzarlo.
+// Mismo patrón que blindMissed(): consume el turno, no gasta MP ni enfriamiento.
+export async function retreatMissed(isPhysical) {
+  const chance = retreatMissChance(gameState.currentEnemy, archetypeScale(gameState.difficulty), isPhysical);
+  if (!chance || Math.random() >= chance) return false;
+  addMessage(formatText(t('archRetreatMiss'), { enemy: gameState.currentEnemy.type }), "combat");
+  showFloatingText(t('blindMissFloat'), window.innerWidth/2+50, window.innerHeight/2-50, "#9CA3AF");
+  tickBuffs();
+  updateUI();
+  await delay(500); await enemyTurn();
+  return true;
+}
+
 export async function playerAttack() {
   if (await blindMissed()) return;
+  if (await retreatMissed(true)) return; // SPEC-1305
   const stats = calculateTotalStats(gameState.player, gameState.equipment);
   const enemy = gameState.currentEnemy;
   const spec = getActiveSpec();
@@ -356,6 +371,9 @@ export async function useSkill(skillId) {
   let mpCost = skill.mpCost;
   if (spec?.bonuses?.mpDiscount) mpCost = Math.max(1, Math.round(mpCost * (1 - spec.bonuses.mpDiscount)));
   if ((p.mp || 0) < mpCost) { addMessage(t('noMana'), "system"); return; }
+
+  // SPEC-1305: antes de gastar MP — una habilidad física puede fallar contra un Hostigador que se aleja
+  if (await retreatMissed(PHYSICAL_TYPES.has(SKILL_DAMAGE_TYPES[skill.id]))) return;
 
   const stats = calculateTotalStats(p, gameState.equipment);
   const result = skill.effect(stats, gameState.currentEnemy, p);

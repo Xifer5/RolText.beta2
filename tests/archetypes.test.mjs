@@ -15,7 +15,7 @@ test("getArchetype: Fácil y jefes no tienen arquetipo", () => {
   assert.equal(A.getArchetype("orc", "impossible"), "wrecker");
   assert.equal(A.getArchetype("orc", "easy"), null);
   assert.equal(A.getArchetype("orc", "adventure", true), null);
-  assert.equal(A.getArchetype("slime", "adventure"), null);
+  assert.equal(A.getArchetype("tent", "adventure"), null); // enemigo común sin arquetipo
 });
 
 test("archetypeScale por dificultad", () => {
@@ -171,7 +171,7 @@ test("genérico: cada enemigo respeta lo que su arquetipo necesita para funciona
 });
 
 test("genérico: toda la i18n de los 12 arquetipos y mensajes nuevos existe en en/es", () => {
-  assert.equal(Object.keys(A.ARCHETYPES).length, 12);
+  assert.equal(Object.keys(A.ARCHETYPES).length, 15);
   for (const k of ["intentStunningBlow", "adviceStunningBlow", "archFrostApplied", "archFrostWearsOff", "archFrostDispelled",
     "archFrostChip", "archStormUndodgeable", "archDrainerHeal", "archPyromancerDoused", "archStunResisted"]) {
     assert.notEqual(t(k), k, k);

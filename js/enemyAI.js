@@ -11,7 +11,7 @@
  * solo presentación).
  */
 
-import { usesStatusLayer } from "./archetypes.js";
+import { usesStatusLayer, RETREAT_CHANCE } from "./archetypes.js";
 
 export const BOSS_HIDE_CHANCE = 0.35;
 export const POWER_ATTACK_MULT = 1.5;
@@ -32,6 +32,8 @@ export const ACTION_META = {
   channeled_magic: { icon: "✨", labelKey: "intentChanneledMagic" },
   // SPEC-1303: Aturdidor — golpe pesado telegrafiado que aturde 1 turno
   stunning_blow:   { icon: "💫", labelKey: "intentStunningBlow" },
+  // SPEC-1305: Hostigador — se aleja en vez de atacar (tus golpes físicos pueden fallar)
+  retreat:         { icon: "🏃", labelKey: "intentRetreat" },
   // SPEC-1101: acciones de boss forzadas por contador de turno (no RNG),
   // decididas en combat.js/rollForcedBossAction — no pasan por decideNextAction.
   devour:       { icon: "😱", labelKey: "intentDevour" },
@@ -62,6 +64,8 @@ export function decideNextAction(e, rng = Math.random) {
     return "attack";
   }
 
+  // SPEC-1305: Hostigador — a veces se aleja en vez de atacar (nunca dos veces seguidas)
+  if (e.archetype === "harasser" && e.lastAction !== "retreat" && rng() < RETREAT_CHANCE) return "retreat";
   // SPEC-1303: Aturdidor — golpe aturdidor telegrafiado (nunca dos seguidos)
   if (e.archetype === "stunner" && e.lastAction !== "stunning_blow" && rng() < 0.3) return "stunning_blow";
   // SPEC-1303: Envenenador/Cegador/Maldito preparan su estado aunque su behavior no sea "status"

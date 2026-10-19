@@ -23,6 +23,10 @@ export const ENEMY_ARCHETYPE = {
   frozen_spirit: "cryomancer", ice_giant: "cryomancer",
   warlock: "drainer", imp: "drainer", vampire: "drainer",
   genie: "stormcaller", jungle_spirit: "stormcaller",
+  // SPEC-1305 — Hostigador, Regenerador, Depredador (enemigos sin arquetipo previo)
+  centaurus: "harasser", pirate: "harasser", drider: "harasser", gremlin: "harasser",
+  slime: "regenerator", fungedBeast: "regenerator", chimera: "regenerator", kraken: "regenerator",
+  cave_bear: "predator", linchorn: "predator", pirate_captain: "predator", pegasus: "predator",
   // Familia C — ataque especial
   giant_spider: "poisoner", vine_serpent: "poisoner",
   beholder: "blinder", medusa: "blinder", sand_worm: "blinder",
@@ -43,6 +47,9 @@ export const ARCHETYPES = {
   blinder:    { icon: "🙈", family: "special", nameKey: "archBlinderName",  tipKey: "archBlinderTip",    adviceKey: "archBlinderAdvice" },
   stunner:    { icon: "💫", family: "special", nameKey: "archStunnerName",  tipKey: "archStunnerTip",    adviceKey: "archStunnerAdvice" },
   cursed:     { icon: "💔", family: "special", nameKey: "archCursedName",   tipKey: "archCursedTip",     adviceKey: "archCursedAdvice" },
+  harasser:    { icon: "🏃", family: "tactical", nameKey: "archHarasserName",    tipKey: "archHarasserTip",    adviceKey: "archHarasserAdvice" },
+  regenerator: { icon: "🌱", family: "tactical", nameKey: "archRegeneratorName", tipKey: "archRegeneratorTip", adviceKey: "archRegeneratorAdvice" },
+  predator:    { icon: "🐾", family: "tactical", nameKey: "archPredatorName",    tipKey: "archPredatorTip",    adviceKey: "archPredatorAdvice" },
 };
 
 // Índice = escala (0 = Fácil, sin efecto). Aventura < Difícil < Imposible.
@@ -168,4 +175,39 @@ export function statusExtraTurns(archetype, scale, type) {
 /** ¿El arquetipo puede preparar un ataque de estado aunque su behavior no sea "status"? */
 export function usesStatusLayer(archetype) {
   return STATUS_ARCHETYPES.has(archetype);
+}
+
+// ── SPEC-1305 — Hostigador / Regenerador / Depredador ───
+
+export const RETREAT_CHANCE = 0.30;                         // prob. de alejarse en vez de atacar
+export const RETREAT_MISS = [0, 0.30, 0.40, 0.50];          // fallo de golpes físicos mientras se aleja
+export const REGEN_PASSIVE_PCT = [0, 0.04, 0.06, 0.08];     // % de HP máx por turno
+export const REGEN_SUSPEND_TURNS = 2;
+export const PREDATOR_BONUS = [0, 0.25, 0.35, 0.50];        // daño extra contra jugador herido
+export const PREDATOR_HP_THRESHOLD = 0.5;
+
+/** Probabilidad de que un golpe físico del jugador falle porque el Hostigador se está alejando. */
+export function retreatMissChance(enemy, scale, isPhysical) {
+  if (!isPhysical || !enemy || enemy.archetype !== "harasser" || enemy.nextAction !== "retreat") return 0;
+  return RETREAT_MISS[scale] || 0;
+}
+
+/**
+ * Cura pasiva del Regenerador al inicio de su turno.
+ * Devuelve { heal, blocked, suspended }: `blocked` es el contador nuevo y
+ * `suspended` indica que el daño continuo acaba de frenar la cura.
+ */
+export function regeneratorTick({ archetype, scale, blocked = 0, hp, maxHp, suppressNow = false, hasTrait = false }) {
+  if (archetype !== "regenerator" || scale < 1 || hasTrait) return { heal: 0, blocked, suspended: false };
+  if (suppressNow) return { heal: 0, blocked: REGEN_SUSPEND_TURNS, suspended: blocked <= 0 };
+  if (blocked > 0) return { heal: 0, blocked: blocked - 1, suspended: false };
+  if (hp >= maxHp) return { heal: 0, blocked: 0, suspended: false };
+  const raw = Math.max(1, Math.floor(maxHp * (REGEN_PASSIVE_PCT[scale] || 0)));
+  return { heal: Math.min(raw, maxHp - hp), blocked: 0, suspended: false };
+}
+
+/** Multiplicador del Depredador contra un jugador por debajo del 50% de HP. */
+export function predatorMult(archetype, scale, hpRatio) {
+  if (archetype !== "predator" || scale < 1 || !(hpRatio < PREDATOR_HP_THRESHOLD)) return 1;
+  return 1 + (PREDATOR_BONUS[scale] || 0);
 }

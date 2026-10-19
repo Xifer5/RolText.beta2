@@ -41,7 +41,8 @@ export const INTENT_ADVICE_KEYS = {
   freeze_magic: "adviceFreezeMagic",
   channel:         "adviceChannel",
   channeled_magic: "adviceChanneledMagic",
-  stunning_blow:   "adviceStunningBlow"
+  stunning_blow:   "adviceStunningBlow",
+  retreat:         "adviceRetreat"
 };
 
 // SPEC-1210 — telegraph narrativo (revisión 2026-08-28, ítem #7): una línea
@@ -448,7 +449,7 @@ export function updateUI() {
       // SPEC-1303: etiqueta de arquetipo (Aventura/Difícil/Imposible); consejo solo en Aventura
       const arch = ARCHETYPES[gameState.currentEnemy.archetype];
       const archBadge = arch
-        ? `<span class="enemy-archetype-badge" data-tooltip="${t(arch.tipKey)}">${arch.icon} ${t(arch.nameKey)}</span>` : "";
+        ? `<span class="enemy-archetype-badge" data-tooltip="${t(arch.tipKey)}">${arch.icon} ${t(arch.nameKey)}${gameState.currentEnemy.regenBlocked > 0 ? ` ⏸${gameState.currentEnemy.regenBlocked}` : ""}</span>` : "";
       const archAdvice = (arch && archetypeScale(gameState.difficulty) === 1)
         ? `<span class="enemy-archetype-advice">💡 ${t(arch.adviceKey)}</span>` : "";
       ui["enemy-name"].innerHTML =

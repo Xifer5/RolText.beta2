@@ -15,7 +15,7 @@ import { applyResistance, getWeaponDamageType, getEffectiveResistances } from ".
 import { delay, damageFloatType, maybeResistanceAdvice, grantMasteryXP } from "./combatFeedback.js";
 import { endCombat } from "./combatRewards.js";
 import { applyDamageToEnemy, tickBuffs, enemyTurn } from "./combat.js";
-import { consumeExposed, blindMissed } from "./playerCombatActions.js";
+import { consumeExposed, blindMissed, retreatMissed } from "./playerCombatActions.js";
 import {
   TECHNIQUES, FAMILY_META, unlockedTechniques, techniqueReady, resolveTechnique,
   damageAfterDefense, currentPassives
@@ -73,6 +73,7 @@ export async function useTechnique(techId) {
 
   // Ceguera: la técnica ofensiva puede fallar como cualquier ataque (consume el turno)
   if (res.rawDamage && await blindMissed()) return;
+  if (res.rawDamage && await retreatMissed(res.kind === "physical")) return; // SPEC-1305
 
   playSound("skill");
   addMessage(formatText(t("techUsed"), { emoji: tech.emoji, name }), "combat");

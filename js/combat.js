@@ -48,7 +48,8 @@ import { currentPassives } from "./weaponTechniques.js";
 import {
   getArchetype, archetypeScale, wreckerDefendMult, skirmisherDodgeBonus, guardianReflect, channelerMult,
   pyromancerBurnDamage, dousesPyromancer, frostDodgePenalty, cryomancerAppliesFrost, fireDispelsFrost, FROST_TURNS,
-  drainerHeal, stormUndodgeable, stormDefendMult, archetypeStatus, statusChanceMult, statusExtraTurns, STUN_IMMUNITY_TURNS
+  drainerHeal, stormUndodgeable, stormDefendMult, archetypeStatus, statusChanceMult, statusExtraTurns, STUN_IMMUNITY_TURNS,
+  regeneratorTick, predatorMult, REGEN_SUSPEND_TURNS
 } from "./archetypes.js";
 
 // Re-exportado: tests/combatAdvice.test.mjs y cualquier otro consumidor
@@ -359,6 +360,9 @@ export async function enemyTurn() {
   if (processPlayerDebuffs()) return;
   if (gameState.stunImmune > 0) gameState.stunImmune--; // SPEC-1303
 
+  // SPEC-1305: el Regenerador se frena si hoy sufre veneno/quemadura/sangrado (se mide antes del tick)
+  const dotActive = !!(gameState.activeDebuffs?.poison || gameState.activeDebuffs?.burn || gameState.activeDebuffs?.bleed);
+
   // Apply poison damage to enemy
   if (gameState.activeDebuffs?.poison) {
     const poisonInfo = gameState.activeDebuffs.poison;
@@ -390,6 +394,19 @@ export async function enemyTurn() {
     bleedInfo.turns--;
     if (bleedInfo.turns <= 0) { delete gameState.activeDebuffs.bleed; addMessage(t('enemyBleedWearsOff'), "system"); }
     if (enemy.hp <= 0) { await delay(300); return endCombat(true); }
+  }
+
+  // SPEC-1305: Regenerador — cura pasiva con contrajuego (fuego/daño continuo la suspenden)
+  const regen = regeneratorTick({
+    archetype: enemy.archetype, scale: archetypeScale(gameState.difficulty), blocked: enemy.regenBlocked || 0,
+    hp: enemy.hp, maxHp: enemy.maxHp, suppressNow: dotActive, hasTrait: enemy.trait === "regenerator"
+  });
+  enemy.regenBlocked = regen.blocked;
+  if (regen.suspended) addMessage(formatText(t("archRegenSuspended"), { enemy: enemy.type }), "combat");
+  if (regen.heal > 0) {
+    enemy.hp = Math.min(enemy.maxHp, enemy.hp + regen.heal);
+    addMessage(formatText(t("archRegenHeal"), { enemy: enemy.type, heal: regen.heal }), "combat");
+    showFloatingText(`+${regen.heal}`, window.innerWidth / 2 + 50, window.innerHeight / 2 - 80, "#4ade80", "1.4em");
   }
 
   // SPEC-1105: Nigromante — la maldición del crítico mágico decae con el tiempo
@@ -483,6 +500,14 @@ export async function enemyTurn() {
     return;
   }
 
+  // SPEC-1305: Hostigador — se aleja este turno (el efecto sobre tus golpes se aplicó mientras estaba anunciado)
+  if (action === "retreat") {
+    addMessage(formatText(t("archRetreatMsg"), { enemy: enemy.type }), "combat");
+    rollEnemyIntent();
+    updateUI();
+    return;
+  }
+
   // SPEC-1101 — Cave Devourer: "devorar" cada 3er turno (contador propio, no
   // RNG), telegrafiado con antelación por rollEnemyIntent como cualquier otra
   // acción.
@@ -506,7 +531,10 @@ export async function enemyTurn() {
   const atkBase = useMagic ? (enemy.magicAttack || 5) : (enemy.attack || 5);
   // SPEC-1105: Nigromante — la maldición reduce el ataque del enemigo mientras dure
   const curseMult = enemy.cursedDebuff?.turns > 0 ? 0.85 : 1;
-  const atkVal = Math.floor(atkBase * powerMult * frozenMult * curseMult * (channeledCast ? channelerMult(archScale) : 1));
+  // SPEC-1305: Depredador — remata al herido
+  const predMult = predatorMult(enemy.archetype, archScale, (p.hp || 0) / (stats.maxHp || p.maxHp || 1));
+  if (predMult > 1) addMessage(formatText(t("archPredatorSmell"), { enemy: enemy.type }), "combat");
+  const atkVal = Math.floor(atkBase * powerMult * frozenMult * curseMult * predMult * (channeledCast ? channelerMult(archScale) : 1));
 
   // Player defense (warrior stance halves damage)
   // SPEC-1102: se guarda ANTES de decrementar — el contraataque universal de
@@ -800,7 +828,10 @@ export function applyDamageToEnemy(dmg, damageType) {
   const enemy = gameState.currentEnemy;
   if (!enemy) return;
   // SPEC-1103: rasgo "Regenerador" — recibir fuego bloquea su regen próxima
-  if (damageType === "fire") enemy.turnsSinceFireHit = 0;
+  if (damageType === "fire") {
+    enemy.turnsSinceFireHit = 0;
+    if (enemy.archetype === "regenerator") enemy.regenBlocked = REGEN_SUSPEND_TURNS; // SPEC-1305
+  }
   // SPEC-1303: hielo/agua apagan al Pirómano; el fuego disipa la escarcha del Criomante
   if (dousesPyromancer(enemy.archetype, damageType)) enemy.burnDoused = true;
   if (fireDispelsFrost(enemy.archetype, damageType) && gameState.playerDebuffs?.frost) {
