@@ -787,14 +787,17 @@ function updateSkillPanel() {
       ${x.emoji} ${x.name}${x.ready ? "" : ` <span class="skill-cost">⏳ ${x.cooldown}</span>`}
     </button>`).join("");
 
-  panel.innerHTML = skills.map(s => {
+  // SPEC-1304/1306: en móvil las técnicas van en su propia fila (si no, quedan a ~1900px del borde del scroll)
+  const skillsHtml = skills.map(s => {
     const canUse = (p.mp||0) >= s.mpCost;
     const elite  = s.levelReq >= 15 ? "skill-elite" : "";
     return `<button class="btn skill-btn ${elite} ${canUse?"":"outlined"}"
       data-skill="${s.id}" ${!canUse?"disabled":""} title="${s.description} (Nv.${s.levelReq})">
       ${s.emoji} ${s.name} <span class="skill-cost">${s.mpCost}MP</span>
     </button>`;
-  }).join("") + techHtml;
+  }).join("");
+  panel.innerHTML = (skillsHtml ? `<div class="skill-row">${skillsHtml}</div>` : "")
+    + (techHtml ? `<div class="skill-row tech-row">${techHtml}</div>` : "");
 
   panel.querySelectorAll("[data-tech]").forEach(btn => {
     btn.addEventListener("click", () => {
