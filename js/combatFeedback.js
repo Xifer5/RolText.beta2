@@ -22,7 +22,12 @@ import {
   getResistanceLabel, getWeakestResistance, getEffectiveResistances
 } from "./damageTypes.js";
 
-export function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+// Los tests ponen globalThis.__PQE_FAST_DELAY__ (tests/helpers/domStub.mjs) para no esperar las
+// pausas de ritmo del combate (400-700ms por acción). En el juego real nunca está definido.
+export function delay(ms) {
+  if (globalThis.__PQE_FAST_DELAY__) return Promise.resolve();
+  return new Promise(r => setTimeout(r, ms));
+}
 
 // SPEC-1103: resistencias efectivas del enemigo `enemyId` — usa el bono en
 // memoria del rasgo "Antiguo" cuando `enemyId` es el enemigo actual de combate

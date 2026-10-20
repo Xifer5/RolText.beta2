@@ -3,6 +3,9 @@
 // (state → stats → ui → …) necesita que los globals existan al evaluarse.
 const noop = () => {};
 
+// Sin pausas de ritmo del combate en tests (ver delay() en combatFeedback.js).
+globalThis.__PQE_FAST_DELAY__ = true;
+
 // Código como toast.js agenda setTimeout de varios segundos (duración real de
 // UI) que no importan en un test — pero por default mantienen vivo el proceso
 // de `node --test` hasta que disparan, sumando segundos muertos a la suite.
